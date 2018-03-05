@@ -112,7 +112,6 @@
     <ClInclude Include="..\RainLibrary3\RainWSA2RecvParam.h" />
     <ClInclude Include="BuildID.h" />
     <ClInclude Include="ListenThread.h" />
-    <ClInclude Include="ListenThreadNode.h" />
     <ClInclude Include="ListenThreadParam.h" />
     <ClInclude Include="ListenWndParam.h" />
     <ClInclude Include="Main.h" />
@@ -145,7 +144,6 @@
     <ClCompile Include="..\RainLibrary3\RainWSA2Utility.cpp" />
     <ClCompile Include="..\RainLibrary3\RainWSA2RecvParam.cpp" />
     <ClCompile Include="ListenThread.cpp" />
-    <ClCompile Include="ListenThreadNode.cpp" />
     <ClCompile Include="ListenThreadParam.cpp" />
     <ClCompile Include="ListenWndParam.cpp" />
     <ClCompile Include="Main.cpp" />
