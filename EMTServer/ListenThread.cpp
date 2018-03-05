@@ -70,19 +70,15 @@ namespace Mono3 {
 		}
 
 		//set up the recvParam to pass to recvThread
-		RecvThreadParam *rfparam = new RecvThreadParam();
-		rfparam->ctllnode = &ltParam;
-		rfparam->sock = &ltParam.cSocket;
-		rfparam->waitingPOST = false;
-		rfparam->serverRootDir = *ltParam.serverRootDir;
-		rfparam->serverAux = *ltParam.serverAux;
+		RecvThreadParam *rtParam = new RecvThreadParam();
+		rtParam->pLTParam = &ltParam;
 
 		ltParam.recvParam.socket = &ltParam.cSocket;
-		ltParam.recvParam.message = &(rfparam->message); //store message in RecvThreadParam
-		ltParam.recvParam.bufLen = 1024; //recv buffer length
-		ltParam.recvParam.funcParam = rfparam; //parameter to be passed to following functions
-		ltParam.recvParam.onProcessMessage = ProcClientMess; //called when any message comes in
-		ltParam.recvParam.onRecvInit = NULL; //called at the beginning of the recvThread, nothing for now
+		ltParam.recvParam.message = &(rtParam->message); //store message in RecvThreadParam
+		ltParam.recvParam.bufLen = Rain::strToT<std::size_t>(ltParam.config->at("recvBufferLength")); //recv buffer length
+		ltParam.recvParam.funcParam = rtParam; //parameter to be passed to following functions
+		ltParam.recvParam.onProcessMessage = onProcessMessage; //called when any message comes in
+		ltParam.recvParam.onRecvInit = onRecvThreadInit; //called at the beginning of the recvThread, nothing for now
 		ltParam.recvParam.onRecvEnd = onRecvThreadEnd; //called at the end of recvThread
 
 		//processing this socket will be handled by the recvThread
@@ -95,8 +91,7 @@ namespace Mono3 {
 		ListenThreadParam *newLTParam = new ListenThreadParam();
 		newLTParam->lSocket = ltParam.lSocket;
 		newLTParam->ltLLMutex = ltParam.ltLLMutex;
-		newLTParam->serverRootDir = ltParam.serverRootDir;
-		newLTParam->serverAux = ltParam.serverAux;
+		newLTParam->config = ltParam.config;
 
 		//attach the listenThread directly after the current one in the linked list
 		newLTParam->prevLTP = &ltParam;

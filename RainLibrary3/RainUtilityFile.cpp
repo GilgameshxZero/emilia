@@ -173,4 +173,23 @@ namespace Rain {
 
 		fileIn.close();
 	}
+
+	std::string getWorkingDirectory() {
+		DWORD bufferLen = GetCurrentDirectory(0, NULL);
+		TCHAR *buffer = new TCHAR[bufferLen];
+		GetCurrentDirectory(bufferLen, buffer);
+		std::string ret(buffer);
+		delete[] buffer;
+		return ret + "\\";
+	}
+
+	std::string &readFullFile(std::string filePath, std::string &fileData) {
+		std::ifstream t(filePath, std::ios::binary);
+		t.seekg(0, std::ios::end);
+		size_t size = t.tellg();
+		fileData = std::string(size, ' ');
+		t.seekg(0);
+		t.read(&fileData[0], size);
+		return fileData;
+	}
 }

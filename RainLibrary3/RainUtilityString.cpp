@@ -136,20 +136,25 @@ namespace Rain {
 			return !std::isspace(ch);
 		}));
 	}
-
 	void strRTrim(std::string &s) {
 		s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
 			return !std::isspace(ch);
 		}).base(), s.end());
 	}
-
 	void strTrim(std::string &s) {
 		strLTrim(s);
 		strRTrim(s);
 	}
 
-	void TrimBSR(std::string &s) {
-		if (!s.empty() && s.back() == '\r')
-			s.pop_back();
+	std::string &appendEnvVar(std::string &envBlock, std::string newVar) {
+		envBlock += newVar;
+		envBlock.push_back('\0');
+		return envBlock;
+	}
+
+	std::string &toLowercase(std::string &s) {
+		for (std::size_t a = 0; a < s.length(); a++)
+			s[a] = tolower(s[a]);
+		return s;
 	}
 }
