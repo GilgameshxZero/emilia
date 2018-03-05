@@ -5,11 +5,11 @@ Responsible for maintaining a socket open for listening on a specified port, as 
 #pragma once
 
 #include "../RainLibrary3/RainLibraries.h"
-#include "ProcMessage.h"
+#include "MessageProc.h"
 #include "ListenThreadNode.h"
 #include "ListenThreadParam.h"
 #include "ListenWndParam.h"
-#include "RecvFuncParam.h"
+#include "MessageProcParam.h"
 
 #include <iomanip>
 #include <fstream>

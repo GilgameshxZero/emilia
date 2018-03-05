@@ -3,7 +3,7 @@
 #include "ListenThreadNode.h"
 #include "ListenThreadParam.h"
 #include "ListenWndParam.h"
-#include "RecvFuncParam.h"
+#include "MessageProcParam.h"
 
 namespace Mono3 {
 	int ProcClientMess(void *param);

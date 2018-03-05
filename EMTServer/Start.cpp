@@ -35,15 +35,15 @@ namespace Mono3 {
 		ListenThreadParam ltParam;
 		ltParam.lSocket = &lSocket;
 		ltParam.ltLLMutex = new std::mutex;
+		ltParam.serverRootDir = &params["serverRootDir"];
+		ltParam.serverAux = &params["serverAuxiliary"];
 
 		ltParam.end = ltParam.beg = NULL;
-		ltParam.serverRootDir = params["serverRootDir"];
-		ltParam.serverAux = params["serverAuxiliary"];
 
 		CreateThread(NULL, 0, Mono3::listenThread, reinterpret_cast<LPVOID>(&ltParam), 0, NULL);
 
-		std::string command, tmp;
 		while (true) {
+			static std::string command, tmp;
 			std::cout << "Accepting commands...\n";
 			std::cin >> command;
 			std::getline(std::cin, tmp);

@@ -72,9 +72,6 @@
     <ClInclude Include="..\RainLibrary3\RainUtilityFile.h">
       <Filter>RainLibrary3</Filter>
     </ClInclude>
-    <ClInclude Include="ProcMessage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\RainLibrary3\RainWSA2RecvParam.h">
       <Filter>RainLibrary3</Filter>
     </ClInclude>
@@ -84,13 +81,16 @@
     <ClInclude Include="ListenWndParam.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RecvFuncParam.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ListenThreadNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ListenThread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageProc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageProcParam.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -154,9 +154,6 @@
     <ClCompile Include="..\RainLibrary3\RainUtilityFile.cpp">
       <Filter>RainLibrary3</Filter>
     </ClCompile>
-    <ClCompile Include="ProcMessage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\RainLibrary3\RainWSA2RecvParam.cpp">
       <Filter>RainLibrary3</Filter>
     </ClCompile>
@@ -166,13 +163,16 @@
     <ClCompile Include="ListenWndParam.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RecvFuncParam.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ListenThreadNode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ListenThread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MessageProc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MessageProcParam.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
