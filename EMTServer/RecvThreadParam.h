@@ -4,7 +4,7 @@
 
 #include <queue>
 
-struct RecvFuncParam {
+struct RecvThreadParam {
 	std::string serverRootDir;
 	std::string serverAux;
 
