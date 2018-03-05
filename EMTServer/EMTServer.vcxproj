@@ -116,8 +116,8 @@
     <ClInclude Include="ListenThreadParam.h" />
     <ClInclude Include="ListenWndParam.h" />
     <ClInclude Include="Main.h" />
-    <ClInclude Include="ProcMessage.h" />
-    <ClInclude Include="RecvFuncParam.h" />
+    <ClInclude Include="MessageProc.h" />
+    <ClInclude Include="MessageProcParam.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Start.h" />
   </ItemGroup>
@@ -149,8 +149,8 @@
     <ClCompile Include="ListenThreadParam.cpp" />
     <ClCompile Include="ListenWndParam.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="ProcMessage.cpp" />
-    <ClCompile Include="RecvFuncParam.cpp" />
+    <ClCompile Include="MessageProc.cpp" />
+    <ClCompile Include="MessageProcParam.cpp" />
     <ClCompile Include="Start.cpp" />
   </ItemGroup>
   <ItemGroup>

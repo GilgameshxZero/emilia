@@ -11,8 +11,8 @@ struct ListenThreadParam {
 	std::mutex *ltLLMutex;
 
 	//parameters to pass to message procs
-	std::string serverRootDir;
-	std::string serverAux;
+	std::string *serverRootDir;
+	std::string *serverAux;
 
 	CTLLNode *beg, *end; //a linked list with all the client thread information
 						 //beg points to a valid node, with prev = NULL, or NULL if the LL is empty
