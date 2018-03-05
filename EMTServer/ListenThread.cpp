@@ -9,8 +9,8 @@ namespace Mono3 {
 
 		//create message queue for listenThread for terminate messages
 		std::unordered_map<UINT, Rain::RainWindow::MSGFC> msgm;
-		msgm.insert(std::make_pair(WM_RAINAVAILABLE, onListenWndInit));
-		msgm.insert(std::make_pair(WM_RAINAVAILABLE + 1, onListenWndEnd));
+		msgm.insert(std::make_pair(WM_LISTENWNDINIT, onListenWndInit));
+		msgm.insert(std::make_pair(WM_LISTENWNDEND, onListenWndEnd));
 		ltParam.rainWnd.create(&msgm);
 
 		ClientProcParam cpparam;
@@ -113,7 +113,7 @@ namespace Mono3 {
 
 		//use postmessage here because we want the thread of the window to process the message, allowing destroywindow to be called
 		//WM_RAINAVAILABLE + 1 is the end message
-		PostMessage(rfparam.ctllnode->rainWnd.hwnd, WM_RAINAVAILABLE + 1, 0, 0);
+		PostMessage(rfparam.ctllnode->rainWnd.hwnd, WM_LISTENWNDEND, 0, 0);
 
 		//free WSA2RecvParam here, since recvThread won't need it anymore
 		delete &rfparam;
