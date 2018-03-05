@@ -76,7 +76,7 @@ namespace Mono3 {
 				while (curLTP != &LTPLLTail) {
 					//use postmessage here because we want the thread of the window to process the message, allowing destroywindow to be called
 					//WM_RAINAVAILABLE + 1 is the end message
-					PostMessage(curLTP->rainWnd.hwnd, WM_RAINAVAILABLE + 1, 0, 0);
+					PostMessage(curLTP->rainWnd.hwnd, WM_LISTENWNDEND, 0, 0);
 					curLTP = curLTP->nextLTP;
 				}
 				ltLLMutex->unlock();
