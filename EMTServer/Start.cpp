@@ -2,15 +2,16 @@
 
 namespace Mono3 {
 	int start() {
-		Rain::redirectCerrFile("NoSync\\errors.txt");
-		Rain::logMemoryLeaks("NoSync\\memoryLeaks.txt");
-
 		std::map<std::string, std::string> params;
 		Rain::readParameterFile("config.ini", params);
 
 		std::cout << "Configuration parameters: \n"
 			<< "\tServer listening port: " << params["serverListenPort"] << "\n"
-			<< "\tServer root directory: " << params["serverRootDir"] << "\n";
+			<< "\tServer root directory: " << params["serverRootDir"] << "\n"
+			<< "\tServer auxillary files: " << params["serverAuxiliary"] << "\n";
+
+		Rain::redirectCerrFile(params["serverAuxiliary"] + "errors.txt");
+		Rain::logMemoryLeaks(params["serverAuxiliary"] + "memoryLeaks.txt");
 
 		WSADATA wsaData;
 		struct addrinfo *sAddr;
@@ -37,6 +38,7 @@ namespace Mono3 {
 
 		ltParam.end = ltParam.beg = NULL;
 		ltParam.serverRootDir = params["serverRootDir"];
+		ltParam.serverAux = params["serverAuxiliary"];
 
 		CreateThread(NULL, 0, Mono3::listenThread, reinterpret_cast<LPVOID>(&ltParam), 0, NULL);
 
