@@ -71,9 +71,14 @@ namespace Mono3 {
 				std::cout << "Socket listen closed\n";
 
 				//shutdown threads by walking through the linked list and sending the end message
+				//while walking through linked list, keep track of any thread handles
+				std::vector<HANDLE> hThreads;
+
 				ltLLMutex->lock();
 				ListenThreadParam *curLTP = LTPLLHead.nextLTP;
 				while (curLTP != &LTPLLTail) {
+					hThreads.push_back(curLTP->hThread);
+
 					//use postmessage here because we want the thread of the window to process the message, allowing destroywindow to be called
 					//WM_RAINAVAILABLE + 1 is the end message
 					PostMessage(curLTP->rainWnd.hwnd, WM_LISTENWNDEND, 0, 0);
@@ -81,8 +86,14 @@ namespace Mono3 {
 				}
 				ltLLMutex->unlock();
 
-				//wait on all threads to terminate
-				Sleep(1000);//todo
+				std::cout << "Found " << hThreads.size() << " active ListenThreads\n";
+
+				//join all handles previously found in the linked list, waiting for all the threads to terminate
+				//no need to close thread handles, GetCurrentThread doesn't require that
+				for (HANDLE hThread : hThreads)
+					WaitForSingleObject(hThread, 0);
+
+				std::cout << "All threads finished and joined\n";
 
 				//no need to freeaddinfo here because RainWSA2 does that for us
 
@@ -100,8 +111,8 @@ namespace Mono3 {
 		//free memory
 		delete ltLLMutex;
 
-		std::cout << "The server has terminated. Exiting autmatically in 1 second...";
-		Sleep(1000);
+		std::cout << "The server has terminated. Exiting automatically in 3 seconds...";
+		Sleep(3000);
 
 		return 0;
 	}
