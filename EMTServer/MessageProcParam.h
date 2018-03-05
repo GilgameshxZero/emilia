@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ListenThreadNode.h"
+#include "ListenThreadParam.h"
 
 #include <queue>
 
@@ -8,7 +8,7 @@ struct RecvFuncParam {
 	std::string serverRootDir;
 	std::string serverAux;
 
-	CTLLNode *ctllnode;
+	ListenThreadParam *ctllnode;
 	std::queue<char> mqueue;
 	SOCKET *sock;
 	std::string message, fmess;

@@ -7,5 +7,4 @@ struct ClientProcParam {
 	Rain::WSA2RecvParam recvparam;
 	HANDLE hrecvthread;
 	ListenThreadParam *ctparam;
-	CTLLNode *ctllnode;
 };

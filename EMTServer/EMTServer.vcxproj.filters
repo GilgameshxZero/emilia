@@ -81,9 +81,6 @@
     <ClInclude Include="ListenWndParam.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ListenThreadNode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ListenThread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -161,9 +158,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ListenWndParam.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ListenThreadNode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ListenThread.cpp">
