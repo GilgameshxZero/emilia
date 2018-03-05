@@ -87,12 +87,18 @@
     <ClInclude Include="RecvThreadParam.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\RainLibrary3\RainAlgorithm.h">
+      <Filter>RainLibrary3</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="BuildIDInc.bat">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="config.ini" />
+    <None Include="cgiScripts.ini" />
+    <None Include="customHeaders.ini" />
+    <None Include="contentTypeSpec.ini" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">
@@ -163,6 +169,9 @@
     <ClCompile Include="RecvThreadParam.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\RainLibrary3\RainAlgorithm.cpp">
+      <Filter>RainLibrary3</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Icon.ico">
@@ -170,8 +179,8 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\EMTServerAuxiliary\errors.txt" />
-    <Text Include="..\EMTServerAuxiliary\log.txt" />
-    <Text Include="..\EMTServerAuxiliary\memoryLeaks.txt" />
+    <Text Include="EMTServerAuxiliary\errors.txt" />
+    <Text Include="EMTServerAuxiliary\log.txt" />
+    <Text Include="EMTServerAuxiliary\memoryLeaks.txt" />
   </ItemGroup>
 </Project>

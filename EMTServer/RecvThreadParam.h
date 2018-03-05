@@ -5,18 +5,22 @@
 #include <queue>
 
 struct RecvThreadParam {
-	std::string serverRootDir;
-	std::string serverAux;
+	//pointer to the listenThread associated with this recvThread
+	ListenThreadParam *pLTParam;
 
-	ListenThreadParam *ctllnode;
-	std::queue<char> mqueue;
-	SOCKET *sock;
-	std::string message, fmess;
+	//where recvThread will store messages after buffering for the handlers
+	std::string message;
 
-	//for processing POST
-	std::map<std::string, std::string> headermap;
-	std::string reqtype, requrl, httpver;
-	bool waitingPOST;
-	std::string POSTmessage;
-	std::size_t POSTlen;
+	//accumulated request from messages
+	std::string request;
+
+	//GET/POST/etc, request method name; "" if don't know yet
+	std::string requestMethod;
+
+	//index of the first character of the end of the block of headers (two newlines), or -1
+	std::size_t headerBlockLength;
+
+	//content length header content for POST requests; -1 if don't know yet
+	//also identifies the length of the body block
+	std::size_t contentLength;
 };

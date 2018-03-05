@@ -11,7 +11,7 @@ namespace Rain {
 
 		//receive data until the server closes the connection
 		do {
-			ret = recv(*recvparam->socket, buffer, recvparam->bufLen, 0);
+			ret = recv(*recvparam->socket, buffer, static_cast<int>(recvparam->bufLen), 0);
 			if (ret > 0) //received ret bytes
 			{
 				*recvparam->message = std::string(buffer, ret);

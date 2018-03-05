@@ -8,6 +8,9 @@
 //parameter passed to any listening thread
 //one for each ListenThread
 struct ListenThreadParam {
+	//program-wide configuration access
+	std::map<std::string, std::string> *config;
+
 	//persistent socket on which to listen for clients
 	SOCKET *lSocket;
 
@@ -22,10 +25,6 @@ struct ListenThreadParam {
 
 	//pointer to ListenThreadParams before and after this, in a linked list
 	ListenThreadParam *prevLTP, *nextLTP;
-
-	//parameters to pass to message procs
-	std::string *serverRootDir;
-	std::string *serverAux;
 
 	//socket that represents connection to one client
 	SOCKET cSocket;

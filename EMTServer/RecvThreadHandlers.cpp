@@ -1,251 +1,243 @@
 #include "RecvThreadHandlers.h"
 
 namespace Mono3 {
-	int ProcClientMess(void *param) {
-		RecvThreadParam &rfparam = *reinterpret_cast<RecvThreadParam *>(param);
-		int error = 0;
+	static const std::string headerDelim = "\r\n\r\n";
 
-		if (rfparam.waitingPOST) //mqueue is guaranteed empty
-		{
-			if (rfparam.message.length() + rfparam.POSTmessage.length() < rfparam.POSTlen) {
-				rfparam.POSTmessage.append(rfparam.message);
-				return 0;
-			} else if (rfparam.message.length() + rfparam.POSTmessage.length() == rfparam.POSTlen) {
-				rfparam.POSTmessage.append(rfparam.message);
-				error = ProcFullMess(&rfparam);
-				return error;
-			} else //message is longer than remaining POST length
-			{
-				rfparam.POSTmessage.append(rfparam.message.substr(0, rfparam.POSTlen - rfparam.POSTmessage.length()));
-				rfparam.message.substr(rfparam.POSTlen - rfparam.POSTmessage.length(), rfparam.message.length());
-				error = ProcFullMess(&rfparam);
-				if (error) return error;
-			}
-		}
+	void onRecvThreadInit(void *funcParam) {
+		RecvThreadParam &rtParam = *reinterpret_cast<RecvThreadParam *>(funcParam);
 
-		//pop all characters from message into the queue, and only process it when we receive a full message (denoted by /r/n/r/n)
-		for (std::size_t a = 0; a < rfparam.message.size(); a++)
-			rfparam.mqueue.push(rfparam.message[a]);
-
-		//use perfect hashing rabin-karp to identify /r/n/r/n
-		unsigned int curhash = 0;
-		static const unsigned int targethash = (static_cast<unsigned int>('\r') << 24) |
-			(static_cast<unsigned int>('\n') << 16) |
-			(static_cast<unsigned int>('\r') << 8) |
-			static_cast<unsigned int>('\n');
-		while (!rfparam.mqueue.empty()) {
-			rfparam.fmess.push_back(rfparam.mqueue.front());
-			curhash = (curhash << 8) | (static_cast<unsigned char>(rfparam.mqueue.front()));
-			rfparam.mqueue.pop();
-
-			if (curhash == targethash) {
-				error = ProcFullMess(&rfparam);
-				rfparam.fmess.clear();
-				if (error) break;
-
-				if (rfparam.waitingPOST) //clear queue into POST message
-				{
-					while (!rfparam.mqueue.empty()) {
-						rfparam.POSTmessage.push_back(rfparam.mqueue.front());
-						rfparam.mqueue.pop();
-					}
-
-					if (rfparam.POSTlen == rfparam.POSTmessage.length()) //all of post message is captured
-					{
-						error = ProcFullMess(&rfparam);
-						if (error) break;
-					}
-				}
-			}
-		}
-
-		return error;
+		//delay all possible initialization of rtParam to here
+		rtParam.requestMethod = "";
+		rtParam.contentLength = -1;
+		rtParam.headerBlockLength = -1;
 	}
-
 	void onRecvThreadEnd(void *funcParam) {
-		//client wants to terminate socket
-		RecvThreadParam &rfparam = *reinterpret_cast<RecvThreadParam *>(funcParam);
+		RecvThreadParam &rtParam = *reinterpret_cast<RecvThreadParam *>(funcParam);
 
 		//use postmessage here because we want the thread of the window to process the message, allowing destroywindow to be called
 		//WM_RAINAVAILABLE + 1 is the end message
-		PostMessage(rfparam.ctllnode->rainWnd.hwnd, WM_LISTENWNDEND, 0, 0);
+		PostMessage(rtParam.pLTParam->rainWnd.hwnd, WM_LISTENWNDEND, 0, 0);
 
 		//free WSA2RecvParam here, since recvThread won't need it anymore
-		delete &rfparam;
+		delete &rtParam;
+	}
+	int onProcessMessage(void *funcParam) {
+		RecvThreadParam &rtParam = *reinterpret_cast<RecvThreadParam *>(funcParam);
+
+		//accumulate messages until a complete request is found
+		//for now, only accept GET requests and non-chunked POST requests (those with a content-length header)
+		//of course, for POST requests, we will need to accumulate not just the header but also the body of the request
+		//onProcessMessage is also responsible for parsing the header before passing it on to processRequest
+		rtParam.request += rtParam.message;
+
+		//if we don't know the requestMethod yet, attempt to calculate it now
+		if (rtParam.requestMethod == "") {
+			std::size_t firstSpace = rtParam.request.find(' ');
+
+			if (firstSpace != std::string::npos) //if there's a space, then everything before that is the requestMethod
+				rtParam.requestMethod = rtParam.request.substr(0, firstSpace);
+		}
+
+		//determine whether the request is complete based on the requestMethod and the currently received request
+		if (rtParam.requestMethod == "") { //still don't know the request method yet, so we should wait for more messages to come in 
+			return 0;
+		} else if (rtParam.requestMethod == "GET") { //GET requests complete when the last four characters are "\r\n\r\n"
+			if (rtParam.request.substr(rtParam.request.length() - 4, 4) == headerDelim) { //get ready to process the request
+				rtParam.contentLength = 0;
+				rtParam.headerBlockLength = rtParam.request.length() - headerDelim.length();
+			}
+			else //if the last line isn't blank, keep on waiting for more messages
+				return 0;
+		} else if (rtParam.requestMethod == "POST") { //identify the header block, find the 'content-length' header, and only process the request when the body is of the correct length
+			rtParam.headerBlockLength = Rain::rabinKarpMatch(rtParam.request, headerDelim);
+			if (rtParam.headerBlockLength == -1) //still waiting on headers
+				return 0;
+
+			//if don't know contentLength yet from previous times we get here, try again to get it
+			if (rtParam.contentLength == -1) {
+				//a lot of these parameters are not used, but that's fine, since it's a one time cost
+				std::map<std::string, std::string> headers;
+				std::string headerBlock = rtParam.request.substr(0, rtParam.headerBlockLength);
+				std::stringstream ss;
+				std::string requestURI, httpVersion;
+
+				ss << headerBlock;
+				ss >> rtParam.requestMethod >> requestURI >> httpVersion;
+				parseHeaders(ss, headers);
+				rtParam.contentLength = Rain::strToT<unsigned long long>(headers["content-length"]);
+			}
+
+			//accumulate request until body is contentLength long
+			unsigned long long requestLength = rtParam.headerBlockLength + 1 + headerDelim.length() + rtParam.contentLength;
+			if (rtParam.request.length() < requestLength)
+				return 0;
+			else if (rtParam.request.length() > requestLength)//for some reason, the request is longer than anticipated, so terminate the socket
+				return -1;
+		}
+
+		//at this point, we have a complete request and we know the size of the header block
+		//so, parse the header and log the request, then send it over to processRequest
+		std::map<std::string, std::string> headers;
+		std::string headerBlock = rtParam.request.substr(0, rtParam.headerBlockLength),
+			bodyBlock = rtParam.request.substr(rtParam.headerBlockLength + headerDelim.length(), rtParam.contentLength); //the body is everything after the header deliminater
+		std::stringstream ss;
+		std::string requestURI, httpVersion;
+		
+		ss << headerBlock;
+		ss >> rtParam.requestMethod >> requestURI >> httpVersion;
+		parseHeaders(ss, headers);
+
+		//log data
+		std::string clientIP = Rain::getClientNumIP(rtParam.pLTParam->cSocket);
+		Rain::rainCoutF(clientIP, ": ", rtParam.requestMethod, " ", requestURI, "\n");
+		std::string fileLog = clientIP + ":\n" + rtParam.request + "\n--------------------------------------------------------------------------------\n";
+		Rain::fastOutputFile(rtParam.pLTParam->config->at("serverAuxiliary") + "log.txt", fileLog, true);
+
+		//send the parsed headers and bodyBlock and other parameters over to processRequest
+		return processRequest(rtParam.pLTParam->cSocket, 
+							  *rtParam.pLTParam->config,
+							  rtParam.requestMethod, 
+							  requestURI, 
+							  httpVersion, 
+							  headers, 
+							  bodyBlock);
 	}
 
-	int ProcFullMess(RecvThreadParam *rfparam) {
-		int error;
-		const int BUFLEN = 1024;
-		std::string tmp, tmp2, requrl, httpver, reqtype;
-		std::map<std::string, std::string> headermap;
-		std::string reqfile, param;
+	int processRequest(SOCKET &cSocket, 
+					   std::map<std::string, std::string> &config,
+					   std::string &requestMethod, 
+					   std::string &requestURI, 
+					   std::string &httpVersion, 
+					   std::map<std::string, std::string> &headers, 
+					   std::string &bodyBlock) {
+		//a complete, partially parsed, request has come in; see onProcessMessage for the methods that we process and those that we don't
+		//we can return 0 to keep socket open, and nonzero to close the socket
 
-		if (rfparam->waitingPOST) //we are waiting POST message, and the whole message has arrived now
-		{
-			//init parameters
-			headermap = rfparam->headermap;
-			reqtype = rfparam->reqtype;
-			requrl = rfparam->requrl;
-			httpver = rfparam->httpver;
+		//only accept HTTP version 1.1
+		if (httpVersion != "HTTP/1.1")
+			return -1;
 
-			rfparam->waitingPOST = false;
-		} else {
-			//get request info
-			std::stringstream ss;
-			ss << rfparam->fmess;
-			ss >> reqtype >> requrl >> httpver;
-			std::getline(ss, tmp);
+		//decompose the requestURI
+		std::size_t questionMarkPos = requestURI.find("?"),
+			hashtagPos = requestURI.find("#");
+		std::string requestFilePath = requestURI.substr(0, questionMarkPos),
+			requestQuery = "", requestFragment = "";
+		if (questionMarkPos != std::string::npos)
+			requestQuery = requestURI.substr(questionMarkPos + 1, hashtagPos);
+		if (hashtagPos != std::string::npos)
+			requestFragment = requestURI.substr(hashtagPos + 1, std::string::npos);
 
-			while (ss >> tmp) {
-				if (tmp.back() == ':')
-					tmp.pop_back();
-				for (std::size_t a = 0; a < tmp.size(); a++)
-					tmp[a] = tolower(tmp[a]);
-				while (ss.peek() == ' ')
-					ss.get();
-				std::getline(ss, tmp2);
-				if (tmp2.back() == '\r')
-					tmp2.pop_back();
-				headermap.insert(make_pair(tmp, tmp2));
+		//parse the URIs
+		if (requestFilePath[0] == '/') //relative filepaths should not begin with a slash
+			requestFilePath = requestFilePath.substr(1, std::string::npos);
+		requestFilePath = Rain::decodeURL(requestFilePath);
+		requestQuery = Rain::decodeURL(requestQuery);
+		requestFragment = Rain::decodeURL(requestFragment);
+		for (int a = 0; a < requestFilePath.size(); a++)
+			if (requestFilePath[a] == '/')
+				requestFilePath[a] = '\\';
+
+		//decompose requestFilePath and check if we need to substitute a default file
+		std::string requestFile = requestFilePath.substr(requestFilePath.rfind("\\") + 1, std::string::npos),
+			requestFileDir = requestFilePath.substr(0, requestFilePath.length() - requestFile.length());
+		if (requestFile.length() == 0)
+			requestFile = config["dirDefaultFile"];
+		std::string requestFilePathRel = requestFileDir + requestFile; //short server path
+		requestFileDir = Rain::getWorkingDirectory() + config["serverRootDir"] + requestFileDir;
+		requestFilePath = requestFileDir + requestFile; //recompose the combined filepath; it is now absolute path
+
+		//make sure cgi scripts are parsed
+		static bool cgiScriptsParsed = false;
+		static std::set<std::string> cgiScripts;
+		if (!cgiScriptsParsed) { //if this is the first time we're here, we also need to read the cgiScripts config file and get a list of all the cgiScripts
+			std::ifstream cgiScriptsConfigIn(config["cgiScripts"], std::ios::binary);
+			while (cgiScriptsConfigIn.good()) {
+				static std::string line;
+				std::getline(cgiScriptsConfigIn, line);
+				Rain::strTrim(line);
+				if (line.length() > 0)
+					cgiScripts.insert(line);
 			}
-
-			//if we have a POST request, don't process it just yet - wait until all bytes are here, then execute the command
-			if (reqtype == "POST") {
-				//save the request
-				rfparam->headermap = headermap;
-				rfparam->reqtype = reqtype;
-				rfparam->requrl = requrl;
-				rfparam->httpver = httpver;
-
-				//mark the messageproc function into a special state
-				rfparam->waitingPOST = true;
-				rfparam->POSTmessage.clear();
-				rfparam->POSTlen = Rain::strToT<long long>(headermap.find("content-length")->second);
-
-				//return, but signal that we are waiting on more messages from client
-				return 0;
-			}
+			cgiScriptsConfigIn.close();
+			cgiScriptsParsed = true;
 		}
 
-		//logging
-		struct sockaddr client_addr;
-		int client_addr_len = sizeof(client_addr);
-		getpeername(*rfparam->sock, &client_addr, &client_addr_len);
-		struct sockaddr_in* pV4Addr = (struct sockaddr_in*)&client_addr;
-		struct in_addr ipAddr = pV4Addr->sin_addr;
-		char str[INET_ADDRSTRLEN];
-		inet_ntop(AF_INET, &ipAddr, str, INET_ADDRSTRLEN);
-		std::string log = static_cast<std::string>(str) + ": " + reqtype + " " + requrl + "\n";
-		Rain::rainCoutF(log);
-		Rain::fastOutputFile(rfparam->serverAux + "log.txt", log, true);
-
-		//identify the file pointed to by the URL as well as any parameters
-		if (requrl == "/")
-			reqfile = "index.html";
-		else {
-			//cut off file at a '?' if it exists - anything after that is the parameter
-			int quesind = 0;
-			requrl = requrl.substr(1, requrl.size() - 1);
-			for (; quesind < requrl.size(); quesind++)
-				if (requrl[quesind] == '?')
-					break;
-			reqfile = Rain::decodeURL(requrl.substr(0, quesind));
-			if (quesind < requrl.size())
-				param = Rain::decodeURL(requrl.substr(quesind + 1, requrl.size() - quesind - 1));
-
-			//convert / to \\ in reqfile
-			for (int a = 0; a < reqfile.size(); a++)
-				if (reqfile[a] == '/')
-					reqfile[a] = '\\';
+		//make sure custom response headers are parsed
+		static bool customHeadersParsed = false;
+		static std::map<std::string, std::string> customHeaders;
+		if (!customHeadersParsed) {
+			Rain::readParameterFile(config["customHeaders"], customHeaders);
+			customHeadersParsed = true;
 		}
 
-		//depending on the extension of the file, serve it to the browser in different ways
-		const std::string rootdir = rfparam->serverRootDir;//"C:\\Main\\Active\\Documents\\Programming\\Rain\\Developing\\Emilia-tan\\Emilia-tan\\Root\\";
-		std::string fullpath = rootdir + reqfile, fileext;
-		reqfile = Rain::getExePath(fullpath);
-
-		for (std::size_t a = 0; a < reqfile.size(); a++) {
-			if (reqfile[reqfile.size() - 1 - a] == '.') {
-				fileext = reqfile.substr(reqfile.size() - a, a);
-				break;
-			}
+		//make sure 404 response is parsed
+		static bool notFound404Parsed = false;
+		static std::string notFound404HTML;
+		if (!notFound404Parsed) {
+			Rain::readFullFile(config["404HTML"], notFound404HTML);
+			notFound404Parsed = true;
 		}
 
-		for (std::size_t a = 0; a < fileext.length(); a++)
-			fileext[a] = tolower(fileext[a]);
+		//response headers that we actually send back should be built on top of customHeaders, so copy customHeaders
+		std::map<std::string, std::string> responseHeaders(customHeaders);
+		std::string responseStatus, responseBody;
 
-		//try to get the right contenttype
-		std::string contenttype;
-		contenttype = "application/octet-stream";
+		//assert that the requestFile exists; if not, send back prespecified 404 file
+		if (!Rain::fileExists(requestFilePath)) {
+			responseStatus = "HTTP/1.1 404 Not Found";
+			responseBody = notFound404HTML;
+			responseHeaders["content-length"] = Rain::tToStr(responseBody.length());
+		} else if (cgiScripts.find(requestFilePathRel) != cgiScripts.end()) { //branch if the file is a cgi script
+			//run the file at FilePath as a cgi script, and respond with its content
+			//set the current environment block as well as additional environment parameters for the script
+			std::string envBlock;
+			Rain::appendEnvVar(envBlock, "QUERY_STRING=" + requestQuery);
+			std::map<std::string, std::string>::iterator iterator = headers.find("referer");
+			if (iterator != headers.end())
+				Rain::appendEnvVar(envBlock, "HTTP_REFERER=" + iterator->second);
+			iterator = headers.find("content-length");
+			if (iterator != headers.end())
+				Rain::appendEnvVar(envBlock, "CONTENT_LENGTH=" + iterator->second);
+			iterator = headers.find("host");
+			if (iterator != headers.end())
+				Rain::appendEnvVar(envBlock, "HTTP_HOST=" + iterator->second);
 
-		//if exe, run it as a cgi script
-		if (fileext == "exe") {
-			//test that the script exists
-			std::ifstream in(fullpath);
-			if (in.fail()) {
-				in.close();
-				std::string headerinfo;
-				headerinfo = "HTTP/1.1 404 Not Found\n\n";
-				error = Rain::sendText(*rfparam->sock, headerinfo.c_str(), headerinfo.length());
-				return 1;
-			}
-
-			//set some environment variables for the script
-			//append them to current environment block
-			std::string tempfile = "tempfile";
-			std::string envir;
-
-			envir += "QUERY_STRING=" + param; //might have equals signs with GET requests, so need to encode
-			envir.push_back('\0');
-
-			auto it = headermap.find("referer");
-			if (it != headermap.end())
-				envir += "HTTP_REFERER=" + it->second,
-				envir.push_back('\0');
-
-			it = headermap.find("content-length");
-			if (it != headermap.end())
-				envir += "CONTENT_LENGTH=" + it->second,
-				envir.push_back('\0');
-
-			it = headermap.find("host");
-			if (it != headermap.end())
-				envir += "HTTP_HOST=" + it->second,
-				envir.push_back('\0');
-
-			LPCH thisenv = GetEnvironmentStrings();
-			int prev = 0;
-			for (int i = 0; ; i++) {
-				if (thisenv[i] == '\0') {
-					envir += std::string(thisenv + prev + 1, thisenv + i);
-					envir.push_back('\0');
-					prev = i;
-					if (thisenv[i + 1] == '\0') {
+			//append current environment block
+			LPCH curEnvBlock = GetEnvironmentStrings();
+			int prevVarBeg = 0;
+			for (int a = 0; ; a++) {
+				if (curEnvBlock[a] == '\0') {
+					Rain::appendEnvVar(envBlock, std::string(curEnvBlock + prevVarBeg + 1, curEnvBlock + a));
+					prevVarBeg = a;
+					if (curEnvBlock[a + 1] == '\0')
 						break;
-					}
 				}
 			}
 
-			envir.push_back('\0');
+			//end the environment variables
+			envBlock.push_back('\0');
 
-			//pipe output of script to a local string
+			//pipe output of script to a local buffer, and create an input pipe as well
+			//this is all pretty technical windows stuff
 			SECURITY_ATTRIBUTES sa;
 			sa.nLength = sizeof(SECURITY_ATTRIBUTES);
 			sa.bInheritHandle = TRUE;
 			sa.lpSecurityDescriptor = NULL;
 
-			HANDLE g_hChildStd_OUT_Rd = NULL, g_hChildStd_OUT_Wr = NULL,
-				g_hChildStd_IN_Rd = NULL, g_hChildStd_IN_Wr = NULL;
-			error = CreatePipe(&g_hChildStd_OUT_Rd, &g_hChildStd_OUT_Wr, &sa, 0);
-			if (!error) return 1;
-			error = SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0);
-			if (!error) return 1;
-			error = CreatePipe(&g_hChildStd_IN_Rd, &g_hChildStd_IN_Wr, &sa, 0);
-			if (!error) return 1;
-			error = SetHandleInformation(g_hChildStd_IN_Wr, HANDLE_FLAG_INHERIT, 0);
-			if (!error) return 1;
+			HANDLE g_hChildStd_OUT_Rd = NULL,
+				g_hChildStd_OUT_Wr = NULL,
+				g_hChildStd_IN_Rd = NULL,
+				g_hChildStd_IN_Wr = NULL;
 
+			if (!CreatePipe(&g_hChildStd_OUT_Rd, &g_hChildStd_OUT_Wr, &sa, 0) ||
+				!SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0) ||
+				!CreatePipe(&g_hChildStd_IN_Rd, &g_hChildStd_IN_Wr, &sa, 0) ||
+				!SetHandleInformation(g_hChildStd_IN_Wr, HANDLE_FLAG_INHERIT, 0)) {
+				Rain::reportError(GetLastError(), "error while setting up pipe for cgi script " + requestFilePath);
+				return -2; //something went wrong, terminate socket, try to fail peacefully
+			}
+
+			//execute the script with the pipes and environment block
 			STARTUPINFO sinfo;
 			PROCESS_INFORMATION pinfo;
 			ZeroMemory(&sinfo, sizeof(sinfo));
@@ -254,179 +246,128 @@ namespace Mono3 {
 			sinfo.dwFlags |= STARTF_USESTDHANDLES;
 			sinfo.hStdOutput = g_hChildStd_OUT_Wr;
 			sinfo.hStdInput = g_hChildStd_IN_Rd;
-			error = CreateProcess(
-				fullpath.c_str(),
+			if (!CreateProcess(
+				requestFilePath.c_str(),
 				NULL,
 				NULL,
 				NULL,
 				TRUE,
 				DETACHED_PROCESS,
-				reinterpret_cast<LPVOID>(const_cast<char *>(envir.c_str())),
-				fullpath.substr(0, fullpath.length() - reqfile.length()).c_str(),
+				reinterpret_cast<LPVOID>(const_cast<char *>(envBlock.c_str())),
+				requestFileDir.c_str(),
 				&sinfo,
-				&pinfo);
-			if (!error) return 1;
+				&pinfo)) { //try to fail peacefully
+				Rain::reportError(GetLastError(), "error while starting cgi script " + requestFilePath);
+				return -3;
+			}
 
-			//if we are processing a POST request, pipe the request into the in pipe and redirect it to the script
-			CHAR chBuf[BUFLEN];
-			BOOL bSuccess = FALSE;
-			DWORD dwRead, dwWritten;
-			if (reqtype == "POST") {
-				for (std::size_t a = 0; a < rfparam->POSTlen;) {
-					if (a + BUFLEN >= rfparam->POSTlen)
-						bSuccess = WriteFile(g_hChildStd_IN_Wr,
-											 rfparam->POSTmessage.c_str() + a, static_cast<DWORD>(rfparam->POSTlen - a), &dwWritten, NULL);
-					else
-						bSuccess = WriteFile(g_hChildStd_IN_Wr,
-											 rfparam->POSTmessage.c_str() + a, BUFLEN, &dwWritten, NULL);
+			//pipe the requestBody to the in pipe of the script
 
-					if (!bSuccess) return 1;
-					a += dwWritten;
+			//if we are processing a POST request, pipe the request body into the in pipe and redirect it to the script
+			static std::size_t cgiInPipeBufLen = Rain::strToT<std::size_t>(config["cgiInPipeBufLen"]);
+			for (std::size_t a = 0; a < bodyBlock.length();) {
+				static DWORD dwWritten;
+				static BOOL bSuccess;
+				if (a + cgiInPipeBufLen >= bodyBlock.length()) //if the current buffer will pipe everything in, make sure not to exceed the end
+					bSuccess = WriteFile(g_hChildStd_IN_Wr, bodyBlock.c_str() + a, static_cast<DWORD>(bodyBlock.length() - a), &dwWritten, NULL);
+				else //there's still a lot to pipe in, so fill the buffer and pipe it in
+					bSuccess = WriteFile(g_hChildStd_IN_Wr, bodyBlock.c_str() + a, static_cast<DWORD>(cgiInPipeBufLen), &dwWritten, NULL);
+
+				if (!bSuccess) { //something went wrong while piping input, try to fail peacefully
+					Rain::reportError(GetLastError(), "error while piping request body to cgi script; request body:\n" + bodyBlock);
+					return -4;
 				}
+				a += dwWritten;
 			}
 			CloseHandle(g_hChildStd_IN_Wr);
 
-			WaitForInputIdle(pinfo.hProcess, 1000 * 15); //wait a max of 15 secs
+			//wait for cgi script to finish, up to a timeout
+			WaitForInputIdle(pinfo.hProcess, Rain::strToT<DWORD>(config["cgiMaxIdleTime"]));
 
 			CloseHandle(pinfo.hProcess);
 			CloseHandle(pinfo.hThread);
 			CloseHandle(g_hChildStd_OUT_Wr);
 			CloseHandle(g_hChildStd_IN_Rd);
 
-			//send some preliminary header info
-			std::string header = std::string("HTTP/1.1 200 OK\r\n");
-			error = Rain::sendText(*rfparam->sock, header.c_str(), header.length());
-			if (error) return 1;
-
-			//pass the output of the script in the pipe to the client socket, buffered
+			//compose response
+			//get the output from the script
+			responseStatus = "HTTP/1.1 200 OK";
+			static std::size_t cgiOutPipeBufLen = Rain::strToT<std::size_t>(config["cgiOutPipeBufLen"]);
+			CHAR *chBuf = new CHAR[cgiOutPipeBufLen];
 			for (;;) {
-				bSuccess = ReadFile(g_hChildStd_OUT_Rd, chBuf, BUFLEN, &dwRead, NULL);
-				if (!bSuccess || dwRead == 0)
+				static DWORD dwRead;
+				if (!ReadFile(g_hChildStd_OUT_Rd, chBuf, static_cast<DWORD>(cgiOutPipeBufLen), &dwRead, NULL) || dwRead == 0) //finished reading from the pipe
 					break;
-
-				error = Rain::sendText(*rfparam->sock, chBuf, dwRead);
-				if (error)
-					break;
+				responseBody += std::string(chBuf, dwRead);
 			}
-
+			delete[] chBuf;
 			CloseHandle(g_hChildStd_OUT_Rd);
-		} else {
-			if (fileext == "pdf")
-				contenttype = "application/pdf";
-			if (fileext == "aac")
-				contenttype = "audio/x-aac";
-			if (fileext == "avi")
-				contenttype = "video/x-msvideo";
-			if (fileext == "bmp")
-				contenttype = "image/bmp";
-			if (fileext == "torrent")
-				contenttype = "application/x-bittorrent";
-			if (fileext == "c")
-				contenttype = "text/x-c";
-			if (fileext == "csv")
-				contenttype = "text/csv";
-			if (fileext == "gif")
-				contenttype = "image/gif";
-			if (fileext == "html")
-				contenttype = "text/html";
-			if (fileext == "ico")
-				contenttype = "image/x-icon";
-			if (fileext == "java")
-				contenttype = "text/x-java-source,java";
-			if (fileext == "jpeg")
-				contenttype = "image/jpeg";
-			if (fileext == "jpg")
-				contenttype = "image/jpeg";
-			if (fileext == "docx")
-				contenttype = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-			if (fileext == "ppt")
-				contenttype = "application/vnd.ms-powerpoint";
-			if (fileext == "pub")
-				contenttype = "application/x-mspublisher";
-			if (fileext == "wma")
-				contenttype = "audio/x-ms-wma";
-			if (fileext == "doc")
-				contenttype = "application/msword";
-			if (fileext == "mid")
-				contenttype = "audio/midi";
-			if (fileext == "mpeg")
-				contenttype = "video/mpeg";
-			if (fileext == "mp4a")
-				contenttype = "audio/mp4";
-			if (fileext == "mp4")
-				contenttype = "video/mp4";
-			if (fileext == "png")
-				contenttype = "image/png";
-			if (fileext == "webm")
-				contenttype = "video/webm";
-			if (fileext == "tiff")
-				contenttype = "image/tiff";
-			if (fileext == "txt")
-				contenttype = "text/plain";
-			if (fileext == "wav")
-				contenttype = "audio/x-wav";
-			if (fileext == "zip")
-				contenttype = "application/zip";
 
-			if (fileext == "mp3")
-				contenttype = "audio/mpeg";
-			if (fileext == "flac")
-				contenttype = "audio/flac";
-			if (fileext == "ogg")
-				contenttype = "audio/ogg";
-
-			if (fileext == "js")
-				contenttype = "application/javascript";
-			if (fileext == "css")
-				contenttype = "text/css";
-			if (fileext == "svg")
-				contenttype = "image/svg+xml";
-
-			//try to open in browser, and download if not possible
-			std::ifstream in;
-			std::string headerinfo;
-			long long filelen = 0;
-			in.open(fullpath, std::ios::binary);
-
-			if (in.fail()) //404 error
-			{
-				headerinfo = "HTTP/1.1 404 Not Found\n\n";
-				error = Rain::sendText(*rfparam->sock, headerinfo.c_str(), headerinfo.length());
-				if (error) return 1;
-			} else {
-				in.seekg(0, in.end);
-				filelen = static_cast<long long>(in.tellg());
-				in.seekg(0, in.beg);
-
-				headerinfo = std::string("HTTP/1.1 200 OK\r\n") +
-					"Content-Type: " + contenttype + "; charset = UTF-8\r\n" +
-					"Content-disposition: inline; filename=" + reqfile + "\r\n" +
-					"Content-Encoding: UTF-8\r\n" +
-					"Content-Length: " + Rain::tToStr(filelen) + "\r\n" +
-					"Server: EMTServer (Monochrome03; Rain) by Yang Yan\r\n" +
-					"Accept-Ranges: bytes\r\n" +
-					"Connection: close\r\n" +
-					"\r\n";
-				error = Rain::sendText(*rfparam->sock, headerinfo.c_str(), headerinfo.length());
-				if (error) return 1;
-
-				//send the file with buffering
-				char buffer[BUFLEN];
-
-				for (int a = 0; a < filelen; a += BUFLEN) {
-					if (a + BUFLEN > filelen) {
-						in.read(buffer, filelen - a);
-						error = Rain::sendText(*rfparam->sock, buffer, filelen - a);
-					} else {
-						in.read(buffer, BUFLEN);
-						error = Rain::sendText(*rfparam->sock, buffer, BUFLEN);
-					}
-					if (error) return 1;
-				}
-				in.close();
+			//try to decompose the responseBody into headers and body and prepare for responding
+			std::size_t headerBlockEnd = Rain::rabinKarpMatch(responseBody, "\r\n\r\n");
+			if (headerBlockEnd == -1) {
+				Rain::reportError(GetLastError(), "cgi script didn't output with correct format; output:\n" + responseBody);
+				return -6;
 			}
+
+			std::stringstream ss;
+			ss << responseBody.substr(0, headerBlockEnd);
+			parseHeaders(ss, responseHeaders);
+			responseBody = responseBody.substr(headerBlockEnd + headerDelim.length(), std::string::npos);
+
+			//now, exit the if statement to send the response
+		} else { //not a cgi script
+			//extract file extension
+			std::string requestFileExt = requestFile.substr(requestFile.rfind(".") + 1, std::string::npos);
+			Rain::toLowercase(requestFileExt);
+
+			//read config to determine contenttype
+			static bool contentTypeParsed = false;
+			static std::map<std::string, std::string> contentTypeSpec;
+			if (!contentTypeParsed) {
+				Rain::readParameterFile(config["contentTypeSpec"], contentTypeSpec);
+				contentTypeParsed = true;
+			}
+
+			std::string contentType;
+			std::map<std::string, std::string>::iterator iterator = contentTypeSpec.find(requestFileExt);
+			if (iterator == contentTypeSpec.end())
+				contentType = config["defaultContentType"];
+			else
+				contentType = iterator->second;
+
+			//compose response
+			responseStatus = "HTTP/1.1 200 OK";
+			Rain::readFullFile(requestFilePath, responseBody);
+			responseHeaders["content-disposition"] = "inline; filename=" + requestFile;
+			responseHeaders["content-length"] = Rain::tToStr(responseBody.length());
+			responseHeaders["content-type"] = contentType + "; charset = UTF-8";
+		}
+
+		//now, send back responseStatus, responseHeaders, and responseBody
+		std::string response = responseStatus + "\r\n";
+		for (auto it : responseHeaders)
+			response += it.first + ":" + it.second + "\r\n";
+		response += "\r\n" + responseBody;
+		if (Rain::sendText(cSocket, response.c_str(), response.length())) {
+			Rain::reportError(GetLastError(), "error while sending response to client; response: " + response);
+			return -7;
 		}
 
 		return 1; //close connection once a full message has been processed
+	}
+
+	void parseHeaders(std::stringstream &headerStream, std::map<std::string, std::string> &headers) {
+		std::string key = "", value;
+		std::getline(headerStream, key, ':');
+
+		while (key.length() != 0) {
+			std::getline(headerStream, value);
+			Rain::strTrim(value);
+			Rain::strTrim(key);
+			headers[Rain::toLowercase(key)] = value;
+			key = "";
+			std::getline(headerStream, key, ':');
+		}
 	}
 }

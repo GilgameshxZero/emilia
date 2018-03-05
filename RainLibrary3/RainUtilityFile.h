@@ -51,4 +51,9 @@ namespace Rain {
 
 	//read parameters from standard parameter file, organized in lines of key:<whitespace>value
 	void readParameterFile(std::string filePath, std::map<std::string, std::string> &params);
+
+	//returns current directory of the executable (not the same as the path to the executable, sometimes)
+	std::string getWorkingDirectory();
+
+	std::string &readFullFile(std::string filePath, std::string &fileData);
 }
