@@ -18,7 +18,7 @@ namespace Mono3 {
 
 		//set some variables before starting the message queue/wnd, so that we know if they are used later
 		ltParam.hRecvThread = NULL;
-		ltParam.recvParam.funcparam = NULL;
+		ltParam.recvParam.funcParam = NULL;
 
 		SetWindowLongPtr(ltParam.rainWnd.hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(&ltParam));
 		SendMessage(ltParam.rainWnd.hwnd, WM_LISTENWNDINIT, 0, 0); //update window and start accepting clients
@@ -78,9 +78,9 @@ namespace Mono3 {
 		rfparam->serverAux = *ltParam.serverAux;
 
 		ltParam.recvParam.socket = &ltParam.cSocket;
-		ltParam.recvParam.message = &(rfparam->message);
-		ltParam.recvParam.bufLen = 1024;
-		ltParam.recvParam.funcParam = rfparam;
+		ltParam.recvParam.message = &(rfparam->message); //store message in MessageProcParam
+		ltParam.recvParam.bufLen = 1024; //recv buffer length
+		ltParam.recvParam.funcParam = rfparam; //parameter to be passed to following functions
 		ltParam.recvParam.onProcessMessage = ProcClientMess; //called when any message comes in
 		ltParam.recvParam.onRecvInit = NULL; //called at the beginning of the recvThread
 		ltParam.recvParam.onRecvEnd = OnClientRecvEnd; //called at the end of recvThread

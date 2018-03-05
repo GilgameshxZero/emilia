@@ -22,11 +22,23 @@ namespace Rain {
 		WSA2RecvParam();
 		WSA2RecvParam(SOCKET *socket, std::string *message, int bufLen, void *funcparam, WSA2RecvPMFunc onProcessMessage, WSA2RecvInitFunc onRecvInit, WSA2RecvExitFunc onRecvEnd);
 
+		//socket between server and client
 		SOCKET *socket;
+
+		//place where message is stored for use by any RecvFuncs
 		std::string *message;
+
+		//length of buffer for recv
 		int bufLen;
+
+		//parameter to be passed to RecvFuncs
 		void *funcParam;
-		WSA2RecvPMFunc onProcessMessage; //return nonzero to terminate recv
+
+		//called whenever recv returns something to the buffer
+		//return nonzero to terminate recv loop
+		WSA2RecvPMFunc onProcessMessage;
+
+		//called when RecvThread is about to start or end
 		WSA2RecvInitFunc onRecvInit;
 		WSA2RecvExitFunc onRecvEnd;
 	};
