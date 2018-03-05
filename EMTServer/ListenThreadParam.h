@@ -2,6 +2,9 @@
 
 #include "../RainLibrary3/RainLibraries.h"
 
+#define WM_LISTENWNDINIT	WM_RAINAVAILABLE
+#define WM_LISTENWNDEND		WM_RAINAVAILABLE + 1
+
 //parameter passed to any listening thread
 //one for each ListenThread
 struct ListenThreadParam {

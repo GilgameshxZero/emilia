@@ -81,10 +81,10 @@
     <ClInclude Include="ListenThread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MessageProc.h">
+    <ClInclude Include="MessageProcParam.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MessageProcParam.h">
+    <ClInclude Include="RecvThreadHandlers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -157,10 +157,10 @@
     <ClCompile Include="ListenThread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MessageProc.cpp">
+    <ClCompile Include="MessageProcParam.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MessageProcParam.cpp">
+    <ClCompile Include="RecvThreadHandlers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
