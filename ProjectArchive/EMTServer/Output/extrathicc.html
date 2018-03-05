@@ -1,0 +1,151 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>仨乂十尺凡 十廾工匸匸</title>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <script type="text/javascript">
+        function convert() {
+            var text = document.forms.namedItem("text").elements["text"].value.toLowerCase(), result = "";
+            var wdal = new Array("凡", "㠯", "匸", "㐰", "仨", "卜", "𠂎", "廾", "工", "丁", "长", "乚", "川", "𠘨", "口", "尸", "㔿", "尺", "丂", "十", "凵", "丷", "州", "乂", "丫", "乙");
+            
+            for (var a = 0; a < text.length; a++) {
+                if (text.charCodeAt(a) >= 97 && text.charCodeAt(a) <= 122)
+                    result += wdal[text.charCodeAt(a) - 97];
+                else
+                    result += text[a];
+            }
+
+            document.forms.namedItem("result").elements["text"].value = result;
+        }
+
+        function customEnter(e) {
+            if (e.keyCode == 13 && !e.shiftKey) {
+                document.forms.namedItem("text").submit();
+                e.preventDefault();
+                return false;
+            }
+        }
+
+        function fitImage() {
+            var pic = document.getElementById("emilia");
+            var maxwidth = document.getElementById("right_half").offsetWidth,
+                maxheight = document.getElementById("right_half").offsetHeight - document.getElementById("bestgirl").offsetHeight - 32,
+                emwidth = pic.offsetWidth,
+                emheight = pic.offsetHeight;
+            if (maxwidth <= 0 || maxheight <= 0)
+                pic.setAttribute("display", "none");
+            else {
+                pic.setAttribute("display", "block");
+                if (emwidth / maxwidth < emheight / maxheight)
+                    pic.setAttribute("height", maxheight + "px");
+                else
+                    pic.setAttribute("width", maxwidth + "px");
+            }
+        }
+
+        window.onresize = function () {
+            fitImage();
+        }
+    </script>
+
+    <style type="text/css">
+        html, body {
+            height: 98%;
+        }
+
+        #page_wrap {
+            display: flex;
+            flex-flow: column;
+            height: 100%;
+        }
+
+        #column_wrap {
+            display: flex;
+            flex-flow: row;
+            flex: 1 1 auto;
+        }
+
+        #left_half {
+            flex: 0 0 47.5%;
+            order: 1;
+            margin-right: 2.5%;
+        }
+
+        #right_half {
+            flex: 0 0 47.5%;
+            order: 2;
+            margin-left: 2.5%;
+        }
+
+        #half_height {
+            display: flex;
+            flex-flow: column;
+            height: 47.5%;
+            width: 100%;
+            margin-bottom: 2.5%;
+        }
+
+        #formarea {
+            display: flex;
+            flex-flow: column;
+            flex: 1 1 auto;
+        }
+
+        #textarea {
+            overflow: auto;
+            resize: none;
+            flex: 1 1 auto;
+        }
+
+        #emiliabox {
+            flex-grow: 1;
+        }
+
+        #emilia {
+            display: block;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="page_wrap">
+        <div>
+            This webpage converts "extra thicc" alphabet characters to "仨乂十尺凡 十廾工匸匸" Unicode characters. It is inspired by variations of the "extra thicc" meme in which the alphabetical characters are replaced with similar Asian characters, though the characters used in that variation are usually "乇乂ㄒ尺卂 ㄒ卄丨匚匚". The double entendre lies within the fact that in most Unicode encodings non-ASCII characters require at least double the storage space of ASCII characters, thus being "extra thick" in size.<br />
+            <br />
+            The wide alphabet is the following: "﻿凡㠯匸㐰仨卜𠂎廾工丁长乚川𠘨口尸㔿尺丂十凵丷州乂丫乙". Capitalization of alphabetical characters is ignored; all other characters remain the same. Enter triggers the submit button; use Shift+Enter for multiline input.<br />
+            <br />
+        </div>
+        <div id="column_wrap">
+            <div id="left_half">
+                <div id="half_height">
+                    <div>
+                        Enter some text in the form below.<br />
+                    </div>
+                    <form id="formarea" name="text" action="javascript:convert()">
+                        <textarea id="textarea" name="text" rows="10" cols="80" onkeydown="javascript:customEnter(event)"></textarea>
+                        <input type="submit" value="Submit">
+                    </form>
+                </div>
+                <div id="half_height">
+                    <div>
+                        Result:<br />
+                    </div>
+                    <form id="formarea" name="result">
+                        <textarea id="textarea" name="text" rows="10" cols="80" readonly></textarea>
+                    </form><br />
+                </div>
+            </div>
+            <div id="right_half">
+                <div id="bestgirl">
+                    仨川工乚工凡-十凡𠘨 㠯仨丂十 𠂎工尺乚!<br />
+                </div>
+                <div id="emiliabox">
+                    <img id="emilia" src="smiling.png" onload="fitImage()" />
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
