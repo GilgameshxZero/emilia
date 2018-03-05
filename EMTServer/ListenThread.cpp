@@ -60,6 +60,7 @@ namespace Mono3 {
 	LRESULT onListenWndInit(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		ListenThreadParam &ltParam = *reinterpret_cast<ListenThreadParam *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
+		//wait for client to connect
 		int error = Rain::servAcceptClient(ltParam.cSocket, *ltParam.lSocket);
 		if (error == WSAEINTR) //the listening socket has been closed from the outside; we are terminating program soon
 			return 0;
@@ -68,22 +69,21 @@ namespace Mono3 {
 			return -1;
 		}
 
-		//std::cout << "Client accepted.\n";
-		ltParam.recvParam.sock = &ltParam.cSocket;
-		ltParam.recvParam.funcparam = reinterpret_cast<void *>(new RecvFuncParam());
-
-		RecvFuncParam *rfparam = reinterpret_cast<RecvFuncParam *>(ltParam.recvParam.funcparam);
+		//set up the recvParam to pass to recvThread
+		RecvFuncParam *rfparam = new RecvFuncParam();
 		rfparam->ctllnode = &ltParam;
 		rfparam->sock = &ltParam.cSocket;
 		rfparam->waitingPOST = false;
 		rfparam->serverRootDir = *ltParam.serverRootDir;
 		rfparam->serverAux = *ltParam.serverAux;
 
+		ltParam.recvParam.socket = &ltParam.cSocket;
 		ltParam.recvParam.message = &(rfparam->message);
-		ltParam.recvParam.buflen = 1024;
-		ltParam.recvParam.OnProcessMessage = ProcClientMess; //called when any message comes in
-		ltParam.recvParam.OnRecvInit = NULL;
-		ltParam.recvParam.OnRecvEnd = OnClientRecvEnd;
+		ltParam.recvParam.bufLen = 1024;
+		ltParam.recvParam.funcParam = rfparam;
+		ltParam.recvParam.onProcessMessage = ProcClientMess; //called when any message comes in
+		ltParam.recvParam.onRecvInit = NULL; //called at the beginning of the recvThread
+		ltParam.recvParam.onRecvEnd = OnClientRecvEnd; //called at the end of recvThread
 
 		//processing this socket will be handled by the recvThread
 		ltParam.hRecvThread = CreateThread(NULL, 0, Rain::recvThread, reinterpret_cast<void *>(&ltParam.recvParam), NULL, NULL);

@@ -3,20 +3,20 @@
 namespace Rain {
 	DWORD WINAPI recvThread(LPVOID lpParameter) {
 		WSA2RecvParam *recvparam = reinterpret_cast<WSA2RecvParam *>(lpParameter);
-		char *buffer = new char[recvparam->buflen];
+		char *buffer = new char[recvparam->bufLen];
 		int ret;
 
-		if (recvparam->OnRecvInit != NULL)
-			recvparam->OnRecvInit(recvparam->funcparam);
+		if (recvparam->onRecvInit != NULL)
+			recvparam->onRecvInit(recvparam->funcParam);
 
 		//receive data until the server closes the connection
 		do {
-			ret = recv(*recvparam->sock, buffer, recvparam->buflen, 0);
+			ret = recv(*recvparam->socket, buffer, recvparam->bufLen, 0);
 			if (ret > 0) //received ret bytes
 			{
 				*recvparam->message = std::string(buffer, ret);
-				if (recvparam->OnProcessMessage != NULL)
-					if (recvparam->OnProcessMessage(recvparam->funcparam))
+				if (recvparam->onProcessMessage != NULL)
+					if (recvparam->onProcessMessage(recvparam->funcParam))
 						break;
 			} else if (ret == 0)
 				break; //connection closed
@@ -28,8 +28,8 @@ namespace Rain {
 		} while (ret > 0);
 
 		delete[] buffer;
-		if (recvparam->OnRecvEnd != NULL)
-			recvparam->OnRecvEnd(recvparam->funcparam);
+		if (recvparam->onRecvEnd != NULL)
+			recvparam->onRecvEnd(recvparam->funcParam);
 
 		return ret;
 	}
