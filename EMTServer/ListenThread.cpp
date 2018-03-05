@@ -82,7 +82,7 @@ namespace Mono3 {
 		ltParam.recvParam.bufLen = 1024; //recv buffer length
 		ltParam.recvParam.funcParam = rfparam; //parameter to be passed to following functions
 		ltParam.recvParam.onProcessMessage = ProcClientMess; //called when any message comes in
-		ltParam.recvParam.onRecvInit = NULL; //called at the beginning of the recvThread
+		ltParam.recvParam.onRecvInit = NULL; //called at the beginning of the recvThread, nothing for now
 		ltParam.recvParam.onRecvEnd = OnClientRecvEnd; //called at the end of recvThread
 
 		//processing this socket will be handled by the recvThread
@@ -109,17 +109,5 @@ namespace Mono3 {
 		CreateThread(NULL, 0, Mono3::listenThread, reinterpret_cast<LPVOID>(newLTParam), 0, NULL);
 
 		return 0;
-	}
-
-	void OnClientRecvEnd(void *param) {
-		//client wants to terminate socket
-		RecvFuncParam &rfparam = *reinterpret_cast<RecvFuncParam *>(param);
-
-		//use postmessage here because we want the thread of the window to process the message, allowing destroywindow to be called
-		//WM_RAINAVAILABLE + 1 is the end message
-		PostMessage(rfparam.ctllnode->rainWnd.hwnd, WM_LISTENWNDEND, 0, 0);
-
-		//free WSA2RecvParam here, since recvThread won't need it anymore
-		delete &rfparam;
 	}
 }
