@@ -126,7 +126,7 @@ namespace Mono3 {
 		inet_ntop(AF_INET, &ipAddr, str, INET_ADDRSTRLEN);
 		std::string log = static_cast<std::string>(str) + ": " + reqtype + " " + requrl + "\n";
 		Rain::rainCoutF(log);
-		Rain::fastOutputFile("NoSync\\log.txt", log, true);
+		Rain::fastOutputFile(rfparam->serverAux + "log.txt", log, true);
 
 		//identify the file pointed to by the URL as well as any parameters
 		if (requrl == "/")
