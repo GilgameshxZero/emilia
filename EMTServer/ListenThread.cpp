@@ -5,6 +5,7 @@ namespace Mono3 {
 		ListenThreadParam &ltParam = *reinterpret_cast<ListenThreadParam *>(lpParameter);
 		
 		//store this thread's handle in the ListenThreadParam
+		//does not need to be close
 		ltParam.hThread = GetCurrentThread();
 
 		//create message queue for listenThread for terminate messages
