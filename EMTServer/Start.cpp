@@ -70,6 +70,10 @@ namespace Mono3 {
 
 				WSACleanup();
 				break;
+			} else if (command == "help") {
+				std::cout << "\"exit\" to terminate server\n";
+			} else {
+				std::cout << "Command not recognized\n";
 			}
 		}
 
