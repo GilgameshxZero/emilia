@@ -19,6 +19,9 @@ Responsible for maintaining a socket open for listening on a specified port, as 
 #include <vector>
 #include <Windows.h>
 
+#define WM_LISTENWNDINIT	WM_RAINAVAILABLE
+#define WM_LISTENWNDEND		WM_RAINAVAILABLE + 1
+
 namespace Mono3 {
 	//called from Start to create a thread
 	DWORD WINAPI listenThread(LPVOID lpParameter);
