@@ -97,6 +97,7 @@ namespace Mono3 {
 		rfparam->sock = &cpparam.clientsock;
 		rfparam->waitingPOST = false;
 		rfparam->serverRootDir = cpparam.ctparam->serverRootDir;
+		rfparam->serverAux = cpparam.ctparam->serverAux;
 
 		cpparam.recvparam.message = &(rfparam->message);
 		cpparam.recvparam.buflen = 1024;

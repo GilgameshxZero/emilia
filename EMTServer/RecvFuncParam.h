@@ -6,6 +6,7 @@
 
 struct RecvFuncParam {
 	std::string serverRootDir;
+	std::string serverAux;
 
 	CTLLNode *ctllnode;
 	std::queue<char> mqueue;
