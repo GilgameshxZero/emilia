@@ -2,7 +2,7 @@
 
 namespace Mono3 {
 	int ProcClientMess(void *param) {
-		RecvFuncParam &rfparam = *reinterpret_cast<RecvFuncParam *>(param);
+		RecvThreadParam &rfparam = *reinterpret_cast<RecvThreadParam *>(param);
 		int error = 0;
 
 		if (rfparam.waitingPOST) //mqueue is guaranteed empty
@@ -62,9 +62,9 @@ namespace Mono3 {
 		return error;
 	}
 
-	void OnClientRecvEnd(void *param) {
+	void onRecvThreadEnd(void *funcParam) {
 		//client wants to terminate socket
-		RecvFuncParam &rfparam = *reinterpret_cast<RecvFuncParam *>(param);
+		RecvThreadParam &rfparam = *reinterpret_cast<RecvThreadParam *>(funcParam);
 
 		//use postmessage here because we want the thread of the window to process the message, allowing destroywindow to be called
 		//WM_RAINAVAILABLE + 1 is the end message
@@ -74,7 +74,7 @@ namespace Mono3 {
 		delete &rfparam;
 	}
 
-	int ProcFullMess(RecvFuncParam *rfparam) {
+	int ProcFullMess(RecvThreadParam *rfparam) {
 		int error;
 		const int BUFLEN = 1024;
 		std::string tmp, tmp2, requrl, httpver, reqtype;

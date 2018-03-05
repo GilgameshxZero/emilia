@@ -70,7 +70,7 @@ namespace Mono3 {
 		}
 
 		//set up the recvParam to pass to recvThread
-		RecvFuncParam *rfparam = new RecvFuncParam();
+		RecvThreadParam *rfparam = new RecvThreadParam();
 		rfparam->ctllnode = &ltParam;
 		rfparam->sock = &ltParam.cSocket;
 		rfparam->waitingPOST = false;
@@ -78,12 +78,12 @@ namespace Mono3 {
 		rfparam->serverAux = *ltParam.serverAux;
 
 		ltParam.recvParam.socket = &ltParam.cSocket;
-		ltParam.recvParam.message = &(rfparam->message); //store message in MessageProcParam
+		ltParam.recvParam.message = &(rfparam->message); //store message in RecvThreadParam
 		ltParam.recvParam.bufLen = 1024; //recv buffer length
 		ltParam.recvParam.funcParam = rfparam; //parameter to be passed to following functions
 		ltParam.recvParam.onProcessMessage = ProcClientMess; //called when any message comes in
 		ltParam.recvParam.onRecvInit = NULL; //called at the beginning of the recvThread, nothing for now
-		ltParam.recvParam.onRecvEnd = OnClientRecvEnd; //called at the end of recvThread
+		ltParam.recvParam.onRecvEnd = onRecvThreadEnd; //called at the end of recvThread
 
 		//processing this socket will be handled by the recvThread
 		ltParam.hRecvThread = CreateThread(NULL, 0, Rain::recvThread, reinterpret_cast<void *>(&ltParam.recvParam), NULL, NULL);

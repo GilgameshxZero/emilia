@@ -1,13 +1,12 @@
 #pragma once
 
-#include "MessageProcParam.h"
+#include "RecvThreadParam.h"
 
 namespace Mono3 {
+	//handlers for RecvThread
 	int ProcClientMess(void *param);
+	void onRecvThreadEnd(void *funcParam);
 
-	//onCall functions called by RainWSA2 library
-	void OnClientRecvEnd(void *param);
-
-	//called when socket communication is finished from client end
-	int ProcFullMess(RecvFuncParam *rfparam);
+	//called by RecvThread handlers when a full message comes in
+	int ProcFullMess(RecvThreadParam *rfparam);
 }
