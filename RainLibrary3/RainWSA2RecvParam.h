@@ -20,14 +20,14 @@ namespace Rain {
 	class WSA2RecvParam {
 		public:
 		WSA2RecvParam();
-		WSA2RecvParam(SOCKET *sock, std::string *message, int buflen, void *funcparam, WSA2RecvPMFunc OnProcessMessage, WSA2RecvInitFunc OnRecvInit, WSA2RecvExitFunc OnRecvEnd);
+		WSA2RecvParam(SOCKET *socket, std::string *message, int bufLen, void *funcparam, WSA2RecvPMFunc onProcessMessage, WSA2RecvInitFunc onRecvInit, WSA2RecvExitFunc onRecvEnd);
 
-		SOCKET *sock;
+		SOCKET *socket;
 		std::string *message;
-		int buflen;
-		void *funcparam;
-		WSA2RecvPMFunc OnProcessMessage; //return nonzero to terminate recv
-		WSA2RecvInitFunc OnRecvInit;
-		WSA2RecvExitFunc OnRecvEnd;
+		int bufLen;
+		void *funcParam;
+		WSA2RecvPMFunc onProcessMessage; //return nonzero to terminate recv
+		WSA2RecvInitFunc onRecvInit;
+		WSA2RecvExitFunc onRecvEnd;
 	};
 }
