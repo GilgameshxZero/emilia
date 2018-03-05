@@ -1,5 +1,0 @@
-Detected memory leaks!
-Dumping objects ->
-{239} normal block at 0x000001AD32A9D0C0, 80 bytes long.
- Data: <                > 02 00 00 00 CD CD CD CD C8 ED 06 FD FD 7F 00 00 
-Object dump complete.

@@ -14,7 +14,7 @@ struct ListenThreadParam {
 	//window representing this thread's message queue, implemented by RainWindow
 	Rain::RainWindow rainWnd;
 
-	//current thread handle
+	//current listen thread handle
 	HANDLE hThread;
 
 	//pointer to ListenThreadParams before and after this, in a linked list
@@ -24,7 +24,12 @@ struct ListenThreadParam {
 	std::string *serverRootDir;
 	std::string *serverAux;
 
-	SOCKET clientsock;
-	Rain::WSA2RecvParam recvparam;
-	HANDLE hrecvthread;
+	//socket that represents connection to one client
+	SOCKET cSocket;
+
+	//handle to the RecvThread associated with this ListenThread/HWND
+	HANDLE hRecvThread;
+
+	//standardized parameter to pass to RecvThread
+	Rain::WSA2RecvParam recvParam;
 };
