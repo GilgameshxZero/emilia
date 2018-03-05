@@ -15,9 +15,9 @@ namespace Mono3 {
 		msgm.insert(std::make_pair(WM_LISTENWNDEND, onListenWndEnd));
 		ltParam.rainWnd.create(&msgm);
 
-		//set some variables before starting the message queue/wnd
-		ltParam.hrecvthread = NULL;
-		ltParam.recvparam.funcparam = NULL;
+		//set some variables before starting the message queue/wnd, so that we know if they are used later
+		ltParam.hRecvThread = NULL;
+		ltParam.recvParam.funcparam = NULL;
 
 		SetWindowLongPtr(ltParam.rainWnd.hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(&ltParam));
 		SendMessage(ltParam.rainWnd.hwnd, WM_LISTENWNDINIT, 0, 0); //update window and start accepting clients
@@ -38,10 +38,13 @@ namespace Mono3 {
 	LRESULT onListenWndEnd(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		ListenThreadParam &ltParam = *reinterpret_cast<ListenThreadParam *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
-		Rain::shutdownSocketSend(ltParam.clientsock);
-		closesocket(ltParam.clientsock);
-		if (ltParam.hrecvthread)
-			CloseHandle(ltParam.hrecvthread);
+		//notify client that we are closing socket, then close it ourselves
+		Rain::shutdownSocketSend(ltParam.cSocket);
+		closesocket(ltParam.cSocket);
+
+		//free up handle memory if it was used (i.e. a client was connected and an instance of RecvThread was started)
+		if (ltParam.hRecvThread)
+			CloseHandle(ltParam.hRecvThread);
 
 		//do not free ListenThreadParam here! We should free it at the actual end of ListenThread
 
@@ -56,7 +59,7 @@ namespace Mono3 {
 	LRESULT onListenWndInit(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		ListenThreadParam &ltParam = *reinterpret_cast<ListenThreadParam *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
-		int error = Rain::servAcceptClient(ltParam.clientsock, *ltParam.lSocket);
+		int error = Rain::servAcceptClient(ltParam.cSocket, *ltParam.lSocket);
 		if (error == WSAEINTR) //the listening socket has been closed from the outside; we are terminating program soon
 			return 0;
 		else if (error) { //actual error
@@ -65,24 +68,24 @@ namespace Mono3 {
 		}
 
 		//std::cout << "Client accepted.\n";
-		ltParam.recvparam.sock = &ltParam.clientsock;
-		ltParam.recvparam.funcparam = reinterpret_cast<void *>(new RecvFuncParam());
+		ltParam.recvParam.sock = &ltParam.cSocket;
+		ltParam.recvParam.funcparam = reinterpret_cast<void *>(new RecvFuncParam());
 
-		RecvFuncParam *rfparam = reinterpret_cast<RecvFuncParam *>(ltParam.recvparam.funcparam);
+		RecvFuncParam *rfparam = reinterpret_cast<RecvFuncParam *>(ltParam.recvParam.funcparam);
 		rfparam->ctllnode = &ltParam;
-		rfparam->sock = &ltParam.clientsock;
+		rfparam->sock = &ltParam.cSocket;
 		rfparam->waitingPOST = false;
 		rfparam->serverRootDir = *ltParam.serverRootDir;
 		rfparam->serverAux = *ltParam.serverAux;
 
-		ltParam.recvparam.message = &(rfparam->message);
-		ltParam.recvparam.buflen = 1024;
-		ltParam.recvparam.OnProcessMessage = ProcClientMess; //called when any message comes in
-		ltParam.recvparam.OnRecvInit = NULL;
-		ltParam.recvparam.OnRecvEnd = OnClientRecvEnd;
+		ltParam.recvParam.message = &(rfparam->message);
+		ltParam.recvParam.buflen = 1024;
+		ltParam.recvParam.OnProcessMessage = ProcClientMess; //called when any message comes in
+		ltParam.recvParam.OnRecvInit = NULL;
+		ltParam.recvParam.OnRecvEnd = OnClientRecvEnd;
 
 		//processing this socket will be handled by the recvThread
-		ltParam.hrecvthread = CreateThread(NULL, 0, Rain::recvThread, reinterpret_cast<void *>(&ltParam.recvparam), NULL, NULL);
+		ltParam.hRecvThread = CreateThread(NULL, 0, Rain::recvThread, reinterpret_cast<void *>(&ltParam.recvParam), NULL, NULL);
 
 		//once we accept a client, create a new clientthread to listen for more connections, thus the linked list structure
 		//before starting a new thread, create a new ListenThreadParam for that ListenThread
