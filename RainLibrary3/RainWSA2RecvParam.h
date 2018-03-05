@@ -29,7 +29,7 @@ namespace Rain {
 		std::string *message;
 
 		//length of buffer for recv
-		int bufLen;
+		std::size_t bufLen;
 
 		//parameter to be passed to RecvFuncs
 		void *funcParam;

@@ -41,4 +41,9 @@ namespace Rain {
 	void strLTrim(std::string &s);
 	void strRTrim(std::string &s);
 	void strTrim(std::string &s);
+
+	//concatenate a string to another, then a NULL character; useful for environment variable block manipulation
+	std::string &appendEnvVar(std::string &envBlock, std::string newVar);
+
+	std::string &toLowercase(std::string &s);
 }

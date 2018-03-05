@@ -9,7 +9,17 @@ namespace Mono3 {
 		std::cout << "Configuration parameters: \n"
 			<< "\tServer listening port: " << params["serverListenPort"] << "\n"
 			<< "\tServer root directory: " << params["serverRootDir"] << "\n"
-			<< "\tServer auxillary files: " << params["serverAuxiliary"] << "\n";
+			<< "\tServer auxillary files: " << params["serverAuxiliary"] << "\n"
+			<< "\trecv buffer length: " << params["recvBufferLength"] << "\n"
+			<< "\tdirDefaultFile: " << params["dirDefaultFile"] << "\n"
+			<< "\tcgiScripts: " << params["cgiScripts"] << "\n"
+			<< "\t404HTML: " << params["404HTML"] << "\n"
+			<< "\tcustomHeaders: " << params["customHeaders"] << "\n"
+			<< "\tcgiInPipeBufLen: " << params["cgiInPipeBufLen"] << "\n"
+			<< "\tcgiOutPipeBufLen: " << params["cgiOutPipeBufLen"] << "\n"
+			<< "\tcgiMaxIdleTime: " << params["cgiMaxIdleTime"] << "\n"
+			<< "\tcontentTypeSpec: " << params["contentTypeSpec"] << "\n"
+			<< "\tdefaultContentType: " << params["defaultContentType"] << "\n";
 
 		//debugging purposes
 		Rain::redirectCerrFile(params["serverAuxiliary"] + "errors.txt");
@@ -42,8 +52,7 @@ namespace Mono3 {
 		ListenThreadParam *ltParam = new ListenThreadParam();
 		ltParam->lSocket = &lSocket;
 		ltParam->ltLLMutex = ltLLMutex;
-		ltParam->serverRootDir = &params["serverRootDir"];
-		ltParam->serverAux = &params["serverAuxiliary"];
+		ltParam->config = &params;
 
 		//create dummy head and tail nodes for the ListenThreadParam linked list, and put the new LTP in between
 		ListenThreadParam LTPLLHead, LTPLLTail;
@@ -98,8 +107,6 @@ namespace Mono3 {
 				//no need to freeaddinfo here because RainWSA2 does that for us
 
 				WSACleanup();
-				std::cout << "WSA cleaned up\n";
-
 				break;
 			} else if (command == "help") {
 				std::cout << "\"exit\" to terminate server\n";
@@ -111,8 +118,8 @@ namespace Mono3 {
 		//free memory
 		delete ltLLMutex;
 
-		std::cout << "The server has terminated. Exiting automatically in 3 seconds...";
-		Sleep(3000);
+		std::cout << "The server has terminated. Exiting automatically in 2 seconds...";
+		Sleep(2000);
 
 		return 0;
 	}
