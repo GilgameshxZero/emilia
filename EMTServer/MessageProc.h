@@ -1,7 +1,6 @@
 #pragma once
 #include "../RainLibrary3/RainLibraries.h"
 #include "ListenThreadParam.h"
-#include "ListenWndParam.h"
 #include "MessageProcParam.h"
 
 namespace Mono3 {

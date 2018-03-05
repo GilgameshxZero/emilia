@@ -78,9 +78,6 @@
     <ClInclude Include="ListenThreadParam.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ListenWndParam.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ListenThread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -155,9 +152,6 @@
       <Filter>RainLibrary3</Filter>
     </ClCompile>
     <ClCompile Include="ListenThreadParam.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ListenWndParam.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ListenThread.cpp">

@@ -23,4 +23,8 @@ struct ListenThreadParam {
 	//parameters to pass to message procs
 	std::string *serverRootDir;
 	std::string *serverAux;
+
+	SOCKET clientsock;
+	Rain::WSA2RecvParam recvparam;
+	HANDLE hrecvthread;
 };

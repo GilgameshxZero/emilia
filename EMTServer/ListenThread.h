@@ -7,7 +7,6 @@ Responsible for maintaining a socket open for listening on a specified port, as 
 #include "../RainLibrary3/RainLibraries.h"
 #include "MessageProc.h"
 #include "ListenThreadParam.h"
-#include "ListenWndParam.h"
 #include "MessageProcParam.h"
 
 #include <iomanip>
