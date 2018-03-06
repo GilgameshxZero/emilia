@@ -1,10 +1,16 @@
 #include "Main.h"
 
-int onProcessMessage(void *funcParam) {
-	Rain::WSA2RecvParam &recvParam = *reinterpret_cast<Rain::WSA2RecvParam *>(funcParam);
-	std::cout << *recvParam.message << std::endl;
+struct RecvThreadParam {
+	Rain::WSA2RecvParam *recvParam;
+	SOCKET *lSocket;
+	int responseNum;
+};
 
-	static std::vector<std::string> responses;
+int onProcessMessage(void *funcParam) {
+	RecvThreadParam &rtParam = *reinterpret_cast<RecvThreadParam *>(funcParam);
+	std::cout << *rtParam.recvParam->message << std::endl;
+
+	std::vector<std::string> responses;
 	responses.push_back("250 emilia-tan.com is still best girl!\r\n");
 	responses.push_back("250 OK\r\n");
 	responses.push_back("250 OK\r\n");
@@ -12,11 +18,42 @@ int onProcessMessage(void *funcParam) {
 	responses.push_back("250 OK\r\n");
 	responses.push_back("221 emilia-tan.com Service closing transmission channel\r\n");
 
-	static int responseNum = 0;
-	Rain::sendText(*recvParam.socket, responses[responseNum].c_str(), responses[responseNum].length());
-	responseNum++;
+	Rain::sendText(*rtParam.recvParam->socket, responses[rtParam.responseNum].c_str(), responses[rtParam.responseNum].length());
+	rtParam.responseNum++;
+
+	if (rtParam.responseNum == responses.size())
+		return 1;
 
 	return 0;
+}
+
+void onRecvEnd(void *funcParam) {
+	RecvThreadParam &rtParam = *reinterpret_cast<RecvThreadParam *>(funcParam);
+
+	SOCKET *cSocket = new SOCKET();
+	Rain::servAcceptClient(*cSocket, *rtParam.lSocket);
+
+	Rain::WSA2RecvParam *recvParam = new Rain::WSA2RecvParam();
+	RecvThreadParam *newRTParam = new RecvThreadParam();
+
+	newRTParam->lSocket = rtParam.lSocket;
+	newRTParam->recvParam = recvParam;
+	newRTParam->responseNum = 0;
+
+	recvParam->bufLen = 65536;
+	recvParam->funcParam = reinterpret_cast<void *>(newRTParam);
+	recvParam->message = new std::string();
+	recvParam->onProcessMessage = onProcessMessage;
+	recvParam->onRecvInit = NULL;
+	recvParam->onRecvEnd = onRecvEnd;
+	recvParam->socket = cSocket;
+
+	CreateThread(NULL, 0, Rain::recvThread, reinterpret_cast<void *>(recvParam), NULL, NULL);
+
+	std::cout << "Client IP:\t" << Rain::getClientNumIP(*cSocket) << "\n";
+
+	std::string message = "220 Emilia loves you too!\r\n";
+	Rain::sendText(*cSocket, message.c_str(), message.length());
 }
 
 int main() {
@@ -39,20 +76,25 @@ int main() {
 	SOCKET cSocket;
 	Rain::servAcceptClient(cSocket, lSocket);
 	Rain::WSA2RecvParam recvParam;
+	RecvThreadParam rtParam;
+
+	rtParam.lSocket = &lSocket;
+	rtParam.recvParam = &recvParam;
+	rtParam.responseNum = 0;
 
 	recvParam.bufLen = 65536;
-	recvParam.funcParam = reinterpret_cast<void *>(&recvParam);
+	recvParam.funcParam = reinterpret_cast<void *>(&rtParam);
 	recvParam.message = new std::string();
 	recvParam.onProcessMessage = onProcessMessage;
 	recvParam.onRecvInit = NULL;
-	recvParam.onRecvEnd = NULL;
+	recvParam.onRecvEnd = onRecvEnd;
 	recvParam.socket = &cSocket;
 
 	CreateThread(NULL, 0, Rain::recvThread, reinterpret_cast<void *>(&recvParam), NULL, NULL);
 
 	std::cout << "Client IP:\t" << Rain::getClientNumIP(cSocket) << "\n";
 
-	std::string message = "220 emilia-tan.com Simple Mail Transfer Service Ready\r\n";
+	std::string message = "220 Emilia loves you too!\r\n";
 	Rain::sendText(cSocket, message.c_str(), message.length());
 
 	std::cin.get();
