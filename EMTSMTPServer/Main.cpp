@@ -5,12 +5,12 @@ int onProcessMessage(void *funcParam) {
 	std::cout << *recvParam.message << std::endl;
 
 	static std::vector<std::string> responses;
-	responses.push_back("250 emilia-tan.com greets google.com");
-	responses.push_back("250 OK");
-	responses.push_back("250 OK");
-	responses.push_back("354 Start mail input; end with <CRLF>.<CRLF>");
-	responses.push_back("250 OK");
-	responses.push_back("221 emilia-tan.com.com Service closing transmission channel");
+	responses.push_back("250 emilia-tan.com is still best girl!\r\n");
+	responses.push_back("250 OK\r\n");
+	responses.push_back("250 OK\r\n");
+	responses.push_back("354 Start mail input; end with <CRLF>.<CRLF>\r\n");
+	responses.push_back("250 OK\r\n");
+	responses.push_back("221 emilia-tan.com Service closing transmission channel\r\n");
 
 	static int responseNum = 0;
 	Rain::sendText(*recvParam.socket, responses[responseNum].c_str(), responses[responseNum].length());
@@ -40,7 +40,7 @@ int main() {
 	Rain::servAcceptClient(cSocket, lSocket);
 	Rain::WSA2RecvParam recvParam;
 
-	recvParam.bufLen = 1024;
+	recvParam.bufLen = 65536;
 	recvParam.funcParam = reinterpret_cast<void *>(&recvParam);
 	recvParam.message = new std::string();
 	recvParam.onProcessMessage = onProcessMessage;
