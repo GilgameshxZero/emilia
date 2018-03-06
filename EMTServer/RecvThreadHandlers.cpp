@@ -192,6 +192,7 @@ namespace Mono3 {
 			responseStatus = "HTTP/1.1 404 Not Found";
 			responseBody = notFound404HTML;
 			responseHeaders["content-length"] = Rain::tToStr(responseBody.length());
+			responseHeaders["content-type"] = "text/html";
 		} else if (cgiScripts.find(requestFilePathRel) != cgiScripts.end()) { //branch if the file is a cgi script
 			//run the file at FilePath as a cgi script, and respond with its content
 			//set the current environment block as well as additional environment parameters for the script
