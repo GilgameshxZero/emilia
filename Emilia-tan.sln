@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		readme.txt = readme.txt
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EMTSMTPServer", "EMTSMTPServer\EMTSMTPServer.vcxproj", "{2A59C17C-AA2A-4D8C-A82D-1B8AA291D41E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -28,6 +30,14 @@ Global
 		{BC62E9C2-F6ED-4129-90BC-17CA20293E01}.Release|x64.Build.0 = Release|x64
 		{BC62E9C2-F6ED-4129-90BC-17CA20293E01}.Release|x86.ActiveCfg = Release|Win32
 		{BC62E9C2-F6ED-4129-90BC-17CA20293E01}.Release|x86.Build.0 = Release|Win32
+		{2A59C17C-AA2A-4D8C-A82D-1B8AA291D41E}.Debug|x64.ActiveCfg = Debug|x64
+		{2A59C17C-AA2A-4D8C-A82D-1B8AA291D41E}.Debug|x64.Build.0 = Debug|x64
+		{2A59C17C-AA2A-4D8C-A82D-1B8AA291D41E}.Debug|x86.ActiveCfg = Debug|Win32
+		{2A59C17C-AA2A-4D8C-A82D-1B8AA291D41E}.Debug|x86.Build.0 = Debug|Win32
+		{2A59C17C-AA2A-4D8C-A82D-1B8AA291D41E}.Release|x64.ActiveCfg = Release|x64
+		{2A59C17C-AA2A-4D8C-A82D-1B8AA291D41E}.Release|x64.Build.0 = Release|x64
+		{2A59C17C-AA2A-4D8C-A82D-1B8AA291D41E}.Release|x86.ActiveCfg = Release|Win32
+		{2A59C17C-AA2A-4D8C-A82D-1B8AA291D41E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

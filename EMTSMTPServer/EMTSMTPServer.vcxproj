@@ -20,7 +20,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{BC62E9C2-F6ED-4129-90BC-17CA20293E01}</ProjectGuid>
+    <ProjectGuid>{2A59C17C-AA2A-4D8C-A82D-1B8AA291D41E}</ProjectGuid>
     <RootNamespace>Project</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -81,7 +81,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\RainLibrary3\RainAlgorithm.h" />
+    <ClInclude Include="..\RainLibrary3\RainError.h" />
+    <ClInclude Include="..\RainLibrary3\RainGdiPlusInclude.h" />
+    <ClInclude Include="..\RainLibrary3\RainLibraries.h" />
+    <ClInclude Include="..\RainLibrary3\RainLogging.h" />
+    <ClInclude Include="..\RainLibrary3\RainUtility.h" />
+    <ClInclude Include="..\RainLibrary3\RainUtilityFile.h" />
+    <ClInclude Include="..\RainLibrary3\RainUtilityGeneral.h" />
+    <ClInclude Include="..\RainLibrary3\RainUtilityString.h" />
+    <ClInclude Include="..\RainLibrary3\RainWindow.h" />
+    <ClInclude Include="..\RainLibrary3\RainWindowsLAM.h" />
+    <ClInclude Include="..\RainLibrary3\RainWSA2.h" />
+    <ClInclude Include="..\RainLibrary3\RainWSA2Include.h" />
+    <ClInclude Include="..\RainLibrary3\RainWSA2RecvParam.h" />
+    <ClInclude Include="..\RainLibrary3\RainWSA2SendRecv.h" />
+    <ClInclude Include="..\RainLibrary3\RainWSA2Utility.h" />
     <ClInclude Include="BuildID.h" />
+    <ClInclude Include="Main.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
@@ -89,6 +106,25 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\RainLibrary3\RainAlgorithm.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainError.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainGdiPlusInclude.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainLibraries.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainLogging.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainUtility.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainUtilityFile.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainUtilityGeneral.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainUtilityString.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainWindow.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainWindowsLAM.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainWSA2.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainWSA2Include.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainWSA2RecvParam.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainWSA2SendRecv.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainWSA2Utility.cpp" />
+    <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
