@@ -88,9 +88,14 @@ namespace Mono3 {
 		parseHeaders(ss, headers);
 
 		//log data
-		std::string clientIP = Rain::getClientNumIP(rtParam.pLTParam->cSocket);
-		Rain::rainCoutF(clientIP, ": ", rtParam.requestMethod, " ", requestURI, "\n");
-		std::string fileLog = clientIP + ":\n" + rtParam.request + "\n--------------------------------------------------------------------------------\n";
+		std::string clientIP = Rain::getClientNumIP(rtParam.pLTParam->cSocket),
+			consoleLog = (clientIP + ": " + rtParam.requestMethod + " " + requestURI).substr(0, 80) + "\n"; //cut off the console log if its too long so that it doesn't stall the other threads
+		Rain::rainCoutF(consoleLog);
+
+		std::time_t const timeNow = std::time(NULL);
+		std::string fileLog = Rain::currentDateTime() + "\t" + clientIP + "\n"
+			+ rtParam.request + "\n"
+			+ "--------------------------------------------------------------------------------\n";
 		Rain::fastOutputFile(rtParam.pLTParam->config->at("serverAuxiliary") + "log.txt", fileLog, true);
 
 		//send the parsed headers and bodyBlock and other parameters over to processRequest
