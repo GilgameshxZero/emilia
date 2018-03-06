@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{BCEBF271-97C5-4C62-97CC-3C2B2EDEE7E2}</ProjectGuid>
+    <RootNamespace>Project</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <OutDir>$(HomeDrive)\Main\Active\Documents\Programming\VSOutsource\Intermediates\$(SolutionName)\$(ProjectName)\$(Configuration)\$(PlatformTarget)\</OutDir>
+    <IntDir>$(OutDir)</IntDir>
+    <TargetName>$(ProjectName)_$(Configuration)_$(PlatformTarget)</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <PreBuildEvent>
+      <Command>BuildIDInc.bat</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>copy "$(TargetPath)" "$(ProjectDir)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\RainLibrary3\RainAlgorithm.h" />
+    <ClInclude Include="..\RainLibrary3\RainError.h" />
+    <ClInclude Include="..\RainLibrary3\RainGdiPlusInclude.h" />
+    <ClInclude Include="..\RainLibrary3\RainLibraries.h" />
+    <ClInclude Include="..\RainLibrary3\RainLogging.h" />
+    <ClInclude Include="..\RainLibrary3\RainUtility.h" />
+    <ClInclude Include="..\RainLibrary3\RainUtilityFile.h" />
+    <ClInclude Include="..\RainLibrary3\RainUtilityGeneral.h" />
+    <ClInclude Include="..\RainLibrary3\RainUtilityString.h" />
+    <ClInclude Include="..\RainLibrary3\RainWindow.h" />
+    <ClInclude Include="..\RainLibrary3\RainWindowsLAM.h" />
+    <ClInclude Include="..\RainLibrary3\RainWSA2.h" />
+    <ClInclude Include="..\RainLibrary3\RainWSA2Include.h" />
+    <ClInclude Include="..\RainLibrary3\RainWSA2RecvParam.h" />
+    <ClInclude Include="..\RainLibrary3\RainWSA2SendRecv.h" />
+    <ClInclude Include="..\RainLibrary3\RainWSA2Utility.h" />
+    <ClInclude Include="BuildID.h" />
+    <ClInclude Include="Main.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="BuildIDInc.bat" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\RainLibrary3\RainAlgorithm.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainError.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainGdiPlusInclude.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainLibraries.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainLogging.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainUtility.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainUtilityFile.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainUtilityGeneral.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainUtilityString.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainWindow.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainWindowsLAM.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainWSA2.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainWSA2Include.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainWSA2RecvParam.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainWSA2SendRecv.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainWSA2Utility.cpp" />
+    <ClCompile Include="Main.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <Target Name="AfterClean">
+    <Delete Files="$(ProjectDir)\$(TargetName).exe" ContinueOnError="true" />
+  </Target>
+</Project>
