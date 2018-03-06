@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="RainLibrary3">
+      <UniqueIdentifier>{24d78a07-4626-42a6-bc2a-ae1595212342}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BuildID.h">
@@ -20,6 +23,57 @@
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RainLibrary3\RainAlgorithm.h">
+      <Filter>RainLibrary3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RainLibrary3\RainError.h">
+      <Filter>RainLibrary3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RainLibrary3\RainGdiPlusInclude.h">
+      <Filter>RainLibrary3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RainLibrary3\RainLibraries.h">
+      <Filter>RainLibrary3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RainLibrary3\RainLogging.h">
+      <Filter>RainLibrary3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RainLibrary3\RainUtility.h">
+      <Filter>RainLibrary3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RainLibrary3\RainUtilityFile.h">
+      <Filter>RainLibrary3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RainLibrary3\RainUtilityGeneral.h">
+      <Filter>RainLibrary3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RainLibrary3\RainUtilityString.h">
+      <Filter>RainLibrary3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RainLibrary3\RainWindow.h">
+      <Filter>RainLibrary3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RainLibrary3\RainWindowsLAM.h">
+      <Filter>RainLibrary3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RainLibrary3\RainWSA2.h">
+      <Filter>RainLibrary3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RainLibrary3\RainWSA2Include.h">
+      <Filter>RainLibrary3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RainLibrary3\RainWSA2RecvParam.h">
+      <Filter>RainLibrary3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RainLibrary3\RainWSA2SendRecv.h">
+      <Filter>RainLibrary3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RainLibrary3\RainWSA2Utility.h">
+      <Filter>RainLibrary3</Filter>
+    </ClInclude>
+    <ClInclude Include="Main.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -31,5 +85,58 @@
     <ResourceCompile Include="resource.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\RainLibrary3\RainAlgorithm.cpp">
+      <Filter>RainLibrary3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RainLibrary3\RainError.cpp">
+      <Filter>RainLibrary3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RainLibrary3\RainGdiPlusInclude.cpp">
+      <Filter>RainLibrary3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RainLibrary3\RainLibraries.cpp">
+      <Filter>RainLibrary3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RainLibrary3\RainLogging.cpp">
+      <Filter>RainLibrary3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RainLibrary3\RainUtility.cpp">
+      <Filter>RainLibrary3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RainLibrary3\RainUtilityFile.cpp">
+      <Filter>RainLibrary3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RainLibrary3\RainUtilityGeneral.cpp">
+      <Filter>RainLibrary3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RainLibrary3\RainUtilityString.cpp">
+      <Filter>RainLibrary3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RainLibrary3\RainWindow.cpp">
+      <Filter>RainLibrary3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RainLibrary3\RainWindowsLAM.cpp">
+      <Filter>RainLibrary3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RainLibrary3\RainWSA2.cpp">
+      <Filter>RainLibrary3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RainLibrary3\RainWSA2Include.cpp">
+      <Filter>RainLibrary3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RainLibrary3\RainWSA2RecvParam.cpp">
+      <Filter>RainLibrary3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RainLibrary3\RainWSA2SendRecv.cpp">
+      <Filter>RainLibrary3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RainLibrary3\RainWSA2Utility.cpp">
+      <Filter>RainLibrary3</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
