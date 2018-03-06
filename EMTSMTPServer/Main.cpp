@@ -2,7 +2,19 @@
 
 int onProcessMessage(void *funcParam) {
 	Rain::WSA2RecvParam &recvParam = *reinterpret_cast<Rain::WSA2RecvParam *>(funcParam);
-	std::cout << recvParam.message;
+	std::cout << *recvParam.message << std::endl;
+
+	static std::vector<std::string> responses;
+	responses.push_back("250 emilia-tan.com greets google.com");
+	responses.push_back("250 OK");
+	responses.push_back("250 OK");
+	responses.push_back("354 Start mail input; end with <CRLF>.<CRLF>");
+	responses.push_back("250 OK");
+	responses.push_back("221 emilia-tan.com.com Service closing transmission channel");
+
+	static int responseNum = 0;
+	Rain::sendText(*recvParam.socket, responses[responseNum].c_str(), responses[responseNum].length());
+	responseNum++;
 
 	return 0;
 }
@@ -40,7 +52,7 @@ int main() {
 
 	std::cout << "Client IP:\t" << Rain::getClientNumIP(cSocket) << "\n";
 
-	std::string message = "220 emilia-tan.com Simple Mail Transfer Service Ready\r\n\n\n";
+	std::string message = "220 emilia-tan.com Simple Mail Transfer Service Ready\r\n";
 	Rain::sendText(cSocket, message.c_str(), message.length());
 
 	std::cin.get();
