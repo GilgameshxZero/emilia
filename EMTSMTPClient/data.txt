@@ -1,0 +1,13 @@
+MIME-Version: 1.0
+From: Yang Yan <gil@emilia-tan.com>
+Subject: hi dad!
+To: wfyan2002@hotmail.com
+Content-Type: multipart/alternative; boundary="94eb2c14c0d6397b230566b74dd2"
+
+--94eb2c14c0d6397b230566b74dd2
+Content-Type: text/plain; charset="UTF-8"
+
+hello world!
+
+--94eb2c14c0d6397b230566b74dd2--
+.
