@@ -24,6 +24,7 @@ namespace Mono3 {
 				rtParam.state = "QUIT";
 				std::string emailBody;
 				response << "MIME-Version: 1.0\r\n"
+					<< "DKIM-Signature: v=1; a=rsa-sha256; s=dkim; d=emilia-tan.com; h=Received : From : To : Subject : ; l=0; bh=;"
 					<< "From: " << config["fromName"] << " <" << config["fromEmail"] << ">\r\n"
 					<< "Subject: " << config["emailSubject"] << "\r\n"
 					<< "To: " << config["toEmail"] << "\r\n"
