@@ -1,0 +1,30 @@
+250 2.0.0 OK 02/7E-06341-B1B4F9A5
+QUIT
+220 SN1NAM02FT031.mail.protection.outlook.com Microsoft ESMTP MAIL Service ready at Wed, 7 Mar 2018 02:16:01 +0000
+EHLO smtp.emilia-tan.com
+250-SN1NAM02FT031.mail.protection.outlook.com Hello [18.96.5.147]
+250-SIZE 49283072
+250-PIPELINING
+250-DSN
+250-ENHANCEDSTATUSCODES
+250-STARTTLS
+250-8BITMIME
+250-BINARYMIME
+250-CHUNKING
+250 SMTPUTF8
+MAIL FROM:<gil@emilia-tan.com>
+250 2.1.0 Sender OK
+RCPT TO:<yangilga@outlook.com>
+250 2.1.5 Recipient OK
+DATA
+354 Start mail input; end with <CRLF>.<CRLF>
+MIME-Version: 1.0
+From: Yang Yan <gil@emilia-tan.com>
+Subject: From Emilia
+To: yangilga@outlook.com
+Content-Type: text/plain; charset="UTF-8"
+
+<3
+.
+250 2.6.0 <f445c4f1-3113-44a9-9c16-d86a69ee91a8@SN1NAM02FT031.eop-nam02.prod.protection.outlook.com> [InternalId=3582002740105, Hostname=SN1NAM02HT121.eop-nam02.prod.protection.outlook.com] 5559 bytes in 0.109, 49.559 KB/sec Queued mail for delivery
+QUIT

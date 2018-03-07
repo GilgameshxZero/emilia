@@ -89,6 +89,7 @@
     <ClInclude Include="..\RainLibrary3\RainUtility.h" />
     <ClInclude Include="..\RainLibrary3\RainUtilityFile.h" />
     <ClInclude Include="..\RainLibrary3\RainUtilityGeneral.h" />
+    <ClInclude Include="..\RainLibrary3\RainUtilityHexString.h" />
     <ClInclude Include="..\RainLibrary3\RainUtilityString.h" />
     <ClInclude Include="..\RainLibrary3\RainWindow.h" />
     <ClInclude Include="..\RainLibrary3\RainWindowsLAM.h" />
@@ -99,10 +100,14 @@
     <ClInclude Include="..\RainLibrary3\RainWSA2Utility.h" />
     <ClInclude Include="BuildID.h" />
     <ClInclude Include="Main.h" />
+    <ClInclude Include="RecvThreadHandlers.h" />
+    <ClInclude Include="RecvThreadParam.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Start.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="BuildIDInc.bat" />
+    <None Include="config.ini" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
@@ -116,6 +121,7 @@
     <ClCompile Include="..\RainLibrary3\RainUtility.cpp" />
     <ClCompile Include="..\RainLibrary3\RainUtilityFile.cpp" />
     <ClCompile Include="..\RainLibrary3\RainUtilityGeneral.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainUtilityHexString.cpp" />
     <ClCompile Include="..\RainLibrary3\RainUtilityString.cpp" />
     <ClCompile Include="..\RainLibrary3\RainWindow.cpp" />
     <ClCompile Include="..\RainLibrary3\RainWindowsLAM.cpp" />
@@ -125,9 +131,13 @@
     <ClCompile Include="..\RainLibrary3\RainWSA2SendRecv.cpp" />
     <ClCompile Include="..\RainLibrary3\RainWSA2Utility.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="RecvThreadHandlers.cpp" />
+    <ClCompile Include="RecvThreadParam.cpp" />
+    <ClCompile Include="Start.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="data.txt" />
+    <Text Include="clientLog.log" />
+    <Text Include="emailBody.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

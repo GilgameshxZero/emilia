@@ -1,6 +1,35 @@
 #include "RainWSA2SendRecv.h"
 
 namespace Rain {
+
+	int sendText(SOCKET &sock, const char *cstrtext, long long len) {
+		long long sent = 0;
+		int ret;
+
+		while (sent < len) {
+			ret = send(sock, cstrtext + sent, static_cast<int>(len - sent), 0);
+			if (ret == SOCKET_ERROR) {
+				ret = WSAGetLastError();
+				return ret;
+			}
+
+			sent += ret;
+		}
+
+		return 0;
+	}
+	int sendText(SOCKET &sock, std::string strText) {
+		return sendText(sock, strText.c_str(), strText.length());
+	}
+
+	int sendHeader(SOCKET &sock, std::unordered_map<std::string, std::string> *headers) {
+		std::string message;
+		for (std::unordered_map<std::string, std::string>::iterator it = headers->begin(); it != headers->end(); it++)
+			message += it->first + ": " + it->second + "\n";
+		message += "\n";
+		return Rain::sendText(sock, message.c_str(), message.length());
+	}
+
 	DWORD WINAPI recvThread(LPVOID lpParameter) {
 		WSA2RecvParam *recvparam = reinterpret_cast<WSA2RecvParam *>(lpParameter);
 		char *buffer = new char[recvparam->bufLen];
@@ -32,31 +61,6 @@ namespace Rain {
 			recvparam->onRecvEnd(recvparam->funcParam);
 
 		return ret;
-	}
-
-	int sendText(SOCKET &sock, const char *cstrtext, long long len) {
-		long long sent = 0;
-		int ret;
-
-		while (sent < len) {
-			ret = send(sock, cstrtext + sent, static_cast<int>(len - sent), 0);
-			if (ret == SOCKET_ERROR) {
-				ret = WSAGetLastError();
-				return ret;
-			}
-
-			sent += ret;
-		}
-
-		return 0;
-	}
-
-	int sendHeader(SOCKET &sock, std::unordered_map<std::string, std::string> *headers) {
-		std::string message;
-		for (std::unordered_map<std::string, std::string>::iterator it = headers->begin(); it != headers->end(); it++)
-			message += it->first + ": " + it->second + "\n";
-		message += "\n";
-		return Rain::sendText(sock, message.c_str(), message.length());
 	}
 
 	HANDLE createRecvThread(

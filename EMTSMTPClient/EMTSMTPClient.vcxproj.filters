@@ -75,11 +75,24 @@
     <ClInclude Include="Main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Start.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\RainLibrary3\RainUtilityHexString.h">
+      <Filter>RainLibrary3</Filter>
+    </ClInclude>
+    <ClInclude Include="RecvThreadHandlers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RecvThreadParam.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="BuildIDInc.bat">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="config.ini" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">
@@ -138,8 +151,21 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Start.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RainLibrary3\RainUtilityHexString.cpp">
+      <Filter>RainLibrary3</Filter>
+    </ClCompile>
+    <ClCompile Include="RecvThreadHandlers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RecvThreadParam.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="data.txt" />
+    <Text Include="emailBody.txt" />
+    <Text Include="clientLog.log" />
   </ItemGroup>
 </Project>
