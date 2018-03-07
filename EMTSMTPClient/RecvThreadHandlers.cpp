@@ -8,7 +8,7 @@ namespace Mono3 {
 
 			//preliminarily test that message is done receiving
 			rtParam.accMess += rtParam.message;
-			if (rtParam.accMess.substr(rtParam.accMess.length() - 2, 2) != "\r\n")
+			if (rtParam.accMess.substr(rtParam.accMess.length() - 2, 2) != "\r\n") //todo
 				return 0;
 
 			//process the accumulated message
