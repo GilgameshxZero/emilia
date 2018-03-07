@@ -1,86 +1,25 @@
-250 2.0.0 OK 02/7E-06341-B1B4F9A5
-QUIT
-220 SN1NAM02FT031.mail.protection.outlook.com Microsoft ESMTP MAIL Service ready at Wed, 7 Mar 2018 02:16:01 +0000
+220 dmz-mailsec-scanner-5.mit.edu ESMTP Symantec Messaging Gateway
 EHLO smtp.emilia-tan.com
-250-SN1NAM02FT031.mail.protection.outlook.com Hello [18.96.5.147]
-250-SIZE 49283072
-250-PIPELINING
-250-DSN
-250-ENHANCEDSTATUSCODES
-250-STARTTLS
+250-dmz-mailsec-scanner-5.mit.edu says EHLO to 18.96.5.147:56793
 250-8BITMIME
-250-BINARYMIME
-250-CHUNKING
-250 SMTPUTF8
-MAIL FROM:<gil@emilia-tan.com>
-250 2.1.0 Sender OK
-RCPT TO:<yangilga@outlook.com>
-250 2.1.5 Recipient OK
-DATA
-354 Start mail input; end with <CRLF>.<CRLF>
-MIME-Version: 1.0
-From: Yang Yan <gil@emilia-tan.com>
-Subject: From Emilia
-To: yangilga@outlook.com
-Content-Type: text/plain; charset="UTF-8"
-
-<3
-.
-250 2.6.0 <f445c4f1-3113-44a9-9c16-d86a69ee91a8@SN1NAM02FT031.eop-nam02.prod.protection.outlook.com> [InternalId=3582002740105, Hostname=SN1NAM02HT121.eop-nam02.prod.protection.outlook.com] 5559 bytes in 0.109, 49.559 KB/sec Queued mail for delivery
-QUIT
-220 BN3NAM01FT029.mail.protection.outlook.com Microsoft ESMTP MAIL Service ready at Wed, 7 Mar 2018 02:42:25 +0000
-EHLO smtp.emilia-tan.com
-250-BN3NAM01FT029.mail.protection.outlook.com Hello [18.96.5.147]
-250-SIZE 49283072
-250-PIPELINING
-250-DSN
 250-ENHANCEDSTATUSCODES
-250-STARTTLS
-250-8BITMIME
-250-BINARYMIME
-250-CHUNKING
-250 SMTPUTF8
+250-SIZE 41943040
+250-PIPELINING
+250 STARTTLS
 MAIL FROM:<gil@emilia-tan.com>
-250 2.1.0 Sender OK
-RCPT TO:<yangilga@outlook.com>
-250 2.1.5 Recipient OK
+250 2.0.0 MAIL FROM accepted
+RCPT TO:<yangilga@mit.edu>
+250 2.0.0 RCPT TO accepted
 DATA
-354 Start mail input; end with <CRLF>.<CRLF>
+354 3.0.0 continue.  finished with "\r\n.\r\n"
 MIME-Version: 1.0
 DKIM-Signature: v=1; a=rsa-sha256; s=dkim; d=emilia-tan.com; h=Received : From : To : Subject : ; l=0; bh=;From: Yang Yan <gil@emilia-tan.com>
 Subject: From Emilia
-To: yangilga@outlook.com
+To: yangilga@mit.edu
 Content-Type: text/plain; charset="UTF-8"
 
 <3
 .
-250 2.6.0 <7468fdd1-a801-4c96-ba22-b184cfce1f06@BN3NAM01FT029.eop-nam01.prod.protection.outlook.com> [InternalId=2186138396388, Hostname=BN3NAM01HT116.eop-nam01.prod.protection.outlook.com] 5581 bytes in 0.414, 13.153 KB/sec Queued mail for delivery
+250 2.0.0 OK 63/6B-10976-E1FFF9A5
 QUIT
-220 DB5EUR03FT041.mail.protection.outlook.com Microsoft ESMTP MAIL Service ready at Wed, 7 Mar 2018 02:43:20 +0000
-EHLO smtp.emilia-tan.com
-250-DB5EUR03FT041.mail.protection.outlook.com Hello [18.96.5.147]
-250-SIZE 49283072
-250-PIPELINING
-250-DSN
-250-ENHANCEDSTATUSCODES
-250-STARTTLS
-250-8BITMIME
-250-BINARYMIME
-250-CHUNKING
-250 SMTPUTF8
-MAIL FROM:<gil@emilia-tan.com>
-250 2.1.0 Sender OK
-RCPT TO:<yangilga@outlook.com>
-250 2.1.5 Recipient OK
-DATA
-354 Start mail input; end with <CRLF>.<CRLF>
-MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; s=dkim; d=emilia-tan.com; h=Received : From : To : Subject : ; l=0; bh=;From: Yang Yan <gil@emilia-tan.com>
-Subject: From Emilia
-To: yangilga@outlook.com
-Content-Type: text/plain; charset="UTF-8"
-
-<3
-.
-250 2.6.0 <a2fa1e3c-5ad1-41a1-911b-6446de12ef96@DB5EUR03FT041.eop-EUR03.prod.protection.outlook.com> [InternalId=5918464974050, Hostname=DB5EUR03HT083.eop-EUR03.prod.protection.outlook.com] 5577 bytes in 0.130, 41.612 KB/sec Queued mail for delivery
-QUIT
+221 2.3.0 dmz-mailsec-scanner-5.mit.edu closing connection
