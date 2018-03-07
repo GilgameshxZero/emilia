@@ -1,5 +1,5 @@
 Connecting to alt3.gmail-smtp-in.l.google.com for host gmail.com...
-220 mx.google.com ESMTP l60si843342ede.366 - gsmtp
+220 mx.google.com ESMTP p2si2915997edp.379 - gsmtp
 EHLO smtp.emilia-tan.com
 250-mx.google.com at your service, [18.96.5.147]
 250-SIZE 157286400
@@ -10,25 +10,27 @@ EHLO smtp.emilia-tan.com
 250-CHUNKING
 250 SMTPUTF8
 MAIL FROM:<gil@emilia-tan.com>
-250 2.1.0 OK l60si843342ede.366 - gsmtp
+250 2.1.0 OK p2si2915997edp.379 - gsmtp
 RCPT TO:<yangawesome@gmail.com>
-250 2.1.5 OK l60si843342ede.366 - gsmtp
+250 2.1.5 OK p2si2915997edp.379 - gsmtp
 DATA
-354  Go ahead l60si843342ede.366 - gsmtp
+354  Go ahead p2si2915997edp.379 - gsmtp
 MIME-Version: 1.0
-Date: Wed,  7 Mar 2018 10:59:56 -0500
+Message-ID: <2018-03-07.11:23:0941@smtp.emilia-tan.com>
+Date: Wed,  7 Mar 2018 11:23:09 -0500
 From: Yang Yan <gil@emilia-tan.com>
-Subject: From Emilia
+Subject: From Emilia & Gil
 To: yangawesome@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 
-<3
+💖
 
 --
 Brought to you by
+晏扬
 Yang (Gilbert) Yan
 from emilia-tan.com
 .
-250 2.0.0 OK 1520438396 l60si843342ede.366 - gsmtp
+250 2.0.0 OK 1520439789 p2si2915997edp.379 - gsmtp
 QUIT
-221 2.0.0 closing connection l60si843342ede.366 - gsmtp
+221 2.0.0 closing connection p2si2915997edp.379 - gsmtp

@@ -25,7 +25,7 @@ namespace Rain {
 		return NULL;
 	}
 	
-	std::string getUTCTime(std::string format) {
+	std::string getTime(std::string format) {
 		time_t     now = time(0);
 		struct tm  tstruct;
 		char       buf[80];

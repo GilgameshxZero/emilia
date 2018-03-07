@@ -56,7 +56,8 @@ namespace Mono3 {
 		int waitSendMail(RecvThreadParam &rtParam, std::map<std::string, std::string> &config, std::stringstream &response) {
 			std::string emailBody;
 			response << "MIME-Version: 1.0\r\n"
-				<< "Date: " << Rain::getUTCTime("%a, %e %b %G %T %z") << "\r\n"
+				<< "Message-ID: <" << Rain::getTime() << rand() << "@smtp.emilia-tan.com>\r\n" //todo
+				<< "Date: " << Rain::getTime("%a, %e %b %G %T %z") << "\r\n"
 				<< "From: " << config["fromName"] << " <" << config["fromEmail"] << ">\r\n"
 				<< "Subject: " << config["emailSubject"] << "\r\n"
 				<< "To: " << config["toEmail"] << "\r\n"
