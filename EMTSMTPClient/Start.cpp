@@ -6,6 +6,8 @@ namespace Mono3 {
 			std::map<std::string, std::string> config;
 			Rain::readParameterFile("config.ini", config);
 
+			Rain::fastOutputFile(config["logFile"], "", false);
+
 			//find the smtp server of the email host
 			std::string emailHost = config["toEmail"];
 			std::size_t toEmailDelimPos = emailHost.find("@");
@@ -38,6 +40,7 @@ namespace Mono3 {
 
 			rtParam.config = &config;
 			rtParam.sSocket = &sSocket;
+			rtParam.socketActive = true;
 
 			recvParam.bufLen = Rain::strToT<std::size_t>(config["recvBufLen"]);
 			recvParam.funcParam = reinterpret_cast<void *>(&rtParam);
@@ -50,9 +53,10 @@ namespace Mono3 {
 			CreateThread(NULL, 0, Rain::recvThread, reinterpret_cast<void *>(&recvParam), NULL, NULL);
 
 			//stall until smtp done
-			Sleep(100); //todo
-			rtParam.mainMutex.lock();
-			rtParam.mainMutex.unlock();
+			while (rtParam.socketActive) {
+				rtParam.mainMutex.lock();
+				rtParam.mainMutex.unlock();
+			}
 
 			closesocket(sSocket);
 			WSACleanup();
