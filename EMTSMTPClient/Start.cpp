@@ -4,7 +4,12 @@ namespace Mono3 {
 	namespace SMTPClient {
 		int start() {
 			std::map<std::string, std::string> config;
-			Rain::readParameterFile("config.ini", config);
+			Rain::readParameterFile("config\\config.ini", config);
+
+			//we are being called programmatically probably; initialize config from environment vars/input
+			if (config["readConfig"] != "yes") {
+				return 1; //todo
+			}
 
 			Rain::fastOutputFile(config["logFile"], "", false);
 
@@ -20,6 +25,9 @@ namespace Mono3 {
 			DnsQuery(emailHost.c_str(), DNS_TYPE_MX, DNS_QUERY_STANDARD, NULL, &dnsRecord, NULL);
 			std::string smtpServer = dnsRecord->Data.MX.pNameExchange;
 			DnsRecordListFree(dnsRecord, DnsFreeRecordList);
+
+			std::cout << "Connecting to " << smtpServer << " for host " << emailHost << "...\r\n";
+			Rain::fastOutputFile(config["logFile"], "Connecting to " + smtpServer + " for host " + emailHost + "...\r\n");
 
 			//connect to the smtp server
 			WSADATA wsaData;
@@ -58,6 +66,7 @@ namespace Mono3 {
 				rtParam.mainMutex.unlock();
 			}
 
+			Rain::shutdownSocketSend(sSocket);
 			closesocket(sSocket);
 			WSACleanup();
 

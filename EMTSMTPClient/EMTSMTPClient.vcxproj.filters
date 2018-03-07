@@ -16,6 +16,12 @@
     <Filter Include="RainLibrary3">
       <UniqueIdentifier>{c228cf0a-e912-4ed5-aa4d-a478fd8ca886}</UniqueIdentifier>
     </Filter>
+    <Filter Include="auxiliary">
+      <UniqueIdentifier>{75f98572-7dee-4a23-a51f-510e89399ab8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="config">
+      <UniqueIdentifier>{9a71b6a3-a062-4cf0-a797-9f3f9b93642a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BuildID.h">
@@ -92,7 +98,9 @@
     <None Include="BuildIDInc.bat">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="config.ini" />
+    <None Include="config\config.ini">
+      <Filter>config</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">
@@ -165,7 +173,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="emailBody.txt" />
-    <Text Include="clientLog.log" />
+    <Text Include="config\emailBody.txt">
+      <Filter>config</Filter>
+    </Text>
+    <Text Include="auxiliary\clientLog.log">
+      <Filter>auxiliary</Filter>
+    </Text>
   </ItemGroup>
 </Project>
