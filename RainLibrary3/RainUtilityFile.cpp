@@ -155,23 +155,24 @@ namespace Rain {
 		out.close();
 	}
 
-	void readParameterFile(std::string filePath, std::map<std::string, std::string> &params) {
+	std::map<std::string, std::string> &readParameterFile(std::string filePath, std::map<std::string, std::string> &params) {
 		static std::ifstream fileIn;
-		static std::string key, value;
+		static std::string key = "", value;
 
-		fileIn.open(filePath);
-		key = "";
-		fileIn >> key;
+		fileIn.open(filePath, std::ios::binary);
+		std::getline(fileIn, key, ':');
 
-		while(key.length () != 0) {
+		while (key.length() != 0) {
 			std::getline(fileIn, value);
-			strTrim(value);
-			params.insert(std::make_pair(key.substr(0, key.length() - 1), value));
+			Rain::strTrim(value);
+			Rain::strTrim(key);
+			params[key] = value;
 			key = "";
-			fileIn >> key;
+			std::getline(fileIn, key, ':');
 		}
 
 		fileIn.close();
+		return params;
 	}
 
 	std::string getWorkingDirectory() {

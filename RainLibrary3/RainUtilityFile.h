@@ -49,8 +49,8 @@ namespace Rain {
 	//shorthand function to output things to a file
 	void fastOutputFile(std::string filename, std::string &output, bool append = false);
 
-	//read parameters from standard parameter file, organized in lines of key:<whitespace>value
-	void readParameterFile(std::string filePath, std::map<std::string, std::string> &params);
+	//read parameters from standard parameter file, organized in lines of key:value, possibly with whitespace inbetween elements
+	std::map<std::string, std::string> &readParameterFile(std::string filePath, std::map<std::string, std::string> &params);
 
 	//returns current directory of the executable (not the same as the path to the executable, sometimes)
 	std::string getWorkingDirectory();
