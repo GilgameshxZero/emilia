@@ -145,7 +145,7 @@ namespace Rain {
 		return dirname;
 	}
 
-	void fastOutputFile(std::string filename, std::string &output, bool append) {
+	void fastOutputFileRef(std::string filename, std::string &output, bool append) {
 		std::ofstream out;
 		if (append)
 			out.open(filename, std::ios_base::out | std::ios_base::binary | std::ios_base::app);
@@ -153,6 +153,9 @@ namespace Rain {
 			out.open(filename, std::ios_base::out | std::ios_base::binary);
 		out << output;
 		out.close();
+	}
+	void fastOutputFile(std::string filename, std::string output, bool append) {
+		fastOutputFileRef(filename, output, append);
 	}
 
 	std::map<std::string, std::string> &readParameterFile(std::string filePath, std::map<std::string, std::string> &params) {
