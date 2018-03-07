@@ -15,5 +15,5 @@ namespace Rain {
 	//dumps memory leaks to a file if on debug mode; application must CloseHandle the return HANDLE, unless it's debug mode and the return is NULL
 	HANDLE logMemoryLeaks(std::string out_file);
 
-	const std::string currentDateTime();
+	std::string getUTCTime(std::string format = "%Y-%m-%d.%X");
 }

@@ -30,6 +30,5 @@ namespace Rain {
 	//both sides can use this function
 	int shutdownSocketSend(SOCKET &ConnectSocket);
 
-	//uility
 	std::string getClientNumIP(SOCKET &clientsock);
 }

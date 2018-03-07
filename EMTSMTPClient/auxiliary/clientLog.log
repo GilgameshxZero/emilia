@@ -1,0 +1,34 @@
+Connecting to alt3.gmail-smtp-in.l.google.com for host gmail.com...
+220 mx.google.com ESMTP l60si843342ede.366 - gsmtp
+EHLO smtp.emilia-tan.com
+250-mx.google.com at your service, [18.96.5.147]
+250-SIZE 157286400
+250-8BITMIME
+250-STARTTLS
+250-ENHANCEDSTATUSCODES
+250-PIPELINING
+250-CHUNKING
+250 SMTPUTF8
+MAIL FROM:<gil@emilia-tan.com>
+250 2.1.0 OK l60si843342ede.366 - gsmtp
+RCPT TO:<yangawesome@gmail.com>
+250 2.1.5 OK l60si843342ede.366 - gsmtp
+DATA
+354  Go ahead l60si843342ede.366 - gsmtp
+MIME-Version: 1.0
+Date: Wed,  7 Mar 2018 10:59:56 -0500
+From: Yang Yan <gil@emilia-tan.com>
+Subject: From Emilia
+To: yangawesome@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+
+<3
+
+--
+Brought to you by
+Yang (Gilbert) Yan
+from emilia-tan.com
+.
+250 2.0.0 OK 1520438396 l60si843342ede.366 - gsmtp
+QUIT
+221 2.0.0 closing connection l60si843342ede.366 - gsmtp

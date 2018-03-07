@@ -5,7 +5,7 @@
 namespace Mono3 {
 	namespace SMTPClient {
 		struct RecvThreadParam {
-			typedef int(*pSMTPWaitFunc) (RecvThreadParam &, std::map<std::string, std::string> &, std::string &, std::stringstream &);
+			typedef int(*pSMTPWaitFunc) (RecvThreadParam &, std::map<std::string, std::string> &, std::stringstream &);
 
 			//configuration
 			std::map<std::string, std::string> *config;
