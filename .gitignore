@@ -1,7 +1,14 @@
+*.aps
+*.user
+
 .vs
 Confidential
 EC2Access
 ServerRoot
-EMTServerDeploy
-*.aps
-*.user
+Live
+
+EMTServer\auxiliary
+EMTServer\config
+
+EMTSMTPClient\auxiliary
+EMTSMTPClient\config

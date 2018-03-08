@@ -160,21 +160,32 @@ namespace Rain {
 
 	std::map<std::string, std::string> &readParameterFile(std::string filePath, std::map<std::string, std::string> &params) {
 		static std::ifstream fileIn;
-		static std::string key = "", value;
 
 		fileIn.open(filePath, std::ios::binary);
-		std::getline(fileIn, key, ':');
+		std::stringstream ss;
+		ss << fileIn.rdbuf();
+		readParameterStream(ss, params);
+		fileIn.close();
+		return params;
+	}
+	std::map<std::string, std::string> &readParameterString(std::string paramString, std::map<std::string, std::string> &params) {
+		std::stringstream ss;
+		ss << paramString;
+		return readParameterStream(ss, params);
+	}
+	std::map<std::string, std::string> &readParameterStream(std::stringstream &paramStream, std::map<std::string, std::string> &params) {
+		static std::string key = "", value;
+		std::getline(paramStream, key, ':');
 
 		while (key.length() != 0) {
-			std::getline(fileIn, value);
+			std::getline(paramStream, value);
 			Rain::strTrim(value);
 			Rain::strTrim(key);
 			params[key] = value;
 			key = "";
-			std::getline(fileIn, key, ':');
+			std::getline(paramStream, key, ':');
 		}
 
-		fileIn.close();
 		return params;
 	}
 

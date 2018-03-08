@@ -1,7 +1,7 @@
 #include "Main.h"
 
 int main() {
-	int error = Mono3::start();
+	int error = Mono3::Server::start();
 
 	if (error != 0) {
 		std::cout << "start returned error code " << error << "\nExiting in 3 seconds...";

@@ -1,3 +1,11 @@
+/*
+Standard
+*/
+
+/*
+Needs brushing up. Originally used with TLS, but not very standard library.
+*/
+
 #pragma once
 
 #include <iomanip>
