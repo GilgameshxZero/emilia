@@ -16,6 +16,12 @@
     <Filter Include="RainLibrary3">
       <UniqueIdentifier>{96261c24-7651-4477-a11b-f9105a279357}</UniqueIdentifier>
     </Filter>
+    <Filter Include="auxiliary">
+      <UniqueIdentifier>{6bb0686f-69eb-4fe6-9ea4-1330759ed699}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="config">
+      <UniqueIdentifier>{8a7c3872-72d0-4091-8621-47c60a97d92a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BuildID.h">
@@ -95,10 +101,21 @@
     <None Include="BuildIDInc.bat">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="config.ini" />
-    <None Include="cgiScripts.ini" />
-    <None Include="customHeaders.ini" />
-    <None Include="contentTypeSpec.ini" />
+    <None Include="config\404.html">
+      <Filter>config</Filter>
+    </None>
+    <None Include="config\cgiScripts.ini">
+      <Filter>config</Filter>
+    </None>
+    <None Include="config\config.ini">
+      <Filter>config</Filter>
+    </None>
+    <None Include="config\contentTypeSpec.ini">
+      <Filter>config</Filter>
+    </None>
+    <None Include="config\customHeaders.ini">
+      <Filter>config</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">
@@ -179,8 +196,14 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="EMTServerAuxiliary\errors.txt" />
-    <Text Include="EMTServerAuxiliary\log.txt" />
-    <Text Include="EMTServerAuxiliary\memoryLeaks.txt" />
+    <Text Include="auxiliary\errors.txt">
+      <Filter>auxiliary</Filter>
+    </Text>
+    <Text Include="auxiliary\log.txt">
+      <Filter>auxiliary</Filter>
+    </Text>
+    <Text Include="auxiliary\memoryLeaks.txt">
+      <Filter>auxiliary</Filter>
+    </Text>
   </ItemGroup>
 </Project>

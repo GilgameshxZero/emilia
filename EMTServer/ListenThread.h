@@ -19,10 +19,12 @@ Responsible for maintaining a socket open for listening on a specified port, as 
 #include <Windows.h>
 
 namespace Mono3 {
-	//called from Start to create a thread
-	DWORD WINAPI listenThread(LPVOID lpParameter);
+	namespace Server {
+		//called from Start to create a thread
+		DWORD WINAPI listenThread(LPVOID lpParameter);
 
-	//message handlers for the listenThread message queue/window
-	LRESULT onListenWndEnd(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	LRESULT onListenWndInit(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+		//message handlers for the listenThread message queue/window
+		LRESULT onListenWndEnd(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+		LRESULT onListenWndInit(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	}
 }
