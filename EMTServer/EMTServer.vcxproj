@@ -174,15 +174,15 @@
     <Image Include="Icon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="auxiliary\errors.txt">
+    <Text Include="auxiliary\EMTServerErrors.txt">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </Text>
-    <Text Include="auxiliary\log.txt">
+    <Text Include="auxiliary\EMTServerLog.log">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </Text>
-    <Text Include="auxiliary\memoryLeaks.txt">
+    <Text Include="auxiliary\EMTServerMemoryLeaks.txt">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </Text>
