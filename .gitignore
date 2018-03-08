@@ -7,8 +7,8 @@ EC2Access
 ServerRoot
 Live
 
-EMTServer\auxiliary
-EMTServer\config
+EMTServer/auxiliary
+EMTServer/config
 
-EMTSMTPClient\auxiliary
-EMTSMTPClient\config
+EMTSMTPClient/auxiliary
+EMTSMTPClient/config
