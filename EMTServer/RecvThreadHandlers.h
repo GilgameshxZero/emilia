@@ -5,20 +5,22 @@
 #include <set>
 
 namespace Mono3 {
-	//handlers for RecvThread
-	void onRecvThreadInit(void *funcParam);
-	void onRecvThreadEnd(void *funcParam);
-	int onProcessMessage(void *funcParam);
+	namespace Server {
+		//handlers for RecvThread
+		void onRecvThreadInit(void *funcParam);
+		void onRecvThreadEnd(void *funcParam);
+		int onProcessMessage(void *funcParam);
 
-	//called by RecvThread handlers when a full message comes in
-	//header keys are all lowercase
-	int processRequest(SOCKET &cSocket,
-					   std::map<std::string, std::string> &config,
-					   std::string &requestMethod,
-					   std::string &requestURI,
-					   std::string &httpVersion,
-					   std::map<std::string, std::string> &headers,
-					   std::string &bodyBlock);
+		//called by RecvThread handlers when a full message comes in
+		//header keys are all lowercase
+		int processRequest(SOCKET &cSocket,
+						   std::map<std::string, std::string> &config,
+						   std::string &requestMethod,
+						   std::string &requestURI,
+						   std::string &httpVersion,
+						   std::map<std::string, std::string> &headers,
+						   std::string &bodyBlock);
 
-	void parseHeaders(std::stringstream &headerStream, std::map<std::string, std::string> &headers);
+		void parseHeaders(std::stringstream &headerStream, std::map<std::string, std::string> &headers);
+	}
 }

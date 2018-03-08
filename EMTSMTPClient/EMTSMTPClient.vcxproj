@@ -97,6 +97,7 @@
     <ClInclude Include="..\RainLibrary3\RainWSA2Include.h" />
     <ClInclude Include="..\RainLibrary3\RainWSA2RecvParam.h" />
     <ClInclude Include="..\RainLibrary3\RainWSA2SendRecv.h" />
+    <ClInclude Include="..\RainLibrary3\RainWSA2SMTP.h" />
     <ClInclude Include="..\RainLibrary3\RainWSA2Utility.h" />
     <ClInclude Include="BuildID.h" />
     <ClInclude Include="Main.h" />
@@ -132,6 +133,7 @@
     <ClCompile Include="..\RainLibrary3\RainWSA2Include.cpp" />
     <ClCompile Include="..\RainLibrary3\RainWSA2RecvParam.cpp" />
     <ClCompile Include="..\RainLibrary3\RainWSA2SendRecv.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainWSA2SMTP.cpp" />
     <ClCompile Include="..\RainLibrary3\RainWSA2Utility.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="RecvThreadHandlers.cpp" />
@@ -139,7 +141,7 @@
     <ClCompile Include="Start.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="auxiliary\clientLog.log">
+    <Text Include="auxiliary\EMTSMTPClientLog.log">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </Text>

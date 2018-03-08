@@ -9,5 +9,7 @@
 #include <vector>
 
 namespace Mono3 {
-	int start();
+	namespace Server {
+		int start();
+	}
 }

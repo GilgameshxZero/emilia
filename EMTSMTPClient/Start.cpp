@@ -6,12 +6,24 @@ namespace Mono3 {
 			std::map<std::string, std::string> config;
 			Rain::readParameterFile("config\\config.ini", config);
 
-			//we are being called programmatically probably; initialize config from environment vars/input
-			if (config["readConfig"] != "yes") {
-				return 1; //todo
-			}
+			//debugging
+			Rain::redirectCerrFile(config["errorLog"]);
+			Rain::logMemoryLeaks(config["memoryLeakLog"]);
 
-			Rain::fastOutputFile(config["logFile"], "", false);
+			//determine if we should use config from the file, or from stdin
+			//config from stdin ends by setting "_configEnd_" to "true"
+			if (config["readConfig"] != "yes") {
+				std::string key, value;
+				std::getline(std::cin, key, ':');
+
+				while (config["_configEnd_"] != "true") {
+					std::getline(std::cin, value);
+					Rain::strTrim(value);
+					Rain::strTrim(key);
+					config[key] = value;
+					std::getline(std::cin, key, ':');
+				}
+			}
 
 			//find the smtp server of the email host
 			std::string emailHost = config["toEmail"];
@@ -69,6 +81,7 @@ namespace Mono3 {
 			Rain::shutdownSocketSend(sSocket);
 			closesocket(sSocket);
 			WSACleanup();
+			Rain::fastOutputFile(config["logFile"], "Finished sending email.\r\n");
 
 			std::cout << "EMTSMTPClient has finished. Exiting in 2 seconds...";
 			Sleep(2000);
