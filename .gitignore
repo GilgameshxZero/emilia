@@ -1,6 +1,6 @@
 *.aps
 *.user
-*_Debug_*.exe
+*.exe
 
 .vs
 Confidential
