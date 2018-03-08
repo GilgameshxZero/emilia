@@ -207,4 +207,20 @@ namespace Rain {
 		t.read(&fileData[0], size);
 		return fileData;
 	}
+
+	std::string getPathDirectory(std::string path) {
+		std::string dir;
+		bool seechar = false;
+		for (std::size_t a = path.length() - 1; a >= 0; a--) {
+			if (path[a] == ':') {
+				dir = "C:\\";
+				break;
+			} else if (path[a] == '\\' && seechar) {
+				dir = path.substr(0, a + 1);
+				break;
+			} else
+				seechar = true;
+		}
+		return dir;
+	}
 }

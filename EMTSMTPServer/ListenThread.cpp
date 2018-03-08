@@ -1,7 +1,7 @@
 #include "ListenThread.h"
 
 namespace Mono3 {
-	namespace Server {
+	namespace SMTPServer {
 		DWORD WINAPI listenThread(LPVOID lpParameter) {
 			ListenThreadParam &ltParam = *reinterpret_cast<ListenThreadParam *>(lpParameter);
 
@@ -27,7 +27,7 @@ namespace Mono3 {
 			WPARAM wndReturn = ltParam.rainWnd.enterMessageLoop();
 			ltParam.rainWnd.~RainWindow(); //double-check to make sure rainWnd is destroyed
 
-			//remove ltParam from the linked list structure
+										   //remove ltParam from the linked list structure
 			ltParam.prevLTP->nextLTP = ltParam.nextLTP;
 			ltParam.nextLTP->prevLTP = ltParam.prevLTP;
 
@@ -74,6 +74,13 @@ namespace Mono3 {
 				return -1;
 			}
 
+			//logging
+			std::cout << Rain::getTime() << " Client connected from " << Rain::getClientNumIP(ltParam.cSocket) << "\r\n";
+			Rain::fastOutputFile(ltParam.config->at("logFile"), Rain::getTime() + " Client connected from " + Rain::getClientNumIP(ltParam.cSocket) + "\r\n", true);
+			
+			//first, send the initial HELO
+			Rain::sendText(ltParam.cSocket, ltParam.config->at("init220") + "\r\n");
+
 			//set up the recvParam to pass to recvThread
 			RecvThreadParam *rtParam = new RecvThreadParam();
 			rtParam->pLTParam = &ltParam;
@@ -86,7 +93,7 @@ namespace Mono3 {
 			ltParam.recvParam.onRecvInit = onRecvThreadInit; //called at the beginning of the recvThread, nothing for now
 			ltParam.recvParam.onRecvEnd = onRecvThreadEnd; //called at the end of recvThread
 
-			//processing this socket will be handled by the recvThread
+														   //processing this socket will be handled by the recvThread
 			ltParam.hRecvThread = CreateThread(NULL, 0, Rain::recvThread, reinterpret_cast<void *>(&ltParam.recvParam), NULL, NULL);
 
 			//once we accept a client, create a new clientthread to listen for more connections, thus the linked list structure
