@@ -10,6 +10,9 @@ namespace Mono3 {
 			//configuration
 			std::map<std::string, std::string> *config;
 
+			//body of email to send
+			std::string *emailBody;
+
 			//connection to server
 			SOCKET *sSocket;
 
@@ -20,6 +23,9 @@ namespace Mono3 {
 			//mutex to lock the main thread while smtp is ongoing
 			std::mutex mainMutex;
 			bool socketActive;
+
+			//main can reference this to determine if the sending was successful
+			bool *clientSuccess;
 
 			//pointer to procMessage func, which we change based on what stage of smtp we are on
 			pSMTPWaitFunc smtpWaitFunc;
