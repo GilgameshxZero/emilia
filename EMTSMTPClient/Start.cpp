@@ -10,39 +10,38 @@ namespace Mono3 {
 			//adjust stream based on readConfig parameter
 			std::istream *configSS;
 			std::ifstream configFIn;
-			if (config["readConfig"] != "yes")
+			if (config["readConfig"] != "yes") {
+				_setmode(_fileno(stdin), _O_BINARY);
 				configSS = &std::cin;
+			}
 			else {
-				configFIn.open("config\\config.ini");
+				configFIn.open("config\\config.ini", std::ios::binary);
 				configSS = &configFIn;
 			}
 
 			//read from stream the same way
 			config.clear();
 			std::string key, value;
-			std::getline(*configSS, key, ':');
 
 			//config ends by setting "_configEnd_" to "true"
-			std::string emailBody;
 			while (config["_configEnd_"] != "true") {
+				std::getline(*configSS, key, ':');
 				Rain::strTrim(key);
 				if (key == "emailBodyData") { //special config key
 					//determine from config whether we should read email body from a file, or from the config itself
 					if (Rain::strToT<int>(config["emailBodyLen"]) == 0) { //read from file
-						Rain::readFullFile(config["emailBodyFile"], emailBody);
+						Rain::readFullFile(config["emailBodyFile"], value);
 					} else { //read from stream some number of characters after the ':'
 						char *ssBuff = new char[Rain::strToT<std::size_t>(config["emailBodyLen"])];
-						configSS->get(ssBuff, Rain::strToT<std::size_t>(config["emailBodyLen"]));
-						emailBody = ssBuff;
+						configSS->read(ssBuff, Rain::strToT<std::size_t>(config["emailBodyLen"]));
+						value = std::string(ssBuff, Rain::strToT<std::size_t>(config["emailBodyLen"]));
 						delete[] ssBuff;
 					}
 				} else {
 					std::getline(*configSS, value);
 					Rain::strTrim(value);
-					config[key] = value;
 				}
-
-				std::getline(*configSS, key, ':');
+				config[key] = value;
 			}
 			if (configFIn.is_open())
 				configFIn.close();
@@ -52,7 +51,7 @@ namespace Mono3 {
 			Rain::logMemoryLeaks(config["memoryLeakLog"]);
 
 			//find the smtp server of the email host
-			std::string emailHost = config["toEmail"];
+			std::string emailHost = config["rcptTo"];
 			std::size_t toEmailDelimPos = emailHost.find("@");
 			
 			if (toEmailDelimPos == std::string::npos || toEmailDelimPos + 1 >= emailHost.length())
@@ -91,7 +90,6 @@ namespace Mono3 {
 				rtParam.config = &config;
 				rtParam.sSocket = &sSocket;
 				rtParam.socketActive = true;
-				rtParam.emailBody = &emailBody;
 				rtParam.clientSuccess = &clientSuccess;
 
 				recvParam.bufLen = Rain::strToT<std::size_t>(config["recvBufLen"]);
