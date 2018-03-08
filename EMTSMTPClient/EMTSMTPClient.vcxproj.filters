@@ -185,5 +185,11 @@
     <Text Include="auxiliary\EMTSMTPClientLog.log">
       <Filter>auxiliary</Filter>
     </Text>
+    <Text Include="auxiliary\EMTSMTPErrorLog.txt">
+      <Filter>auxiliary</Filter>
+    </Text>
+    <Text Include="auxiliary\EMTSMTPMemoryLeaks.txt">
+      <Filter>auxiliary</Filter>
+    </Text>
   </ItemGroup>
 </Project>
