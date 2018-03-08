@@ -95,7 +95,7 @@ namespace Mono3 {
 			Rain::fastOutputFile(rtParam.pLTParam->config->at("serverLog"),
 								 Rain::getTime() + "\t" + clientIP + "\t" + Rain::tToStr(rtParam.request.length()) + " bytes\r\n" +
 								 rtParam.request + "\r\n" +
-								 std::string("-", 80), true);
+								 "--------------------------------------------------------------------------------\r\n", true);
 
 			//send the parsed headers and bodyBlock and other parameters over to processRequest
 			return processRequest(rtParam.pLTParam->cSocket,
@@ -259,7 +259,7 @@ namespace Mono3 {
 					TRUE,
 					DETACHED_PROCESS,
 					reinterpret_cast<LPVOID>(const_cast<char *>(envBlock.c_str())),
-					requestFileDir.c_str(),
+					Rain::getPathDirectory(requestFilePath).c_str(),
 					&sinfo,
 					&pinfo)) { //try to fail peacefully
 					Rain::reportError(GetLastError(), "error while starting cgi script " + requestFilePath);
@@ -289,7 +289,6 @@ namespace Mono3 {
 				//wait for cgi script to finish, up to a timeout
 				WaitForInputIdle(pinfo.hProcess, Rain::strToT<DWORD>(config["cgiMaxIdleTime"]));
 
-				CloseHandle(pinfo.hProcess);
 				CloseHandle(pinfo.hThread);
 				CloseHandle(g_hChildStd_OUT_Wr);
 				CloseHandle(g_hChildStd_IN_Rd);
@@ -301,12 +300,23 @@ namespace Mono3 {
 				CHAR *chBuf = new CHAR[cgiOutPipeBufLen];
 				for (;;) {
 					static DWORD dwRead;
-					if (!ReadFile(g_hChildStd_OUT_Rd, chBuf, static_cast<DWORD>(cgiOutPipeBufLen), &dwRead, NULL) || dwRead == 0) //finished reading from the pipe
+					if (!ReadFile(g_hChildStd_OUT_Rd, chBuf, static_cast<DWORD>(cgiOutPipeBufLen), &dwRead, NULL)) { //maybe error
+						DWORD error = GetLastError();
+						if (error == ERROR_BROKEN_PIPE) //the pipe broke because the process has shut it down, this is okay
+							break;
+						else { //actually bad, terminate process
+							TerminateProcess(pinfo.hProcess, 0);
+							Rain::reportError(error, "something went wrong with ReadFile");
+							break;
+						}
+					}
+					if (dwRead == 0) //nothing left in pipe
 						break;
 					responseBody += std::string(chBuf, dwRead);
 				}
 				delete[] chBuf;
 				CloseHandle(g_hChildStd_OUT_Rd);
+				CloseHandle(pinfo.hProcess);
 
 				//try to decompose the responseBody into headers and body and prepare for responding
 				std::size_t headerBlockEnd = Rain::rabinKarpMatch(responseBody, "\r\n\r\n");

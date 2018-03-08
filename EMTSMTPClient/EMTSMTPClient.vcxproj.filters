@@ -185,11 +185,16 @@
     <Text Include="auxiliary\EMTSMTPClientLog.log">
       <Filter>auxiliary</Filter>
     </Text>
-    <Text Include="auxiliary\EMTSMTPErrorLog.txt">
+    <Text Include="auxiliary\EMTSMTPClientErrorLog.txt">
       <Filter>auxiliary</Filter>
     </Text>
-    <Text Include="auxiliary\EMTSMTPMemoryLeaks.txt">
+    <Text Include="auxiliary\EMTSMTPClientMemoryLeaks.txt">
       <Filter>auxiliary</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Icon.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

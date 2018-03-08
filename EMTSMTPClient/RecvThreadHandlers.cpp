@@ -45,7 +45,7 @@ namespace Mono3 {
 			if (Rain::getSMTPStatusCode(rtParam.message) != 250) //confirm status code
 				return 1;
 
-			response << "MAIL FROM:<" << config["fromEmail"] << ">\r\n";
+			response << "MAIL FROM:<" << config["mailFrom"] << ">\r\n";
 			rtParam.smtpWaitFunc = waitRcptTo;
 			return 0;
 		}
@@ -53,7 +53,7 @@ namespace Mono3 {
 			if (Rain::getSMTPStatusCode(rtParam.message) != 250) //confirm status code
 				return 1;
 
-			response << "RCPT TO:<" << config["toEmail"] << ">\r\n";
+			response << "RCPT TO:<" << config["rcptTo"] << ">\r\n";
 			rtParam.smtpWaitFunc = waitData;
 			return 0;
 		}
@@ -69,16 +69,20 @@ namespace Mono3 {
 			if (Rain::getSMTPStatusCode(rtParam.message) != 354) //confirm status code
 				return 1;
 
-			response << "MIME-Version: 1.0\r\n"
-				<< "Message-ID: <" << Rain::getTime() << rand() << "@smtp.emilia-tan.com>\r\n" //todo
-				<< "Date: " << Rain::getTime("%a, %e %b %G %T %z") << "\r\n"
-				<< "From: " << config["fromName"] << " <" << config["fromEmail"] << ">\r\n"
-				<< "Subject: " << config["emailSubject"] << "\r\n"
-				<< "To: " << config["toEmail"] << "\r\n"
-				<< "Content-Type: text/plain; charset=\"UTF-8\"\r\n"
-				<< "\r\n"
-				<< *rtParam.emailBody << "\r\n"
-				<< ".\r\n";
+			//if rawBody is yes, then send the body without setting any of the headers
+			if (config["rawBody"] == "yes")
+				response << config["emailBodyData"];
+			else
+				response << "MIME-Version: 1.0\r\n"
+					<< "Message-ID: <" << Rain::getTime() << rand() << "@smtp.emilia-tan.com>\r\n" //todo
+					<< "Date: " << Rain::getTime("%a, %e %b %G %T %z") << "\r\n"
+					<< "From: " << config["fromName"] << " <" << (config["fromEmail"] == "mailFrom" ? config["mailFrom"] : config["fromEmail"]) << ">\r\n"
+					<< "Subject: " << config["emailSubject"] << "\r\n"
+					<< "To: " << (config["toEmail"] == "rcptTo" ? config["rcptTo"] : config["toEmail"]) << "\r\n"
+					<< "Content-Type: text/plain; charset=\"UTF-8\"\r\n"
+					<< "\r\n"
+					<< config["emailBodyData"] << "\r\n"
+					<< ".\r\n";
 			rtParam.smtpWaitFunc = waitQuit;
 			return 0;
 		}

@@ -13,3 +13,6 @@ EMTServer/config
 
 EMTSMTPClient/auxiliary
 EMTSMTPClient/config
+
+EMTSMTPServer/auxiliary
+EMTSMTPServer/config

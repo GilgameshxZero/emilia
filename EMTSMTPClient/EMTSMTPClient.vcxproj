@@ -145,12 +145,15 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </Text>
-    <Text Include="auxiliary\EMTSMTPErrorLog.txt" />
-    <Text Include="auxiliary\EMTSMTPMemoryLeaks.txt" />
+    <Text Include="auxiliary\EMTSMTPClientErrorLog.txt" />
+    <Text Include="auxiliary\EMTSMTPClientMemoryLeaks.txt" />
     <Text Include="config\emailBody.txt">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Icon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

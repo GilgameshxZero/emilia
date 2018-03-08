@@ -59,4 +59,6 @@ namespace Rain {
 	std::string getWorkingDirectory();
 
 	std::string &readFullFile(std::string filePath, std::string &fileData);
+
+	std::string getPathDirectory(std::string path);
 }

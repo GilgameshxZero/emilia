@@ -10,9 +10,6 @@ namespace Mono3 {
 			//configuration
 			std::map<std::string, std::string> *config;
 
-			//body of email to send
-			std::string *emailBody;
-
 			//connection to server
 			SOCKET *sSocket;
 
