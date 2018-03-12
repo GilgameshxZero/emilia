@@ -75,10 +75,20 @@ namespace Mono3 {
 				Rain::reportError(GetLastError(), "error in quickClientInit");
 				return -1;
 			}
-			if (Rain::connToServ(&sAddr, sSocket)) {
-				Rain::reportError(GetLastError(), "error in connToServ");
-				return -1;
+			//try a max of 100 times
+			//todo: 100 config
+			int connToServTry = 0;
+			for (; connToServTry < 100; connToServTry++) {
+				if (Rain::connToServ(&sAddr, sSocket)) {
+					Rain::reportError(GetLastError(), "error in connToServ");
+					std::cout << "Error " << GetLastError() << " while connecting to server, trying again...\r\n";
+					Rain::fastOutputFile(config["logFile"], "Error " + Rain::tToStr(GetLastError()) + " while connecting to server, trying again...\r\n", true);
+				}
+				else
+					break;
 			}
+			if (connToServTry == 100)
+				return -1;
 
 			//stall until smtp done
 			bool clientSuccess = false;
