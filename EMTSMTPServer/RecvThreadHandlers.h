@@ -12,5 +12,7 @@ namespace Mono3 {
 		int waitData(RecvThreadParam &rtParam, std::map<std::string, std::string> &config, std::stringstream &response);
 		int waitSendMail(RecvThreadParam &rtParam, std::map<std::string, std::string> &config, std::stringstream &response);
 		int waitQuit(RecvThreadParam &rtParam, std::map<std::string, std::string> &config, std::stringstream &response);
+
+		int waitAuthLogin(RecvThreadParam &rtParam, std::map<std::string, std::string> &config, std::stringstream &response);
 	}
 }
