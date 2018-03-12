@@ -32,11 +32,14 @@ namespace Mono3 {
 			//arrange threads in a linked list, with dummy beginning and end nodes
 			//ltParam needs to be dynamically allocated, because it will be freed by listenThread
 			//however, the mutex should be allocated outside ltParam, because we will need to use it again even after the threads have exited
-			std::mutex *ltLLMutex = new std::mutex;
+			std::mutex ltLLMutex;
+
+			std::mutex smtpClientMutex;
 
 			ListenThreadParam *ltParam = new ListenThreadParam();
 			ltParam->lSocket = &lSocket;
-			ltParam->ltLLMutex = ltLLMutex;
+			ltParam->ltLLMutex = &ltLLMutex;
+			ltParam->smtpClientMutex = &smtpClientMutex;
 			ltParam->config = &config;
 
 			//create dummy head and tail nodes for the ListenThreadParam linked list, and put the new LTP in between
@@ -69,7 +72,7 @@ namespace Mono3 {
 					//while walking through linked list, keep track of any thread handles
 					std::vector<HANDLE> hThreads;
 
-					ltLLMutex->lock();
+					ltLLMutex.lock();
 					ListenThreadParam *curLTP = LTPLLHead.nextLTP;
 					while (curLTP != &LTPLLTail) {
 						hThreads.push_back(curLTP->hThread);
@@ -79,7 +82,7 @@ namespace Mono3 {
 						PostMessage(curLTP->rainWnd.hwnd, WM_LISTENWNDEND, 0, 0);
 						curLTP = curLTP->nextLTP;
 					}
-					ltLLMutex->unlock();
+					ltLLMutex.unlock();
 
 					std::cout << "Found " << hThreads.size() << " active ListenThreads\r\n";
 					Rain::fastOutputFile(config["logFile"], "Found " + Rain::tToStr(hThreads.size()) + " active ListenThreads\r\n", true);
@@ -102,8 +105,6 @@ namespace Mono3 {
 					std::cout << "Command not recognized\r\n";
 				}
 			}
-
-			delete ltLLMutex;
 
 			std::cout << "EMTSMTPServer has exited. Exiting in 2 seconds...\r\n\r\n";
 			Rain::fastOutputFile(config["logFile"], "EMTSMTPServer has exited. Exiting in 2 seconds...\r\n\r\n", true);
