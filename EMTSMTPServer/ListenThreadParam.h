@@ -19,6 +19,9 @@ namespace Mono3 {
 			//mutex to lock the link list when modifications are being made to it
 			std::mutex *ltLLMutex;
 
+			//mutex to lock the smtp client while it is being used by another thread
+			std::mutex *smtpClientMutex;
+
 			//window representing this thread's message queue, implemented by RainWindow
 			Rain::RainWindow rainWnd;
 

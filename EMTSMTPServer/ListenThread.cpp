@@ -103,6 +103,7 @@ namespace Mono3 {
 			ListenThreadParam *newLTParam = new ListenThreadParam();
 			newLTParam->lSocket = ltParam.lSocket;
 			newLTParam->ltLLMutex = ltParam.ltLLMutex;
+			newLTParam->smtpClientMutex = ltParam.smtpClientMutex;
 			newLTParam->config = ltParam.config;
 
 			//attach the listenThread directly after the current one in the linked list
