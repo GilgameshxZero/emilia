@@ -213,6 +213,9 @@ namespace Mono3 {
 				}
 				delete[] chBuf;
 				CloseHandle(g_hChildStd_OUT_Rd);
+
+				//should still try to end well
+				WaitForSingleObject(pinfo.hProcess, INFINITE);
 				CloseHandle(pinfo.hProcess);
 
 				rtParam.pLTParam->smtpClientMutex->unlock();
