@@ -221,7 +221,12 @@ namespace Mono3 {
 				rtParam.pLTParam->smtpClientMutex->unlock();
 
 				//done, log
-				std::cout << clientOut << "\r\n";
+				std::cout << "--------------------------------------------------------------------------------\r\n" 
+					<< "SMTPClient\r\n"
+					<< "\r\n"
+					<< clientOut << "\r\n"
+					<< "--------------------------------------------------------------------------------\r\n"
+					<< "\r\n";
 				//Rain::fastOutputFile(rtParam.pLTParam->config->at("logFile"), clientOut, true); //todo: fix extra newlines in log
 			} else {
 				std::cout << Rain::getTime() << " SMTP was not successful with " << Rain::getClientNumIP(rtParam.pLTParam->cSocket) << "\r\n";
