@@ -45,46 +45,77 @@ namespace Mono3 {
 					forwardConfigParsed = true;
 				}
 
-				//get address we should forward to
+				//to pass to smtp client
+				std::string clientIn;
+
+				//depending on the to/from addresses, we either want to forward an email that was intended for @emilia-tan, or send an email from @emilia-tan
 				std::size_t atDelimPos = rtParam.smtpHeaders["RCPT TO"].find("@");
 				if (atDelimPos == std::string::npos) { //invalid rcpt to header, error ane return
 					Rain::reportError(-1, "invalid RCPT TO header " + rtParam.smtpHeaders["RCPT TO"]);
 					return;
 				}
-				std::string toEmiliaAddr = rtParam.smtpHeaders["RCPT TO"].substr(0, atDelimPos);
-				std::string rcptTo;
-				if (forwardConfig.find(toEmiliaAddr) == forwardConfig.end())
-					rcptTo = config["defaultForward"];
-				else
-					rcptTo = forwardConfig[toEmiliaAddr];
+				if (rtParam.smtpHeaders["RCPT TO"].substr(atDelimPos + 1, std::string::npos) == "emilia-tan.com") { //an email destined for @emilia-tan
+					//get address we should forward to
+					std::string toEmiliaAddr = rtParam.smtpHeaders["RCPT TO"].substr(0, atDelimPos);
+					std::string rcptTo;
+					if (forwardConfig.find(toEmiliaAddr) == forwardConfig.end())
+						rcptTo = config["defaultForward"];
+					else
+						rcptTo = forwardConfig[toEmiliaAddr];
 
-				//write input to the client, in the form a parameter file; see client for more details
-				std::string clientIn;
-				std::stringstream clientInSS;
-				clientInSS << "readConfig: no" << "\r\n"
-					<< "\r\n"
-					<< "smtpPort: 25" << "\r\n"
-					<< "recvBufLen: 1024" << "\r\n"
-					<< "ehloResponse: smtp.emilia-tan.com" << "\r\n"
-					<< "logFile: auxiliary\\EMTSMTPClientLog.log" << "\r\n"
-					<< "errorLog: auxiliary\\EMTSMTPClientErrorLog.txt" << "\r\n"
-					<< "memoryLeakLog: auxiliary\\EMTSMTPClientMemoryLeaks.txt" << "\r\n"
-					<< "\r\n"
-					<< "rawBody: yes\r\n"
-					<< "mailFrom: server@emilia-tan.com\r\n"
-					<< "rcptTo: " << rcptTo << "\r\n"
-					<< "\r\n"
-					<< "fromEmail: mailFrom\r\n" //doesn't matter
-					<< "toEmail: rcptTo\r\n" //doesn't matter
-					<< "fromName: _" << "\r\n"
-					<< "emailSubject: _" << "\r\n"
-					<< "\r\n"
-					<< "emailBodyFile: _" << "\r\n"
-					<< "emailBodyLen: " << rtParam.emailBody.length() << "\r\n"
-					<< "emailBodyData:" << rtParam.emailBody << "\r\n" //no space after colon is important
-					<< "\r\n"
-					<< "_configEnd_: true" << "\r\n";
-				clientIn = clientInSS.str();
+					//write input to the client, in the form a parameter file; see client for more details
+					std::stringstream clientInSS;
+					clientInSS << "readConfig: no" << "\r\n"
+						<< "\r\n"
+						<< "smtpPort: 25" << "\r\n"
+						<< "recvBufLen: 1024" << "\r\n"
+						<< "ehloResponse: smtp.emilia-tan.com" << "\r\n"
+						<< "logFile: auxiliary\\EMTSMTPClientLog.log" << "\r\n"
+						<< "errorLog: auxiliary\\EMTSMTPClientErrorLog.txt" << "\r\n"
+						<< "memoryLeakLog: auxiliary\\EMTSMTPClientMemoryLeaks.txt" << "\r\n"
+						<< "\r\n"
+						<< "rawBody: yes\r\n"
+						<< "mailFrom: server@emilia-tan.com\r\n"
+						<< "rcptTo: " << rcptTo << "\r\n"
+						<< "\r\n"
+						<< "fromEmail: mailFrom\r\n" //doesn't matter
+						<< "toEmail: rcptTo\r\n" //doesn't matter
+						<< "fromName: _" << "\r\n"
+						<< "emailSubject: _" << "\r\n"
+						<< "\r\n"
+						<< "emailBodyFile: _" << "\r\n"
+						<< "emailBodyLen: " << rtParam.emailBody.length() << "\r\n"
+						<< "emailBodyData:" << rtParam.emailBody << "\r\n" //no space after colon is important
+						<< "\r\n"
+						<< "_configEnd_: true" << "\r\n";
+					clientIn = clientInSS.str();
+				} else { //an email send by another client for us, from @emilia-tan.com
+					std::stringstream clientInSS;
+					clientInSS << "readConfig: no" << "\r\n"
+						<< "\r\n"
+						<< "smtpPort: 25" << "\r\n"
+						<< "recvBufLen: 1024" << "\r\n"
+						<< "ehloResponse: smtp.emilia-tan.com" << "\r\n"
+						<< "logFile: auxiliary\\EMTSMTPClientLog.log" << "\r\n"
+						<< "errorLog: auxiliary\\EMTSMTPClientErrorLog.txt" << "\r\n"
+						<< "memoryLeakLog: auxiliary\\EMTSMTPClientMemoryLeaks.txt" << "\r\n"
+						<< "\r\n"
+						<< "rawBody: yes\r\n"
+						<< "mailFrom: " << rtParam.smtpHeaders["MAIL FROM"] << "\r\n"
+						<< "rcptTo: " << rtParam.smtpHeaders["RCPT TO"] << "\r\n"
+						<< "\r\n"
+						<< "fromEmail: mailFrom\r\n" //doesn't matter
+						<< "toEmail: rcptTo\r\n" //doesn't matter
+						<< "fromName: _" << "\r\n"
+						<< "emailSubject: _" << "\r\n"
+						<< "\r\n"
+						<< "emailBodyFile: _" << "\r\n"
+						<< "emailBodyLen: " << rtParam.emailBody.length() << "\r\n"
+						<< "emailBodyData:" << rtParam.emailBody << "\r\n" //no space after colon is important
+						<< "\r\n"
+						<< "_configEnd_: true" << "\r\n";
+					clientIn = clientInSS.str();
+				}
 
 				//similar to cgi stuff in EMTServer
 				std::string clientExePath = Rain::getWorkingDirectory() + config["clientExePath"],
@@ -182,8 +213,8 @@ namespace Mono3 {
 				CloseHandle(pinfo.hProcess);
 
 				//done, log
-				std::cout << clientOut;
-				Rain::fastOutputFile(rtParam.pLTParam->config->at("logFile"), clientOut, true);
+				std::cout << clientOut << "\r\n";
+				//Rain::fastOutputFile(rtParam.pLTParam->config->at("logFile"), clientOut, true); //todo: fix extra newlines in log
 			} else {
 				std::cout << Rain::getTime() << " SMTP was not successful with " << Rain::getClientNumIP(rtParam.pLTParam->cSocket) << "\r\n";
 				Rain::fastOutputFile(rtParam.pLTParam->config->at("logFile"), Rain::getTime() + " SMTP was not successful with " + Rain::getClientNumIP(rtParam.pLTParam->cSocket) + "\r\n", true);
@@ -199,7 +230,8 @@ namespace Mono3 {
 
 		int waitEhlo(RecvThreadParam &rtParam, std::map<std::string, std::string> &config, std::stringstream &response) {
 			//todo: confirm ehlo
-			response << config["ehlo250"] << "\r\n";
+			response << "250-Emilia is best girl!\r\n"
+				"250 AUTH LOGIN PLAIN CRAM-MD5" << "\r\n";
 			rtParam.smtpWaitFunc = waitData;
 			return 0;
 		}
@@ -210,7 +242,8 @@ namespace Mono3 {
 			if (messCpy == "DATA") {
 				rtParam.smtpWaitFunc = waitSendMail;
 				response << config["data354"] << "\r\n";
-			}
+			} else if (messCpy.find("AUTH PLAIN") != std::string::npos)
+				return waitAuthLogin(rtParam, config, response);
 			else { //otherwise interpret headers
 				std::size_t colonLoc = rtParam.accMess.find(":");
 				if (colonLoc == std::string::npos) //no colon, not valid header
@@ -246,6 +279,12 @@ namespace Mono3 {
 				response << config["waitQuit502"] << "\r\n";
 				return 0;
 			}
+		}
+
+		int waitAuthLogin(RecvThreadParam &rtParam, std::map<std::string, std::string> &config, std::stringstream &response) {
+			response << "235 Emilia loves the world!\r\n";
+			rtParam.smtpWaitFunc = waitData;
+			return 0;
 		}
 	}
 }
