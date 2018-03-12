@@ -117,6 +117,9 @@ namespace Mono3 {
 					clientIn = clientInSS.str();
 				}
 
+				//make sure smtp client only runs one at a time, so that we don't overload ports and cause errors
+				rtParam.pLTParam->smtpClientMutex->lock();
+
 				//similar to cgi stuff in EMTServer
 				std::string clientExePath = Rain::getWorkingDirectory() + config["clientExePath"],
 					clientExeDir = Rain::getPathDirectory(clientExePath);
@@ -211,6 +214,8 @@ namespace Mono3 {
 				delete[] chBuf;
 				CloseHandle(g_hChildStd_OUT_Rd);
 				CloseHandle(pinfo.hProcess);
+
+				rtParam.pLTParam->smtpClientMutex->unlock();
 
 				//done, log
 				std::cout << clientOut << "\r\n";
