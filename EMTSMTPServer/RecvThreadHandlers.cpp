@@ -51,9 +51,9 @@ namespace Mono3 {
 					<< "maxConnToServ: 10" << "\r\n"
 					<< "maxSendAttempt: 10" << "\r\n"
 					<< "\r\n"
-					<< "logFile: auxiliary\\EMTSMTPClientLog.log" << "\r\n"
-					<< "errorLog: auxiliary\\EMTSMTPClientErrorLog.txt" << "\r\n"
-					<< "memoryLeakLog: auxiliary\\EMTSMTPClientMemoryLeaks.txt" << "\r\n"
+					<< "logFile: ..\\Auxiliary\\EMTSMTPClientLog.log" << "\r\n"
+					<< "errorLog: ..\\Auxiliary\\EMTSMTPClientErrorLog.txt" << "\r\n"
+					<< "memoryLeakLog: ..\\Auxiliary\\EMTSMTPClientMemoryLeaks.txt" << "\r\n"
 					<< "\r\n"
 					<< "rawBody: yes\r\n";
 
