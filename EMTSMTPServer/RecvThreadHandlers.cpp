@@ -16,8 +16,7 @@ namespace Mono3 {
 			int ret = rtParam.smtpWaitFunc(rtParam, config, response);
 			Rain::sendText(rtParam.pLTParam->cSocket, response.str());
 
-			std::cout << rtParam.accMess << response.str();
-			Rain::fastOutputFile(config["logFile"], rtParam.accMess + response.str(), true);
+			rtParam.log += rtParam.accMess + response.str();
 			rtParam.accMess = "";
 
 			return ret;
@@ -33,20 +32,30 @@ namespace Mono3 {
 
 			//start up client to forward mail to forwarding address, if smtp was sucessful
 			if (rtParam.smtpSuccess) {
-				std::cout << Rain::getTime() << " SMTP success with " << Rain::getClientNumIP(rtParam.pLTParam->cSocket) << "\r\n";
-				Rain::fastOutputFile(rtParam.pLTParam->config->at("logFile"), Rain::getTime() + " SMTP success with " + Rain::getClientNumIP(rtParam.pLTParam->cSocket) + "\r\n", true);
+				rtParam.log += Rain::getTime() + " SMTP success with " + Rain::getClientNumIP(rtParam.pLTParam->cSocket) + "\r\n";
 
 				//use the smtp client to send the email to the forward address
 				//make sure the forward options are known
-				static bool forwardConfigParsed = false;
-				static std::map<std::string, std::string> forwardConfig;
-				if (!forwardConfigParsed) {
-					Rain::readParameterFile(config["forwardConfig"], forwardConfig);
-					forwardConfigParsed = true;
-				}
+				//read these options every time we come here
+				std::map<std::string, std::string> forwardConfig;
+				Rain::readParameterFile(config["forwardConfig"], forwardConfig);
 
 				//to pass to smtp client
 				std::string clientIn;
+				std::stringstream clientInSS;
+				clientInSS << "readConfig: no" << "\r\n"
+					<< "\r\n"
+					<< "smtpPort: 25" << "\r\n"
+					<< "recvBufLen: 1024" << "\r\n"
+					<< "ehloResponse: smtp.emilia-tan.com" << "\r\n"
+					<< "maxConnToServ: 10" << "\r\n"
+					<< "maxSendAttempt: 10" << "\r\n"
+					<< "\r\n"
+					<< "logFile: auxiliary\\EMTSMTPClientLog.log" << "\r\n"
+					<< "errorLog: auxiliary\\EMTSMTPClientErrorLog.txt" << "\r\n"
+					<< "memoryLeakLog: auxiliary\\EMTSMTPClientMemoryLeaks.txt" << "\r\n"
+					<< "\r\n"
+					<< "rawBody: yes\r\n";
 
 				//depending on the to/from addresses, we either want to forward an email that was intended for @emilia-tan, or send an email from @emilia-tan
 				std::size_t atDelimPos = rtParam.smtpHeaders["RCPT TO"].find("@");
@@ -64,58 +73,24 @@ namespace Mono3 {
 						rcptTo = forwardConfig[toEmiliaAddr];
 
 					//write input to the client, in the form a parameter file; see client for more details
-					std::stringstream clientInSS;
-					clientInSS << "readConfig: no" << "\r\n"
-						<< "\r\n"
-						<< "smtpPort: 25" << "\r\n"
-						<< "recvBufLen: 1024" << "\r\n"
-						<< "ehloResponse: smtp.emilia-tan.com" << "\r\n"
-						<< "logFile: auxiliary\\EMTSMTPClientLog.log" << "\r\n"
-						<< "errorLog: auxiliary\\EMTSMTPClientErrorLog.txt" << "\r\n"
-						<< "memoryLeakLog: auxiliary\\EMTSMTPClientMemoryLeaks.txt" << "\r\n"
-						<< "\r\n"
-						<< "rawBody: yes\r\n"
-						<< "mailFrom: server@emilia-tan.com\r\n"
-						<< "rcptTo: " << rcptTo << "\r\n"
-						<< "\r\n"
-						<< "fromEmail: mailFrom\r\n" //doesn't matter
-						<< "toEmail: rcptTo\r\n" //doesn't matter
-						<< "fromName: _" << "\r\n"
-						<< "emailSubject: _" << "\r\n"
-						<< "\r\n"
-						<< "emailBodyFile: _" << "\r\n"
-						<< "emailBodyLen: " << rtParam.emailBody.length() << "\r\n"
-						<< "emailBodyData:" << rtParam.emailBody << "\r\n" //no space after colon is important
-						<< "\r\n"
-						<< "_configEnd_: true" << "\r\n";
-					clientIn = clientInSS.str();
+					clientInSS << "mailFrom: server@emilia-tan.com\r\n"
+						<< "rcptTo: " << rcptTo << "\r\n";
 				} else { //an email send by another client for us, from @emilia-tan.com
-					std::stringstream clientInSS;
-					clientInSS << "readConfig: no" << "\r\n"
-						<< "\r\n"
-						<< "smtpPort: 25" << "\r\n"
-						<< "recvBufLen: 1024" << "\r\n"
-						<< "ehloResponse: smtp.emilia-tan.com" << "\r\n"
-						<< "logFile: auxiliary\\EMTSMTPClientLog.log" << "\r\n"
-						<< "errorLog: auxiliary\\EMTSMTPClientErrorLog.txt" << "\r\n"
-						<< "memoryLeakLog: auxiliary\\EMTSMTPClientMemoryLeaks.txt" << "\r\n"
-						<< "\r\n"
-						<< "rawBody: yes\r\n"
-						<< "mailFrom: " << rtParam.smtpHeaders["MAIL FROM"] << "\r\n"
-						<< "rcptTo: " << rtParam.smtpHeaders["RCPT TO"] << "\r\n"
-						<< "\r\n"
-						<< "fromEmail: mailFrom\r\n" //doesn't matter
-						<< "toEmail: rcptTo\r\n" //doesn't matter
-						<< "fromName: _" << "\r\n"
-						<< "emailSubject: _" << "\r\n"
-						<< "\r\n"
-						<< "emailBodyFile: _" << "\r\n"
-						<< "emailBodyLen: " << rtParam.emailBody.length() << "\r\n"
-						<< "emailBodyData:" << rtParam.emailBody << "\r\n" //no space after colon is important
-						<< "\r\n"
-						<< "_configEnd_: true" << "\r\n";
-					clientIn = clientInSS.str();
+					clientInSS << "mailFrom: " << rtParam.smtpHeaders["MAIL FROM"] << "\r\n"
+						<< "rcptTo: " << rtParam.smtpHeaders["RCPT TO"] << "\r\n";
 				}
+				clientInSS << "\r\n"
+					<< "fromEmail: mailFrom\r\n" //doesn't matter
+					<< "toEmail: rcptTo\r\n" //doesn't matter
+					<< "fromName: _" << "\r\n"
+					<< "emailSubject: _" << "\r\n"
+					<< "\r\n"
+					<< "emailBodyFile: _" << "\r\n"
+					<< "emailBodyLen: " << rtParam.emailBody.length() << "\r\n"
+					<< "emailBodyData:" << rtParam.emailBody << "\r\n" //no space after colon is important
+					<< "\r\n"
+					<< "_configEnd_: true" << "\r\n";
+				clientIn = clientInSS.str();
 
 				//make sure smtp client only runs one at a time, so that we don't overload ports and cause errors
 				rtParam.pLTParam->smtpClientMutex->lock();
@@ -201,8 +176,7 @@ namespace Mono3 {
 						DWORD error = GetLastError();
 						if (error == ERROR_BROKEN_PIPE) //the pipe broke because the process has shut it down, this is okay
 							break;
-						else { //actually bad, terminate process
-							TerminateProcess(pinfo.hProcess, 0);
+						else { //actually bad
 							Rain::reportError(error, "something went wrong with ReadFile");
 							break;
 						}
@@ -214,24 +188,24 @@ namespace Mono3 {
 				delete[] chBuf;
 				CloseHandle(g_hChildStd_OUT_Rd);
 
-				//should still try to end well
-				WaitForSingleObject(pinfo.hProcess, INFINITE);
+				//wait for client to end, up to some time
+				WaitForSingleObject(pinfo.hProcess, Rain::strToT<DWORD>(config["smtpClientMaxTimeout"]));
+
+				//if it hasn't ended by then, we have to move on
+				TerminateProcess(pinfo.hProcess, 0);
 				CloseHandle(pinfo.hProcess);
 
 				rtParam.pLTParam->smtpClientMutex->unlock();
 
 				//done, log
-				std::cout << "--------------------------------------------------------------------------------\r\n" 
-					<< "SMTPClient\r\n"
-					<< "\r\n"
-					<< clientOut << "\r\n"
-					<< "--------------------------------------------------------------------------------\r\n"
-					<< "\r\n";
-				//Rain::fastOutputFile(rtParam.pLTParam->config->at("logFile"), clientOut, true); //todo: fix extra newlines in log
+				rtParam.log += "--------------------------------------------------------------------------------\r\nSMTPClient\r\n\r\n" + clientOut + "\r\n--------------------------------------------------------------------------------\r\n\r\n";
 			} else {
-				std::cout << Rain::getTime() << " SMTP was not successful with " << Rain::getClientNumIP(rtParam.pLTParam->cSocket) << "\r\n";
-				Rain::fastOutputFile(rtParam.pLTParam->config->at("logFile"), Rain::getTime() + " SMTP was not successful with " + Rain::getClientNumIP(rtParam.pLTParam->cSocket) + "\r\n", true);
+				rtParam.log += Rain::getTime() + " SMTP was not successful with " + Rain::getClientNumIP(rtParam.pLTParam->cSocket) + "\r\n";
 			}
+
+			//output the entire log of the recvThread to the console and file now
+			Rain::rainCoutF(rtParam.log);
+			Rain::fastOutputFileRef(config["logFile"], rtParam.log, true);
 
 			//use postmessage here because we want the thread of the window to process the message, allowing destroywindow to be called
 			//WM_RAINAVAILABLE + 1 is the end message

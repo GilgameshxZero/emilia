@@ -2,10 +2,8 @@
 // Microsoft Visual C++ generated include file.
 // Used by resource.rc
 //
-#define VERSION_MINOR                   0
-#define VERSION_REVISION                0
-#define VERSION_MAJOR                   1
-#define VERSION_BUILD                   62
+#include "BuildID.h"
+
 #define IDI_ICON1                       101
 
 // Next default values for new objects
