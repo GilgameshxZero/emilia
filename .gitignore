@@ -7,12 +7,10 @@ Confidential
 EC2Access
 ServerRoot
 Live
+Auxiliary
 
-EMTServer/auxiliary
 EMTServer/config
 
-EMTSMTPClient/auxiliary
 EMTSMTPClient/config
 
-EMTSMTPServer/auxiliary
 EMTSMTPServer/config

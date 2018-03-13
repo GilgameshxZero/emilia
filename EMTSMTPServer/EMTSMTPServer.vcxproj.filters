@@ -182,19 +182,19 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="auxiliary\EMTSMTPServerErrorLog.txt">
-      <Filter>auxiliary</Filter>
-    </Text>
-    <Text Include="auxiliary\EMTSMTPServerLog.log">
-      <Filter>auxiliary</Filter>
-    </Text>
-    <Text Include="auxiliary\EMTSMTPServerMemoryLeaks.txt">
-      <Filter>auxiliary</Filter>
-    </Text>
-  </ItemGroup>
-  <ItemGroup>
     <Image Include="Icon.ico">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\Auxiliary\EMTSMTPServerErrorLog.txt">
+      <Filter>auxiliary</Filter>
+    </Text>
+    <Text Include="..\Auxiliary\EMTSMTPServerLog.log">
+      <Filter>auxiliary</Filter>
+    </Text>
+    <Text Include="..\Auxiliary\EMTSMTPServerMemoryLeaks.txt">
+      <Filter>auxiliary</Filter>
+    </Text>
   </ItemGroup>
 </Project>
