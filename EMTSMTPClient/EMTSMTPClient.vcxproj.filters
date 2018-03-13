@@ -182,13 +182,13 @@
     <Text Include="config\emailBody.txt">
       <Filter>config</Filter>
     </Text>
-    <Text Include="auxiliary\EMTSMTPClientLog.log">
+    <Text Include="..\Auxiliary\EMTSMTPClientErrorLog.txt">
       <Filter>auxiliary</Filter>
     </Text>
-    <Text Include="auxiliary\EMTSMTPClientErrorLog.txt">
+    <Text Include="..\Auxiliary\EMTSMTPClientLog.log">
       <Filter>auxiliary</Filter>
     </Text>
-    <Text Include="auxiliary\EMTSMTPClientMemoryLeaks.txt">
+    <Text Include="..\Auxiliary\EMTSMTPClientMemoryLeaks.txt">
       <Filter>auxiliary</Filter>
     </Text>
   </ItemGroup>

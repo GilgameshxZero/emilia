@@ -196,13 +196,13 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="auxiliary\EMTServerLog.log">
+    <Text Include="..\Auxiliary\EMTServerErrors.txt">
       <Filter>auxiliary</Filter>
     </Text>
-    <Text Include="auxiliary\EMTServerErrors.txt">
+    <Text Include="..\Auxiliary\EMTServerLog.log">
       <Filter>auxiliary</Filter>
     </Text>
-    <Text Include="auxiliary\EMTServerMemoryLeaks.txt">
+    <Text Include="..\Auxiliary\EMTServerMemoryLeaks.txt">
       <Filter>auxiliary</Filter>
     </Text>
   </ItemGroup>

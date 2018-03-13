@@ -75,10 +75,10 @@ namespace Mono3 {
 				Rain::reportError(GetLastError(), "error in quickClientInit");
 				return -1;
 			}
-			//try a max of 100 times
-			//todo: 100 config
+
+			//try some number of times to connect to the server, in case of timeout
 			int connToServTry = 0;
-			for (; connToServTry < 100; connToServTry++) {
+			for (; connToServTry < Rain::strToT<std::size_t>(config["maxConnToServ"]); connToServTry++) {
 				if (Rain::connToServ(&sAddr, sSocket)) {
 					Rain::reportError(GetLastError(), "error in connToServ");
 					std::cout << "Error " << GetLastError() << " while connecting to server, trying again...\r\n";
@@ -87,12 +87,12 @@ namespace Mono3 {
 				else
 					break;
 			}
-			if (connToServTry == 100)
+			if (connToServTry == Rain::strToT<std::size_t>(config["maxConnToServ"]))
 				return -1;
 
 			//stall until smtp done
 			bool clientSuccess = false;
-			while (!clientSuccess) {
+			for (int a = 0;!clientSuccess && a < Rain::strToT<std::size_t>(config["maxSendAttempt"]);a++) {
 				//prepare to listen
 				RecvThreadParam rtParam;
 				Rain::WSA2RecvParam recvParam;
@@ -118,21 +118,21 @@ namespace Mono3 {
 				}
 
 				if (!clientSuccess) {
-					//log
-					std::cout << "Did not send mail successfully, trying again...\r\n";
-					Rain::fastOutputFile(config["logFile"], "Did not send mail successfully, trying again...\r\n", true);
-
-					Sleep(10000);
+					std::cout << "Did not send mail successfully (attempt " << a + 1 << " of " << config["maxSendAttempt"] << ")\r\n";
+					Rain::fastOutputFile(config["logFile"], "Did not send mail successfully (attempt " + Rain::tToStr(a + 1) + " of " + config["maxSendAttempt"] + ")\r\n", true);
+				} else {
+					std::cout << "Mail sent successfully\r\n";
+					Rain::fastOutputFile(config["logFile"], "Mail sent successfully\r\n", true);
 				}
 			}
 
 			Rain::shutdownSocketSend(sSocket);
 			closesocket(sSocket);
 			WSACleanup();
-			std::cout << "Finished sending email\r\n";
-			Rain::fastOutputFile(config["logFile"], "Finished sending email\r\n\r\n", true);
+			std::cout << "--------------------------------------------------------------------------------\r\n\r\n";
+			Rain::fastOutputFile(config["logFile"], "--------------------------------------------------------------------------------\r\n\r\n", true);
 
-			std::cout << "EMTSMTPClient has finished. Exiting in 2 seconds...";
+			std::cout << "EMTSMTPClient has finished. Exiting in 2 seconds...\r\n";
 			Sleep(2000);
 
 			return 0;

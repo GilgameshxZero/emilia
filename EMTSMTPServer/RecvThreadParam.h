@@ -26,6 +26,9 @@ namespace Mono3 {
 
 			//whether communications finished successfully
 			bool smtpSuccess;
+
+			//accumulated log for the recvThread
+			std::string log;
 		};
 	}
 }

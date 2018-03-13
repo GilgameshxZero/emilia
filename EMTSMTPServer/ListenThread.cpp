@@ -73,10 +73,6 @@ namespace Mono3 {
 				Rain::reportError(error, "failed in ListenThread.cpp, at Rain::servAcceptClient");
 				return -1;
 			}
-
-			//logging
-			std::cout << Rain::getTime() << " Client connected from " << Rain::getClientNumIP(ltParam.cSocket) << "\r\n";
-			Rain::fastOutputFile(ltParam.config->at("logFile"), Rain::getTime() + " Client connected from " + Rain::getClientNumIP(ltParam.cSocket) + "\r\n", true);
 			
 			//first, send the initial HELO
 			Rain::sendText(ltParam.cSocket, ltParam.config->at("init220") + "\r\n");
@@ -84,6 +80,9 @@ namespace Mono3 {
 			//set up the recvParam to pass to recvThread
 			RecvThreadParam *rtParam = new RecvThreadParam();
 			rtParam->pLTParam = &ltParam;
+
+			//logging
+			rtParam->log += Rain::getTime() + " Client connected from " + Rain::getClientNumIP(ltParam.cSocket) + "\r\n";
 
 			ltParam.recvParam.socket = &ltParam.cSocket;
 			ltParam.recvParam.message = &(rtParam->message); //store message in RecvThreadParam
