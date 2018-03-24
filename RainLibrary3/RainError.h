@@ -10,5 +10,5 @@ Standard
 
 namespace Rain {
 	int reportError(int code, std::string desc = "");
-	std::streambuf *redirectCerrFile(std::string filename);
+	std::streambuf *redirectCerrFile(std::string filename, bool append = false);
 }

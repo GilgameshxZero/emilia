@@ -1,0 +1,4 @@
+3.5.0
+	added append option in error output
+	standardized some logging
+	now buffered socket communications from server
