@@ -4,6 +4,8 @@ Standard
 
 #pragma once
 
+#include "RainUtilityFile.h"
+
 #include <iostream>
 #include <mutex>
 
@@ -65,4 +67,10 @@ namespace Rain {
 		std::lock_guard<std::mutex> m_cout(getCoutMutex());
 		return streamOut(std::cout, args...);
 	}
+
+	//output to both a logging file and the console; can set logging file via optional parameter
+	//truncate the console log if log is too long
+	//by defualt, truncate to one line; 0 doesn't truncate
+	void outLogStdTruncRef(std::string &info, int maxLen = 80, std::string filePath = "", bool append = true);
+	void outLogStdTrunc(std::string info, int maxLen = 80, std::string filePath = "", bool append = true);
 }
