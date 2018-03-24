@@ -25,4 +25,19 @@ namespace Rain {
 	std::mutex &getCoutMutex() {
 		return rainCout.GetMutex();
 	}
+
+	void outLogStdTruncRef(std::string &info, int maxLen, std::string filePath, bool append) {
+		static std::string persistentLogFilePath = "";
+		if (filePath != "")
+			persistentLogFilePath = filePath;
+		Rain::fastOutputFileRef(persistentLogFilePath, info, append);
+		if (maxLen != 0)
+			Rain::rainCoutF(info.substr(0, maxLen));
+		else
+			Rain::rainCoutF(info);
+	}
+
+	void outLogStdTrunc(std::string info, int maxLen, std::string filePath, bool append) {
+		Rain::outLogStdTruncRef(info, maxLen, filePath, append);
+	}
 }

@@ -3,15 +3,21 @@
 namespace Mono3 {
 	namespace Server {
 		int start() {
+			std::string configFile = "config\\config.ini";
+
 			//parameters
 			std::map<std::string, std::string> config;
-			Rain::readParameterFile("config\\config.ini", config);
-
-			std::cout << "Read " << config.size() << " configuration options from file\n";
+			Rain::readParameterFile(configFile, config);
 
 			//debugging purposes
-			Rain::redirectCerrFile(config["errorLog"]);
+			Rain::redirectCerrFile(config["errorLog"], true);
 			Rain::logMemoryLeaks(config["memoryLeakLog"]);
+
+			Rain::outLogStdTrunc("Starting server...\r\nRead " + Rain::tToStr(config.size()) + " configuration options:\r\n", 0, config["serverLog"]);
+
+			//output parameters
+			for (std::map<std::string, std::string>::iterator it = config.begin(); it != config.end(); it++)
+				Rain::outLogStdTrunc("\t" + it->first + ": " + it->second + "\r\n");
 
 			//winsock setup
 			WSADATA wsaData;
@@ -21,12 +27,12 @@ namespace Mono3 {
 				Rain::reportError(GetLastError(), "error in quickServerInit");
 				return -1;
 			}
-			std::cout << "Server initialized\n";
+			Rain::outLogStdTrunc("Server initialized\r\n");
 			if (Rain::listenServSocket(lSocket)) {
 				Rain::reportError(GetLastError(), "error in listenServSocket");
 				return -1;
 			}
-			std::cout << "Listening...\n";
+			Rain::outLogStdTrunc("Listening...\r\n");
 
 			//main thread responsible for capturing cin and commands
 			//spawn listening threads to deal with socket connections
@@ -104,8 +110,8 @@ namespace Mono3 {
 			//free memory
 			delete ltLLMutex;
 
-			std::cout << "The server has terminated. Exiting automatically in 2 seconds...";
-			Sleep(2000);
+			Rain::outLogStdTrunc("The server has terminated. Exiting automatically in 1 second...");
+			Sleep(1000);
 
 			return 0;
 		}

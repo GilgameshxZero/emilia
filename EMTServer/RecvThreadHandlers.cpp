@@ -192,6 +192,15 @@ namespace Mono3 {
 				responseBody = notFound404HTML;
 				responseHeaders["content-length"] = Rain::tToStr(responseBody.length());
 				responseHeaders["content-type"] = "text/html";
+
+				std::string response = responseStatus + "\r\n";
+				for (auto it : responseHeaders)
+					response += it.first + ":" + it.second + "\r\n";
+				response += "\r\n" + responseBody;
+				if (Rain::sendText(cSocket, response.c_str(), response.length())) {
+					Rain::reportError(GetLastError(), "error while sending response to client; response: " + response);
+					return -7;
+				}
 			} else if (cgiScripts.find(requestFilePathRel) != cgiScripts.end()) { //branch if the file is a cgi script
 				//run the file at FilePath as a cgi script, and respond with its content
 				//set the current environment block as well as additional environment parameters for the script
@@ -294,8 +303,13 @@ namespace Mono3 {
 				CloseHandle(g_hChildStd_IN_Rd);
 
 				//compose response
-				//get the output from the script
+				//get buffered output from the script, and send it over the socket buffered
 				responseStatus = "HTTP/1.1 200 OK";
+				if (Rain::sendText(cSocket, responseStatus)) {
+					Rain::reportError(GetLastError(), "error while sending response to client; responseStatus: " + responseStatus);
+					return -7;
+				}
+
 				static std::size_t cgiOutPipeBufLen = Rain::strToT<std::size_t>(config["cgiOutPipeBufLen"]);
 				CHAR *chBuf = new CHAR[cgiOutPipeBufLen];
 				for (;;) {
@@ -312,26 +326,18 @@ namespace Mono3 {
 					}
 					if (dwRead == 0) //nothing left in pipe
 						break;
-					responseBody += std::string(chBuf, dwRead);
+
+					//send buffer through socket
+					responseBody = std::string(chBuf, dwRead);
+					if (Rain::sendText(cSocket, responseBody)) {
+						Rain::reportError(GetLastError(), "error while sending response to client; responseBody part: " + responseBody);
+						return -7;
+					}
 				}
 				delete[] chBuf;
 				CloseHandle(g_hChildStd_OUT_Rd);
 				CloseHandle(pinfo.hProcess);
-
-				//try to decompose the responseBody into headers and body and prepare for responding
-				std::size_t headerBlockEnd = Rain::rabinKarpMatch(responseBody, "\r\n\r\n");
-				if (headerBlockEnd == -1) {
-					Rain::reportError(GetLastError(), "cgi script didn't output with correct format; output:\n" + responseBody);
-					return -6;
-				}
-
-				std::stringstream ss;
-				ss << responseBody.substr(0, headerBlockEnd);
-				parseHeaders(ss, responseHeaders);
-				responseBody = responseBody.substr(headerBlockEnd + headerDelim.length(), std::string::npos);
-
-				//now, exit the if statement to send the response
-			} else { //not a cgi script
+			} else { //not a cgi script, must be a file request
 				//extract file extension
 				std::string requestFileExt = requestFile.substr(requestFile.rfind(".") + 1, std::string::npos);
 				Rain::toLowercase(requestFileExt);
@@ -353,23 +359,44 @@ namespace Mono3 {
 
 				//compose response
 				responseStatus = "HTTP/1.1 200 OK";
-				Rain::readFullFile(requestFilePath, responseBody);
-				responseHeaders["content-disposition"] = "inline; filename=" + requestFile;
-				responseHeaders["content-length"] = Rain::tToStr(responseBody.length());
-				responseHeaders["content-type"] = contentType + "; charset = UTF-8";
+				responseHeaders["content-disposition"] = "inline;filename=" + requestFile;
+				responseHeaders["content-type"] = contentType + ";charset=UTF-8";
+
+				//get file length
+				std::ifstream fileIn(requestFilePath, std::ios_base::binary);
+				std::streampos fileBeg = fileIn.tellg();
+				fileIn.seekg(0, fileIn.end);
+				responseHeaders["content-length"] = Rain::tToStr(fileIn.tellg() - fileBeg);
+				fileIn.seekg(0, fileIn.beg);
+
+				//send what we know
+				std::string response = responseStatus + "\r\n";
+				for (auto it : responseHeaders)
+					response += it.first + ":" + it.second + "\r\n";
+				response += "\r\n";
+				if (Rain::sendText(cSocket, response)) {
+					Rain::reportError(GetLastError(), "error while sending response to client; response: " + response);
+					return -7;
+				}
+
+				//send file buffered
+				static std::size_t fileBufLen = Rain::strToT<std::size_t>(config["fileBufLen"]);
+				char *buffer = new char[fileBufLen];
+				std::size_t fileLen = Rain::strToT<std::size_t>(responseHeaders["content-length"]);
+				for (std::size_t a = 0; a < fileLen; a += fileBufLen) {
+					std::size_t actualRead = min(fileBufLen, fileLen - a);
+					fileIn.read(buffer, actualRead);
+					if (Rain::sendText(cSocket, buffer, actualRead)) {
+						Rain::reportError(GetLastError(), "error while sending response to client; response segment: " + std::string(buffer, actualRead));
+						return -7;
+					}
+				}
+				delete[] buffer;
+				fileIn.close();
 			}
 
-			//now, send back responseStatus, responseHeaders, and responseBody
-			std::string response = responseStatus + "\r\n";
-			for (auto it : responseHeaders)
-				response += it.first + ":" + it.second + "\r\n";
-			response += "\r\n" + responseBody;
-			if (Rain::sendText(cSocket, response.c_str(), response.length())) {
-				Rain::reportError(GetLastError(), "error while sending response to client; response: " + response);
-				return -7;
-			}
-
-			return 1; //close connection once a full message has been processed
+			//close connection once a full message has been processed
+			return 1;
 		}
 
 		void parseHeaders(std::stringstream &headerStream, std::map<std::string, std::string> &headers) {
