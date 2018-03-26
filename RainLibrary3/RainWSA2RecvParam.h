@@ -20,7 +20,7 @@ namespace Rain {
 	class WSA2RecvParam {
 		public:
 		WSA2RecvParam();
-		WSA2RecvParam(SOCKET *socket, std::string *message, int bufLen, void *funcparam, WSA2RecvPMFunc onProcessMessage, WSA2RecvInitFunc onRecvInit, WSA2RecvExitFunc onRecvEnd);
+		WSA2RecvParam(SOCKET *socket, std::string *message, int bufLen, void *funcparam, WSA2RecvPMFunc onProcessMessage, WSA2RecvInitFunc onRecvInit, WSA2RecvExitFunc onRecvExit);
 
 		//socket between server and client
 		SOCKET *socket;
@@ -40,6 +40,6 @@ namespace Rain {
 
 		//called when RecvThread is about to start or end
 		WSA2RecvInitFunc onRecvInit;
-		WSA2RecvExitFunc onRecvEnd;
+		WSA2RecvExitFunc onRecvExit;
 	};
 }

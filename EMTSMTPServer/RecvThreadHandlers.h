@@ -2,8 +2,8 @@
 
 #include "RecvThreadParam.h"
 
-namespace Mono3 {
-	namespace SMTPServer {
+namespace Monochrome3 {
+	namespace EMTSMTPServer {
 		int onProcessMessage(void *funcParam);
 		void onRecvThreadInit(void *funcParam);
 		void onRecvThreadEnd(void *funcParam);

@@ -1,7 +1,7 @@
 #include "RecvThreadHandlers.h"
 
-namespace Mono3 {
-	namespace Server {
+namespace Monochrome3 {
+	namespace EMTServer {
 		static const std::string headerDelim = "\r\n\r\n";
 
 		void onRecvThreadInit(void *funcParam) {

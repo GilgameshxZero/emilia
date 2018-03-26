@@ -57,8 +57,8 @@ namespace Rain {
 		} while (ret > 0);
 
 		delete[] buffer;
-		if (recvparam->onRecvEnd != NULL)
-			recvparam->onRecvEnd(recvparam->funcParam);
+		if (recvparam->onRecvExit != NULL)
+			recvparam->onRecvExit(recvparam->funcParam);
 
 		return ret;
 	}

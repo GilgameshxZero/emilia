@@ -16,10 +16,10 @@
     <Filter Include="RainLibrary3">
       <UniqueIdentifier>{c228cf0a-e912-4ed5-aa4d-a478fd8ca886}</UniqueIdentifier>
     </Filter>
-    <Filter Include="auxiliary">
+    <Filter Include="Auxiliary">
       <UniqueIdentifier>{75f98572-7dee-4a23-a51f-510e89399ab8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="config">
+    <Filter Include="Configuration">
       <UniqueIdentifier>{9a71b6a3-a062-4cf0-a797-9f3f9b93642a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -102,7 +102,7 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="config\config.ini">
-      <Filter>config</Filter>
+      <Filter>Configuration</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -180,16 +180,16 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="config\emailBody.txt">
-      <Filter>config</Filter>
+      <Filter>Configuration</Filter>
     </Text>
     <Text Include="..\Auxiliary\EMTSMTPClientErrorLog.txt">
-      <Filter>auxiliary</Filter>
+      <Filter>Auxiliary</Filter>
     </Text>
     <Text Include="..\Auxiliary\EMTSMTPClientLog.log">
-      <Filter>auxiliary</Filter>
+      <Filter>Auxiliary</Filter>
     </Text>
     <Text Include="..\Auxiliary\EMTSMTPClientMemoryLeaks.txt">
-      <Filter>auxiliary</Filter>
+      <Filter>Auxiliary</Filter>
     </Text>
   </ItemGroup>
   <ItemGroup>

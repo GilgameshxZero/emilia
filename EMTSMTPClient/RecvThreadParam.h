@@ -2,8 +2,8 @@
 
 #include "../RainLibrary3/RainLibraries.h"
 
-namespace Mono3 {
-	namespace SMTPClient {
+namespace Monochrome3 {
+	namespace EMTSMTPClient {
 		struct RecvThreadParam {
 			typedef int(*pSMTPWaitFunc) (RecvThreadParam &, std::map<std::string, std::string> &, std::stringstream &);
 

@@ -1,11 +1,11 @@
 #include "Start.h"
 
-namespace Mono3 {
-	namespace SMTPClient {
+namespace Monochrome3 {
+	namespace EMTSMTPClient {
 		int start() {
 			//determine if we should use config from the file, or from stdin
 			std::map<std::string, std::string> config;
-			Rain::readParameterFile("config\\config.ini", config); //don't need all the parameters just yet, but read it anyway just for readConfig
+			Rain::readParameterFile("Configuration\\config.ini", config); //don't need all the parameters just yet, but read it anyway just for readConfig
 
 			//adjust stream based on readConfig parameter
 			std::istream *configSS;
@@ -107,7 +107,7 @@ namespace Mono3 {
 				recvParam.message = &rtParam.message;
 				recvParam.onProcessMessage = onProcessMessage;
 				recvParam.onRecvInit = onRecvInit;
-				recvParam.onRecvEnd = onRecvEnd;
+				recvParam.onRecvExit = onRecvExit;
 				recvParam.socket = &sSocket;
 
 				CreateThread(NULL, 0, Rain::recvThread, reinterpret_cast<void *>(&recvParam), NULL, NULL);

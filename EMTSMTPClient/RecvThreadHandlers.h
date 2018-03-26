@@ -2,11 +2,11 @@
 
 #include "RecvThreadParam.h"
 
-namespace Mono3 {
-	namespace SMTPClient {
+namespace Monochrome3 {
+	namespace EMTSMTPClient {
 		int onProcessMessage(void *funcParam);
 		void onRecvInit(void *funcParam);
-		void onRecvEnd(void *funcParam);
+		void onRecvExit(void *funcParam);
 
 		int waitEhlo(RecvThreadParam &rtParam, std::map<std::string, std::string> &config, std::stringstream &response);
 		int waitMailFrom(RecvThreadParam &rtParam, std::map<std::string, std::string> &config, std::stringstream &response);

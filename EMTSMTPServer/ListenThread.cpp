@@ -1,7 +1,7 @@
 #include "ListenThread.h"
 
-namespace Mono3 {
-	namespace SMTPServer {
+namespace Monochrome3 {
+	namespace EMTSMTPServer {
 		DWORD WINAPI listenThread(LPVOID lpParameter) {
 			ListenThreadParam &ltParam = *reinterpret_cast<ListenThreadParam *>(lpParameter);
 
@@ -90,7 +90,7 @@ namespace Mono3 {
 			ltParam.recvParam.funcParam = rtParam; //parameter to be passed to following functions
 			ltParam.recvParam.onProcessMessage = onProcessMessage; //called when any message comes in
 			ltParam.recvParam.onRecvInit = onRecvThreadInit; //called at the beginning of the recvThread, nothing for now
-			ltParam.recvParam.onRecvEnd = onRecvThreadEnd; //called at the end of recvThread
+			ltParam.recvParam.onRecvExit = onRecvThreadEnd; //called at the end of recvThread
 
 														   //processing this socket will be handled by the recvThread
 			ltParam.hRecvThread = CreateThread(NULL, 0, Rain::recvThread, reinterpret_cast<void *>(&ltParam.recvParam), NULL, NULL);

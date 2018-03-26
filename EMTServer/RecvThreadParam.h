@@ -4,8 +4,8 @@
 
 #include <queue>
 
-namespace Mono3 {
-	namespace Server {
+namespace Monochrome3 {
+	namespace EMTServer {
 		struct RecvThreadParam {
 			//pointer to the listenThread associated with this recvThread
 			ListenThreadParam *pLTParam;

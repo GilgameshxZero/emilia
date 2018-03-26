@@ -1,9 +1,9 @@
 #include "Start.h"
 
-namespace Mono3 {
-	namespace Server {
+namespace Monochrome3 {
+	namespace EMTServer {
 		int start() {
-			std::string configFile = "config\\config.ini";
+			std::string configFile = "Configuration\\config.ini";
 
 			//parameters
 			std::map<std::string, std::string> config;
@@ -27,7 +27,7 @@ namespace Mono3 {
 				Rain::reportError(GetLastError(), "error in quickServerInit");
 				return -1;
 			}
-			Rain::outLogStdTrunc("Server initialized\r\n");
+			Rain::outLogStdTrunc("EMTServer initialized\r\n");
 			if (Rain::listenServSocket(lSocket)) {
 				Rain::reportError(GetLastError(), "error in listenServSocket");
 				return -1;
