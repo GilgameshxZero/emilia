@@ -110,47 +110,44 @@
     <ClInclude Include="..\RainLibrary3\RainWSA2Include.h" />
     <ClInclude Include="..\RainLibrary3\RainWSA2SendRecv.h" />
     <ClInclude Include="..\RainLibrary3\RainWSA2Server.h" />
+    <ClInclude Include="..\RainLibrary3\RainWSA2SMTP.h" />
     <ClInclude Include="..\RainLibrary3\RainWSA2Utility.h" />
-    <ClInclude Include="..\RainLibrary3\RainWSA2RecvParam.h" />
     <ClInclude Include="BuildID.h" />
-    <ClInclude Include="ListenThread.h" />
-    <ClInclude Include="ListenThreadParam.h" />
     <ClInclude Include="Main.h" />
-    <ClInclude Include="RecvThreadParam.h" />
-    <ClInclude Include="RecvThreadHandlers.h" />
+    <ClInclude Include="ConnectionHandlers.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Start.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="BuildIDInc.bat" />
-    <None Include="config\404.html">
+    <None Include="Configuration\404.html">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
-    <None Include="config\cgiScripts.ini">
+    <None Include="Configuration\cgiScripts.ini">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
-    <None Include="config\config.ini">
+    <None Include="Configuration\config.ini">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
-    <None Include="config\contentTypeSpec.ini">
+    <None Include="Configuration\contentTypeSpec.ini">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
-    <None Include="config\customHeaders.ini">
+    <None Include="Configuration\customHeaders.ini">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
   </ItemGroup>
@@ -173,13 +170,10 @@
     <ClCompile Include="..\RainLibrary3\RainWSA2Include.cpp" />
     <ClCompile Include="..\RainLibrary3\RainWSA2SendRecv.cpp" />
     <ClCompile Include="..\RainLibrary3\RainWSA2Server.cpp" />
+    <ClCompile Include="..\RainLibrary3\RainWSA2SMTP.cpp" />
     <ClCompile Include="..\RainLibrary3\RainWSA2Utility.cpp" />
-    <ClCompile Include="..\RainLibrary3\RainWSA2RecvParam.cpp" />
-    <ClCompile Include="ListenThread.cpp" />
-    <ClCompile Include="ListenThreadParam.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="RecvThreadParam.cpp" />
-    <ClCompile Include="RecvThreadHandlers.cpp" />
+    <ClCompile Include="ConnectionHandlers.cpp" />
     <ClCompile Include="Start.cpp" />
   </ItemGroup>
   <ItemGroup>

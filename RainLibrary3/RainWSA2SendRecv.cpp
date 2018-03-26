@@ -1,6 +1,18 @@
 #include "RainWSA2SendRecv.h"
 
 namespace Rain {
+	WSA2RecvFuncParam::WSA2RecvFuncParam() {
+	}
+
+	WSA2RecvFuncParam::WSA2RecvFuncParam(SOCKET *socket, std::string *message, int buflen, void *funcParam, WSA2RecvPMFunc onProcessMessage, WSA2RecvInitFunc onRecvInit, WSA2RecvExitFunc onRecvExit) {
+		this->socket = socket;
+		this->message = message;
+		this->bufLen = bufLen;
+		this->funcParam = funcParam;
+		this->onProcessMessage = onProcessMessage;
+		this->onRecvInit = onRecvInit;
+		this->onRecvExit = onRecvExit;
+	}
 
 	int sendText(SOCKET &sock, const char *cstrtext, long long len) {
 		long long sent = 0;
@@ -31,7 +43,7 @@ namespace Rain {
 	}
 
 	DWORD WINAPI recvThread(LPVOID lpParameter) {
-		WSA2RecvParam *recvparam = reinterpret_cast<WSA2RecvParam *>(lpParameter);
+		WSA2RecvFuncParam *recvparam = reinterpret_cast<WSA2RecvFuncParam *>(lpParameter);
 		char *buffer = new char[recvparam->bufLen];
 		int ret;
 
@@ -64,7 +76,7 @@ namespace Rain {
 	}
 
 	HANDLE createRecvThread(
-		WSA2RecvParam *recvparam, //if NULL: returns pointer to RecvParam that must be freed when the thread ends
+		WSA2RecvFuncParam *recvparam, //if NULL: returns pointer to RecvParam that must be freed when the thread ends
 								 //if not NULL: ignores the the next 6 parameters, and uses this as the param for recvThread
 		SOCKET *connection,
 		std::string *message, //where the message is stored each time OnProcessMessage is called
@@ -78,7 +90,7 @@ namespace Rain {
 		LPDWORD lpThreadId,
 		LPSECURITY_ATTRIBUTES lpThreadAttributes) {
 		if (recvparam == NULL)
-			recvparam = new WSA2RecvParam(connection, message, buflen, funcparam, OnProcessMessage, OnRecvInit, OnRecvEnd);
+			recvparam = new WSA2RecvFuncParam(connection, message, buflen, funcparam, OnProcessMessage, OnRecvInit, OnRecvEnd);
 
 		return CreateThread(lpThreadAttributes, dwStackSize, recvThread, reinterpret_cast<LPVOID>(recvparam), dwCreationFlags, lpThreadId);
 	}

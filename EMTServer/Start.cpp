@@ -34,81 +34,31 @@ namespace Monochrome3 {
 			}
 			Rain::outLogStdTrunc("Listening...\r\n");
 
-			//main thread responsible for capturing cin and commands
-			//spawn listening threads to deal with socket connections
-			//arrange threads in a linked list, with dummy beginning and end nodes
-			//ltParam needs to be dynamically allocated, because it will be freed by listenThread
-			//however, the mutex should be allocated outside ltParam, because we will need to use it again even after the threads have exited
-			std::mutex *ltLLMutex = new std::mutex;
-
-			ListenThreadParam *ltParam = new ListenThreadParam();
-			ltParam->lSocket = &lSocket;
-			ltParam->ltLLMutex = ltLLMutex;
-			ltParam->config = &config;
-
-			//create dummy head and tail nodes for the ListenThreadParam linked list, and put the new LTP in between
-			ListenThreadParam LTPLLHead, LTPLLTail;
-			LTPLLHead.prevLTP = NULL;
-			LTPLLHead.nextLTP = ltParam;
-			ltParam->prevLTP = &LTPLLHead;
-			ltParam->nextLTP = &LTPLLTail;
-			LTPLLTail.prevLTP = ltParam;
-			LTPLLTail.nextLTP = NULL;
-
-			CreateThread(NULL, 0, listenThread, reinterpret_cast<LPVOID>(ltParam), 0, NULL);
-
-			//at this point, we should assume that ltParam may be deleted already
+			//continuously accept clients on listening socket using ListenThread
+			ConnectionCallerParam ccParam;
+			ccParam.config = &config;
+			HANDLE hListenThread = Rain::createListenThread(lSocket, reinterpret_cast<void *>(&ccParam), Rain::strToT<std::size_t>(config["recvBufferLength"]), onConnectionProcessMessage, onConnectionInit, onConnectionExit);
 
 			//command loop
 			while (true) {
 				static std::string command, tmp;
-				std::cout << "Accepting commands...\n";
+				Rain::outLogStdTrunc("Accepting commands...\r\n");
 				std::cin >> command;
 				std::getline(std::cin, tmp);
 
 				if (command == "exit") {
 					//first, close the listening socket so that all calls to 'accept' terminate
 					closesocket(lSocket);
-					std::cout << "Socket listen closed\n";
-
-					//shutdown threads by walking through the linked list and sending the end message
-					//while walking through linked list, keep track of any thread handles
-					std::vector<HANDLE> hThreads;
-
-					ltLLMutex->lock();
-					ListenThreadParam *curLTP = LTPLLHead.nextLTP;
-					while (curLTP != &LTPLLTail) {
-						hThreads.push_back(curLTP->hThread);
-
-						//use postmessage here because we want the thread of the window to process the message, allowing destroywindow to be called
-						//WM_RAINAVAILABLE + 1 is the end message
-						PostMessage(curLTP->rainWnd.hwnd, WM_LISTENWNDEND, 0, 0);
-						curLTP = curLTP->nextLTP;
-					}
-					ltLLMutex->unlock();
-
-					std::cout << "Found " << hThreads.size() << " active ListenThreads\n";
-
-					//join all handles previously found in the linked list, waiting for all the threads to terminate
-					//no need to close thread handles, GetCurrentThread doesn't require that
-					for (HANDLE hThread : hThreads)
-						WaitForSingleObject(hThread, 0);
-
-					std::cout << "All threads finished and joined\n";
+					WaitForSingleObject(hListenThread, 0);
+					Rain::outLogStdTrunc("Listening shutdown and ListenThread joined\n");
 
 					//no need to freeaddinfo here because RainWSA2 does that for us
-
 					WSACleanup();
 					break;
-				} else if (command == "help") {
-					std::cout << "\"exit\" to terminate server\n";
 				} else {
-					std::cout << "Command not recognized\n";
+					Rain::outLogStdTrunc("Command not recognized\r\n");
 				}
 			}
-
-			//free memory
-			delete ltLLMutex;
 
 			Rain::outLogStdTrunc("The server has terminated. Exiting automatically in 1 second...");
 			Sleep(1000);

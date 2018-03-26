@@ -6,12 +6,41 @@ Standard
 
 #include "RainWindow.h"
 #include "RainWSA2Include.h"
-#include "RainWSA2RecvParam.h"
 
 #include <string>
 #include <unordered_map>
 
 namespace Rain {
+	typedef int(*WSA2RecvPMFunc) (void *);
+	typedef void(*WSA2RecvInitFunc) (void *);
+	typedef void(*WSA2RecvExitFunc) (void *);
+
+	class WSA2RecvFuncParam {
+		public:
+		WSA2RecvFuncParam();
+		WSA2RecvFuncParam(SOCKET *socket, std::string *message, int bufLen, void *funcparam, WSA2RecvPMFunc onProcessMessage, WSA2RecvInitFunc onRecvInit, WSA2RecvExitFunc onRecvExit);
+
+		//socket between server and client
+		SOCKET *socket;
+
+		//place where message is stored for use by any RecvFuncs
+		std::string *message;
+
+		//length of buffer for recv
+		std::size_t bufLen;
+
+		//parameter to be passed to RecvFuncs
+		void *funcParam;
+
+		//called whenever recv returns something to the buffer
+		//return nonzero to terminate recv loop
+		WSA2RecvPMFunc onProcessMessage;
+
+		//called when RecvThread is about to start or end
+		WSA2RecvInitFunc onRecvInit;
+		WSA2RecvExitFunc onRecvExit;
+	};
+
 	//send raw text over a socket
 	int sendText(SOCKET &sock, const char *cstrtext, long long len);
 	int sendText(SOCKET &sock, std::string strText);
@@ -21,7 +50,7 @@ namespace Rain {
 	//calls a function whenever a message is received; 
 	DWORD WINAPI recvThread(LPVOID lpParameter); //don't use this; use createRecvThread
 	HANDLE createRecvThread(
-		WSA2RecvParam *recvparam, //if NULL: returns pointer to RecvParam that must be freed when the thread ends
+		WSA2RecvFuncParam *recvparam, //if NULL: returns pointer to RecvParam that must be freed when the thread ends
 								 //if not NULL: ignores the the next 6 parameters, and uses this as the param for recvThread
 		SOCKET *connection = NULL,
 		std::string *message = NULL, //where the message is stored each time OnProcessMessage is called

@@ -78,45 +78,36 @@
     <ClInclude Include="..\RainLibrary3\RainUtilityFile.h">
       <Filter>RainLibrary3</Filter>
     </ClInclude>
-    <ClInclude Include="..\RainLibrary3\RainWSA2RecvParam.h">
-      <Filter>RainLibrary3</Filter>
-    </ClInclude>
-    <ClInclude Include="ListenThreadParam.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ListenThread.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RecvThreadHandlers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RecvThreadParam.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\RainLibrary3\RainAlgorithm.h">
       <Filter>RainLibrary3</Filter>
     </ClInclude>
     <ClInclude Include="..\RainLibrary3\RainWSA2Server.h">
       <Filter>RainLibrary3</Filter>
     </ClInclude>
+    <ClInclude Include="..\RainLibrary3\RainWSA2SMTP.h">
+      <Filter>RainLibrary3</Filter>
+    </ClInclude>
+    <ClInclude Include="ConnectionHandlers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="BuildIDInc.bat">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="config\404.html">
+    <None Include="Configuration\404.html">
       <Filter>Configuration</Filter>
     </None>
-    <None Include="config\cgiScripts.ini">
+    <None Include="Configuration\cgiScripts.ini">
       <Filter>Configuration</Filter>
     </None>
-    <None Include="config\config.ini">
+    <None Include="Configuration\config.ini">
       <Filter>Configuration</Filter>
     </None>
-    <None Include="config\contentTypeSpec.ini">
+    <None Include="Configuration\contentTypeSpec.ini">
       <Filter>Configuration</Filter>
     </None>
-    <None Include="config\customHeaders.ini">
+    <None Include="Configuration\customHeaders.ini">
       <Filter>Configuration</Filter>
     </None>
   </ItemGroup>
@@ -174,26 +165,17 @@
     <ClCompile Include="..\RainLibrary3\RainUtilityFile.cpp">
       <Filter>RainLibrary3</Filter>
     </ClCompile>
-    <ClCompile Include="..\RainLibrary3\RainWSA2RecvParam.cpp">
-      <Filter>RainLibrary3</Filter>
-    </ClCompile>
-    <ClCompile Include="ListenThreadParam.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ListenThread.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RecvThreadHandlers.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RecvThreadParam.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\RainLibrary3\RainAlgorithm.cpp">
       <Filter>RainLibrary3</Filter>
     </ClCompile>
     <ClCompile Include="..\RainLibrary3\RainWSA2Server.cpp">
       <Filter>RainLibrary3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\RainLibrary3\RainWSA2SMTP.cpp">
+      <Filter>RainLibrary3</Filter>
+    </ClCompile>
+    <ClCompile Include="ConnectionHandlers.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

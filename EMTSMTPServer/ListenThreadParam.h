@@ -38,7 +38,7 @@ namespace Monochrome3 {
 			HANDLE hRecvThread;
 
 			//standardized parameter to pass to RecvThread
-			Rain::WSA2RecvParam recvParam;
+			Rain::WSA2RecvFuncParam rfParam;
 		};
 	}
 }

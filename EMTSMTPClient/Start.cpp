@@ -95,22 +95,22 @@ namespace Monochrome3 {
 			for (int a = 0;!clientSuccess && a < Rain::strToT<std::size_t>(config["maxSendAttempt"]);a++) {
 				//prepare to listen
 				RecvThreadParam rtParam;
-				Rain::WSA2RecvParam recvParam;
+				Rain::WSA2RecvFuncParam rfParam;
 
 				rtParam.config = &config;
 				rtParam.sSocket = &sSocket;
 				rtParam.socketActive = true;
 				rtParam.clientSuccess = &clientSuccess;
 
-				recvParam.bufLen = Rain::strToT<std::size_t>(config["recvBufLen"]);
-				recvParam.funcParam = reinterpret_cast<void *>(&rtParam);
-				recvParam.message = &rtParam.message;
-				recvParam.onProcessMessage = onProcessMessage;
-				recvParam.onRecvInit = onRecvInit;
-				recvParam.onRecvExit = onRecvExit;
-				recvParam.socket = &sSocket;
+				rfParam.bufLen = Rain::strToT<std::size_t>(config["recvBufLen"]);
+				rfParam.funcParam = reinterpret_cast<void *>(&rtParam);
+				rfParam.message = &rtParam.message;
+				rfParam.onProcessMessage = onProcessMessage;
+				rfParam.onRecvInit = onRecvInit;
+				rfParam.onRecvExit = onRecvExit;
+				rfParam.socket = &sSocket;
 
-				CreateThread(NULL, 0, Rain::recvThread, reinterpret_cast<void *>(&recvParam), NULL, NULL);
+				CreateThread(NULL, 0, Rain::recvThread, reinterpret_cast<void *>(&rfParam), NULL, NULL);
 
 				while (rtParam.socketActive) {
 					rtParam.mainMutex.lock();

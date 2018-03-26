@@ -1,106 +1,107 @@
-#include "RecvThreadHandlers.h"
+#include "ConnectionHandlers.h"
 
 namespace Monochrome3 {
 	namespace EMTServer {
 		static const std::string headerDelim = "\r\n\r\n";
 
-		void onRecvThreadInit(void *funcParam) {
-			RecvThreadParam &rtParam = *reinterpret_cast<RecvThreadParam *>(funcParam);
+		void onConnectionInit(void *funcParam) {
+			Rain::WSA2ListenThreadRecvFuncDelegateParam &ltrfdParam = *reinterpret_cast<Rain::WSA2ListenThreadRecvFuncDelegateParam *>(funcParam);
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ltrfdParam.callerParam);
+
+			//create the delegate parameter for the first time
+			ltrfdParam.delegateParam = new ConnectionDelegateParam();
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ltrfdParam.delegateParam);
 
 			//delay all possible initialization of rtParam to here
-			rtParam.requestMethod = "";
-			rtParam.contentLength = -1;
-			rtParam.headerBlockLength = -1;
+			cdParam.requestMethod = "";
+			cdParam.contentLength = -1;
+			cdParam.headerBlockLength = -1;
 		}
-		void onRecvThreadEnd(void *funcParam) {
-			RecvThreadParam &rtParam = *reinterpret_cast<RecvThreadParam *>(funcParam);
-
-			//use postmessage here because we want the thread of the window to process the message, allowing destroywindow to be called
-			//WM_RAINAVAILABLE + 1 is the end message
-			PostMessage(rtParam.pLTParam->rainWnd.hwnd, WM_LISTENWNDEND, 0, 0);
-
-			//free WSA2RecvParam here, since recvThread won't need it anymore
-			delete &rtParam;
+		void onConnectionExit(void *funcParam) {
+			//free the delegate parameter
+			delete reinterpret_cast<Rain::WSA2ListenThreadRecvFuncDelegateParam *>(funcParam)->delegateParam;
 		}
-		int onProcessMessage(void *funcParam) {
-			RecvThreadParam &rtParam = *reinterpret_cast<RecvThreadParam *>(funcParam);
+		int onConnectionProcessMessage(void *funcParam) {
+			Rain::WSA2ListenThreadRecvFuncDelegateParam &ltrfdParam = *reinterpret_cast<Rain::WSA2ListenThreadRecvFuncDelegateParam *>(funcParam);
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ltrfdParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ltrfdParam.delegateParam);
 
 			//accumulate messages until a complete request is found
 			//for now, only accept GET requests and non-chunked POST requests (those with a content-length header)
 			//of course, for POST requests, we will need to accumulate not just the header but also the body of the request
 			//onProcessMessage is also responsible for parsing the header before passing it on to processRequest
-			rtParam.request += rtParam.message;
+			cdParam.request += ltrfdParam.message;
 
 			//if we don't know the requestMethod yet, attempt to calculate it now
-			if (rtParam.requestMethod == "") {
-				std::size_t firstSpace = rtParam.request.find(' ');
+			if (cdParam.requestMethod == "") {
+				std::size_t firstSpace = cdParam.request.find(' ');
 
 				if (firstSpace != std::string::npos) //if there's a space, then everything before that is the requestMethod
-					rtParam.requestMethod = rtParam.request.substr(0, firstSpace);
+					cdParam.requestMethod = cdParam.request.substr(0, firstSpace);
 			}
 
 			//determine whether the request is complete based on the requestMethod and the currently received request
-			if (rtParam.requestMethod == "") { //still don't know the request method yet, so we should wait for more messages to come in 
+			if (cdParam.requestMethod == "") { //still don't know the request method yet, so we should wait for more messages to come in 
 				return 0;
-			} else if (rtParam.requestMethod == "GET") { //GET requests complete when the last four characters are "\r\n\r\n"
-				if (rtParam.request.substr(rtParam.request.length() - 4, 4) == headerDelim) { //get ready to process the request
-					rtParam.contentLength = 0;
-					rtParam.headerBlockLength = rtParam.request.length() - headerDelim.length();
+			} else if (cdParam.requestMethod == "GET") { //GET requests complete when the last four characters are "\r\n\r\n"
+				if (cdParam.request.substr(cdParam.request.length() - 4, 4) == headerDelim) { //get ready to process the request
+					cdParam.contentLength = 0;
+					cdParam.headerBlockLength = cdParam.request.length() - headerDelim.length();
 				} else //if the last line isn't blank, keep on waiting for more messages
 					return 0;
-			} else if (rtParam.requestMethod == "POST") { //identify the header block, find the 'content-length' header, and only process the request when the body is of the correct length
-				rtParam.headerBlockLength = Rain::rabinKarpMatch(rtParam.request, headerDelim);
-				if (rtParam.headerBlockLength == -1) //still waiting on headers
+			} else if (cdParam.requestMethod == "POST") { //identify the header block, find the 'content-length' header, and only process the request when the body is of the correct length
+				cdParam.headerBlockLength = Rain::rabinKarpMatch(cdParam.request, headerDelim);
+				if (cdParam.headerBlockLength == -1) //still waiting on headers
 					return 0;
 
 				//if don't know contentLength yet from previous times we get here, try again to get it
-				if (rtParam.contentLength == -1) {
+				if (cdParam.contentLength == -1) {
 					//a lot of these parameters are not used, but that's fine, since it's a one time cost
 					std::map<std::string, std::string> headers;
-					std::string headerBlock = rtParam.request.substr(0, rtParam.headerBlockLength);
+					std::string headerBlock = cdParam.request.substr(0, cdParam.headerBlockLength);
 					std::stringstream ss;
 					std::string requestURI, httpVersion;
 
 					ss << headerBlock;
-					ss >> rtParam.requestMethod >> requestURI >> httpVersion;
+					ss >> cdParam.requestMethod >> requestURI >> httpVersion;
 					parseHeaders(ss, headers);
-					rtParam.contentLength = Rain::strToT<unsigned long long>(headers["content-length"]);
+					cdParam.contentLength = Rain::strToT<unsigned long long>(headers["content-length"]);
 				}
 
 				//accumulate request until body is contentLength long
-				unsigned long long requestLength = rtParam.headerBlockLength + 1 + headerDelim.length() + rtParam.contentLength;
-				if (rtParam.request.length() < requestLength)
+				unsigned long long requestLength = cdParam.headerBlockLength + 1 + headerDelim.length() + cdParam.contentLength;
+				if (cdParam.request.length() < requestLength)
 					return 0;
-				else if (rtParam.request.length() > requestLength)//for some reason, the request is longer than anticipated, so terminate the socket
+				else if (cdParam.request.length() > requestLength)//for some reason, the request is longer than anticipated, so terminate the socket
 					return -1;
 			}
 
 			//at this point, we have a complete request and we know the size of the header block
 			//so, parse the header and log the request, then send it over to processRequest
 			std::map<std::string, std::string> headers;
-			std::string headerBlock = rtParam.request.substr(0, rtParam.headerBlockLength),
-				bodyBlock = rtParam.request.substr(rtParam.headerBlockLength + headerDelim.length(), rtParam.contentLength); //the body is everything after the header deliminater
+			std::string headerBlock = cdParam.request.substr(0, cdParam.headerBlockLength),
+				bodyBlock = cdParam.request.substr(cdParam.headerBlockLength + headerDelim.length(), cdParam.contentLength); //the body is everything after the header deliminater
 			std::stringstream ss;
 			std::string requestURI, httpVersion;
 
 			ss << headerBlock;
-			ss >> rtParam.requestMethod >> requestURI >> httpVersion;
+			ss >> cdParam.requestMethod >> requestURI >> httpVersion;
 			parseHeaders(ss, headers);
 
 			//log data
-			std::string clientIP = Rain::getClientNumIP(rtParam.pLTParam->cSocket),
-				consoleLog = (clientIP + ": " + rtParam.requestMethod + " " + requestURI).substr(0, 80) + "\n"; //cut off the console log if its too long so that it doesn't stall the other threads
+			std::string clientIP = Rain::getClientNumIP(*ltrfdParam.cSocket),
+				consoleLog = (clientIP + ": " + cdParam.requestMethod + " " + requestURI).substr(0, 80) + "\n"; //cut off the console log if its too long so that it doesn't stall the other threads
 			Rain::rainCoutF(consoleLog);
 
-			Rain::fastOutputFile(rtParam.pLTParam->config->at("serverLog"),
-								 Rain::getTime() + "\t" + clientIP + "\t" + Rain::tToStr(rtParam.request.length()) + " bytes\r\n" +
-								 rtParam.request + "\r\n" +
+			Rain::fastOutputFile(ccParam.config->at("serverLog"),
+								 Rain::getTime() + "\t" + clientIP + "\t" + Rain::tToStr(cdParam.request.length()) + " bytes\r\n" +
+								 cdParam.request + "\r\n" +
 								 "--------------------------------------------------------------------------------\r\n", true);
 
 			//send the parsed headers and bodyBlock and other parameters over to processRequest
-			return processRequest(rtParam.pLTParam->cSocket,
-								  *rtParam.pLTParam->config,
-								  rtParam.requestMethod,
+			return processRequest(*ltrfdParam.cSocket,
+								  *ccParam.config,
+								  cdParam.requestMethod,
 								  requestURI,
 								  httpVersion,
 								  headers,
