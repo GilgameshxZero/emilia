@@ -7,7 +7,7 @@ namespace Rain {
 							  Rain::WSA2RecvPMFunc onProcessMessage,
 							  Rain::WSA2RecvInitFunc onRecvInit,
 							  Rain::WSA2RecvExitFunc onRecvExit) {
-		WSA2ListenThreadParam *ltParam = new WSA2ListenThreadParam;
+		WSA2ListenThreadParam *ltParam = new WSA2ListenThreadParam();
 		ltParam->lSocket = &lSocket;
 		ltParam->recvFuncParam = recvFuncParam;
 		ltParam->recvBufferLength = recvBufferLength;
@@ -35,6 +35,7 @@ namespace Rain {
 
 			int error = Rain::servAcceptClient(*cSocket, *ltParam.lSocket);
 			if (error == WSAEINTR) {//listening closed from outside the thread; prepare to exit thread
+				delete cSocket;
 				break;
 			}
 			else if (error) { //unexpected
@@ -72,12 +73,16 @@ namespace Rain {
 		//wait on all spawned and active recvThreads to exit
 		while (llHead.nextLTRFP != &llTail) {
 			//close client socket to force blocking WSA2 calls to finish
+			llMutex.lock();
 			Rain::shutdownSocketSend(*llHead.nextLTRFP->ltrfdParam.cSocket);
 			closesocket(*llHead.nextLTRFP->ltrfdParam.cSocket);
+			//in case thread gets shutdown while some operations are happening with its handle
+			HANDLE curRecvThread = llHead.nextLTRFP->hRecvThread;
+			llMutex.unlock();
 
 			//join the recvThread
-			CancelSynchronousIo(llHead.nextLTRFP->hRecvThread);
-			WaitForSingleObject(llHead.nextLTRFP->hRecvThread, 0);
+			CancelSynchronousIo(curRecvThread);
+			WaitForSingleObject(curRecvThread, 0);
 		}
 
 		//free ltParam which was dynamically created by createListenThread
@@ -104,6 +109,7 @@ namespace Rain {
 		ltrfParam.llMutex->unlock();
 
 		//free memory allocated in listenThread
+		CloseHandle(ltrfParam.hRecvThread);
 		delete ltrfParam.ltrfdParam.cSocket;
 		delete ltrfParam.pRFParam;
 		delete &ltrfParam;
