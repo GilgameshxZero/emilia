@@ -50,7 +50,8 @@ namespace Monochrome3 {
 					//first, close the listening socket so that all calls to 'accept' terminate
 					closesocket(lSocket);
 					WaitForSingleObject(hListenThread, 0);
-					Rain::outLogStdTrunc("Listening shutdown and ListenThread joined\n");
+					CloseHandle(hListenThread);
+					Rain::outLogStdTrunc("Listening shutdown and ListenThread joined\r\n");
 
 					//no need to freeaddinfo here because RainWSA2 does that for us
 					WSACleanup();
@@ -60,7 +61,7 @@ namespace Monochrome3 {
 				}
 			}
 
-			Rain::outLogStdTrunc("The server has terminated. Exiting automatically in 1 second...");
+			Rain::outLogStdTrunc("The server has terminated. Exiting automatically in 1 second...\r\n");
 			Sleep(1000);
 
 			return 0;

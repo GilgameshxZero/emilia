@@ -2,6 +2,8 @@
 
 #include "../RainLibrary3/RainLibraries.h"
 
+#include "BuildID.h"
+
 #include <map>
 #include <set>
 
