@@ -19,7 +19,7 @@ namespace Monochrome3 {
 
 			//set some variables before starting the message queue/wnd, so that we know if they are used later
 			ltParam.hRecvThread = NULL;
-			ltParam.recvParam.funcParam = NULL;
+			ltParam.rfParam.funcParam = NULL;
 
 			SetWindowLongPtr(ltParam.rainWnd.hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(&ltParam));
 			SendMessage(ltParam.rainWnd.hwnd, WM_LISTENWNDINIT, 0, 0); //update window and start accepting clients
@@ -77,23 +77,23 @@ namespace Monochrome3 {
 			//first, send the initial HELO
 			Rain::sendText(ltParam.cSocket, ltParam.config->at("init220") + "\r\n");
 
-			//set up the recvParam to pass to recvThread
+			//set up the rfParam to pass to recvThread
 			RecvThreadParam *rtParam = new RecvThreadParam();
 			rtParam->pLTParam = &ltParam;
 
 			//logging
 			rtParam->log += Rain::getTime() + " Client connected from " + Rain::getClientNumIP(ltParam.cSocket) + "\r\n";
 
-			ltParam.recvParam.socket = &ltParam.cSocket;
-			ltParam.recvParam.message = &(rtParam->message); //store message in RecvThreadParam
-			ltParam.recvParam.bufLen = Rain::strToT<std::size_t>(ltParam.config->at("recvBufferLength")); //recv buffer length
-			ltParam.recvParam.funcParam = rtParam; //parameter to be passed to following functions
-			ltParam.recvParam.onProcessMessage = onProcessMessage; //called when any message comes in
-			ltParam.recvParam.onRecvInit = onRecvThreadInit; //called at the beginning of the recvThread, nothing for now
-			ltParam.recvParam.onRecvExit = onRecvThreadEnd; //called at the end of recvThread
+			ltParam.rfParam.socket = &ltParam.cSocket;
+			ltParam.rfParam.message = &(rtParam->message); //store message in RecvThreadParam
+			ltParam.rfParam.bufLen = Rain::strToT<std::size_t>(ltParam.config->at("recvBufferLength")); //recv buffer length
+			ltParam.rfParam.funcParam = rtParam; //parameter to be passed to following functions
+			ltParam.rfParam.onProcessMessage = onProcessMessage; //called when any message comes in
+			ltParam.rfParam.onRecvInit = onRecvThreadInit; //called at the beginning of the recvThread, nothing for now
+			ltParam.rfParam.onRecvExit = onRecvThreadEnd; //called at the end of recvThread
 
 														   //processing this socket will be handled by the recvThread
-			ltParam.hRecvThread = CreateThread(NULL, 0, Rain::recvThread, reinterpret_cast<void *>(&ltParam.recvParam), NULL, NULL);
+			ltParam.hRecvThread = CreateThread(NULL, 0, Rain::recvThread, reinterpret_cast<void *>(&ltParam.rfParam), NULL, NULL);
 
 			//once we accept a client, create a new clientthread to listen for more connections, thus the linked list structure
 			//before starting a new thread, create a new ListenThreadParam for that ListenThread

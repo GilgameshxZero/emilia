@@ -211,7 +211,7 @@ namespace Monochrome3 {
 			//WM_RAINAVAILABLE + 1 is the end message
 			PostMessage(rtParam.pLTParam->rainWnd.hwnd, WM_LISTENWNDEND, 0, 0);
 
-			//free WSA2RecvParam here, since recvThread won't need it anymore
+			//free WSA2RecvFuncParam here, since recvThread won't need it anymore
 			delete &rtParam;
 		}
 
