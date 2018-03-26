@@ -10,8 +10,8 @@
 
 #pragma comment (lib, "Dnsapi.lib")
 
-namespace Mono3 {
-	namespace SMTPClient {
+namespace Monochrome3 {
+	namespace EMTSMTPClient {
 		int start();
 	}
 }

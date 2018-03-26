@@ -16,10 +16,10 @@
     <Filter Include="RainLibrary3">
       <UniqueIdentifier>{96261c24-7651-4477-a11b-f9105a279357}</UniqueIdentifier>
     </Filter>
-    <Filter Include="auxiliary">
+    <Filter Include="Auxiliary">
       <UniqueIdentifier>{6bb0686f-69eb-4fe6-9ea4-1330759ed699}</UniqueIdentifier>
     </Filter>
-    <Filter Include="config">
+    <Filter Include="Configuration">
       <UniqueIdentifier>{8a7c3872-72d0-4091-8621-47c60a97d92a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -97,7 +97,7 @@
       <Filter>RainLibrary3</Filter>
     </ClInclude>
     <ClInclude Include="..\RainLibrary3\RainWSA2Server.h">
-      <Filter>Header Files</Filter>
+      <Filter>RainLibrary3</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -105,19 +105,19 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="config\404.html">
-      <Filter>config</Filter>
+      <Filter>Configuration</Filter>
     </None>
     <None Include="config\cgiScripts.ini">
-      <Filter>config</Filter>
+      <Filter>Configuration</Filter>
     </None>
     <None Include="config\config.ini">
-      <Filter>config</Filter>
+      <Filter>Configuration</Filter>
     </None>
     <None Include="config\contentTypeSpec.ini">
-      <Filter>config</Filter>
+      <Filter>Configuration</Filter>
     </None>
     <None Include="config\customHeaders.ini">
-      <Filter>config</Filter>
+      <Filter>Configuration</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -203,14 +203,13 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Auxiliary\EMTServerErrors.txt">
-      <Filter>auxiliary</Filter>
+      <Filter>Auxiliary</Filter>
     </Text>
     <Text Include="..\Auxiliary\EMTServerLog.log">
-      <Filter>auxiliary</Filter>
+      <Filter>Auxiliary</Filter>
     </Text>
     <Text Include="..\Auxiliary\EMTServerMemoryLeaks.txt">
-      <Filter>auxiliary</Filter>
+      <Filter>Auxiliary</Filter>
     </Text>
-    <Text Include="changelog.txt" />
   </ItemGroup>
 </Project>

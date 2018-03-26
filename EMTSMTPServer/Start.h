@@ -9,8 +9,8 @@
 
 #pragma comment (lib, "Dnsapi.lib")
 
-namespace Mono3 {
-	namespace SMTPServer {
+namespace Monochrome3 {
+	namespace EMTSMTPServer {
 		int start();
 	}
 }

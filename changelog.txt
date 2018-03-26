@@ -1,0 +1,16 @@
+EMTServer
+	3.5.0
+		added append option in error output
+		standardized some logging
+		now buffered socket communications from server
+	3.5.1
+		updated content-type setting for .mkv files to video/webm
+		light refactoring
+
+EMTSMTPClient
+	1.1.1
+		light refactoring
+
+EMTSMTPServer
+	1.2.1
+		light refactoring
