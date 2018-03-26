@@ -1,7 +1,7 @@
 #include "RecvThreadHandlers.h"
 
-namespace Mono3 {
-	namespace SMTPClient {
+namespace Monochrome3 {
+	namespace EMTSMTPClient {
 		int onProcessMessage(void *funcParam) {
 			RecvThreadParam &rtParam = *reinterpret_cast<RecvThreadParam *>(funcParam);
 			std::map<std::string, std::string> &config = *rtParam.config;
@@ -27,7 +27,7 @@ namespace Mono3 {
 			rtParam.mainMutex.lock();
 			rtParam.smtpWaitFunc = waitEhlo;
 		}
-		void onRecvEnd(void *funcParam) {
+		void onRecvExit(void *funcParam) {
 			RecvThreadParam &rtParam = *reinterpret_cast<RecvThreadParam *>(funcParam);
 			rtParam.mainMutex.unlock();
 			rtParam.socketActive = false;

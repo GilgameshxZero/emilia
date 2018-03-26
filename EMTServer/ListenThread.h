@@ -18,8 +18,8 @@ Responsible for maintaining a socket open for listening on a specified port, as 
 #include <vector>
 #include <Windows.h>
 
-namespace Mono3 {
-	namespace Server {
+namespace Monochrome3 {
+	namespace EMTServer {
 		//called from Start to create a thread
 		DWORD WINAPI listenThread(LPVOID lpParameter);
 

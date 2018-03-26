@@ -1,11 +1,11 @@
 #include "Start.h"
 
-namespace Mono3 {
-	namespace SMTPServer {
+namespace Monochrome3 {
+	namespace EMTSMTPServer {
 		int start() {
 			//read config
 			std::map<std::string, std::string> config;
-			Rain::readParameterFile("config\\config.ini", config);
+			Rain::readParameterFile("Configuration\\config.ini", config);
 
 			//debugging
 			Rain::redirectCerrFile(config["errorLog"]);

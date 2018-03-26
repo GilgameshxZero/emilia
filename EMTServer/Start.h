@@ -8,8 +8,8 @@
 #include <sstream>
 #include <vector>
 
-namespace Mono3 {
-	namespace Server {
+namespace Monochrome3 {
+	namespace EMTServer {
 		int start();
 	}
 }

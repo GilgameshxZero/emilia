@@ -4,8 +4,8 @@
 
 #include <set>
 
-namespace Mono3 {
-	namespace Server {
+namespace Monochrome3 {
+	namespace EMTServer {
 		//handlers for RecvThread
 		void onRecvThreadInit(void *funcParam);
 		void onRecvThreadEnd(void *funcParam);

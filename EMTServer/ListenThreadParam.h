@@ -5,8 +5,8 @@
 #define WM_LISTENWNDINIT	WM_RAINAVAILABLE
 #define WM_LISTENWNDEND		WM_RAINAVAILABLE + 1
 
-namespace Mono3 {
-	namespace Server {
+namespace Monochrome3 {
+	namespace EMTServer {
 		//parameter passed to any listening thread
 		//one for each ListenThread
 		struct ListenThreadParam {
