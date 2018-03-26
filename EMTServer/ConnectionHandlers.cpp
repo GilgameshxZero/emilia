@@ -9,13 +9,14 @@ namespace Monochrome3 {
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ltrfdParam.callerParam);
 
 			//create the delegate parameter for the first time
-			ltrfdParam.delegateParam = new ConnectionDelegateParam();
-			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ltrfdParam.delegateParam);
+			ConnectionDelegateParam *cdParam = new ConnectionDelegateParam();
+			ltrfdParam.delegateParam = reinterpret_cast<void *>(cdParam);
 
 			//delay all possible initialization of rtParam to here
-			cdParam.requestMethod = "";
-			cdParam.contentLength = -1;
-			cdParam.headerBlockLength = -1;
+			cdParam->request = "";
+			cdParam->requestMethod = "";
+			cdParam->contentLength = -1;
+			cdParam->headerBlockLength = -1;
 		}
 		void onConnectionExit(void *funcParam) {
 			//free the delegate parameter
@@ -99,13 +100,23 @@ namespace Monochrome3 {
 								 "--------------------------------------------------------------------------------\r\n", true);
 
 			//send the parsed headers and bodyBlock and other parameters over to processRequest
-			return processRequest(*ltrfdParam.cSocket,
-								  *ccParam.config,
-								  cdParam.requestMethod,
-								  requestURI,
-								  httpVersion,
-								  headers,
-								  bodyBlock);
+			int prRet = processRequest(*ltrfdParam.cSocket,
+									   *ccParam.config,
+									   cdParam.requestMethod,
+									   requestURI,
+									   httpVersion,
+									   headers,
+									   bodyBlock);
+			//if it decides to keep the connection open after this full request, then reset request-specific parameters for the recvThread
+			if (prRet == 0) {
+				cdParam.request = "";
+				cdParam.requestMethod = "";
+				cdParam.contentLength = -1;
+				cdParam.headerBlockLength = -1;
+			}
+
+			//< 0 is error, 0 is keep-alive, and > 0 is peacefully close
+			return prRet;
 		}
 
 		int processRequest(SOCKET &cSocket,
@@ -172,6 +183,10 @@ namespace Monochrome3 {
 			static std::map<std::string, std::string> customHeaders;
 			if (!customHeadersParsed) {
 				Rain::readParameterFile(config["customHeaders"], customHeaders);
+
+				//add server versioning info to "server" header
+				customHeaders["server"] = customHeaders["server"] + " (ver. " + Rain::tToStr(VERSION_MAJOR) + "." + Rain::tToStr(VERSION_MINOR) + "." + Rain::tToStr(VERSION_REVISION) + "." + Rain::tToStr(VERSION_BUILD) + ")";
+
 				customHeadersParsed = true;
 			}
 
@@ -396,8 +411,11 @@ namespace Monochrome3 {
 				fileIn.close();
 			}
 
-			//close connection once a full message has been processed
-			return 1;
+			//depending on the "connection" header, close or keep open the socket
+			if (Rain::toLowercase(headers["connection"]) == "keep-alive")
+				return 0;
+			else
+				return 1;
 		}
 
 		void parseHeaders(std::stringstream &headerStream, std::map<std::string, std::string> &headers) {
