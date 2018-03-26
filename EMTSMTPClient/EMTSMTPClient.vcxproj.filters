@@ -101,7 +101,7 @@
     <None Include="BuildIDInc.bat">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="config\config.ini">
+    <None Include="Configuration\config.ini">
       <Filter>Configuration</Filter>
     </None>
   </ItemGroup>
@@ -179,9 +179,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="config\emailBody.txt">
-      <Filter>Configuration</Filter>
-    </Text>
     <Text Include="..\Auxiliary\EMTSMTPClientErrorLog.txt">
       <Filter>Auxiliary</Filter>
     </Text>
@@ -190,6 +187,9 @@
     </Text>
     <Text Include="..\Auxiliary\EMTSMTPClientMemoryLeaks.txt">
       <Filter>Auxiliary</Filter>
+    </Text>
+    <Text Include="Configuration\emailBody.txt">
+      <Filter>Configuration</Filter>
     </Text>
   </ItemGroup>
   <ItemGroup>

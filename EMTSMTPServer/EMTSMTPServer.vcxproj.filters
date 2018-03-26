@@ -101,10 +101,10 @@
     <None Include="BuildIDInc.bat">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="config\config.ini">
+    <None Include="Configuration\config.ini">
       <Filter>Configuration</Filter>
     </None>
-    <None Include="config\forwardConfig.ini">
+    <None Include="Configuration\forwardConfig.ini">
       <Filter>Configuration</Filter>
     </None>
   </ItemGroup>
