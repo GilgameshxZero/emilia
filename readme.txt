@@ -8,6 +8,8 @@ Changelog:
 	EMTServer
 		todo
 			clean up memory leaks
+		3.7.1
+			added .py content-type spec
 		3.7.0
 			updated fileversion detail on .exe
 			standardized logging more
@@ -25,12 +27,16 @@ Changelog:
 			now buffered socket communications from server
 
 	EMTSMTPClient
+		todo
+			standardize to new rain library
 		1.1.1
 			light refactoring
 			project structure changes
 			updated fileversion detail on .exe
 
 	EMTSMTPServer
+		todo
+			standardize to new rain library
 		1.2.1
 			light refactoring
 			project structure changes
