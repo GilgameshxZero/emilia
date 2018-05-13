@@ -51,6 +51,7 @@ namespace Rain {
 	void fastOutputFile(std::string filename, std::string output, bool append = false);
 
 	//read parameters from standard parameter file, organized in lines (terminated by \n) of key:value, possibly with whitespace inbetween elements
+	//appends to map
 	std::map<std::string, std::string> &readParameterFile(std::string filePath, std::map<std::string, std::string> &params);
 	std::map<std::string, std::string> &readParameterString(std::string paramString, std::map<std::string, std::string> &params);
 	std::map<std::string, std::string> &readParameterStream(std::stringstream &paramStream, std::map<std::string, std::string> &params);
