@@ -19,6 +19,9 @@
     <Filter Include="Configuration">
       <UniqueIdentifier>{75be755d-35da-4b22-944f-33a5b2d2f059}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Auxiliary">
+      <UniqueIdentifier>{9c0eef0d-0fd6-4ad9-887c-801dfa7c3424}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BuildID.h">
@@ -168,5 +171,16 @@
     <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2Utility.cpp">
       <Filter>RainLibrary3</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\error.log">
+      <Filter>Auxiliary</Filter>
+    </Text>
+    <Text Include="..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\log.log">
+      <Filter>Auxiliary</Filter>
+    </Text>
+    <Text Include="..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\memory-leaks.log">
+      <Filter>Auxiliary</Filter>
+    </Text>
   </ItemGroup>
 </Project>

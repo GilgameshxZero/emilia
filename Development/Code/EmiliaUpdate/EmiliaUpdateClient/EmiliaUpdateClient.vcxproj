@@ -135,6 +135,11 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Start.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\error.log" />
+    <Text Include="..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\log.log" />
+    <Text Include="..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\memory-leaks.log" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
