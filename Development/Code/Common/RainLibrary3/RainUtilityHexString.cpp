@@ -24,14 +24,14 @@ namespace Rain {
 	}
 
 	std::string &appHexBytes(std::string &data, std::string hexStr) {
-		for (int a = 0; a < hexStr.length(); a += 2)
+		for (std::size_t a = 0; a < hexStr.length(); a += 2)
 			appHexByte(data, hexStr.substr(a, 2));
 		return data;
 	}
 
 	std::string byteStrToHexStr(std::string data) {
 		std::stringstream ss;
-		for (int a = 0; a < data.length(); a++)
+		for (std::size_t a = 0; a < data.length(); a++)
 			ss << charToHex(data[a]);
 		return ss.str();
 	}

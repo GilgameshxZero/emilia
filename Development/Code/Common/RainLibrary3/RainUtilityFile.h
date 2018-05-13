@@ -17,6 +17,7 @@ All utilities dealing with files.
 #include <sys/stat.h>
 #include <vector>
 #include <map>
+#include <set>
 #include <sstream>
 
 namespace Rain {
@@ -26,7 +27,7 @@ namespace Rain {
 	void getFiles(std::string directory, std::vector<std::string> &rtrn, std::string format);
 
 	//Get all subdirectories in a directory, in a certain format. NOTE: Takes and returns UTF8 multibyte strings - but works with unicode directories.
-	void getDirectories(std::string directory, std::vector<std::string> &rtrn, std::string format);
+	void getDirectories(std::string directory, std::vector<std::string> &rtrn, std::string format = "*");
 
 	//returns UTF8
 	std::string getExePath();
@@ -55,6 +56,8 @@ namespace Rain {
 	std::map<std::string, std::string> &readParameterFile(std::string filePath, std::map<std::string, std::string> &params);
 	std::map<std::string, std::string> &readParameterString(std::string paramString, std::map<std::string, std::string> &params);
 	std::map<std::string, std::string> &readParameterStream(std::stringstream &paramStream, std::map<std::string, std::string> &params);
+
+	std::vector<std::string> &readMultilineFile(std::string filePath, std::vector<std::string> &params);
 
 	//returns current directory of the executable (not the same as the path to the executable, sometimes)
 	std::string getWorkingDirectory();

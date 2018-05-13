@@ -189,6 +189,27 @@ namespace Rain {
 		return params;
 	}
 
+	std::vector<std::string> &readMultilineFile(std::string filePath, std::vector<std::string> &params) {
+		static std::ifstream fileIn;
+
+		fileIn.open(filePath, std::ios::binary);
+		std::stringstream ss;
+		ss << fileIn.rdbuf();
+
+		static std::string value = "";
+		std::getline(ss, value);
+
+		while (value.length() != 0) {
+			Rain::strTrim(value);
+			params.push_back(value);
+			value = "";
+			std::getline(ss, value);
+		}
+
+		fileIn.close();
+		return params;
+	}
+
 	std::string getWorkingDirectory() {
 		DWORD bufferLen = GetCurrentDirectory(0, NULL);
 		TCHAR *buffer = new TCHAR[bufferLen];
@@ -201,7 +222,7 @@ namespace Rain {
 	std::string &readFullFile(std::string filePath, std::string &fileData) {
 		std::ifstream t(filePath, std::ios::binary);
 		t.seekg(0, std::ios::end);
-		size_t size = t.tellg();
+		size_t size = static_cast<size_t>(t.tellg());
 		fileData = std::string(size, ' ');
 		t.seekg(0);
 		t.read(&fileData[0], size);
