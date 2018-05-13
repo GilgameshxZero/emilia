@@ -36,8 +36,10 @@ namespace Rain {
 		else
 			Rain::rainCoutF(info);
 	}
-
 	void outLogStdTrunc(std::string info, int maxLen, std::string filePath, bool append) {
 		Rain::outLogStdTruncRef(info, maxLen, filePath, append);
+	}
+	void outLogStd(std::string info, std::string filePath, bool append) {
+		Rain::outLogStdTruncRef(info, 0, filePath, append);
 	}
 }

@@ -8,7 +8,7 @@
 #include <vector>
 
 namespace Monochrome3 {
-	namespace EmiliaUpdateClient {
-		int start();
+	namespace EmiliaUpdateCRHelper {
+		int start(int argc, char* argv[]);
 	}
 }
