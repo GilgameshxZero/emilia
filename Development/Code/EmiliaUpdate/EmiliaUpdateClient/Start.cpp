@@ -2,7 +2,7 @@
 
 namespace Monochrome3 {
 	namespace EmiliaUpdateClient {
-		int start() {
+		int start(int argc, char* argv[]) {
 			//parameters
 			std::map<std::string, std::string> config;
 
@@ -19,6 +19,20 @@ namespace Monochrome3 {
 			Rain::outLogStd("Starting...\r\n" + Rain::tToStr(config.size()) + " configuration options:\r\n", config["aux-path"] + config["aux-log"]);
 			for (std::map<std::string, std::string>::iterator it = config.begin(); it != config.end(); it++)
 				Rain::outLogStd("\t" + it->first + ": " + it->second + "\r\n");
+
+			Rain::outLogStd("\r\nCommand line arguments: " + Rain::tToStr(argc) + "\r\n\r\n");
+			for (int a = 0; a < argc; a++) {
+				Rain::outLogStd(std::string(argv[a]) + "\r\n");
+			}
+			Rain::outLogStd("\r\n");
+
+			//check command line, perhaps we are being restarted by helper and need to display a message
+			if (argc >= 2) {
+				std::string arg1 = argv[1];
+				Rain::strTrim(arg1);
+				if (arg1 == "staging-crh-success")
+					Rain::outLogStd("IMPORTANT: Staging operation delayed helper script (EmiliaUpdateCRHelper) completed successfully.\r\n\r\n");
+			}
 
 			//command loop
 			while (true) {
@@ -81,7 +95,7 @@ namespace Monochrome3 {
 							Rain::outLogStd("Doesn't exist:\t");
 						} else {
 							if (thisPath == Rain::getFullPathStr(stagingCodeDir + file)) {
-								delayPath = thisPath;
+								delayPath = Rain::getFullPathStr(devCodeDir + file);
 								Rain::outLogStd("Delayed:\t");
 							} else {
 								Rain::createDirRec(Rain::pathToDir(stagingCodeDir + file));
@@ -96,30 +110,12 @@ namespace Monochrome3 {
 					}
 
 					//if we need to replace the current script, run CRHelper, which will restart the current script when complete
-					if (true || delayPath != "") {
-						STARTUPINFO sinfo;
-						PROCESS_INFORMATION pinfo;
-						ZeroMemory(&sinfo, sizeof(sinfo));
-						ZeroMemory(&pinfo, sizeof(pinfo));
-						sinfo.cb = sizeof(sinfo);
-						std::string crhelperAbspath = Rain::getFullPathStr(config["crhelper"]);
-						std::string temp = ("\"" + crhelperAbspath + "\" gilgamesh").c_str();
-						if (!CreateProcess(
-							("\"" + crhelperAbspath + "\" gilgamesh").c_str(),
-							NULL,
-							NULL,
-							NULL,
-							FALSE,
-							CREATE_NEW_CONSOLE,
-							NULL,
-							Rain::pathToDir(crhelperAbspath).c_str(),
-							&sinfo,
-							&pinfo)) {
-							Rain::reportError(GetLastError(), "CRHelper could not be started");
-							Rain::outLogStd("\r\nSomething went wrong while starting the CRHelper script. Exiting in 3 seconds...\r\n");
-							Sleep(3000);
-							return 0;
-						}
+					if (delayPath != "") {
+						std::string crhelperAbspath = Rain::getFullPathStr(config["crhelper"]),
+							crhWorkingDir = Rain::pathToDir(crhelperAbspath),
+							crhCmdLine = "\"" + delayPath + "\" \"" + thisPath + "\"";
+						crhWorkingDir = crhWorkingDir.substr(0, crhWorkingDir.length() - 1);
+						ShellExecute(NULL, "open", crhelperAbspath.c_str(), crhCmdLine.c_str(), crhWorkingDir.c_str(), SW_SHOWDEFAULT);
 
 						Rain::outLogStd("\r\nThe current executable needs to be replaced. It will be restarted when the operation is complete. Exiting in 3 seconds...\r\n");
 						Sleep(3000);
