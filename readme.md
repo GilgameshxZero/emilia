@@ -54,7 +54,8 @@ Files are organized on production exactly as in the /Production directory.
 The update server/client will be referred to as the update script. When updating, the update client in **staging** should always be used. The update server should be run from **production**. Take note that even as the update process is underway, production files may change, likely the auxiliary and server files. There are several functions the script communication should complete:
 * Development to Staging: Updates /Staging with /Development as follows:
 	* Auxiliary: Not modified.
-	* Code: Maintains directory structure with only relevant files inside; **relevant files are determined in a client-side configuration file for the update script, under staging**, from where the udpate script shall be run. The update script will also update itself in this step with the script from production.
+	* Code: Maintains directory structure with only relevant files inside; **relevant files are determined in a client-side configuration file for the update script, under staging**, from where the udpate script shall be run. The update script may also update itself in this step with the script from production.
+		* If the script itself is specified as a relevant staging file, then, the script should run another executable, which waits until the current executable exits to do the replace operation, and then restart the script.
 	* Configuration: Not modified.
 	* Server: Not modified.
 

@@ -29,6 +29,18 @@ namespace Rain {
 	//Get all subdirectories in a directory, in a certain format. NOTE: Takes and returns UTF8 multibyte strings - but works with unicode directories.
 	void getDirectories(std::string directory, std::vector<std::string> &rtrn, std::string format = "*");
 
+	std::string pathToDir(std::string path);
+	std::string pathToFile(std::string path);
+	void createDirRec(std::string dir);
+
+	std::string getExecutablePath();
+
+	bool isEquivalentPath(std::string path1, std::string path2);
+
+	BY_HANDLE_FILE_INFORMATION getFileInformation(std::string path);
+
+	std::string getFullPathStr(std::string path);
+
 	//returns UTF8
 	std::string getExePath();
 
