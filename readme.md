@@ -105,7 +105,7 @@ In the root, there will also be additional untracked files not part of the offic
 
 ### Emilia-tan
 * 1.2.0
-	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer) = (3.7.2, 1.1.1, 1.2.2, 1.0.0, -)
+	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer, EmiliaUpdateCRHelper) = (3.7.2, 1.1.1, 1.2.2, 1.0.0, 1.0.0, 1.0.0)
 * 1.1.1
 	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer) = (3.7.2, 1.1.1, 1.2.2, -, -)
 	* removed .vs from git
@@ -168,8 +168,17 @@ In the root, there will also be additional untracked files not part of the offic
 ### EmiliaUpdate
 
 #### EmiliaUpdateClient
+* 1.0.0
+	* Development to Staging
+	* integration with CRH
+
+#### EmiliaUpdateCRHelper
+* 1.0.0
+	* allows a copy + run operation delayed until the destination is writable
 
 #### EmiliaUpdateServer
+* 1.0.0
+	* 
 
 ## Todo
 

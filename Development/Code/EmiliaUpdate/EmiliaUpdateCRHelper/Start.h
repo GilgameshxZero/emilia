@@ -3,6 +3,7 @@
 
 #include <ctime>
 #include <fstream>
+#include <shellapi.h>
 #include <string>
 #include <sstream>
 #include <vector>

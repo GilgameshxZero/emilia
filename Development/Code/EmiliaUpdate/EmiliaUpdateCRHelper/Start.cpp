@@ -60,22 +60,7 @@ namespace Monochrome3 {
 
 			//run destination file
 			Rain::outLogStd("Starting destination as executable...\r\n");
-			STARTUPINFO sinfo;
-			PROCESS_INFORMATION pinfo;
-			ZeroMemory(&sinfo, sizeof(sinfo));
-			ZeroMemory(&pinfo, sizeof(pinfo));
-			sinfo.cb = sizeof(sinfo);
-			CreateProcess(
-				("\"" + dest + "\" staging-crh-success").c_str(),
-				NULL,
-				NULL,
-				NULL,
-				FALSE,
-				CREATE_NEW_CONSOLE,
-				NULL,
-				Rain::pathToDir(dest).c_str(),
-				&sinfo,
-				&pinfo);
+			ShellExecute(NULL, "open", dest.c_str(), "staging-crh-success", Rain::pathToDir(dest).c_str(), SW_SHOWDEFAULT);
 
 			Rain::outLogStd("The program has terminated. Exiting in 3 seconds...\r\n");
 			Sleep(3000);
