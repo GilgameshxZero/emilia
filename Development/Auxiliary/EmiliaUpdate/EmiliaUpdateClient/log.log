@@ -1,425 +1,12 @@
-Starting client...
-6 configuration options:
+Starting...
+8 configuration options:
 	aux-error: error.log
 	aux-log: log.log
 	aux-memory: memory-leaks.log
 	aux-path: ..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\
 	config-file: config.ini
 	config-path: ..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\
-Accepting commands...
-Starting client...
-6 configuration options:
-	aux-error: error.log
-	aux-log: log.log
-	aux-memory: memory-leaks.log
-	aux-path: ..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\
-	config-file: config.ini
-	config-path: ..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\
-Accepting commands...
-Starting client...
-6 configuration options:
-	aux-error: error.log
-	aux-log: log.log
-	aux-memory: memory-leaks.log
-	aux-path: ..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\
-	config-file: config.ini
-	config-path: ..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\
-Accepting commands...
-exit
-The client has terminated. Exiting in 3 seconds...
-Starting client...
-7 configuration options:
-	aux-error: error.log
-	aux-log: log.log
-	aux-memory: memory-leaks.log
-	aux-path: ..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\
-	config-file: config.ini
-	config-path: ..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\
-	staging-files: staging-files.ini
-Accepting commands...
-Command: stage
-Checking directory structure...
-Starting client...
-7 configuration options:
-	aux-error: error.log
-	aux-log: log.log
-	aux-memory: memory-leaks.log
-	aux-path: ..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\
-	config-file: config.ini
-	config-path: ..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\
-	staging-files: staging-files.ini
-Accepting commands...
-Command: stage
-Checking directory structure...
-Copying relevant files from /Development/Code to /Staging/Code...
-Copied:	EmiliaMail\EmiliaMailClient\EmiliaMailClient_Release_x64.exe
-
-Copied:	EmiliaMail\EmiliaMailClient\config.ini
-
-Copied:	EmiliaMail\EmiliaMailServer\EmiliaMailServer_Release_x64.exe
-
-Copied:	EmiliaMail\EmiliaMailServer\config.ini
-
-Copied:	EmiliaSite\EmiliaSiteServer\EmiliaSiteServer_Release_x64.exe
-
-Copied:	EmiliaSite\EmiliaSiteServer\config.ini
-
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Release_x86.exe
-
-Copied:	EmiliaUpdate\EmiliaUpdateClient\config-loc.ini
-
-Command complete.
-Accepting commands...
-Command: exit
-The client has terminated. Exiting in 3 seconds...
-Starting client...
-7 configuration options:
-	aux-error: error.log
-	aux-log: log.log
-	aux-memory: memory-leaks.log
-	aux-path: ..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\
-	config-file: config.ini
-	config-path: ..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\
-	staging-files: staging-files.ini
-Accepting commands...
-Command: stage
-Checking directory structure...
-Copying relevant files from /Development/Code to /Staging/Code...
-
-Starting client...
-7 configuration options:
-	aux-error: error.log
-	aux-log: log.log
-	aux-memory: memory-leaks.log
-	aux-path: ..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\
-	config-file: config.ini
-	config-path: ..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\
-	staging-files: staging-files.ini
-Accepting commands...
-Command: stage
-Checking directory structure...
-Copying relevant files from /Development/Code to /Staging/Code...
-
-Copied:	EmiliaMail\EmiliaMailClient\EmiliaMailClient_Release_x64.exe
-Copied:	EmiliaMail\EmiliaMailClient\config.ini
-Copied:	EmiliaMail\EmiliaMailServer\EmiliaMailServer_Release_x64.exe
-Copied:	EmiliaMail\EmiliaMailServer\config.ini
-Copied:	EmiliaSite\EmiliaSiteServer\EmiliaSiteServer_Release_x64.exe
-Copied:	EmiliaSite\EmiliaSiteServer\config.ini
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Release_x86.exe
-Copied:	EmiliaUpdate\EmiliaUpdateClient\config-loc.ini
-Command complete.
-
-Accepting commands...
-Command: exit
-The client has terminated. Exiting in 3 seconds...
-Starting client...
-7 configuration options:
-	aux-error: error.log
-	aux-log: log.log
-	aux-memory: memory-leaks.log
-	aux-path: ..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\
-	config-file: config.ini
-	config-path: ..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\
-	staging-files: staging-files.ini
-Accepting commands...
-Command: stage
-Checking directory structure...
-Copying relevant files from /Development/Code to /Staging/Code...
-
-Copied:	EmiliaMail\EmiliaMailClient\EmiliaMailClient_Release_x64.exe
-Copied:	EmiliaMail\EmiliaMailClient\config.ini
-Copied:	EmiliaMail\EmiliaMailServer\EmiliaMailServer_Release_x64.exe
-Copied:	EmiliaMail\EmiliaMailServer\config.ini
-Copied:	EmiliaSite\EmiliaSiteServer\EmiliaSiteServer_Release_x64.exe
-Copied:	EmiliaSite\EmiliaSiteServer\config.ini
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Release_x86.exe
-Copied:	EmiliaUpdate\EmiliaUpdateClient\config-loc.ini
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\EmiliaUpdateServer_Release_x86.exe
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\config-loc.ini
-Command complete.
-
-Accepting commands...
-Command: exit
-The client has terminated. Exiting in 3 seconds...
-Starting client...
-7 configuration options:
-	aux-error: error.log
-	aux-log: log.log
-	aux-memory: memory-leaks.log
-	aux-path: ..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\
-	config-file: config.ini
-	config-path: ..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\
-	staging-files: staging-files.ini
-Accepting commands...
-Command: stage
-Checking directory structure...
-Copying relevant files from /Development/Code to /Staging/Code...
-
-Copied:	EmiliaMail\EmiliaMailClient\EmiliaMailClient_Release_x64.exe
-Copied:	EmiliaMail\EmiliaMailClient\config.ini
-Copied:	EmiliaMail\EmiliaMailServer\EmiliaMailServer_Release_x64.exe
-Copied:	EmiliaMail\EmiliaMailServer\config.ini
-Copied:	EmiliaSite\EmiliaSiteServer\EmiliaSiteServer_Release_x64.exe
-Copied:	EmiliaSite\EmiliaSiteServer\config.ini
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Release_x64.exe
-Copied:	EmiliaUpdate\EmiliaUpdateClient\config-loc.ini
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\EmiliaUpdateServer_Release_x64.exe
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\config-loc.ini
-Copied:	EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Debug_x64.exe
-Command complete.
-
-Accepting commands...
-Command: exit
-The client has terminated. Exiting in 3 seconds...
-Starting client...
-7 configuration options:
-	aux-error: error.log
-	aux-log: log.log
-	aux-memory: memory-leaks.log
-	aux-path: ..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\
-	config-file: config.ini
-	config-path: ..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\
-	staging-files: staging-files.ini
-Accepting commands...
-Command: stage
-Checking directory structure...
-Copying relevant files from /Development/Code to /Staging/Code...
-
-Copied:	EmiliaMail\EmiliaMailClient\EmiliaMailClient_Release_x64.exe
-Copied:	EmiliaMail\EmiliaMailClient\config.ini
-Copied:	EmiliaMail\EmiliaMailServer\EmiliaMailServer_Release_x64.exe
-Copied:	EmiliaMail\EmiliaMailServer\config.ini
-Copied:	EmiliaSite\EmiliaSiteServer\EmiliaSiteServer_Release_x64.exe
-Copied:	EmiliaSite\EmiliaSiteServer\config.ini
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Release_x64.exe
-Copied:	EmiliaUpdate\EmiliaUpdateClient\config-loc.ini
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\EmiliaUpdateServer_Release_x64.exe
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\config-loc.ini
-Copied:	EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Debug_x64.exe
-Command complete.
-
-Accepting commands...
-Command: exit
-The client has terminated. Exiting in 3 seconds...
-Starting client...
-7 configuration options:
-	aux-error: error.log
-	aux-log: log.log
-	aux-memory: memory-leaks.log
-	aux-path: ..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\
-	config-file: config.ini
-	config-path: ..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\
-	staging-files: staging-files.ini
-Accepting commands...
-Command: stage
-Checking directory structure...
-Copying relevant files from /Development/Code to /Staging/Code...
-
-Copied:	EmiliaMail\EmiliaMailClient\EmiliaMailClient_Release_x64.exe
-Copied:	EmiliaMail\EmiliaMailClient\config.ini
-Copied:	EmiliaMail\EmiliaMailServer\EmiliaMailServer_Release_x64.exe
-Copied:	EmiliaMail\EmiliaMailServer\config.ini
-Copied:	EmiliaSite\EmiliaSiteServer\EmiliaSiteServer_Release_x64.exe
-Copied:	EmiliaSite\EmiliaSiteServer\config.ini
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Release_x64.exe
-Copied:	EmiliaUpdate\EmiliaUpdateClient\config-loc.ini
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\EmiliaUpdateServer_Release_x64.exe
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\config-loc.ini
-Copied:	EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Debug_x64.exe
-Command complete.
-
-Accepting commands...
-Command: exit
-The client has terminated. Exiting in 3 seconds...
-Starting client...
-7 configuration options:
-	aux-error: error.log
-	aux-log: log.log
-	aux-memory: memory-leaks.log
-	aux-path: ..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\
-	config-file: config.ini
-	config-path: ..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\
-	staging-files: staging-files.ini
-Accepting commands...
-Command: stage
-Checking directory structure...
-Copying relevant files from /Development/Code to /Staging/Code...
-
-Copied:		EmiliaMail\EmiliaMailClient\EmiliaMailClient_Release_x64.exe
-Copied:		EmiliaMail\EmiliaMailClient\config.ini
-Copied:		EmiliaMail\EmiliaMailServer\EmiliaMailServer_Release_x64.exe
-Copied:		EmiliaMail\EmiliaMailServer\config.ini
-Copied:		EmiliaSite\EmiliaSiteServer\EmiliaSiteServer_Release_x64.exe
-Copied:		EmiliaSite\EmiliaSiteServer\config.ini
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Release_x64.exe
-Copied:		EmiliaUpdate\EmiliaUpdateClient\config-loc.ini
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\EmiliaUpdateServer_Release_x64.exe
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\config-loc.ini
-Copied:		EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Debug_x64.exe
-Command complete.
-
-Accepting commands...
-Command: exit
-The client has terminated. Exiting in 3 seconds...
-Starting client...
-7 configuration options:
-	aux-error: error.log
-	aux-log: log.log
-	aux-memory: memory-leaks.log
-	aux-path: ..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\
-	config-file: config.ini
-	config-path: ..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\
-	staging-files: staging-files.ini
-Accepting commands...
-Command: exit
-The client has terminated. Exiting in 3 seconds...
-Starting client...
-7 configuration options:
-	aux-error: error.log
-	aux-log: log.log
-	aux-memory: memory-leaks.log
-	aux-path: ..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\
-	config-file: config.ini
-	config-path: ..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\
-	staging-files: staging-files.ini
-Accepting commands...
-Command: stage
-Checking directory structure...
-Removing files in /Staging/Code...
-
-Enter to continue staging files...
-
-Copying relevant files from /Development/Code to /Staging/Code...
-
-Copied:		EmiliaMail\EmiliaMailClient\EmiliaMailClient_Release_x64.exe
-Copied:		EmiliaMail\EmiliaMailClient\config.ini
-Copied:		EmiliaMail\EmiliaMailServer\EmiliaMailServer_Release_x64.exe
-Copied:		EmiliaMail\EmiliaMailServer\config.ini
-Copied:		EmiliaSite\EmiliaSiteServer\EmiliaSiteServer_Release_x64.exe
-Copied:		EmiliaSite\EmiliaSiteServer\config.ini
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Release_x64.exe
-Copied:		EmiliaUpdate\EmiliaUpdateClient\config-loc.ini
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\EmiliaUpdateServer_Release_x64.exe
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\config-loc.ini
-Copied:		EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Debug_x64.exe
-Command complete.
-
-Accepting commands...
-Command: exit
-The client has terminated. Exiting in 3 seconds...
-Starting client...
-7 configuration options:
-	aux-error: error.log
-	aux-log: log.log
-	aux-memory: memory-leaks.log
-	aux-path: ..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\
-	config-file: config.ini
-	config-path: ..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\
-	staging-files: staging-files.ini
-Accepting commands...
-Command: stage
-Checking directory structure...
-Removing files in /Staging/Code...
-Enter to continue staging files...
-Copying relevant files from /Development/Code to /Staging/Code...
-
-Copied:		EmiliaMail\EmiliaMailClient\EmiliaMailClient_Release_x64.exe
-Copied:		EmiliaMail\EmiliaMailClient\config.ini
-Copied:		EmiliaMail\EmiliaMailServer\EmiliaMailServer_Release_x64.exe
-Copied:		EmiliaMail\EmiliaMailServer\config.ini
-Copied:		EmiliaSite\EmiliaSiteServer\EmiliaSiteServer_Release_x64.exe
-Copied:		EmiliaSite\EmiliaSiteServer\config.ini
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Release_x64.exe
-Copied:		EmiliaUpdate\EmiliaUpdateClient\config-loc.ini
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\EmiliaUpdateServer_Release_x64.exe
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\config-loc.ini
-Copied:		EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Debug_x64.exe
-
-Command complete.
-Accepting commands...
-Starting client...
-7 configuration options:
-	aux-error: error.log
-	aux-log: log.log
-	aux-memory: memory-leaks.log
-	aux-path: ..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\
-	config-file: config.ini
-	config-path: ..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\
-	staging-files: staging-files.ini
-Accepting commands...
-Command: stage
-Checking directory structure...
-Removing files in /Staging/Code...
-Enter to continue staging files...
-Copying relevant files from /Development/Code to /Staging/Code...
-
-Copied:		EmiliaMail\EmiliaMailClient\EmiliaMailClient_Release_x64.exe
-Copied:		EmiliaMail\EmiliaMailClient\config.ini
-Copied:		EmiliaMail\EmiliaMailServer\EmiliaMailServer_Release_x64.exe
-Copied:		EmiliaMail\EmiliaMailServer\config.ini
-Copied:		EmiliaSite\EmiliaSiteServer\EmiliaSiteServer_Release_x64.exe
-Copied:		EmiliaSite\EmiliaSiteServer\config.ini
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Release_x64.exe
-Copied:		EmiliaUpdate\EmiliaUpdateClient\config-loc.ini
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\EmiliaUpdateServer_Release_x64.exe
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\config-loc.ini
-Copied:		EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Debug_x64.exe
-
-Command complete.
-Accepting commands...
-Command: exit
-The client has terminated. Exiting in 3 seconds...
-Starting client...
-7 configuration options:
-	aux-error: error.log
-	aux-log: log.log
-	aux-memory: memory-leaks.log
-	aux-path: ..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\
-	config-file: config.ini
-	config-path: ..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\
-	staging-files: staging-files.ini
-Accepting commands...
-Starting client...
-7 configuration options:
-	aux-error: error.log
-	aux-log: log.log
-	aux-memory: memory-leaks.log
-	aux-path: ..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\
-	config-file: config.ini
-	config-path: ..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\
-	staging-files: staging-files.ini
-Accepting commands...
-Command: stage
-Checking directory structure...
-Removing files in /Staging/Code...
-Enter to continue staging files...
-Copying relevant files from /Development/Code to /Staging/Code...
-
-Copied:		EmiliaMail\EmiliaMailClient\EmiliaMailClient_Release_x64.exe
-Copied:		EmiliaMail\EmiliaMailClient\config.ini
-Copied:		EmiliaMail\EmiliaMailServer\EmiliaMailServer_Release_x64.exe
-Copied:		EmiliaMail\EmiliaMailServer\config.ini
-Copied:		EmiliaSite\EmiliaSiteServer\EmiliaSiteServer_Release_x64.exe
-Copied:		EmiliaSite\EmiliaSiteServer\config.ini
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Release_x64.exe
-Copied:		EmiliaUpdate\EmiliaUpdateClient\config-loc.ini
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\EmiliaUpdateServer_Release_x64.exe
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\config-loc.ini
-Copied:		EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Debug_x64.exe
-
-Command complete.
-Accepting commands...
-Command: exit
-The client has terminated. Exiting in 3 seconds...
-Starting client...
-7 configuration options:
-	aux-error: error.log
-	aux-log: log.log
-	aux-memory: memory-leaks.log
-	aux-path: ..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\
-	config-file: config.ini
-	config-path: ..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\
+	crhelper: ..\EmiliaUpdateCRHelper\EmiliaUpdateCRHelper_Release_x64.exe
 	staging-files: staging-files.ini
 Accepting commands...
 Command: stage
@@ -433,24 +20,24 @@ Copied:		EmiliaMail\EmiliaMailServer\EmiliaMailServer_Release_x64.exe
 Copied:		EmiliaMail\EmiliaMailServer\config.ini
 Copied:		EmiliaSite\EmiliaSiteServer\EmiliaSiteServer_Release_x64.exe
 Copied:		EmiliaSite\EmiliaSiteServer\config.ini
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Release_x64.exe
+Copied:		EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Release_x64.exe
 Copied:		EmiliaUpdate\EmiliaUpdateClient\config-loc.ini
 Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\EmiliaUpdateServer_Release_x64.exe
 Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\config-loc.ini
+Copied:		EmiliaUpdate\EmiliaUpdateCRHelper\EmiliaUpdateCRHelper_Release_x64.exe
+Copied:		EmiliaUpdate\EmiliaUpdateCRHelper\config-loc.ini
 Copied:		EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Debug_x64.exe
 
-Staging complete.
-Accepting commands...
-Command: exit
-The client has terminated. Exiting in 3 seconds...
-Starting client...
-7 configuration options:
+Something went wrong while starting the CRHelper script. Exiting in 3 seconds...
+Starting...
+8 configuration options:
 	aux-error: error.log
 	aux-log: log.log
 	aux-memory: memory-leaks.log
 	aux-path: ..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\
 	config-file: config.ini
 	config-path: ..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\
+	crhelper: ..\EmiliaUpdateCRHelper\EmiliaUpdateCRHelper_Release_x64.exe
 	staging-files: staging-files.ini
 Accepting commands...
 Command: stage
@@ -464,24 +51,24 @@ Copied:		EmiliaMail\EmiliaMailServer\EmiliaMailServer_Release_x64.exe
 Copied:		EmiliaMail\EmiliaMailServer\config.ini
 Copied:		EmiliaSite\EmiliaSiteServer\EmiliaSiteServer_Release_x64.exe
 Copied:		EmiliaSite\EmiliaSiteServer\config.ini
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Release_x64.exe
+Copied:		EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Release_x64.exe
 Copied:		EmiliaUpdate\EmiliaUpdateClient\config-loc.ini
 Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\EmiliaUpdateServer_Release_x64.exe
 Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\config-loc.ini
+Copied:		EmiliaUpdate\EmiliaUpdateCRHelper\EmiliaUpdateCRHelper_Release_x64.exe
+Copied:		EmiliaUpdate\EmiliaUpdateCRHelper\config-loc.ini
 Copied:		EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Debug_x64.exe
 
-Staging complete.
-Accepting commands...
-Command: exit
-The client has terminated. Exiting in 3 seconds...
-Starting client...
-7 configuration options:
+Something went wrong while starting the CRHelper script. Exiting in 3 seconds...
+Starting...
+8 configuration options:
 	aux-error: error.log
 	aux-log: log.log
 	aux-memory: memory-leaks.log
 	aux-path: ..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\
 	config-file: config.ini
 	config-path: ..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\
+	crhelper: ..\EmiliaUpdateCRHelper\EmiliaUpdateCRHelper_Release_x64.exe
 	staging-files: staging-files.ini
 Accepting commands...
 Command: stage
@@ -495,13 +82,130 @@ Copied:		EmiliaMail\EmiliaMailServer\EmiliaMailServer_Release_x64.exe
 Copied:		EmiliaMail\EmiliaMailServer\config.ini
 Copied:		EmiliaSite\EmiliaSiteServer\EmiliaSiteServer_Release_x64.exe
 Copied:		EmiliaSite\EmiliaSiteServer\config.ini
-Doesn't exist:	EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Release_x64.exe
+Copied:		EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Release_x64.exe
 Copied:		EmiliaUpdate\EmiliaUpdateClient\config-loc.ini
 Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\EmiliaUpdateServer_Release_x64.exe
 Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\config-loc.ini
+Copied:		EmiliaUpdate\EmiliaUpdateCRHelper\EmiliaUpdateCRHelper_Release_x64.exe
+Copied:		EmiliaUpdate\EmiliaUpdateCRHelper\config-loc.ini
+Copied:		EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Debug_x64.exe
+Starting...
+8 configuration options:
+	aux-error: error.log
+	aux-log: log.log
+	aux-memory: memory-leaks.log
+	aux-path: ..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\
+	config-file: config.ini
+	config-path: ..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\
+	crhelper: ..\EmiliaUpdateCRHelper\EmiliaUpdateCRHelper_Release_x64.exe
+	staging-files: staging-files.ini
+Accepting commands...
+Command: stage
+Checking directory structure...
+Removing files in /Staging/Code...
+Copying relevant files from /Development/Code to /Staging/Code...
+
+Copied:		EmiliaMail\EmiliaMailClient\EmiliaMailClient_Release_x64.exe
+Copied:		EmiliaMail\EmiliaMailClient\config.ini
+Copied:		EmiliaMail\EmiliaMailServer\EmiliaMailServer_Release_x64.exe
+Copied:		EmiliaMail\EmiliaMailServer\config.ini
+Copied:		EmiliaSite\EmiliaSiteServer\EmiliaSiteServer_Release_x64.exe
+Copied:		EmiliaSite\EmiliaSiteServer\config.ini
+Copied:		EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Release_x64.exe
+Copied:		EmiliaUpdate\EmiliaUpdateClient\config-loc.ini
+Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\EmiliaUpdateServer_Release_x64.exe
+Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\config-loc.ini
+Copied:		EmiliaUpdate\EmiliaUpdateCRHelper\EmiliaUpdateCRHelper_Release_x64.exe
+Copied:		EmiliaUpdate\EmiliaUpdateCRHelper\config-loc.ini
+Copied:		EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Debug_x64.exe
+Starting...
+8 configuration options:
+	aux-error: error.log
+	aux-log: log.log
+	aux-memory: memory-leaks.log
+	aux-path: ..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\
+	config-file: config.ini
+	config-path: ..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\
+	crhelper: ..\EmiliaUpdateCRHelper\EmiliaUpdateCRHelper_Release_x64.exe
+	staging-files: staging-files.ini
+Accepting commands...
+Command: stage
+Checking directory structure...
+Removing files in /Staging/Code...
+Copying relevant files from /Development/Code to /Staging/Code...
+
+Copied:		EmiliaMail\EmiliaMailClient\EmiliaMailClient_Release_x64.exe
+Copied:		EmiliaMail\EmiliaMailClient\config.ini
+Copied:		EmiliaMail\EmiliaMailServer\EmiliaMailServer_Release_x64.exe
+Copied:		EmiliaMail\EmiliaMailServer\config.ini
+Copied:		EmiliaSite\EmiliaSiteServer\EmiliaSiteServer_Release_x64.exe
+Copied:		EmiliaSite\EmiliaSiteServer\config.ini
+Copied:		EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Release_x64.exe
+Copied:		EmiliaUpdate\EmiliaUpdateClient\config-loc.ini
+Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\EmiliaUpdateServer_Release_x64.exe
+Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\config-loc.ini
+Copied:		EmiliaUpdate\EmiliaUpdateCRHelper\EmiliaUpdateCRHelper_Release_x64.exe
+Copied:		EmiliaUpdate\EmiliaUpdateCRHelper\config-loc.ini
 Copied:		EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Debug_x64.exe
 
-Staging complete.
+Something went wrong while starting the CRHelper script. Exiting in 3 seconds...
+Starting...
+8 configuration options:
+	aux-error: error.log
+	aux-log: log.log
+	aux-memory: memory-leaks.log
+	aux-path: ..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\
+	config-file: config.ini
+	config-path: ..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\
+	crhelper: ..\EmiliaUpdateCRHelper\EmiliaUpdateCRHelper_Release_x64.exe
+	staging-files: staging-files.ini
 Accepting commands...
-Command: exit
-The client has terminated. Exiting in 3 seconds...
+Command: stage
+Checking directory structure...
+Removing files in /Staging/Code...
+Copying relevant files from /Development/Code to /Staging/Code...
+
+Copied:		EmiliaMail\EmiliaMailClient\EmiliaMailClient_Release_x64.exe
+Copied:		EmiliaMail\EmiliaMailClient\config.ini
+Copied:		EmiliaMail\EmiliaMailServer\EmiliaMailServer_Release_x64.exe
+Copied:		EmiliaMail\EmiliaMailServer\config.ini
+Copied:		EmiliaSite\EmiliaSiteServer\EmiliaSiteServer_Release_x64.exe
+Copied:		EmiliaSite\EmiliaSiteServer\config.ini
+Copied:		EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Release_x64.exe
+Copied:		EmiliaUpdate\EmiliaUpdateClient\config-loc.ini
+Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\EmiliaUpdateServer_Release_x64.exe
+Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\config-loc.ini
+Copied:		EmiliaUpdate\EmiliaUpdateCRHelper\EmiliaUpdateCRHelper_Release_x64.exe
+Copied:		EmiliaUpdate\EmiliaUpdateCRHelper\config-loc.ini
+Copied:		EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Debug_x64.exe
+
+Something went wrong while starting the CRHelper script. Exiting in 3 seconds...
+Starting...
+8 configuration options:
+	aux-error: error.log
+	aux-log: log.log
+	aux-memory: memory-leaks.log
+	aux-path: ..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateClient\
+	config-file: config.ini
+	config-path: ..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\
+	crhelper: ..\EmiliaUpdateCRHelper\EmiliaUpdateCRHelper_Release_x64.exe
+	staging-files: staging-files.ini
+Accepting commands...
+Command: stage
+Checking directory structure...
+Removing files in /Staging/Code...
+Copying relevant files from /Development/Code to /Staging/Code...
+
+Copied:		EmiliaMail\EmiliaMailClient\EmiliaMailClient_Release_x64.exe
+Copied:		EmiliaMail\EmiliaMailClient\config.ini
+Copied:		EmiliaMail\EmiliaMailServer\EmiliaMailServer_Release_x64.exe
+Copied:		EmiliaMail\EmiliaMailServer\config.ini
+Copied:		EmiliaSite\EmiliaSiteServer\EmiliaSiteServer_Release_x64.exe
+Copied:		EmiliaSite\EmiliaSiteServer\config.ini
+Copied:		EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Release_x64.exe
+Copied:		EmiliaUpdate\EmiliaUpdateClient\config-loc.ini
+Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\EmiliaUpdateServer_Release_x64.exe
+Doesn't exist:	EmiliaUpdate\EmiliaUpdateServer\config-loc.ini
+Copied:		EmiliaUpdate\EmiliaUpdateCRHelper\EmiliaUpdateCRHelper_Release_x64.exe
+Copied:		EmiliaUpdate\EmiliaUpdateCRHelper\config-loc.ini
+Copied:		EmiliaUpdate\EmiliaUpdateClient\EmiliaUpdateClient_Debug_x64.exe

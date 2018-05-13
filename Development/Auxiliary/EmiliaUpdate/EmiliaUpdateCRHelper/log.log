@@ -1,0 +1,24 @@
+Starting...
+6 configuration options:
+	aux-error: error.log
+	aux-log: log.log
+	aux-memory: memory-leaks.log
+	aux-path: ..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateCRHelper\
+	config-file: config.ini
+	config-path: ..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateCRHelper\
+Command line arguments: 1
+C:\Main\Active\Documents\Programming\VSOutsource\Intermediates\EmiliaUpdate\EmiliaUpdateCRHelper\Debug\x64\EmiliaUpdateCRHelper_Debug_x64.exe
+There are not the correct number of command line arguments. Exiting in 3 seconds...
+Starting...
+6 configuration options:
+	aux-error: error.log
+	aux-log: log.log
+	aux-memory: memory-leaks.log
+	aux-path: ..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateCRHelper\
+	config-file: config.ini
+	config-path: ..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateCRHelper\
+Command line arguments: 1
+
+C:\Main\Active\Documents\Programming\VSOutsource\Intermediates\EmiliaUpdate\EmiliaUpdateCRHelper\Debug\x64\EmiliaUpdateCRHelper_Debug_x64.exe
+
+There are not the correct number of command line arguments. Exiting in 3 seconds...
