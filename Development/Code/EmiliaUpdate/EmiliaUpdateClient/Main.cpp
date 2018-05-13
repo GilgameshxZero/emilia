@@ -1,7 +1,7 @@
 #include "Main.h"
 
-int main() {
-	int error = Monochrome3::EmiliaUpdateClient::start();
+int main(int argc, char* argv[]) {
+	int error = Monochrome3::EmiliaUpdateClient::start(argc, argv);
 
 	if (error != 0) {
 		std::cout << "start returned error code " << error << "\nExiting in 3 seconds...";
