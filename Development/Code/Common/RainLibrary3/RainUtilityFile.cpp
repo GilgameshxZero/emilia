@@ -48,6 +48,57 @@ namespace Rain {
 		}
 	}
 
+	std::string pathToDir(std::string path) {
+		return path.substr(0, path.find_last_of("\\/")) + "\\";
+	}
+	std::string pathToFile(std::string path) {
+		return path.substr(path.find_last_of("\\/") + 1, path.length());
+	}
+	void createDirRec(std::string dir) {
+		size_t pos = 0;
+		dir = dir.substr(0, dir.length() - 1); //remove the '\\'
+		do {
+			pos = dir.find_first_of("\\/", pos + 1);
+			CreateDirectory(dir.substr(0, pos).c_str(), NULL);
+		} while (pos != std::string::npos);
+	}
+
+	std::string getExecutablePath() {
+		char multibyte[MAX_PATH];
+		wchar_t buffer[MAX_PATH];
+
+		GetModuleFileNameW(NULL, buffer, MAX_PATH);
+		WideCharToMultiByte(CP_UTF8, 0, buffer, -1, multibyte, MAX_PATH, NULL, NULL);
+		return std::string(multibyte);
+	}
+
+	bool isEquivalentPath(std::string path1, std::string path2) {
+		BY_HANDLE_FILE_INFORMATION info1 = getFileInformation(path1),
+			info2 = getFileInformation(path2);
+		return (info1.dwVolumeSerialNumber == info2.dwVolumeSerialNumber &&
+				info1.nFileIndexLow == info2.nFileIndexLow &&
+				info1.nFileIndexHigh == info2.nFileIndexHigh);
+	}
+
+	BY_HANDLE_FILE_INFORMATION getFileInformation(std::string path) {
+		HANDLE handle = CreateFile(path.c_str(),
+								  0,
+								  FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+								  NULL,
+								  OPEN_EXISTING,
+								  FILE_ATTRIBUTE_NORMAL,
+								  NULL);
+		BY_HANDLE_FILE_INFORMATION info;
+		GetFileInformationByHandle(handle, &info);
+		return info;
+	}
+
+	std::string getFullPathStr(std::string path) {
+		TCHAR tcFullPath[32767];
+		GetFullPathName(path.c_str(), 32767, tcFullPath, NULL);
+		return tcFullPath;
+	}
+
 	std::string getExePath() {
 		char multibyte[MAX_PATH];
 		wchar_t buffer[MAX_PATH];
