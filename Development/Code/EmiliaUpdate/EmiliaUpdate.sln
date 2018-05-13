@@ -3,7 +3,35 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2000
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EmiliaUpdateClient", "EmiliaUpdateClient\EmiliaUpdateClient.vcxproj", "{BC62E9C2-F6ED-4129-90BC-17CA20293E01}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EmiliaUpdateServer", "EmiliaUpdateServer\EmiliaUpdateServer.vcxproj", "{2D4B4736-92FB-417E-A3BD-410D02D635C2}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BC62E9C2-F6ED-4129-90BC-17CA20293E01}.Debug|x64.ActiveCfg = Debug|x64
+		{BC62E9C2-F6ED-4129-90BC-17CA20293E01}.Debug|x64.Build.0 = Debug|x64
+		{BC62E9C2-F6ED-4129-90BC-17CA20293E01}.Debug|x86.ActiveCfg = Debug|Win32
+		{BC62E9C2-F6ED-4129-90BC-17CA20293E01}.Debug|x86.Build.0 = Debug|Win32
+		{BC62E9C2-F6ED-4129-90BC-17CA20293E01}.Release|x64.ActiveCfg = Release|x64
+		{BC62E9C2-F6ED-4129-90BC-17CA20293E01}.Release|x64.Build.0 = Release|x64
+		{BC62E9C2-F6ED-4129-90BC-17CA20293E01}.Release|x86.ActiveCfg = Release|Win32
+		{BC62E9C2-F6ED-4129-90BC-17CA20293E01}.Release|x86.Build.0 = Release|Win32
+		{2D4B4736-92FB-417E-A3BD-410D02D635C2}.Debug|x64.ActiveCfg = Debug|x64
+		{2D4B4736-92FB-417E-A3BD-410D02D635C2}.Debug|x64.Build.0 = Debug|x64
+		{2D4B4736-92FB-417E-A3BD-410D02D635C2}.Debug|x86.ActiveCfg = Debug|Win32
+		{2D4B4736-92FB-417E-A3BD-410D02D635C2}.Debug|x86.Build.0 = Debug|Win32
+		{2D4B4736-92FB-417E-A3BD-410D02D635C2}.Release|x64.ActiveCfg = Release|x64
+		{2D4B4736-92FB-417E-A3BD-410D02D635C2}.Release|x64.Build.0 = Release|x64
+		{2D4B4736-92FB-417E-A3BD-410D02D635C2}.Release|x86.ActiveCfg = Release|Win32
+		{2D4B4736-92FB-417E-A3BD-410D02D635C2}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
