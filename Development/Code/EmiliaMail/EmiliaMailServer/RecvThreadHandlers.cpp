@@ -51,9 +51,9 @@ namespace Monochrome3 {
 					<< "maxConnToServ: 3" << "\r\n"
 					<< "maxSendAttempt: 3" << "\r\n"
 					<< "\r\n"
-					<< "logFile: ..\\Auxiliary\\EMTSMTPClientLog.log" << "\r\n"
-					<< "errorLog: ..\\Auxiliary\\EMTSMTPClientErrorLog.txt" << "\r\n"
-					<< "memoryLeakLog: ..\\Auxiliary\\EMTSMTPClientMemoryLeaks.txt" << "\r\n"
+					<< "logFile: ..\\..\\..\\Auxiliary\\EmiliaMail\\EmiliaMailClient\\log.log" << "\r\n"
+					<< "errorLog: ..\\..\\..\\Auxiliary\\EmiliaMail\\EmiliaMailClient\\error.log" << "\r\n"
+					<< "memoryLeakLog: ..\\..\\..\\Auxiliary\\EmiliaMail\\EmiliaMailClient\\memory-leaks.log" << "\r\n"
 					<< "\r\n"
 					<< "rawBody: yes\r\n";
 
