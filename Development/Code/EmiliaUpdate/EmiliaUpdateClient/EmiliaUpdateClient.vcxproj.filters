@@ -98,6 +98,9 @@
     <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\config.ini">
       <Filter>Configuration</Filter>
     </None>
+    <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\staging-files.ini">
+      <Filter>Configuration</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">
