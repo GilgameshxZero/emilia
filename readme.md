@@ -102,6 +102,9 @@ In the root, there will also be additional untracked files not part of the offic
 ## Changelog
 
 ### Emilia-tan
+* 1.1.1
+	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer) = (3.7.2, 1.1.1, 1.2.2, -, -)
+	* removed .vs from git
 * 1.1.0
 	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer) = (3.7.2, 1.1.1, 1.2.2, -, -)
 	* established Development, Staging, Production branches
