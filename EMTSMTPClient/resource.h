@@ -4,8 +4,6 @@
 //
 #include "BuildID.h"
 
-#define VERSION_BUILD                   183
-
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
