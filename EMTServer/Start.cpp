@@ -11,7 +11,7 @@ namespace Monochrome3 {
 
 			//debugging purposes
 			Rain::redirectCerrFile(config["errorLog"], true);
-			Rain::logMemoryLeaks(config["memoryLeakLog"]);
+			HANDLE hFMemLeak = Rain::logMemoryLeaks(config["memoryLeakLog"]);
 
 			Rain::outLogStdTrunc("Starting server...\r\nRead " + Rain::tToStr(config.size()) + " configuration options:\r\n", 0, config["serverLog"]);
 
@@ -60,6 +60,9 @@ namespace Monochrome3 {
 					Rain::outLogStdTrunc("Command not recognized\r\n");
 				}
 			}
+
+			if (hFMemLeak != NULL)
+				CloseHandle(hFMemLeak);
 
 			Rain::outLogStdTrunc("The server has terminated. Exiting automatically in 1 second...\r\n");
 			Sleep(1000);

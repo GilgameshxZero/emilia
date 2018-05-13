@@ -70,7 +70,7 @@ namespace Monochrome3 {
 				}
 
 				//accumulate request until body is contentLength long
-				unsigned long long requestLength = cdParam.headerBlockLength + 1 + headerDelim.length() + cdParam.contentLength;
+				unsigned long long requestLength = cdParam.headerBlockLength + headerDelim.length() + cdParam.contentLength;
 				if (cdParam.request.length() < requestLength)
 					return 0;
 				else if (cdParam.request.length() > requestLength)//for some reason, the request is longer than anticipated, so terminate the socket

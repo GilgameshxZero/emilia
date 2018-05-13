@@ -69,9 +69,6 @@
     <ClInclude Include="..\RainLibrary3\RainWSA2Include.h">
       <Filter>RainLibrary3</Filter>
     </ClInclude>
-    <ClInclude Include="..\RainLibrary3\RainWSA2RecvParam.h">
-      <Filter>RainLibrary3</Filter>
-    </ClInclude>
     <ClInclude Include="..\RainLibrary3\RainWSA2SendRecv.h">
       <Filter>RainLibrary3</Filter>
     </ClInclude>
@@ -148,9 +145,6 @@
       <Filter>RainLibrary3</Filter>
     </ClCompile>
     <ClCompile Include="..\RainLibrary3\RainWSA2Include.cpp">
-      <Filter>RainLibrary3</Filter>
-    </ClCompile>
-    <ClCompile Include="..\RainLibrary3\RainWSA2RecvParam.cpp">
       <Filter>RainLibrary3</Filter>
     </ClCompile>
     <ClCompile Include="..\RainLibrary3\RainWSA2SendRecv.cpp">

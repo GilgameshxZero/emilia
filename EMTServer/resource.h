@@ -4,8 +4,6 @@
 //
 #include "BuildID.h"
 
-#define IDI_ICON1                       105
-
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
