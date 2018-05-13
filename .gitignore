@@ -1,17 +1,5 @@
-*.aps
-*.user
-*.exe
+*.suo
 
-.vs
-Confidential
-EC2Access
-ServerRoot
-Live
-Auxiliary
-ProjectArchive
-
-EMTServer/config
-
-EMTSMTPClient/config
-
-EMTSMTPServer/config
+emilia-tan.com
+Staging
+Production

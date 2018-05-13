@@ -29,7 +29,7 @@ Files are organized in any development root as follows:
 		* EmiliaSite: HTTP/HTTPS webserver.
 		* EmiliaMail: SMTP client and server.
 		* EmiliaUpdate: Update server/client.
-		* RainLibrary: Cycles of the Rain library, used between many code files. This is implemented as a symlink on the development environment from an external directory.
+		* Common: Shared code between all projects, such as the Rain Library
 	* Configuration
 	* Server
 * Staging: Intermediary between development and production. Functional most of the time.
@@ -53,7 +53,7 @@ Files are organized on production exactly as in the /Production directory.
 The update server/client will be referred to as the update script. When updating, the update client in **staging** should always be used. The update server should be run from **production**. Take note that even as the update process is underway, production files may change, likely the auxiliary and server files. There are several functions the script communication should complete:
 * Development to Staging: Updates /Staging with /Development as follows:
 	* Auxiliary: Not modified.
-	* Code: Maintains directory structure with only relevant files inside; relevant files are determined in a client-side configuration file for the update script, under staging, from where the udpate script shall be run. The update script will also update itself in this step with the script from production.
+	* Code: Maintains directory structure with only relevant files inside; **relevant files are determined in a client-side configuration file for the update script, under staging**, from where the udpate script shall be run. The update script will also update itself in this step with the script from production.
 	* Configuration: Not modified.
 	* Server: Not modified.
 
@@ -61,7 +61,7 @@ Before deployment from staging to production, any necessary configuration and se
 * Staging to Production: Before running this command, the staging files should be identical to those to be used in production. This command will do a few things in the following order:
 	* Shut down production.
 	* Download production files to /Production.
-	* Wipe /Production and replace with /Staging, ignoring files specified in the configuration for the update client in **staging**.
+	* Wipe /Production and replace with /Staging, **ignoring files specified in the configuration for the update client in staging**.
 		* Ignored files should be auxiliary, configuration, or server, but never code.
 	* Replace /Staging with /Production, without ignoring any files.
 	* Restart the update script.
@@ -95,9 +95,19 @@ Only the following directory structures will be version controlled, primarily fo
 
 Git commits to master encouraged to contain updated versioning of each component of the repository.
 
+## Additional Files
+In the root, there will also be additional untracked files not part of the official repository.
+* emilia-tan.com: Files specific to emilia-tan.com's management
+
 ## Changelog
 
 ### Emilia-tan
+* 1.1.0
+	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer) = (3.7.2, 1.1.1, 1.2.2, -, -)
+	* established Development, Staging, Production branches
+		* Production maintained with live production environment
+		* Staging maintained with in dev code
+		* old projects re-organized into Development in preparation for EmiliaUpdate and staging and production deployment
 * 1.0.0
 	* established new workflows for staging, production, and deployment
 	* introduced EmiliaUpdate
