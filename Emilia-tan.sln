@@ -9,7 +9,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
-		readme.txt = readme.txt
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EMTSMTPServer", "EMTSMTPServer\EMTSMTPServer.vcxproj", "{2A59C17C-AA2A-4D8C-A82D-1B8AA291D41E}"

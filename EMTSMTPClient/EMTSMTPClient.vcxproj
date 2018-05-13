@@ -97,7 +97,6 @@
     <ClInclude Include="..\RainLibrary3\RainWindowsLAM.h" />
     <ClInclude Include="..\RainLibrary3\RainWSA2.h" />
     <ClInclude Include="..\RainLibrary3\RainWSA2Include.h" />
-    <ClInclude Include="..\RainLibrary3\RainWSA2RecvParam.h" />
     <ClInclude Include="..\RainLibrary3\RainWSA2SendRecv.h" />
     <ClInclude Include="..\RainLibrary3\RainWSA2SMTP.h" />
     <ClInclude Include="..\RainLibrary3\RainWSA2Utility.h" />
@@ -135,7 +134,6 @@
     <ClCompile Include="..\RainLibrary3\RainWindowsLAM.cpp" />
     <ClCompile Include="..\RainLibrary3\RainWSA2.cpp" />
     <ClCompile Include="..\RainLibrary3\RainWSA2Include.cpp" />
-    <ClCompile Include="..\RainLibrary3\RainWSA2RecvParam.cpp" />
     <ClCompile Include="..\RainLibrary3\RainWSA2SendRecv.cpp" />
     <ClCompile Include="..\RainLibrary3\RainWSA2SMTP.cpp" />
     <ClCompile Include="..\RainLibrary3\RainWSA2Utility.cpp" />

@@ -15,7 +15,7 @@ namespace Monochrome3 {
 				configSS = &std::cin;
 			}
 			else {
-				configFIn.open("config\\config.ini", std::ios::binary);
+				configFIn.open("Configuration\\config.ini", std::ios::binary);
 				configSS = &configFIn;
 			}
 
