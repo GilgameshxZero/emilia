@@ -47,7 +47,7 @@ namespace Monochrome3 {
 				} else if (command == "help") {
 					//see readme for what each of these do
 					Rain::outLogStd("Available commands: exit, help, stage, deploy, download, prod-stop, prod-start, sync-stop, sync-start\r\n");
-				} else if (command == "stage") {
+				} else if (command == "stage-dev") {
 					//verify directory structures
 					Rain::outLogStd("Checking directory structure...\r\n");
 					std::string rootDir = "..\\..\\..\\..\\";
@@ -124,7 +124,8 @@ namespace Monochrome3 {
 					}
 
 					Rain::outLogStd("\r\nStaging complete.\r\n");
-				} else if (command == "deploy") {
+				} else if (command == "deploy-staging") {
+				} else if (command == "stage-prod") {
 				} else if (command == "download") {
 				} else if (command == "prod-stop") {
 				} else if (command == "prod-start") {

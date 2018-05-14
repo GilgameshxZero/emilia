@@ -73,6 +73,7 @@ Before deployment from staging to production, any necessary configuration and se
 
 There are a few additional functions for ease of use:
 * Production Download: Changes to production files (likely auxiliary and server) will be reflected in the development environment under /Production.
+* Stage Production: Downloads to /Production, then replaces /Staging with /Production.
 * Production Stop: Stops production, by executing commands specified in the update script configuration.
 * Production Start: Starts production, again by executing a set of commands specified in configuration.
 * Production Sync Start: Actively update /Production with any changes to production. While sync is active, commands other than Production Sync Stop cannot be executed.
