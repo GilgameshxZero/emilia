@@ -66,8 +66,9 @@ namespace Monochrome3 {
 
 					//no need to freeaddinfo here because RainWSA2 does that for us
 					WSACleanup();
+					break;
 				} else {
-					Rain::outLogStd("Command not recognized\r\n");
+					Rain::outLogStd("Command not recognized.\r\n");
 				}
 			}
 
