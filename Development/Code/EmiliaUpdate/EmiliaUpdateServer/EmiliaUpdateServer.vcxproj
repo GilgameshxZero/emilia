@@ -81,14 +81,60 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Common\RainLibrary3\RainAlgorithm.h" />
+    <ClInclude Include="..\..\Common\RainLibrary3\RainError.h" />
+    <ClInclude Include="..\..\Common\RainLibrary3\RainGdiPlusInclude.h" />
+    <ClInclude Include="..\..\Common\RainLibrary3\RainLibraries.h" />
+    <ClInclude Include="..\..\Common\RainLibrary3\RainLogging.h" />
+    <ClInclude Include="..\..\Common\RainLibrary3\RainUtility.h" />
+    <ClInclude Include="..\..\Common\RainLibrary3\RainUtilityFile.h" />
+    <ClInclude Include="..\..\Common\RainLibrary3\RainUtilityGeneral.h" />
+    <ClInclude Include="..\..\Common\RainLibrary3\RainUtilityHexString.h" />
+    <ClInclude Include="..\..\Common\RainLibrary3\RainUtilityString.h" />
+    <ClInclude Include="..\..\Common\RainLibrary3\RainWindow.h" />
+    <ClInclude Include="..\..\Common\RainLibrary3\RainWindowsLAM.h" />
+    <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2.h" />
+    <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2Include.h" />
+    <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2SendRecv.h" />
+    <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2Server.h" />
+    <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2SMTP.h" />
+    <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2Utility.h" />
     <ClInclude Include="BuildID.h" />
+    <ClInclude Include="ConnectionHandlers.h" />
+    <ClInclude Include="Main.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Start.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateServer\config.ini" />
     <None Include="BuildIDInc.bat" />
+    <None Include="config-loc.ini" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Common\RainLibrary3\RainAlgorithm.cpp" />
+    <ClCompile Include="..\..\Common\RainLibrary3\RainError.cpp" />
+    <ClCompile Include="..\..\Common\RainLibrary3\RainGdiPlusInclude.cpp" />
+    <ClCompile Include="..\..\Common\RainLibrary3\RainLibraries.cpp" />
+    <ClCompile Include="..\..\Common\RainLibrary3\RainLogging.cpp" />
+    <ClCompile Include="..\..\Common\RainLibrary3\RainUtility.cpp" />
+    <ClCompile Include="..\..\Common\RainLibrary3\RainUtilityFile.cpp" />
+    <ClCompile Include="..\..\Common\RainLibrary3\RainUtilityGeneral.cpp" />
+    <ClCompile Include="..\..\Common\RainLibrary3\RainUtilityHexString.cpp" />
+    <ClCompile Include="..\..\Common\RainLibrary3\RainUtilityString.cpp" />
+    <ClCompile Include="..\..\Common\RainLibrary3\RainWindow.cpp" />
+    <ClCompile Include="..\..\Common\RainLibrary3\RainWindowsLAM.cpp" />
+    <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2.cpp" />
+    <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2Include.cpp" />
+    <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2SendRecv.cpp" />
+    <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2Server.cpp" />
+    <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2SMTP.cpp" />
+    <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2Utility.cpp" />
+    <ClCompile Include="ConnectionHandlers.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Start.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
