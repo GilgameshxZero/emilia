@@ -10,6 +10,8 @@ namespace Monochrome3 {
 			Rain::readParameterFile(configLocFile, config);
 			std::string configFile = config["config-path"] + config["config-file"];
 			Rain::readParameterFile(configFile, config);
+			std::string authenticationFile = config["config-path"] + config["auth-file"];
+			Rain::readParameterFile(authenticationFile, config);
 
 			//debugging
 			Rain::redirectCerrFile(config["aux-path"] + config["aux-error"], true);
@@ -28,7 +30,7 @@ namespace Monochrome3 {
 
 			//check command line for notifications
 			if (argc >= 2) {
-				//do nothing
+				//todo
 			}
 
 			//set up network stuff to continuously accept sockets

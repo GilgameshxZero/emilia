@@ -101,13 +101,15 @@
     <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2Utility.h" />
     <ClInclude Include="BuildID.h" />
     <ClInclude Include="ConnectionHandlers.h" />
+    <ClInclude Include="ConnectionParams.h" />
     <ClInclude Include="Main.h" />
-    <ClInclude Include="MessageHandlers.h" />
+    <ClInclude Include="RequestHandlers.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Start.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateServer\config.ini" />
+    <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateServer\credentials.confidential.ini" />
     <None Include="BuildIDInc.bat" />
     <None Include="config-loc.ini" />
   </ItemGroup>
@@ -134,9 +136,15 @@
     <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2SMTP.cpp" />
     <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2Utility.cpp" />
     <ClCompile Include="ConnectionHandlers.cpp" />
+    <ClCompile Include="ConnectionParams.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="MessageHandlers.cpp" />
+    <ClCompile Include="RequestHandlers.cpp" />
     <ClCompile Include="Start.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateServer\error.log" />
+    <Text Include="..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateServer\log.log" />
+    <Text Include="..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateServer\memory-leaks.log" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
