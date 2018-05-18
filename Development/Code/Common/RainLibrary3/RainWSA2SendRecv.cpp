@@ -33,6 +33,16 @@ namespace Rain {
 	int sendText(SOCKET &sock, std::string strText) {
 		return sendText(sock, strText.c_str(), strText.length());
 	}
+	int sendText(SOCKET &sock, std::string &strText) {
+		return sendText(sock, strText.c_str(), strText.length());
+	}
+
+	int sendBlockText(SOCKET &sock, std::string strText) {
+		return sendText(sock, Rain::tToStr(strText.length()) + " " + strText);
+	}
+	int sendBlockText(SOCKET &sock, std::string &strText) {
+		return sendText(sock, Rain::tToStr(strText.length()) + " " + strText);
+	}
 
 	int sendHeader(SOCKET &sock, std::unordered_map<std::string, std::string> *headers) {
 		std::string message;
