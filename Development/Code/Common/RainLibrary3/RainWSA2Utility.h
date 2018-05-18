@@ -27,8 +27,10 @@ namespace Rain {
 
 	int quickServerInit(WSADATA &wsaData, std::string port, struct addrinfo **paddr, SOCKET &listener);
 
-	//both sides can use this function
+	//both sides
 	int shutdownSocketSend(SOCKET &ConnectSocket);
-
 	std::string getClientNumIP(SOCKET &clientsock);
+
+	//custom Rain formats
+	int sendBlockText
 }
