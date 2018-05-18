@@ -113,6 +113,9 @@
     <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateServer\credentials.confidential.ini">
       <Filter>Configuration</Filter>
     </None>
+    <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateServer\prod-servers.ini">
+      <Filter>Configuration</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">

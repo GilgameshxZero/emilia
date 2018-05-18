@@ -27,7 +27,7 @@ namespace Monochrome3 {
 				Rain::outLogStd(std::string(argv[a]) + "\r\n");
 			}
 
-			if (argc != 3) {//need a copy source and destination
+			if (argc < 3) {//need a copy source and destination
 				Rain::outLogStd("\r\nThere are not the correct number of command line arguments. Exiting in 3 seconds...\r\n");
 				Sleep(3000);
 				return 0;
@@ -58,9 +58,14 @@ namespace Monochrome3 {
 			CloseHandle(hDest);
 			CopyFile(source.c_str(), dest.c_str(), FALSE);
 
-			//run destination file
+			//run destination file with any additional arguments passed to the cmdLine
 			Rain::outLogStd("Starting destination as executable...\r\n");
-			ShellExecute(NULL, "open", dest.c_str(), "staging-crh-success", Rain::pathToDir(dest).c_str(), SW_SHOWDEFAULT);
+			std::string cmdLine = "";
+			for (int a = 3; a < argc; a++)
+				cmdLine += std::string(argv[a]) + " ";
+			if (cmdLine.length() > 1)
+				cmdLine.pop_back(); //remove the trailing space
+			ShellExecute(NULL, "open", dest.c_str(), cmdLine.c_str(), Rain::pathToDir(dest).c_str(), SW_SHOWDEFAULT);
 
 			Rain::outLogStd("The program has terminated. Exiting in 3 seconds...\r\n");
 			Sleep(3000);

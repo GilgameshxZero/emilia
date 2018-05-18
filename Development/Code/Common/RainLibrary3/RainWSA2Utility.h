@@ -30,7 +30,4 @@ namespace Rain {
 	//both sides
 	int shutdownSocketSend(SOCKET &ConnectSocket);
 	std::string getClientNumIP(SOCKET &clientsock);
-
-	//custom Rain formats
-	int sendBlockText
 }

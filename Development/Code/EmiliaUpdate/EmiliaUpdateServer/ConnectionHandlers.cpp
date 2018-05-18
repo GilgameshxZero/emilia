@@ -17,6 +17,8 @@ namespace Monochrome3 {
 			cdParam->config = cdParam->config;
 			cdParam->request = "";
 			cdParam->requestLength = 0;
+
+			cdParam->authenticated = false;
 		}
 		void onConnectionExit(void *funcParam) {
 			//free the delegate parameter
