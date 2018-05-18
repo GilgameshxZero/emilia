@@ -4,7 +4,7 @@ Monochrome code: 3
 ## About
 
 ### Author
-Yang Yan, USACO Finalist & MIT 2021.
+Yang Yan.
 
 ### Purpose
 SMTP & HTTP server written in native C++ for the Windows platform, primarily for use on emilia-tan.com. The repository includes some scripts and files hosted on the emilia-tan.com domain.
@@ -43,6 +43,9 @@ Files are organized in any development root as follows:
 	* Code
 	* Configuration
 	* Server
+
+### Flow Terminology
+Downstream-Development-Staging-Productoin-Upstream
 
 ### Updating & Deploying (to AWS e.g. emilia-tan.com, with e.g. EmiliaUpdate)
 Deployment should be non-continuous. The production server will have an update server. Development will run an update client which connects with the server update script and transfers any changes. This way, we can avoid having more private information accesible through github while granting full control over deployment.

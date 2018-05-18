@@ -113,7 +113,9 @@ namespace Monochrome3 {
 					if (delayPath != "") {
 						std::string crhelperAbspath = Rain::getFullPathStr(config["crhelper"]),
 							crhWorkingDir = Rain::pathToDir(crhelperAbspath),
-							crhCmdLine = "\"" + delayPath + "\" \"" + thisPath + "\"";
+							crhCmdLine = "\"" + delayPath + "\" \"" + 
+							thisPath + "\"" + 
+							"staging-crh-success";
 						crhWorkingDir = crhWorkingDir.substr(0, crhWorkingDir.length() - 1);
 						ShellExecute(NULL, "open", crhelperAbspath.c_str(), crhCmdLine.c_str(), crhWorkingDir.c_str(), SW_SHOWDEFAULT);
 

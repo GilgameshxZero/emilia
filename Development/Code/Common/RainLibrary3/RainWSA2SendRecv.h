@@ -44,6 +44,11 @@ namespace Rain {
 	//send raw text over a socket
 	int sendText(SOCKET &sock, const char *cstrtext, long long len);
 	int sendText(SOCKET &sock, std::string strText);
+	int sendText(SOCKET &sock, std::string &strText);
+
+	//custom Rain formats of messages
+	int sendBlockText(SOCKET &sock, std::string strText);
+	int sendBlockText(SOCKET &sock, std::string &strText);
 
 	int sendHeader(SOCKET &sock, std::unordered_map<std::string, std::string> *headers);
 
