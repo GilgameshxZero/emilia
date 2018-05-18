@@ -13,6 +13,8 @@ namespace Monochrome3 {
 			ltrfdParam.delegateParam = reinterpret_cast<void *>(cdParam);
 
 			//initialize cdParam here
+			cdParam->cSocket = ltrfdParam.cSocket;
+			cdParam->config = cdParam->config;
 			cdParam->request = "";
 			cdParam->requestLength = 0;
 		}
@@ -22,7 +24,6 @@ namespace Monochrome3 {
 		}
 		int onConnectionProcessMessage(void *funcParam) {
 			Rain::WSA2ListenThreadRecvFuncDelegateParam &ltrfdParam = *reinterpret_cast<Rain::WSA2ListenThreadRecvFuncDelegateParam *>(funcParam);
-			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ltrfdParam.callerParam);
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ltrfdParam.delegateParam);
 
 			//delegate to request handlers once the message is complete
@@ -38,11 +39,11 @@ namespace Monochrome3 {
 
 			//if message is complete
 			if (cdParam.requestLength != 0 && cdParam.request.length() == cdParam.requestLength) {
-				return HandleMessage(ltrfdParam);
+				return HandleRequest(cdParam);
 			}
 
 			//< 0 is error, 0 is keep-alive, and > 0 is peacefully close
-			return 1;
+			return 0;
 		}
 	}
 }

@@ -93,7 +93,10 @@
     <ClInclude Include="ConnectionHandlers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MessageHandlers.h">
+    <ClInclude Include="ConnectionParams.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RequestHandlers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -105,6 +108,9 @@
       <Filter>Configuration</Filter>
     </None>
     <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateServer\config.ini">
+      <Filter>Configuration</Filter>
+    </None>
+    <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateServer\credentials.confidential.ini">
       <Filter>Configuration</Filter>
     </None>
   </ItemGroup>
@@ -177,8 +183,22 @@
     <ClCompile Include="ConnectionHandlers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MessageHandlers.cpp">
+    <ClCompile Include="ConnectionParams.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RequestHandlers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateServer\error.log">
+      <Filter>Auxiliary</Filter>
+    </Text>
+    <Text Include="..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateServer\log.log">
+      <Filter>Auxiliary</Filter>
+    </Text>
+    <Text Include="..\..\..\Auxiliary\EmiliaUpdate\EmiliaUpdateServer\memory-leaks.log">
+      <Filter>Auxiliary</Filter>
+    </Text>
   </ItemGroup>
 </Project>

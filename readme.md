@@ -52,7 +52,7 @@ There exists a staging stage between development and production. Staging will ne
 Files are organized on production exactly as in the /Production directory.
 
 The update server/client will be referred to as the update script. When updating, the update client in **staging** should always be used. The update server should be run from **production**. Take note that even as the update process is underway, production files may change, likely the auxiliary and server files. There are several functions the script communication should complete:
-* Development to Staging: Updates /Staging with /Development as follows:
+* Development to Staging (stage-dev): Updates /Staging with /Development as follows:
 	* Auxiliary: Not modified.
 	* Code: Maintains directory structure with only relevant files inside; **relevant files are determined in a client-side configuration file for the update script, under staging**, from where the udpate script shall be run. The update script may also update itself in this step with the script from production.
 		* If the script itself is specified as a relevant staging file, then, the script should run another executable, which waits until the current executable exits to do the replace operation, and then restart the script.
@@ -60,10 +60,10 @@ The update server/client will be referred to as the update script. When updating
 	* Server: Not modified.
 
 Before deployment from staging to production, any necessary configuration and server file changes should be made in staging. Staging will inevitably modify files in production that production also modifies. We have an ignore list in the udpate client configuraiton which can prevent merge conflicts.
-* Staging to Production: Before running this command, the staging files should be identical to those to be used in production. This command will do a few things in the following order:
+* Staging to Production (deploy-staging): Before running this command, the staging files should be identical to those to be used in production. This command will do a few things in the following order:
 	* Shut down production.
 	* Download production files to /Production.
-	* Wipe /Production and replace with /Staging, **ignoring files specified in the configuration for the update client in staging**.
+	* Wipe /Production and replace with /Staging, **ignoring files when wiping specified in the configuration for the update client in staging**.
 		* Ignored files should be auxiliary, configuration, or server, but never code.
 	* Replace /Staging with /Production, without ignoring any files.
 	* Restart the update script.
@@ -72,12 +72,12 @@ Before deployment from staging to production, any necessary configuration and se
 	* Start production.
 
 There are a few additional functions for ease of use:
-* Production Download: Changes to production files (likely auxiliary and server) will be reflected in the development environment under /Production.
-* Stage Production: Downloads to /Production, then replaces /Staging with /Production.
-* Production Stop: Stops production, by executing commands specified in the update script configuration.
-* Production Start: Starts production, again by executing a set of commands specified in configuration.
-* Production Sync Start: Actively update /Production with any changes to production. While sync is active, commands other than Production Sync Stop cannot be executed.
-* Production Sync Stop: Stops the active sync.
+* Production Download (prod-download): Changes to production files (likely auxiliary and server) will be reflected in the development environment under /Production.
+* Stage Production (stage-prod): Downloads to /Production, then replaces /Staging with /Production.
+* Production Stop (prod-stop): Stops production, by executing commands specified in the update script configuration.
+* Production Start (prod-start): Starts production, again by executing a set of commands specified in configuration.
+* Production Sync Start (sync-stop): Actively update /Production with any changes to production. While sync is active, commands other than Production Sync Stop cannot be executed.
+* Production Sync Stop (sync-start): Stops the active sync.
 
 ### Versioning
 Each program under `Code` will have a separate version associated with it. THe format is the same, as follows: `major.minor.revision.build`. The main repository will have a version associated with it as well, but without `build`.
