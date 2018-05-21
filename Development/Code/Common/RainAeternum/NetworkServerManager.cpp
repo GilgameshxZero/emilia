@@ -1,25 +1,12 @@
-#include "RainWSA2Server.h"
+#include "NetworkServerManager.h"
 
 namespace Rain {
-	WSA2RecvFuncParam::WSA2RecvFuncParam() {
-	}
-
-	WSA2RecvFuncParam::WSA2RecvFuncParam(SOCKET *socket, std::string *message, int buflen, void *funcParam, RecvHandlerFunc onProcessMessage, WSA2RecvInitFunc onRecvInit, WSA2RecvExitFunc onRecvExit) {
-		this->socket = socket;
-		this->message = message;
-		this->bufLen = bufLen;
-		this->funcParam = funcParam;
-		this->onProcessMessage = onProcessMessage;
-		this->onRecvInit = onRecvInit;
-		this->onRecvExit = onRecvExit;
-	}
-
 	HANDLE createListenThread(SOCKET &lSocket,
 							  void *recvFuncParam,
 							  std::size_t recvBufferLength,
-							  Rain::RecvHandlerFunc onProcessMessage,
-							  Rain::WSA2RecvInitFunc onRecvInit,
-							  Rain::WSA2RecvExitFunc onRecvExit) {
+							  Rain::NetworkRecvHandlerParam::EventHandler onProcessMessage,
+							  Rain::NetworkRecvHandlerParam::EventHandler onRecvInit,
+							  Rain::NetworkRecvHandlerParam::EventHandler onRecvExit) {
 		WSA2ListenThreadParam *ltParam = new WSA2ListenThreadParam();
 		ltParam->lSocket = &lSocket;
 		ltParam->recvFuncParam = recvFuncParam;
@@ -57,7 +44,7 @@ namespace Rain {
 			}
 
 			//only when a client is accepted will we create new parameters and add them to the linked lists
-			WSA2RecvFuncParam *rfParam = new WSA2RecvFuncParam();
+			NetworkRecvHandlerParam *rfParam = new NetworkRecvHandlerParam();
 			WSA2ListenThreadRecvFuncParam *ltrfParam = new WSA2ListenThreadRecvFuncParam();
 
 			ltrfParam->llMutex = &llMutex;
@@ -104,16 +91,16 @@ namespace Rain {
 		return 0;
 	}
 
-	void onListenThreadRecvInit(void *funcParam) {
+	int onListenThreadRecvInit(void *funcParam) {
 		//call delegate handler
 		WSA2ListenThreadRecvFuncParam &ltrfParam = *reinterpret_cast<WSA2ListenThreadRecvFuncParam *>(funcParam);
-		ltrfParam.pLTParam->onRecvInit(reinterpret_cast<void *>(&ltrfParam.ltrfdParam));
+		return ltrfParam.pLTParam->onRecvInit(reinterpret_cast<void *>(&ltrfParam.ltrfdParam));
 	}
-	void onListenThreadRecvExit(void *funcParam) {
+	int onListenThreadRecvExit(void *funcParam) {
 		WSA2ListenThreadRecvFuncParam &ltrfParam = *reinterpret_cast<WSA2ListenThreadRecvFuncParam *>(funcParam);
 
 		//call delegate handler
-		ltrfParam.pLTParam->onRecvExit(reinterpret_cast<void *>(&ltrfParam.ltrfdParam));
+		int delRtrn = ltrfParam.pLTParam->onRecvExit(reinterpret_cast<void *>(&ltrfParam.ltrfdParam));
 
 		//modify linked list and remove current ltrfParam
 		ltrfParam.llMutex->lock();
@@ -126,6 +113,8 @@ namespace Rain {
 		delete ltrfParam.ltrfdParam.cSocket;
 		delete ltrfParam.pRFParam;
 		delete &ltrfParam;
+
+		return delRtrn;
 	}
 	int onListenThreadRecvProcessMessage(void *funcParam) {
 		//call delegate handler

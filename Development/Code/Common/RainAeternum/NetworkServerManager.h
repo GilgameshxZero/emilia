@@ -9,8 +9,8 @@ Implements thread for listening for socket connections and spawning recvThreads.
 #pragma once
 
 #include "RainError.h"
-#include "RainWSA2SendRecv.h"
-#include "RainWSA2Utility.h"
+#include "NetworkRecvThread.h"
+#include "NetworkUtility.h"
 
 #include <cstddef>
 #include <mutex>
@@ -22,9 +22,9 @@ namespace Rain {
 		SOCKET *lSocket;
 		void *recvFuncParam;
 		std::size_t recvBufferLength;
-		RecvHandlerFunc onProcessMessage;
-		WSA2RecvInitFunc onRecvInit;
-		WSA2RecvExitFunc onRecvExit;
+		NetworkRecvHandlerParam::EventHandler onProcessMessage;
+		NetworkRecvHandlerParam::EventHandler onRecvInit;
+		NetworkRecvHandlerParam::EventHandler onRecvExit;
 	};
 
 	//used to pass parameters from listenThread spawned recvThreads to recv handlers specified in createListenThread
@@ -47,8 +47,8 @@ namespace Rain {
 		//used by recvThread handlers to pass to their delegate handlers
 		WSA2ListenThreadRecvFuncDelegateParam ltrfdParam;
 
-		//keep track of WSA2RecvFuncParam, which needs to be freed on recvThread exit
-		WSA2RecvFuncParam *pRFParam;
+		//keep track of NetworkRecvHandlerParam, which needs to be freed on recvThread exit
+		NetworkRecvHandlerParam *pRFParam;
 
 		//position in a linked list of ltrfParam, which should be modified when recvThread inits or exits
 		WSA2ListenThreadRecvFuncParam *prevLTRFP, *nextLTRFP;
@@ -71,16 +71,16 @@ namespace Rain {
 	HANDLE createListenThread(SOCKET &lSocket,
 							  void *recvFuncParam, //parameter to be passed to handler delegates
 							  std::size_t recvBufferLength,
-							  Rain::RecvHandlerFunc onProcessMessage,
-							  Rain::WSA2RecvInitFunc onRecvInit,
-							  Rain::WSA2RecvExitFunc onRecvExit);
+							  Rain::NetworkRecvHandlerParam::EventHandler onProcessMessage,
+							  Rain::NetworkRecvHandlerParam::EventHandler onRecvInit,
+							  Rain::NetworkRecvHandlerParam::EventHandler onRecvExit);
 	
 	//don't use externally
 	//implements the listen thread specified above
 	DWORD WINAPI listenThread(LPVOID lpParameter);
 
 	//handlers used by the listenThread, which eventually call the corresponding handlers passed to createListenThread
-	void onListenThreadRecvInit(void *funcParam);
-	void onListenThreadRecvExit(void *funcParam);
+	int onListenThreadRecvInit(void *funcParam);
+	int onListenThreadRecvExit(void *funcParam);
 	int onListenThreadRecvProcessMessage(void *funcParam);
 }

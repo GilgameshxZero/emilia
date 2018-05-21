@@ -1,4 +1,4 @@
-#include "RainWSA2Utility.h"
+#include "NetworkUtility.h"
 
 namespace Rain {
 	int initWinsock(WSADATA &wsaData) {
@@ -164,6 +164,22 @@ namespace Rain {
 		return 0;
 	}
 
+	int sendText(SOCKET &sock, const char *cstrtext, long long len) {
+		long long sent = 0;
+		int ret;
+
+		while (sent < len) {
+			ret = send(sock, cstrtext + sent, static_cast<int>(len - sent), 0);
+			if (ret == SOCKET_ERROR) {
+				ret = WSAGetLastError();
+				return ret;
+			}
+
+			sent += ret;
+		}
+
+		return 0;
+	}
 	int sendText(SOCKET &sock, std::string strText) {
 		return sendText(sock, strText.c_str(), strText.length());
 	}
@@ -184,5 +200,12 @@ namespace Rain {
 			message += it->first + ": " + it->second + "\n";
 		message += "\n";
 		return Rain::sendText(sock, message.c_str(), message.length());
+	}
+
+	RainWindow *createSendHandler(std::unordered_map<UINT, RainWindow::MSGFC> *msgm) {
+		RainWindow *rw = new RainWindow();
+		rw->create(msgm, NULL, NULL, 0, 0, GetModuleHandle(NULL), NULL, NULL, NULL, "", NULL, NULL, "", WS_POPUP, 0, 0, 0, 0, NULL, NULL, RainWindow::NULLCLASSNAME);
+
+		return rw;
 	}
 }

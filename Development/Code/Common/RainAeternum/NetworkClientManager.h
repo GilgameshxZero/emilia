@@ -8,7 +8,7 @@ Implements class NetworkClientManager, which maintains a socket connection to an
 
 #pragma once
 
-#include "RainWSA2Include.h"
+#include "NetworkWSAInclude.h"
 
 #include <string>
 #include <queue>
