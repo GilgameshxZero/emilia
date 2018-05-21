@@ -1,9 +1,10 @@
 #pragma once
 #include "../../Common/RainLibrary3/RainLibraries.h"
 
+#include "CommandHandlers.h"
+
 #include <ctime>
 #include <fstream>
-#include <shellapi.h>
 #include <string>
 #include <sstream>
 #include <vector>

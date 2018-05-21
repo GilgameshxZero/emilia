@@ -100,12 +100,15 @@
     <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2SMTP.h" />
     <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2Utility.h" />
     <ClInclude Include="BuildID.h" />
+    <ClInclude Include="CommandHandlers.h" />
+    <ClInclude Include="SocketManager.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Start.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\config.ini" />
+    <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\deploy-ignore.ini" />
     <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\staging-files.ini" />
     <None Include="BuildIDInc.bat" />
     <None Include="config-loc.ini" />
@@ -132,6 +135,8 @@
     <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2Server.cpp" />
     <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2SMTP.cpp" />
     <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2Utility.cpp" />
+    <ClCompile Include="CommandHandlers.cpp" />
+    <ClCompile Include="SocketManager.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Start.cpp" />
   </ItemGroup>
