@@ -270,6 +270,12 @@ namespace Rain {
 		return ret + "\\";
 	}
 
+	std::size_t getFileSize(std::string file) {
+		std::ifstream t(file, std::ios::binary);
+		t.seekg(0, std::ios::end);
+		t.close();
+		return static_cast<std::size_t>(t.tellg());
+	}
 	std::string &readFullFile(std::string filePath, std::string &fileData) {
 		std::ifstream t(filePath, std::ios::binary);
 		t.seekg(0, std::ios::end);
@@ -277,6 +283,7 @@ namespace Rain {
 		fileData = std::string(size, ' ');
 		t.seekg(0);
 		t.read(&fileData[0], size);
+		t.close();
 		return fileData;
 	}
 

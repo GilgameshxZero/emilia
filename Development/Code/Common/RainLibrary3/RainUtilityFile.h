@@ -74,6 +74,7 @@ namespace Rain {
 	//returns current directory of the executable (not the same as the path to the executable, sometimes)
 	std::string getWorkingDirectory();
 
+	std::size_t getFileSize(std::string file);
 	std::string &readFullFile(std::string filePath, std::string &fileData);
 
 	std::string getPathDirectory(std::string path);

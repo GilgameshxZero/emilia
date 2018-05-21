@@ -8,19 +8,24 @@ namespace Monochrome3 {
 			Rain::WSA2ListenThreadRecvFuncDelegateParam &ltrfdParam = *reinterpret_cast<Rain::WSA2ListenThreadRecvFuncDelegateParam *>(funcParam);
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ltrfdParam.callerParam);
 
+			//TODO: if another connection is active, close this one
+			if (ccParam.clientConnected)
+				return;
+			ccParam.clientConnected = true;
+
 			//create the delegate parameter for the first time
 			ConnectionDelegateParam *cdParam = new ConnectionDelegateParam();
 			ltrfdParam.delegateParam = reinterpret_cast<void *>(cdParam);
 
 			//initialize cdParam here
-			cdParam->cSocket = ltrfdParam.cSocket;
-			cdParam->config = cdParam->config;
 			cdParam->request = "";
 			cdParam->requestLength = 0;
 
 			cdParam->authenticated = false;
 		}
 		void onConnectionExit(void *funcParam) {
+			reinterpret_cast<ConnectionCallerParam *>(reinterpret_cast<Rain::WSA2ListenThreadRecvFuncDelegateParam *>(funcParam)->callerParam)->clientConnected = false;
+
 			//free the delegate parameter
 			delete reinterpret_cast<Rain::WSA2ListenThreadRecvFuncDelegateParam *>(funcParam)->delegateParam;
 		}
@@ -40,9 +45,8 @@ namespace Monochrome3 {
 			}
 
 			//if message is complete
-			if (cdParam.requestLength != 0 && cdParam.request.length() == cdParam.requestLength) {
-				return HandleRequest(cdParam);
-			}
+			if (cdParam.requestLength != 0 && cdParam.request.length() == cdParam.requestLength)
+				return HandleRequest(ltrfdParam);
 
 			//< 0 is error, 0 is keep-alive, and > 0 is peacefully close
 			return 0;
