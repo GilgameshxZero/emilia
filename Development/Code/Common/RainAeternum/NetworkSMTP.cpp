@@ -1,4 +1,4 @@
-#include "RainWSA2SMTP.h"
+#include "NetworkSMTP.h"
 
 namespace Rain {
 	int getSMTPStatusCode(std::string &message) {

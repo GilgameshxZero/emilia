@@ -3,12 +3,11 @@ Standard
 */
 
 #pragma once
-
-#include "RainWSA2Include.h"
-
-#include "RainWSA2SendRecv.h"
+#include "NetworkWSAInclude.h"
+#include "RainWindow.h"
 
 #include <string>
+#include <unordered_map>
 
 namespace Rain {
 	int initWinsock(WSADATA &wsaData);
@@ -34,6 +33,8 @@ namespace Rain {
 	std::string getClientNumIP(SOCKET &clientsock);
 
 	//send/recv
+	//send raw text over a socket
+	int sendText(SOCKET &sock, const char *cstrtext, long long len);
 	int sendText(SOCKET &sock, std::string strText);
 	int sendTextRef(SOCKET &sock, std::string &strText);
 
@@ -42,4 +43,8 @@ namespace Rain {
 	int sendBlockTextRef(SOCKET &sock, std::string &strText);
 
 	int sendHeader(SOCKET &sock, std::unordered_map<std::string, std::string> *headers);
+
+	//create a message queue/window which will respond to messages sent to it
+	//RainWindow * which is returned must be freed
+	RainWindow *createSendHandler(std::unordered_map<UINT, RainWindow::MSGFC> *msgm);
 }
