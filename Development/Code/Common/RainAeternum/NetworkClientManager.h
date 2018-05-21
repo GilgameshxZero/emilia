@@ -8,7 +8,8 @@ Implements class NetworkClientManager, which maintains a socket connection to an
 
 #pragma once
 
-#include "NetworkWSAInclude.h"
+#include "NetworkRecvHandlerParam.h"
+#include "NetworkUtility.h"
 
 #include <string>
 #include <queue>
@@ -16,8 +17,9 @@ Implements class NetworkClientManager, which maintains a socket connection to an
 namespace Rain {
 	class NetworkClientManager {
 		public:
-		//event handler format
-		typedef int(*EventHandlerFunc) (void *);
+		static const int STATUS_DISCONNECTED,
+			STATUS_CONNECTED,
+			STATUS_CONNECTING;
 
 		NetworkClientManager();
 
@@ -51,7 +53,9 @@ namespace Rain {
 
 		//set event handlers in addition to those of class
 		//pass NULL to any parameter to remove the custom handler
-		void setEventHandlers(EventHandlerFunc onConnect, EventHandlerFunc onMessage, EventHandlerFunc onDisconnect);
+		void setEventHandlers(NetworkRecvHandlerParam::EventHandler onConnect, 
+							  NetworkRecvHandlerParam::EventHandler onMessage, 
+							  NetworkRecvHandlerParam::EventHandler onDisconnect);
 
 		//set reconnect attempt times from default 5000
 		//will attempt to reconnect more often at the beginning, then slow down exponentially
@@ -64,10 +68,17 @@ namespace Rain {
 		int socketStatus;
 		std::string ipAddress;
 		DWORD lowPort, highPort;
-		EventHandlerFunc onConnect, onMessage, onDisconnect;
-		DWORD msReconnectAttempt;
+		NetworkRecvHandlerParam::EventHandler onConnect, onMessage, onDisconnect;
+		DWORD msReconnectWaitMax;
 
-		//disconnects socket immediately
+		//current wait between connect attempts
+		DWORD msReconnectWait;
+
+		//disconnects socket immediately, regardless of state
+		//sets state as -1
 		void disconnectSocket();
+
+		//thread function to attempt reconnects with time intervals
+		static void attemptConnectThread(void *param);
 	};
 }

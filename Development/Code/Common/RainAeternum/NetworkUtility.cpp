@@ -2,7 +2,8 @@
 
 namespace Rain {
 	int initWinsock(WSADATA &wsaData) {
-		return WSAStartup(MAKEWORD(2, 2), &wsaData);
+		if (!isWSAStarted())
+			return WSAStartup(MAKEWORD(2, 2), &wsaData);
 	}
 
 	int getClientAddr(std::string host, std::string port, struct addrinfo **result) {
@@ -164,27 +165,25 @@ namespace Rain {
 		return 0;
 	}
 
-	int sendText(SOCKET &sock, const char *cstrtext, long long len) {
-		long long sent = 0;
-		int ret;
+	int sendText(SOCKET &sock, const char *cstrtext, int len) {
+		static int sent, ret;
 
+		sent = ret = 0;
 		while (sent < len) {
-			ret = send(sock, cstrtext + sent, static_cast<int>(len - sent), 0);
+			ret = send(sock, cstrtext + sent, len - sent, 0);
 			if (ret == SOCKET_ERROR) {
 				ret = WSAGetLastError();
 				return ret;
 			}
-
 			sent += ret;
 		}
-
-		return 0;
+		return ret;
 	}
 	int sendText(SOCKET &sock, std::string strText) {
-		return sendText(sock, strText.c_str(), strText.length());
+		return sendText(sock, strText.c_str(), static_cast<int>(strText.length()));
 	}
-	int sendTextRef(SOCKET &sock, std::string &strText) {
-		return sendText(sock, strText.c_str(), strText.length());
+	int sendText(SOCKET &sock, std::string *strText) {
+		return sendText(sock, strText->c_str(), static_cast<int>(strText->length()));
 	}
 
 	int sendBlockText(SOCKET &sock, std::string strText) {
@@ -199,7 +198,7 @@ namespace Rain {
 		for (std::unordered_map<std::string, std::string>::iterator it = headers->begin(); it != headers->end(); it++)
 			message += it->first + ": " + it->second + "\n";
 		message += "\n";
-		return Rain::sendText(sock, message.c_str(), message.length());
+		return Rain::sendText(sock, message.c_str(), static_cast<int>(message.length()));
 	}
 
 	RainWindow *createSendHandler(std::unordered_map<UINT, RainWindow::MSGFC> *msgm) {
@@ -207,5 +206,14 @@ namespace Rain {
 		rw->create(msgm, NULL, NULL, 0, 0, GetModuleHandle(NULL), NULL, NULL, NULL, "", NULL, NULL, "", WS_POPUP, 0, 0, 0, 0, NULL, NULL, RainWindow::NULLCLASSNAME);
 
 		return rw;
+	}
+
+	bool isWSAStarted() {
+		SOCKET s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+		if (s == INVALID_SOCKET && WSAGetLastError() == WSANOTINITIALISED) {
+			return false;
+		}
+		closesocket(s);
+		return true;
 	}
 }

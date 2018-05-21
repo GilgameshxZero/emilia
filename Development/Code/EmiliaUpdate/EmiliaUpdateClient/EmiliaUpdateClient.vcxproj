@@ -82,7 +82,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Common\RainAeternum\NetworkClientManager.h" />
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkLibraries.h" />
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkRecvHandlerParam.h" />
     <ClInclude Include="..\..\Common\RainAeternum\NetworkRecvThread.h" />
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkServerManager.h" />
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkSMTP.h" />
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkUtility.h" />
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkWSAInclude.h" />
     <ClInclude Include="..\..\Common\RainAeternum\RainAlgorithm.h" />
     <ClInclude Include="..\..\Common\RainAeternum\RainError.h" />
     <ClInclude Include="..\..\Common\RainAeternum\RainGdiPlusInclude.h" />
@@ -95,12 +101,6 @@
     <ClInclude Include="..\..\Common\RainAeternum\RainUtilityString.h" />
     <ClInclude Include="..\..\Common\RainAeternum\RainWindow.h" />
     <ClInclude Include="..\..\Common\RainAeternum\RainWindowsLAM.h" />
-    <ClInclude Include="..\..\Common\RainAeternum\NetworkLibraries.h" />
-    <ClInclude Include="..\..\Common\RainAeternum\NetworkWSAInclude.h" />
-    <ClInclude Include="..\..\Common\RainAeternum\NetworkRecvHandlerParam.h" />
-    <ClInclude Include="..\..\Common\RainAeternum\NetworkServerManager.h" />
-    <ClInclude Include="..\..\Common\RainAeternum\NetworkSMTP.h" />
-    <ClInclude Include="..\..\Common\RainAeternum\NetworkUtility.h" />
     <ClInclude Include="BuildID.h" />
     <ClInclude Include="CommandHandlers.h" />
     <ClInclude Include="Main.h" />
@@ -119,7 +119,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Common\RainAeternum\NetworkClientManager.cpp" />
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkLibraries.cpp" />
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkRecvHandlerParam.cpp" />
     <ClCompile Include="..\..\Common\RainAeternum\NetworkRecvThread.cpp" />
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkServerManager.cpp" />
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkSMTP.cpp" />
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkUtility.cpp" />
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkWSAInclude.cpp" />
     <ClCompile Include="..\..\Common\RainAeternum\RainAlgorithm.cpp" />
     <ClCompile Include="..\..\Common\RainAeternum\RainError.cpp" />
     <ClCompile Include="..\..\Common\RainAeternum\RainGdiPlusInclude.cpp" />
@@ -132,12 +138,6 @@
     <ClCompile Include="..\..\Common\RainAeternum\RainUtilityString.cpp" />
     <ClCompile Include="..\..\Common\RainAeternum\RainWindow.cpp" />
     <ClCompile Include="..\..\Common\RainAeternum\RainWindowsLAM.cpp" />
-    <ClCompile Include="..\..\Common\RainAeternum\NetworkLibraries.cpp" />
-    <ClCompile Include="..\..\Common\RainAeternum\NetworkWSAInclude.cpp" />
-    <ClCompile Include="..\..\Common\RainAeternum\NetworkRecvHandlerParam.cpp" />
-    <ClCompile Include="..\..\Common\RainAeternum\NetworkServerManager.cpp" />
-    <ClCompile Include="..\..\Common\RainAeternum\NetworkSMTP.cpp" />
-    <ClCompile Include="..\..\Common\RainAeternum\NetworkUtility.cpp" />
     <ClCompile Include="CommandHandlers.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Start.cpp" />
