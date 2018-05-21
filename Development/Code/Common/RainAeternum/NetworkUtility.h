@@ -34,9 +34,9 @@ namespace Rain {
 
 	//send/recv
 	//send raw text over a socket
-	int sendText(SOCKET &sock, const char *cstrtext, long long len);
+	int sendText(SOCKET &sock, const char *cstrtext, int len);
 	int sendText(SOCKET &sock, std::string strText);
-	int sendTextRef(SOCKET &sock, std::string &strText);
+	int sendText(SOCKET &sock, std::string *strText);
 
 	//custom Rain formats of messages
 	int sendBlockText(SOCKET &sock, std::string strText);
@@ -47,4 +47,7 @@ namespace Rain {
 	//create a message queue/window which will respond to messages sent to it
 	//RainWindow * which is returned must be freed
 	RainWindow *createSendHandler(std::unordered_map<UINT, RainWindow::MSGFC> *msgm);
+
+	//test if WSAStartup called
+	bool isWSAStarted();
 }
