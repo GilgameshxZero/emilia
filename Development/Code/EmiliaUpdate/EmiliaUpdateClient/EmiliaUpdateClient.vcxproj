@@ -94,6 +94,7 @@
     <ClInclude Include="..\..\Common\RainLibrary3\RainWindow.h" />
     <ClInclude Include="..\..\Common\RainLibrary3\RainWindowsLAM.h" />
     <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2.h" />
+    <ClInclude Include="..\..\Common\RainLibrary3\NetworkClientManager.h" />
     <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2Include.h" />
     <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2SendRecv.h" />
     <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2Server.h" />
@@ -101,7 +102,6 @@
     <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2Utility.h" />
     <ClInclude Include="BuildID.h" />
     <ClInclude Include="CommandHandlers.h" />
-    <ClInclude Include="SocketManager.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Start.h" />
@@ -130,13 +130,13 @@
     <ClCompile Include="..\..\Common\RainLibrary3\RainWindow.cpp" />
     <ClCompile Include="..\..\Common\RainLibrary3\RainWindowsLAM.cpp" />
     <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2.cpp" />
+    <ClCompile Include="..\..\Common\RainLibrary3\NetworkClientManager.cpp" />
     <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2Include.cpp" />
     <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2SendRecv.cpp" />
     <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2Server.cpp" />
     <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2SMTP.cpp" />
     <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2Utility.cpp" />
     <ClCompile Include="CommandHandlers.cpp" />
-    <ClCompile Include="SocketManager.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Start.cpp" />
   </ItemGroup>
