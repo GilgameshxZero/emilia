@@ -93,8 +93,8 @@
     <ClInclude Include="CommandHandlers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SocketManager.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\Common\RainLibrary3\NetworkClientManager.h">
+      <Filter>RainLibrary3</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -183,8 +183,8 @@
     <ClCompile Include="CommandHandlers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SocketManager.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\Common\RainLibrary3\NetworkClientManager.cpp">
+      <Filter>RainLibrary3</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
