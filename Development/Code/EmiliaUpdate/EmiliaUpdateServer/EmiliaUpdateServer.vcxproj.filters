@@ -93,10 +93,16 @@
     <ClInclude Include="ConnectionHandlers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ConnectionParams.h">
+    <ClInclude Include="RequestHandlers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RequestHandlers.h">
+    <ClInclude Include="ServerStatus.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConnectionCallerParam.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConnectionDelegateParam.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -186,10 +192,16 @@
     <ClCompile Include="ConnectionHandlers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ConnectionParams.cpp">
+    <ClCompile Include="RequestHandlers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RequestHandlers.cpp">
+    <ClCompile Include="ServerStatus.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ConnectionCallerParam.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ConnectionDelegateParam.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

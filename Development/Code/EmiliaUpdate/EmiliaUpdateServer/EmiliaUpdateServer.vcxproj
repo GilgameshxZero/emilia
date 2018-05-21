@@ -100,8 +100,10 @@
     <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2SMTP.h" />
     <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2Utility.h" />
     <ClInclude Include="BuildID.h" />
+    <ClInclude Include="ConnectionCallerParam.h" />
+    <ClInclude Include="ConnectionDelegateParam.h" />
     <ClInclude Include="ConnectionHandlers.h" />
-    <ClInclude Include="ConnectionParams.h" />
+    <ClInclude Include="ServerStatus.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="RequestHandlers.h" />
     <ClInclude Include="resource.h" />
@@ -136,8 +138,10 @@
     <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2Server.cpp" />
     <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2SMTP.cpp" />
     <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2Utility.cpp" />
+    <ClCompile Include="ConnectionCallerParam.cpp" />
+    <ClCompile Include="ConnectionDelegateParam.cpp" />
     <ClCompile Include="ConnectionHandlers.cpp" />
-    <ClCompile Include="ConnectionParams.cpp" />
+    <ClCompile Include="ServerStatus.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="RequestHandlers.cpp" />
     <ClCompile Include="Start.cpp" />
