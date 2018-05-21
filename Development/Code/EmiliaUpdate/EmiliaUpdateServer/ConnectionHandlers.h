@@ -1,7 +1,8 @@
 #pragma once
 #include "../../Common/RainLibrary3/RainLibraries.h"
 
-#include "ConnectionParams.h"
+#include "ConnectionCallerParam.h"
+#include "ConnectionDelegateParam.h"
 #include "RequestHandlers.h"
 
 #include <map>

@@ -33,14 +33,14 @@ namespace Rain {
 	int sendText(SOCKET &sock, std::string strText) {
 		return sendText(sock, strText.c_str(), strText.length());
 	}
-	int sendText(SOCKET &sock, std::string &strText) {
+	int sendTextRef(SOCKET &sock, std::string &strText) {
 		return sendText(sock, strText.c_str(), strText.length());
 	}
 
 	int sendBlockText(SOCKET &sock, std::string strText) {
 		return sendText(sock, Rain::tToStr(strText.length()) + " " + strText);
 	}
-	int sendBlockText(SOCKET &sock, std::string &strText) {
+	int sendBlockTextRef(SOCKET &sock, std::string &strText) {
 		return sendText(sock, Rain::tToStr(strText.length()) + " " + strText);
 	}
 

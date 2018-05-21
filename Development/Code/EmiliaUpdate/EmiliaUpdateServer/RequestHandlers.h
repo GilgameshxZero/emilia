@@ -1,26 +1,27 @@
 #pragma once
 #include "../../Common/RainLibrary3/RainLibraries.h"
 
-#include "ConnectionParams.h"
+#include "ConnectionCallerParam.h"
+#include "ConnectionDelegateParam.h"
 
 #include <shellapi.h>
 #include <string>
 
 namespace Monochrome3 {
 	namespace EmiliaUpdateServer {
-		typedef int(*RequestMethodHandler)(ConnectionDelegateParam &);
+		typedef int(*RequestMethodHandler)(Rain::WSA2ListenThreadRecvFuncDelegateParam &);
 
 		//general method which takes request and distributes it to appropriate method handler
-		int HandleRequest(ConnectionDelegateParam &cdParam);
+		int HandleRequest(Rain::WSA2ListenThreadRecvFuncDelegateParam &ltrfdParam);
 
 		//specific handlers for different messages
-		int HRAuthenticate(ConnectionDelegateParam &cdParam);
+		int HRAuthenticate(Rain::WSA2ListenThreadRecvFuncDelegateParam &ltrfdParam);
 		/*
 		Method: authenticate
 		Contains:
 			password
 		*/
-		int HRProdUpload(ConnectionDelegateParam &cdParam);
+		int HRProdUpload(Rain::WSA2ListenThreadRecvFuncDelegateParam &ltrfdParam);
 		/*
 		Method: prod-upload
 		Linebreaks: \r\n
@@ -32,22 +33,22 @@ namespace Monochrome3 {
 			The bytes of each file, in consecutive format
 		Blocking: prod-upload might be blocked into multiple blocks; however, each block will have the prod-upload method; assume that they all build off of each other until the end of a single prod-upload request
 		*/
-		int HRProdDownload(ConnectionDelegateParam &cdParam);
+		int HRProdDownload(Rain::WSA2ListenThreadRecvFuncDelegateParam &ltrfdParam);
 		/*
 		Method: prod-download
 		Contains:
 			same information as prod-upload
 		*/
-		int HRProdStop(ConnectionDelegateParam &cdParam);
+		int HRProdStop(Rain::WSA2ListenThreadRecvFuncDelegateParam &ltrfdParam);
 		/*
 		*/
-		int HRProdStart(ConnectionDelegateParam &cdParam);
+		int HRProdStart(Rain::WSA2ListenThreadRecvFuncDelegateParam &ltrfdParam);
 		/*
 		*/
-		int HRSyncStop(ConnectionDelegateParam &cdParam);
+		int HRSyncStop(Rain::WSA2ListenThreadRecvFuncDelegateParam &ltrfdParam);
 		/*
 		*/
-		int HRSyncStart(ConnectionDelegateParam &cdParam);
+		int HRSyncStart(Rain::WSA2ListenThreadRecvFuncDelegateParam &ltrfdParam);
 		/*
 		*/
 	}
