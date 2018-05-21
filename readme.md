@@ -190,6 +190,9 @@ In the root, there will also be additional untracked files not part of the offic
 * implement a testing framework for both development and staging.
 * implement a monitoring framework for production.
 
+### RainLibrary
+* upgrade to 4 sometime, to clean up logging and implement subscriber flows
+
 ### EmiliaSite
 
 #### EmiliaSite

@@ -90,6 +90,12 @@
     <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2Utility.h">
       <Filter>RainLibrary3</Filter>
     </ClInclude>
+    <ClInclude Include="CommandHandlers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SocketManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="BuildIDInc.bat">
@@ -102,6 +108,9 @@
       <Filter>Configuration</Filter>
     </None>
     <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\staging-files.ini">
+      <Filter>Configuration</Filter>
+    </None>
+    <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\deploy-ignore.ini">
       <Filter>Configuration</Filter>
     </None>
   </ItemGroup>
@@ -170,6 +179,12 @@
     </ClCompile>
     <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2Utility.cpp">
       <Filter>RainLibrary3</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandHandlers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SocketManager.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

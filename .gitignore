@@ -4,4 +4,3 @@ Staging
 Production
 
 *.confidential*
-*.log
