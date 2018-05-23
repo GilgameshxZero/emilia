@@ -1,4 +1,4 @@
-#include "RainError.h"
+#include "UtilityError.h"
 
 namespace Rain {
 	int reportError(int code, std::string desc) {

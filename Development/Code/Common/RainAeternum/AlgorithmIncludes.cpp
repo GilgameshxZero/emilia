@@ -1,4 +1,4 @@
-#include "RainAlgorithm.h"
+#include "AlgorithmIncludes.h"
 
 namespace Rain {
 	unsigned long long fastModExp(unsigned long long base, unsigned long long exp, unsigned long long mod) {

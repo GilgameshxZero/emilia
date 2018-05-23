@@ -6,7 +6,7 @@ Standard
 
 #pragma once
 
-#include "RainWindowsLAM.h"
+#include "WindowsLAMInclude.h"
 
 #include <objidl.h> //must come before gdiplus.h
 #include <gdiplus.h>

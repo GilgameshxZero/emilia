@@ -2,9 +2,13 @@
 Standard
 */
 
+/*
+Functions to make program logging easier.
+*/
+
 #pragma once
 
-#include "RainUtilityFile.h"
+#include "UtilityFilesystem.h"
 
 #include <iostream>
 #include <mutex>
@@ -74,4 +78,7 @@ namespace Rain {
 	void outLogStdTruncRef(std::string &info, int maxLen = 80, std::string filePath = "", bool append = true);
 	void outLogStdTrunc(std::string info, int maxLen = 80, std::string filePath = "", bool append = true);
 	void outLogStd(std::string info, std::string filePath = "", bool append = true);
+
+	//dumps memory leaks to a file if on debug mode; application must CloseHandle the return HANDLE, unless it's debug mode and the return is NULL
+	HANDLE logMemoryLeaks(std::string out_file);
 }
