@@ -6,31 +6,31 @@ namespace Rain {
 		char *buffer = new char[recvparam->bufLen];
 		int ret;
 
-		if (recvparam->onRecvInit != NULL) {
-			if (!recvparam->onRecvInit(recvparam->funcParam)) {
-				//receive data until the server closes the connection
-				do {
-					ret = recv(*recvparam->socket, buffer, static_cast<int>(recvparam->bufLen), 0);
-					if (ret > 0) //received ret bytes
-					{
-						*recvparam->message = std::string(buffer, ret);
-						if (recvparam->onProcessMessage != NULL)
-							if (recvparam->onProcessMessage(recvparam->funcParam))
-								break;
-					} else if (ret == 0)
-						break; //connection closed
-					else //failure
-					{
-						ret = WSAGetLastError();
-						break;
-					}
-				} while (ret > 0);
+		if (recvparam->onRecvInit != NULL)
+			if (recvparam->onRecvInit(recvparam->funcParam))
+				return 0;
 
-				delete[] buffer;
-				if (recvparam->onRecvExit != NULL)
-					recvparam->onRecvExit(recvparam->funcParam); //going to return soon regardless if nonzero
+		//receive data until the server closes the connection
+		do {
+			ret = recv(*recvparam->socket, buffer, static_cast<int>(recvparam->bufLen), 0);
+			if (ret > 0) //received ret bytes
+			{
+				*recvparam->message = std::string(buffer, ret);
+				if (recvparam->onProcessMessage != NULL)
+					if (recvparam->onProcessMessage(recvparam->funcParam))
+						break;
+			} else if (ret == 0)
+				break; //connection closed
+			else //failure
+			{
+				ret = WSAGetLastError();
+				break;
 			}
-		}
+		} while (ret > 0);
+
+		delete[] buffer;
+		if (recvparam->onRecvExit != NULL)
+			recvparam->onRecvExit(recvparam->funcParam); //going to return soon regardless if nonzero
 
 		return ret;
 	}

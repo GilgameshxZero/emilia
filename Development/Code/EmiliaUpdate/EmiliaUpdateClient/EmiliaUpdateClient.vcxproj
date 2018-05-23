@@ -81,12 +81,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkBase.h" />
     <ClInclude Include="..\..\Common\RainAeternum\NetworkClientManager.h" />
     <ClInclude Include="..\..\Common\RainAeternum\NetworkLibraries.h" />
     <ClInclude Include="..\..\Common\RainAeternum\NetworkRecvHandlerParam.h" />
     <ClInclude Include="..\..\Common\RainAeternum\NetworkRecvThread.h" />
     <ClInclude Include="..\..\Common\RainAeternum\NetworkServerManager.h" />
     <ClInclude Include="..\..\Common\RainAeternum\NetworkSMTP.h" />
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkSocketManager.h" />
     <ClInclude Include="..\..\Common\RainAeternum\NetworkUtility.h" />
     <ClInclude Include="..\..\Common\RainAeternum\NetworkWSAInclude.h" />
     <ClInclude Include="..\..\Common\RainAeternum\RainAlgorithm.h" />
@@ -109,6 +111,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\config.ini" />
+    <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\credentials.confidential.ini" />
     <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\deploy-ignore.ini" />
     <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\staging-files.ini" />
     <None Include="BuildIDInc.bat" />
@@ -118,12 +121,14 @@
     <ResourceCompile Include="resource.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkBase.cpp" />
     <ClCompile Include="..\..\Common\RainAeternum\NetworkClientManager.cpp" />
     <ClCompile Include="..\..\Common\RainAeternum\NetworkLibraries.cpp" />
     <ClCompile Include="..\..\Common\RainAeternum\NetworkRecvHandlerParam.cpp" />
     <ClCompile Include="..\..\Common\RainAeternum\NetworkRecvThread.cpp" />
     <ClCompile Include="..\..\Common\RainAeternum\NetworkServerManager.cpp" />
     <ClCompile Include="..\..\Common\RainAeternum\NetworkSMTP.cpp" />
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkSocketManager.cpp" />
     <ClCompile Include="..\..\Common\RainAeternum\NetworkUtility.cpp" />
     <ClCompile Include="..\..\Common\RainAeternum\NetworkWSAInclude.cpp" />
     <ClCompile Include="..\..\Common\RainAeternum\RainAlgorithm.cpp" />
