@@ -1,70 +1,6 @@
 #include "NetworkUtility.h"
 
 namespace Rain {
-	int initWinsock(WSADATA &wsaData) {
-		if (!isWSAStarted())
-			return WSAStartup(MAKEWORD(2, 2), &wsaData);
-	}
-
-	int getClientAddr(std::string host, std::string port, struct addrinfo **result) {
-		struct addrinfo hints;
-
-		ZeroMemory(&hints, sizeof(hints));
-		hints.ai_family = AF_UNSPEC;
-		hints.ai_socktype = SOCK_STREAM;
-		hints.ai_protocol = IPPROTO_TCP;
-
-		int ret = getaddrinfo(host.c_str(), port.c_str(), &hints, result);
-		if (ret != 0)
-			WSACleanup();
-		return ret;
-	}
-
-	int createClientSocket(struct addrinfo **ptr, SOCKET &ConnectSocket) {
-		ConnectSocket = INVALID_SOCKET;
-
-		ConnectSocket = socket((*ptr)->ai_family, (*ptr)->ai_socktype,
-			(*ptr)->ai_protocol);
-
-		if (ConnectSocket == INVALID_SOCKET) {
-			int ret = WSAGetLastError();
-			freeaddrinfo(*ptr);
-			WSACleanup();
-			return ret;
-		}
-		return 0;
-	}
-
-	int connToServ(struct addrinfo **ptr, SOCKET &ConnectSocket) {
-		struct addrinfo *curaddr = (*ptr);
-		int ret;
-
-		while (true) {
-			ret = connect(ConnectSocket, curaddr->ai_addr, (int) curaddr->ai_addrlen);
-			if (ret == SOCKET_ERROR)
-				ret = WSAGetLastError();
-			else
-				break;
-
-			if (curaddr->ai_next == NULL)
-				break;
-
-			curaddr = curaddr->ai_next;
-		}
-
-		return ret;
-	}
-
-	int shutdownSocketSend(SOCKET &ConnectSocket) {
-		if (shutdown(ConnectSocket, SD_SEND) == SOCKET_ERROR) {
-			int ret = WSAGetLastError();
-			closesocket(ConnectSocket);
-			WSACleanup();
-			return ret;
-		}
-
-		return 0;
-	}
 
 	int getServAddr(std::string port, struct addrinfo **result) {
 		struct addrinfo hints;
@@ -141,56 +77,20 @@ namespace Rain {
 		return std::string(clhname);
 	}
 
-	int quickClientInit(WSADATA &wsaData, std::string host, std::string port, struct addrinfo **paddr, SOCKET &connect) {
-		int error;
-		error = Rain::initWinsock(wsaData);
-		if (error) return error;
-		error = Rain::getClientAddr(host, port, paddr);
-		if (error) return error;
-		error = Rain::createClientSocket(paddr, connect);
-		if (error) return error;
-		return 0;
-	}
-
-	int quickServerInit(WSADATA &wsaData, std::string port, struct addrinfo **paddr, SOCKET &listener) {
-		int error;
-		error = Rain::initWinsock(wsaData);
-		if (error) return error;
-		error = Rain::getServAddr(port, paddr);
-		if (error) return error;
-		error = Rain::createServLSocket(paddr, listener);
-		if (error) return error;
-		error = Rain::bindServLSocket(paddr, listener);
-		if (error) return error;
-		return 0;
-	}
-
-	int sendText(SOCKET &sock, const char *cstrtext, int len) {
-		static int sent, ret;
-
-		sent = ret = 0;
-		while (sent < len) {
-			ret = send(sock, cstrtext + sent, len - sent, 0);
-			if (ret == SOCKET_ERROR) {
-				ret = WSAGetLastError();
-				return ret;
-			}
-			sent += ret;
-		}
-		return ret;
-	}
-	int sendText(SOCKET &sock, std::string strText) {
-		return sendText(sock, strText.c_str(), static_cast<int>(strText.length()));
-	}
-	int sendText(SOCKET &sock, std::string *strText) {
-		return sendText(sock, strText->c_str(), static_cast<int>(strText->length()));
-	}
 
 	int sendBlockText(SOCKET &sock, std::string strText) {
-		return sendText(sock, Rain::tToStr(strText.length()) + " " + strText);
+		return sendRawMessage(sock, Rain::tToStr(strText.length()) + " " + strText);
 	}
 	int sendBlockTextRef(SOCKET &sock, std::string &strText) {
-		return sendText(sock, Rain::tToStr(strText.length()) + " " + strText);
+		return sendRawMessage(sock, Rain::tToStr(strText.length()) + " " + strText);
+	}
+
+	void sendBlockMessage(Rain::NetworkSocketManager &manager, std::string message) {
+		Rain::sendBlockMessage(manager, &message);
+	}
+	void sendBlockMessage(Rain::NetworkSocketManager &manager, std::string *message) {
+		manager.sendRawMessage(Rain::tToStr(message->length()) + " ");
+		manager.sendRawMessage(message);
 	}
 
 	int sendHeader(SOCKET &sock, std::unordered_map<std::string, std::string> *headers) {
@@ -198,7 +98,7 @@ namespace Rain {
 		for (std::unordered_map<std::string, std::string>::iterator it = headers->begin(); it != headers->end(); it++)
 			message += it->first + ": " + it->second + "\n";
 		message += "\n";
-		return Rain::sendText(sock, message.c_str(), static_cast<int>(message.length()));
+		return Rain::sendRawMessage(sock, message.c_str(), static_cast<int>(message.length()));
 	}
 
 	RainWindow *createSendHandler(std::unordered_map<UINT, RainWindow::MSGFC> *msgm) {

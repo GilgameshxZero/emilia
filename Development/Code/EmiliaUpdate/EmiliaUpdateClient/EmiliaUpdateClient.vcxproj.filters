@@ -99,6 +99,12 @@
     <ClInclude Include="..\..\Common\RainAeternum\RainWindowsLAM.h">
       <Filter>RainAeternum</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkBase.h">
+      <Filter>RainAeternum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkSocketManager.h">
+      <Filter>RainAeternum</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="BuildIDInc.bat">
@@ -114,6 +120,9 @@
       <Filter>Configuration</Filter>
     </None>
     <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\deploy-ignore.ini">
+      <Filter>Configuration</Filter>
+    </None>
+    <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\credentials.confidential.ini">
       <Filter>Configuration</Filter>
     </None>
   </ItemGroup>
@@ -190,6 +199,12 @@
       <Filter>RainAeternum</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Common\RainAeternum\RainWindowsLAM.cpp">
+      <Filter>RainAeternum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkBase.cpp">
+      <Filter>RainAeternum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkSocketManager.cpp">
       <Filter>RainAeternum</Filter>
     </ClCompile>
   </ItemGroup>

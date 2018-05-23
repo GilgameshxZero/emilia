@@ -8,30 +8,40 @@ Implements class NetworkClientManager, which maintains a socket connection to an
 
 #pragma once
 
-#include "NetworkRecvHandlerParam.h"
+#include "NetworkBase.h"
+#include "NetworkRecvThread.h"
+#include "NetworkSocketManager.h"
 #include "NetworkUtility.h"
 
 #include <string>
 #include <queue>
+#include <vector>
 
 namespace Rain {
-	class NetworkClientManager {
+	class NetworkClientManager : public NetworkSocketManager {
 		public:
-		static const int STATUS_DISCONNECTED,
-			STATUS_CONNECTED,
-			STATUS_CONNECTING;
+		typedef void(*SendMessagePtrFunc)(std::string *);
+
+		static const int STATUS_DISCONNECTED = -1,
+			STATUS_CONNECTED = 0,
+			STATUS_CONNECTING = 1;
+		static const std::size_t RECV_BUF_LEN = 65536;
 
 		NetworkClientManager();
+		~NetworkClientManager();
 
 		//sends raw message over socket
 		//non-blocking by default; if socket is unusable, will delay send until socket is usable again
 		//messages are sent without buffering
-		DWORD sendRawMessage(std::string request);
+		void sendRawMessage(std::string request);
 
 		//if blocking, passing by pointer would be faster, avoiding copying of string and sending directly
-		DWORD sendRawMessage(std::string *request);
+		void sendRawMessage(std::string *request);
+
+		void clearMessageQueue();
 
 		//wait until timeout elapses or queued messages are sent
+		//0 for infinite
 		void blockForMessageQueue(DWORD msTimeout = 5000);
 
 		//set sendRawMessage as blocking or non-blocking
@@ -41,9 +51,10 @@ namespace Rain {
 		int getSocketStatus();
 
 		//blocks until either timeout elapses or socket connects
+		//0 for infinite
 		void blockForConnect(DWORD msTimeout = 10000);
 
-		//returns a usable socket if possible, or NULL otherwise
+		//returns current socket immediately
 		SOCKET &getSocket();
 
 		//if called with non-empty ipAddress, setClientTarget will tell class to begin trying to connect to the target
@@ -55,11 +66,15 @@ namespace Rain {
 		//pass NULL to any parameter to remove the custom handler
 		void setEventHandlers(NetworkRecvHandlerParam::EventHandler onConnect, 
 							  NetworkRecvHandlerParam::EventHandler onMessage, 
-							  NetworkRecvHandlerParam::EventHandler onDisconnect);
+							  NetworkRecvHandlerParam::EventHandler onDisconnect,
+							  void *funcParam);
 
-		//set reconnect attempt times from default 5000
+		//set reconnect attempt time max from default 3000
 		//will attempt to reconnect more often at the beginning, then slow down exponentially
 		DWORD setReconnectAttemptTime(DWORD msMaxInterval);
+
+		//set send message attempt time max
+		DWORD setSendAttemptTime(DWORD msMaxInterval);
 
 		private:
 		SOCKET socket;
@@ -69,16 +84,40 @@ namespace Rain {
 		std::string ipAddress;
 		DWORD lowPort, highPort;
 		NetworkRecvHandlerParam::EventHandler onConnect, onMessage, onDisconnect;
-		DWORD msReconnectWaitMax;
+		void *funcParam;
+		DWORD msReconnectWaitMax, msSendWaitMax;
 
 		//current wait between connect attempts
 		DWORD msReconnectWait;
+
+		//current wait between send message attempts
+		DWORD msSendMessageWait;
+
+		//addresses of all the ports
+		std::vector<struct addrinfo *> portAddrs;
+
+		//will be triggerred while socket is connected
+		HANDLE connectEvent;
+
+		//triggerred when message queue is empty
+		HANDLE messageDoneEvent;
+
+		//recvThread parameter associated with the current recvThread
+		Rain::NetworkRecvHandlerParam rParam;
 
 		//disconnects socket immediately, regardless of state
 		//sets state as -1
 		void disconnectSocket();
 
 		//thread function to attempt reconnects with time intervals
-		static void attemptConnectThread(void *param);
+		static DWORD attemptConnectThread(LPVOID param);
+
+		//thread function to attempt send messages on an interval
+		static DWORD attemptSendMessageThread(LPVOID param);
+
+		//event handlers for internal recvThread, before passing to delegates
+		static int onRecvInit(void *param);
+		static int onRecvExit(void *param);
+		static int onProcessMessage(void *param);
 	};
 }

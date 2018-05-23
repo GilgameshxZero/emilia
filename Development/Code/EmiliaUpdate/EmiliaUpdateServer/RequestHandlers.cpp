@@ -15,8 +15,14 @@ namespace Monochrome3 {
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ltrfdParam.delegateParam);
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ltrfdParam.callerParam);
 
-			cdParam.requestMethod = cdParam.request.substr(0, cdParam.request.find(' '));
-			cdParam.request = cdParam.request.substr(cdParam.request.find(' ') + 1, cdParam.request.length());
+			//takes until the end of string if ' ' can't be found
+			size_t firstSpace = cdParam.request.find(' ');
+			cdParam.requestMethod = cdParam.request.substr(0, firstSpace);
+
+			if (firstSpace != cdParam.request.npos)
+				cdParam.request = cdParam.request.substr(cdParam.request.find(' ') + 1, cdParam.request.length());
+			else
+				cdParam.request = "";
 
 			auto handler = methodHandlerMap.find(cdParam.requestMethod);
 			int handlerRet = 0;
@@ -164,11 +170,11 @@ namespace Monochrome3 {
 			Rain::getRelFilePathRec((*ccParam.config)["prod-root-dir"], files);
 
 			//send header as one block, then block the files based on a block-size limit
-			std::string response = files.size() + "\r\n";
+			std::string response = Rain::tToStr(files.size()) + "\r\n";
 			for (int a = 0; a < files.size(); a++)
 				response += files[a] + "\r\n";
 			for (int a = 0; a < files.size(); a++)
-				response += Rain::getFileSize(files[a]) + "\r\n";
+				response += Rain::tToStr(Rain::getFileSize((*ccParam.config)["prod-root-dir"] + files[a])) + "\r\n";
 			response += "\r\n";
 			Rain::sendBlockTextRef(*ltrfdParam.cSocket, response);
 
