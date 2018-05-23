@@ -108,8 +108,9 @@ In the root, there will also be additional untracked files not part of the offic
 ## Changelog
 
 ### Emilia-tan
-* 1.2.0
+* 1.1.2
 	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer, EmiliaUpdateCRHelper) = (3.7.2, 1.1.1, 1.2.2, 1.0.0, 1.0.0, 1.0.0)
+	* some updates to readme.md
 * 1.1.1
 	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer) = (3.7.2, 1.1.1, 1.2.2, -, -)
 	* removed .vs from git
@@ -127,6 +128,13 @@ In the root, there will also be additional untracked files not part of the offic
 		* EMTSMTPServer/EMTSMTPClient -> EmiliaMail
 	* hotfixed EmiliaMail and EmiliaSite using old workflows
 	* hotfixed Github repository.
+
+### RainLibrary
+* Aeternum
+	* not very backwards-compatible with v3
+	* added NetworkClientManager class for client connections
+	* added abstract NetworkSocketManager
+	* restructured some flows and renamed some things
 
 ### EmiliaSite
 
@@ -173,8 +181,9 @@ In the root, there will also be additional untracked files not part of the offic
 
 #### EmiliaUpdateClient
 * 1.0.0
-	* Development to Staging
+	* dev to staging
 	* integration with CRH
+	* staging to prod WIP
 
 #### EmiliaUpdateCRHelper
 * 1.0.0
@@ -182,7 +191,7 @@ In the root, there will also be additional untracked files not part of the offic
 
 #### EmiliaUpdateServer
 * 1.0.0
-	* 
+	* implemented all non-sync commands
 
 ## Todo
 
