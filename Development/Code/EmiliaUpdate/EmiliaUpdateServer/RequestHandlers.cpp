@@ -92,8 +92,6 @@ namespace Monochrome3 {
 					for (int a = 0; a < n; a++) {
 						std::getline(headerSS, header[a].first, '\n'); //should extract up until and including \n
 						Rain::strTrim(header[a].first); //clean up \r
-					}
-					for (int a = 0; a < n; a++) {
 						static std::string tmp;
 						std::getline(headerSS, tmp, '\n'); //should extract up until and including \n
 						header[a].second = Rain::strToT<std::size_t>(tmp);
@@ -172,9 +170,7 @@ namespace Monochrome3 {
 			//send header as one block, then block the files based on a block-size limit
 			std::string response = Rain::tToStr(files.size()) + "\r\n";
 			for (int a = 0; a < files.size(); a++)
-				response += files[a] + "\r\n";
-			for (int a = 0; a < files.size(); a++)
-				response += Rain::tToStr(Rain::getFileSize((*ccParam.config)["prod-root-dir"] + files[a])) + "\r\n";
+				response += files[a] + "\r\n" + Rain::tToStr(Rain::getFileSize((*ccParam.config)["prod-root-dir"] + files[a])) + "\r\n";
 			response += "\r\n";
 			Rain::sendBlockTextRef(*ltrfdParam.cSocket, response);
 
