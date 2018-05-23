@@ -39,6 +39,12 @@
     <ClInclude Include="CommandHandlers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Common\RainAeternum\GdiplusInclude.h">
+      <Filter>RainAeternum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkBase.h">
+      <Filter>RainAeternum</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Common\RainAeternum\NetworkClientManager.h">
       <Filter>RainAeternum</Filter>
     </ClInclude>
@@ -57,6 +63,9 @@
     <ClInclude Include="..\..\Common\RainAeternum\NetworkSMTP.h">
       <Filter>RainAeternum</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkSocketManager.h">
+      <Filter>RainAeternum</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Common\RainAeternum\NetworkUtility.h">
       <Filter>RainAeternum</Filter>
     </ClInclude>
@@ -69,19 +78,7 @@
     <ClInclude Include="..\..\Common\RainAeternum\RainWindow.h">
       <Filter>RainAeternum</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\RainAeternum\NetworkBase.h">
-      <Filter>RainAeternum</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Common\RainAeternum\NetworkSocketManager.h">
-      <Filter>RainAeternum</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Common\RainAeternum\WindowsLAMInclude.h">
-      <Filter>RainAeternum</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Common\RainAeternum\UtilityString.h">
-      <Filter>RainAeternum</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Common\RainAeternum\UtilityTime.h">
+    <ClInclude Include="..\..\Common\RainAeternum\UtilityError.h">
       <Filter>RainAeternum</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Common\RainAeternum\UtilityFilesystem.h">
@@ -90,16 +87,19 @@
     <ClInclude Include="..\..\Common\RainAeternum\UtilityLibraries.h">
       <Filter>RainAeternum</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\RainAeternum\AlgorithmIncludes.h">
-      <Filter>RainAeternum</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Common\RainAeternum\UtilityLogging.h">
       <Filter>RainAeternum</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\RainAeternum\GdiplusInclude.h">
+    <ClInclude Include="..\..\Common\RainAeternum\UtilityString.h">
       <Filter>RainAeternum</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\RainAeternum\UtilityError.h">
+    <ClInclude Include="..\..\Common\RainAeternum\UtilityTime.h">
+      <Filter>RainAeternum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\RainAeternum\WindowsLAMInclude.h">
+      <Filter>RainAeternum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\RainAeternum\AlgorithmLibraries.h">
       <Filter>RainAeternum</Filter>
     </ClInclude>
   </ItemGroup>
@@ -138,6 +138,12 @@
     <ClCompile Include="CommandHandlers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Common\RainAeternum\GdiplusInclude.cpp">
+      <Filter>RainAeternum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkBase.cpp">
+      <Filter>RainAeternum</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Common\RainAeternum\NetworkClientManager.cpp">
       <Filter>RainAeternum</Filter>
     </ClCompile>
@@ -156,6 +162,9 @@
     <ClCompile Include="..\..\Common\RainAeternum\NetworkSMTP.cpp">
       <Filter>RainAeternum</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkSocketManager.cpp">
+      <Filter>RainAeternum</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Common\RainAeternum\NetworkUtility.cpp">
       <Filter>RainAeternum</Filter>
     </ClCompile>
@@ -168,19 +177,7 @@
     <ClCompile Include="..\..\Common\RainAeternum\RainWindow.cpp">
       <Filter>RainAeternum</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Common\RainAeternum\NetworkBase.cpp">
-      <Filter>RainAeternum</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\RainAeternum\NetworkSocketManager.cpp">
-      <Filter>RainAeternum</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\RainAeternum\WindowsLAMInclude.cpp">
-      <Filter>RainAeternum</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\RainAeternum\UtilityString.cpp">
-      <Filter>RainAeternum</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\RainAeternum\UtilityTime.cpp">
+    <ClCompile Include="..\..\Common\RainAeternum\UtilityError.cpp">
       <Filter>RainAeternum</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Common\RainAeternum\UtilityFilesystem.cpp">
@@ -189,16 +186,19 @@
     <ClCompile Include="..\..\Common\RainAeternum\UtilityLibraries.cpp">
       <Filter>RainAeternum</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Common\RainAeternum\AlgorithmIncludes.cpp">
-      <Filter>RainAeternum</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Common\RainAeternum\UtilityLogging.cpp">
       <Filter>RainAeternum</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Common\RainAeternum\GdiplusInclude.cpp">
+    <ClCompile Include="..\..\Common\RainAeternum\UtilityString.cpp">
       <Filter>RainAeternum</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Common\RainAeternum\UtilityError.cpp">
+    <ClCompile Include="..\..\Common\RainAeternum\UtilityTime.cpp">
+      <Filter>RainAeternum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\RainAeternum\WindowsLAMInclude.cpp">
+      <Filter>RainAeternum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\RainAeternum\AlgorithmLibraries.cpp">
       <Filter>RainAeternum</Filter>
     </ClCompile>
   </ItemGroup>

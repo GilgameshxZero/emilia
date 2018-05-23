@@ -24,7 +24,6 @@ namespace Rain {
 		ss << x;
 		return ss.str();
 	}
-
 	//converts from a string to some other type using stringstream
 	template <typename T>
 	T strToT(std::string s) {

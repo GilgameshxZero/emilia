@@ -7,11 +7,11 @@ namespace Monochrome3 {
 			std::map<std::string, std::string> config;
 
 			std::string configLocFile = "config-loc.ini";
-			Rain::readParameterFile(configLocFile, config);
+			Rain::concatMap(config, Rain::readParameterFile(configLocFile));
 			std::string configFile = config["config-path"] + config["config-file"];
-			Rain::readParameterFile(configFile, config);
+			Rain::concatMap(config, Rain::readParameterFile(configFile));
 			std::string authenticationFile = config["config-path"] + config["auth-file"];
-			Rain::readParameterFile(authenticationFile, config);
+			Rain::concatMap(config, Rain::readParameterFile(authenticationFile));
 
 			//debugging
 			Rain::redirectCerrFile(config["aux-path"] + config["aux-error"], true);

@@ -186,7 +186,7 @@ namespace Rain {
 		return data;
 	}
 	std::string strPushHexChr(std::string data, std::pair<char, char> hex) {
-		strPushHexChr(&data, hex);
+		return *strPushHexChr(&data, hex);
 	}
 
 	std::string *strPushHexStr(std::string *data, std::string *hexStr) {
