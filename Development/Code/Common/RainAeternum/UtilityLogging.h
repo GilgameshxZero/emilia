@@ -8,12 +8,42 @@ Functions to make program logging easier.
 
 #pragma once
 
+#include "NetworkSocketManager.h"
 #include "UtilityFilesystem.h"
 
 #include <iostream>
 #include <mutex>
 
 namespace Rain {
+	//thread-safe versatile class that can input from stdin, stdout, strings and sockets, and output to stdout and files
+	class RainLogger {
+		public:
+		//add/remove stdin logging source
+		static void setStdinSrc(bool use);
+
+		//add/remove stdout logging source
+		static void setStdoutSrc(bool use);
+
+		//adds/removes logging of socket communications
+		static void setNSMSrc(NetworkSocketManager &nsm, bool use);
+
+		//output a string to logging outputs
+		static void logString(std::string *s);
+		static void logString(std::string s);
+
+		//add/remove stdout logging destination
+		static void setStdoutDst(bool use);
+
+		//add/remove log output file
+		static void setFileDst(std::string path, bool use);
+
+		//set a truncate rule on stdout destination; 0 = don't truncate
+		static void setStdoutTruncate(int len);
+
+		private:
+		
+	};
+	
 	//returns a shared mutex which locks cout for functions later
 	std::mutex &getCoutMutex();
 
