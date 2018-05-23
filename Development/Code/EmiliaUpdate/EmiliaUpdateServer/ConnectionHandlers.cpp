@@ -8,9 +8,8 @@ namespace Monochrome3 {
 			Rain::WSA2ListenThreadRecvFuncDelegateParam &ltrfdParam = *reinterpret_cast<Rain::WSA2ListenThreadRecvFuncDelegateParam *>(funcParam);
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ltrfdParam.callerParam);
 
-			//TODO: if another connection is active, close this one
 			if (ccParam.clientConnected)
-				return;
+				return; //TODO: if another connection is active, close this one
 			ccParam.clientConnected = true;
 
 			//create the delegate parameter for the first time
@@ -36,17 +35,31 @@ namespace Monochrome3 {
 			//delegate to request handlers once the message is complete
 			//message/request length is at the beginning, as a base-10 string, before a space
 			cdParam.request += ltrfdParam.message;
-			if (cdParam.requestLength != 0) {
-				std::size_t firstSpace = cdParam.request.find(' ');
-				if (firstSpace != std::string::npos) {
-					cdParam.requestLength = Rain::strToT<std::size_t>(cdParam.request.substr(0, firstSpace));
-					cdParam.request = cdParam.request.substr(firstSpace + 1, cdParam.request.length());
-				}
-			}
 
-			//if message is complete
-			if (cdParam.requestLength != 0 && cdParam.request.length() == cdParam.requestLength)
-				return HandleRequest(ltrfdParam);
+			int ret = 0;
+			while (true) {
+				if (cdParam.requestLength == 0) {
+					std::size_t firstSpace = cdParam.request.find(' ');
+					if (firstSpace != std::string::npos) {
+						cdParam.requestLength = Rain::strToT<std::size_t>(cdParam.request.substr(0, firstSpace));
+						cdParam.request = cdParam.request.substr(firstSpace + 1, cdParam.request.length());
+					}
+				}
+
+				//if message is complete
+				if (cdParam.requestLength != 0 && cdParam.request.length() >= cdParam.requestLength) {
+					std::string fragment = cdParam.request.substr(cdParam.requestLength, cdParam.request.length());
+					cdParam.request = cdParam.request.substr(0, cdParam.requestLength);
+
+					int hrReturn = HandleRequest(ltrfdParam);
+					if (hrReturn < 0 || (hrReturn > 0 && ret >= 0))
+						ret = hrReturn;
+
+					cdParam.request = fragment;
+					cdParam.requestLength = 0;
+				} else
+					break;
+			}
 
 			//< 0 is error, 0 is keep-alive, and > 0 is peacefully close
 			return 0;

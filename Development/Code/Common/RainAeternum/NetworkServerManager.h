@@ -9,6 +9,7 @@ Implements thread for listening for socket connections and spawning recvThreads.
 #pragma once
 
 #include "RainError.h"
+#include "NetworkBase.h"
 #include "NetworkRecvThread.h"
 #include "NetworkUtility.h"
 

@@ -8,6 +8,7 @@ Include utility for all WSA2-related Rain libraries.
 
 #pragma once
 
+#include "NetworkBase.h"
 #include "NetworkClientManager.h"
 #include "NetworkWSAInclude.h"
 #include "NetworkRecvHandlerParam.h"
