@@ -31,7 +31,7 @@ namespace Monochrome3 {
 			//check command line, perhaps we are being restarted by helper and need to display a message
 			if (argc >= 2) {
 				std::string arg1 = argv[1];
-				Rain::strTrim(arg1);
+				Rain::strTrimWhite(arg1);
 				if (arg1 == "staging-crh-success")
 					Rain::outLogStd("IMPORTANT: Staging operation delayed helper script (EmiliaUpdateCRHelper) completed successfully.\r\n\r\n");
 			}

@@ -2,10 +2,16 @@
 Standard
 */
 
+/*
+Implements RainWindow class which adds functionality on typical HWNDs.
+
+Windows-specific.
+*/
+
 #pragma once
 
-#include "RainWindowsLAM.h"
-#include "RainUtility.h"
+#include "WindowsLAMInclude.h"
+#include "UtilityLibraries.h"
 
 #include <tchar.h>
 #include <unordered_map>

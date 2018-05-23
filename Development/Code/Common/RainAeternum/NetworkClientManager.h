@@ -20,8 +20,6 @@ Implements class NetworkClientManager, which maintains a socket connection to an
 namespace Rain {
 	class NetworkClientManager : public NetworkSocketManager {
 		public:
-		typedef void(*SendMessagePtrFunc)(std::string *);
-
 		static const int STATUS_DISCONNECTED = -1,
 			STATUS_CONNECTED = 0,
 			STATUS_CONNECTING = 1;

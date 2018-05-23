@@ -43,6 +43,9 @@ namespace Rain {
 			//start thread to send messages
 			Rain::simpleCreateThread(NetworkClientManager::attemptSendMessageThread, this);
 		}
+
+		if (this->blockSendRawMessage)
+			this->blockForMessageQueue(0);
 	}
 	void NetworkClientManager::clearMessageQueue() {
 		this->messageQueue = std::queue<std::string>();
