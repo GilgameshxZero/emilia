@@ -18,99 +18,16 @@ Implements thread for listening for socket connections and spawning recvThreads.
 #include <mutex>
 
 namespace Rain {
-	class NetworkServerManager : public NetworkSocketManager {
-		public:
-		static const std::size_t RECV_BUF_LEN = 65536;
 
-		NetworkServerManager();
-		~NetworkServerManager();
-
-		//sends raw message over socket
-		//non-blocking by default; if socket is unusable, will delay send until socket is usable again
-		//messages are sent without buffering
-		void sendRawMessage(std::string request);
-
-		//if blocking, passing by pointer would be faster, avoiding copying of string and sending directly
-		void sendRawMessage(std::string *request);
-
-		void clearMessageQueue();
-
-		//wait until timeout elapses or queued messages are sent
-		//0 for infinite
-		void blockForMessageQueue(DWORD msTimeout = 5000);
-
-		//set sendRawMessage as blocking or non-blocking
-		bool setSendRawMessageBlocking(bool blocking);
-
-		//returns current socket immediately
-		SOCKET &getSocket();
-
-		//change socket to listen on different ports, or start socket listen on some ports
-		void setServerListen(DWORD lowPort, DWORD highPort);
-
-		//set event handlers in addition to those of class
-		//pass NULL to any parameter to remove the custom handler
-		void setEventHandlers(NetworkRecvHandlerParam::EventHandler onConnect,
-							  NetworkRecvHandlerParam::EventHandler onMessage,
-							  NetworkRecvHandlerParam::EventHandler onDisconnect,
-							  void *funcParam);
-
-		//set send message attempt time max
-		DWORD setSendAttemptTime(DWORD msMaxInterval);
-
-		private:
-		SOCKET socket;
-		std::queue<std::string> messageQueue;
-		bool blockSendRawMessage;
-		int socketStatus;
-		std::string ipAddress;
-		DWORD lowPort, highPort;
-		NetworkRecvHandlerParam::EventHandler onConnect, onMessage, onDisconnect;
-		void *funcParam;
-		DWORD msReconnectWaitMax, msSendWaitMax;
-
-		//current wait between connect attempts
-		DWORD msReconnectWait;
-
-		//current wait between send message attempts
-		DWORD msSendMessageWait;
-
-		//addresses of all the ports
-		std::vector<struct addrinfo *> portAddrs;
-
-		//will be triggerred while socket is connected
-		HANDLE connectEvent;
-
-		//triggerred when message queue is empty
-		HANDLE messageDoneEvent;
-
-		//recvThread parameter associated with the current recvThread
-		Rain::NetworkRecvHandlerParam rParam;
-
-		//disconnects socket immediately, regardless of state
-		//sets state as -1
-		void disconnectSocket();
-
-		//thread function to attempt reconnects with time intervals
-		static DWORD attemptConnectThread(LPVOID param);
-
-		//thread function to attempt send messages on an interval
-		static DWORD attemptSendMessageThread(LPVOID param);
-
-		//event handlers for internal recvThread, before passing to delegates
-		static int onRecvInit(void *param);
-		static int onRecvExit(void *param);
-		static int onProcessMessage(void *param);
-	};
 	//used to pass parameters from createListenThread to listenThread
 	struct WSA2ListenThreadParam {
 		//same variables as createListenThread - check there for what these do
 		SOCKET *lSocket;
 		void *recvFuncParam;
 		std::size_t recvBufferLength;
-		NetworkRecvHandlerParam::EventHandler onProcessMessage;
-		NetworkRecvHandlerParam::EventHandler onRecvInit;
-		NetworkRecvHandlerParam::EventHandler onRecvExit;
+		RecvHandlerParam::EventHandler onProcessMessage;
+		RecvHandlerParam::EventHandler onRecvInit;
+		RecvHandlerParam::EventHandler onRecvExit;
 	};
 
 	//used to pass parameters from listenThread spawned recvThreads to recv handlers specified in createListenThread
@@ -133,8 +50,8 @@ namespace Rain {
 		//used by recvThread handlers to pass to their delegate handlers
 		WSA2ListenThreadRecvFuncDelegateParam ltrfdParam;
 
-		//keep track of NetworkRecvHandlerParam, which needs to be freed on recvThread exit
-		NetworkRecvHandlerParam *pRFParam;
+		//keep track of RecvHandlerParam, which needs to be freed on recvThread exit
+		RecvHandlerParam *pRFParam;
 
 		//position in a linked list of ltrfParam, which should be modified when recvThread inits or exits
 		WSA2ListenThreadRecvFuncParam *prevLTRFP, *nextLTRFP;
@@ -157,10 +74,10 @@ namespace Rain {
 	HANDLE createListenThread(SOCKET &lSocket,
 							  void *recvFuncParam, //parameter to be passed to handler delegates
 							  std::size_t recvBufferLength,
-							  Rain::NetworkRecvHandlerParam::EventHandler onProcessMessage,
-							  Rain::NetworkRecvHandlerParam::EventHandler onRecvInit,
-							  Rain::NetworkRecvHandlerParam::EventHandler onRecvExit);
-	
+							  Rain::RecvHandlerParam::EventHandler onProcessMessage,
+							  Rain::RecvHandlerParam::EventHandler onRecvInit,
+							  Rain::RecvHandlerParam::EventHandler onRecvExit);
+
 	//don't use externally
 	//implements the listen thread specified above
 	DWORD WINAPI listenThread(LPVOID lpParameter);
@@ -169,4 +86,80 @@ namespace Rain {
 	int onListenThreadRecvInit(void *funcParam);
 	int onListenThreadRecvExit(void *funcParam);
 	int onListenThreadRecvProcessMessage(void *funcParam);
+
+	//manages a single server/client connection, from the server-end
+	class ServerSocketManager : public SocketManager {
+		public:
+		ServerSocketManager();
+		~ServerSocketManager();
+
+		//sends raw message over socket, without queueing or blocking
+		void sendRawMessage(std::string request);
+		void sendRawMessage(std::string *request);
+
+		//returns current socket immediately
+		SOCKET &getSocket();
+
+		//set event handlers in addition to those of class
+		//pass NULL to any parameter to remove the custom handler
+		void setEventHandlers(RecvHandlerParam::EventHandler onConnect,
+							  RecvHandlerParam::EventHandler onMessage,
+							  RecvHandlerParam::EventHandler onDisconnect,
+							  void *funcParam);
+
+		private:
+		SOCKET socket;
+		RecvHandlerParam::EventHandler onConnect, onMessage, onDisconnect;
+		void *funcParam;
+		RainLogger *logger;
+
+		//recvThread parameter associated with the current recvThread
+		Rain::RecvHandlerParam rParam;
+
+		//inheirited from SocketManager; sets logging on and off for communications on this socket
+		bool setLogging(bool enable, void *logger);
+
+		//event handlers for internal recvThread, before passing to delegates
+		static int onRecvInit(void *param);
+		static int onRecvExit(void *param);
+		static int onProcessMessage(void *param);
+	};
+
+	//spawns a ServerSocketManager for each new connection
+	class ServerManager {
+		public:
+		ServerManager();
+		~ServerManager();
+
+		//returns current socket immediately
+		SOCKET &getSocket();
+
+		//change socket to listen on different ports, or start socket listen on some ports
+		void setServerListen(DWORD lowPort, DWORD highPort);
+
+		//set event handlers in addition to those of class
+		//pass NULL to any parameter to remove the custom handler
+		void setEventHandlers(RecvHandlerParam::EventHandler onConnect,
+							  RecvHandlerParam::EventHandler onMessage,
+							  RecvHandlerParam::EventHandler onDisconnect,
+							  void *funcParam);
+
+		//sets buffer length of recv thread
+		std::size_t setRecvBufLen(std::size_t newLen);
+
+		private:
+		SOCKET socket;
+		DWORD lowPort, highPort;
+		RecvHandlerParam::EventHandler onConnect, onMessage, onDisconnect;
+		void *funcParam;
+		std::size_t recvBufLen;
+
+		//recvThread parameter associated with the current recvThread
+		Rain::RecvHandlerParam rParam;
+
+		//event handlers for internal recvThread, before passing to delegates
+		static int onRecvInit(void *param);
+		static int onRecvExit(void *param);
+		static int onProcessMessage(void *param);
+	};
 }
