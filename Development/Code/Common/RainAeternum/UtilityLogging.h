@@ -8,8 +8,9 @@ Functions to make program logging easier.
 
 #pragma once
 
-#include "NetworkSocketManager.h"
 #include "UtilityFilesystem.h"
+#include "UtilityTime.h"
+#include "NetworkSocketManager.h"
 
 #include <iostream>
 #include <mutex>
@@ -19,30 +20,41 @@ namespace Rain {
 	//one RainLogger can IO from multiple sources, but its log stream will be the same to all outputs; if multiple logs are needed, use multiple RainLoggers
 	class RainLogger {
 		public:
+		RainLogger();
+		~RainLogger();
+
 		//enable/disable logging of socket communications
-		bool setSocketSrc(Rain::SocketManager *nsm, bool use);
+		void setSocketSrc(Rain::SocketManager *nsm, bool enable);
 
 		//enable/disable stdin logging source
-		bool setStdinSrc(bool enable);
+		void setStdinSrc(bool enable);
 
 		//enable/disable stdout logging source
-		bool setStdoutSrc(bool use);
+		void setStdoutSrc(bool enable);
 
 		//output a string to logging outputs
+		//called by SocketManagers when they need to log anything
 		void logString(std::string *s);
 		void logString(std::string s);
 
 		//enable/disable log output file
-		bool setFileDst(std::string path, bool use);
+		void setFileDst(std::string path, bool enable);
 
 		//enable/disable stdout logging destination
-		bool setStdoutDst(bool use);
-
-		//set a truncate rule on stdout destination per log; 0 = don't truncate
-		int setStdoutTruncate(int len);
+		//can also set a rule to truncate each log to a certian length; 0 is don't truncate
+		//don't capture what we log to stdout
+		void setStdoutDst(bool enable, std::size_t len = 0);
 
 		private:
-		//
+		std::set<std::string> fileDst;
+		bool outputStdout;
+		std::size_t stdoutTrunc;
+
+		//triggering this event terminates all threads started by RainLogger
+		HANDLE stdinThreadEvent, stdoutThreadEvent;
+
+		//thread which captures stdin/stdout and logs their information
+		static DWORD WINAPI stdioLogThread(LPVOID lpParameter);
 	};
 	
 	//returns a shared mutex which locks cout for functions later

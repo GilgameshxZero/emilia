@@ -25,6 +25,7 @@ namespace Rain {
 					  int family = AF_UNSPEC, int sockType = SOCK_STREAM, int type = IPPROTO_TCP);
 
 	//same thing as getTargetAddr, but with different default arguments, to be used for servers trying to listen on a port
+	//return 0 if no error
 	int getServerAddr(struct addrinfo **server, std::string port,
 					  int family = AF_UNSPEC, int sockType = SOCK_STREAM, int type = IPPROTO_TCP, int flags = AI_PASSIVE);
 

@@ -4,7 +4,7 @@ Standard
 
 #pragma once
 #include "NetworkBase.h"
-#include "NetworkClientManager.h"
+#include "NetworkSocketManager.h"
 #include "RainWindow.h"
 
 #include <string>
