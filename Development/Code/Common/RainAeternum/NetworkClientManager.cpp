@@ -19,6 +19,8 @@ namespace Rain {
 		Rain::initWinsock22();
 	}
 	ClientSocketManager::~ClientSocketManager() {
+		this->freePortAddrs();
+
 		CloseHandle(this->connectEvent);
 
 		//this automatically closes the send thread
@@ -110,6 +112,11 @@ namespace Rain {
 		this->recvBufLen = newLen;
 		return origValue;
 	}
+	bool ClientSocketManager::setLogging(void *logger) {
+		bool ret = (this->logger != NULL);
+		this->logger = reinterpret_cast<RainLogger *>(logger);
+		return ret;
+	}
 	void ClientSocketManager::disconnectSocket() {
 		if (this->socketStatus == this->STATUS_DISCONNECTED) {
 			return;
@@ -121,16 +128,17 @@ namespace Rain {
 			this->socketStatus = this->STATUS_DISCONNECTED;
 		}
 	}
-	bool ClientSocketManager::setLogging(bool enable, void *logger) {
-		bool ret = (this->logger != NULL);
-		this->logger = reinterpret_cast<RainLogger *>(logger);
-		return ret;
+	void ClientSocketManager::freePortAddrs() {
+		for (std::size_t a = 0; a < this->portAddrs.size(); a++) {
+			Rain::freeAddrInfo(&portAddrs[a]);
+		}
+		this->portAddrs.clear();
 	}
-	DWORD ClientSocketManager::attemptConnectThread(LPVOID param) {
+	DWORD WINAPI ClientSocketManager::attemptConnectThread(LPVOID param) {
 		Rain::ClientSocketManager &csm = *reinterpret_cast<Rain::ClientSocketManager *>(param);
 
 		csm.msReconnectWait = 1;
-		csm.portAddrs.clear();
+		csm.freePortAddrs();
 		csm.portAddrs.resize(csm.highPort - csm.lowPort + 1, NULL);
 		ResetEvent(csm.connectEvent);
 
@@ -174,7 +182,7 @@ namespace Rain {
 
 		return 0;
 	}
-	DWORD ClientSocketManager::attemptSendMessageThread(LPVOID param) {
+	DWORD WINAPI ClientSocketManager::attemptSendMessageThread(LPVOID param) {
 		Rain::ClientSocketManager &csm = *reinterpret_cast<Rain::ClientSocketManager *>(param);
 
 		csm.msSendMessageWait = 1;

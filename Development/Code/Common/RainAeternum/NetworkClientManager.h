@@ -78,6 +78,9 @@ namespace Rain {
 		//sets buffer length of recv thread
 		std::size_t setRecvBufLen(std::size_t newLen);
 
+		//inheirited from SocketManager; sets logging on and off for communications on this socket; pass NULL to disable
+		bool setLogging(void *logger);
+
 		private:
 		SOCKET socket;
 		std::queue<std::string> messageQueue;
@@ -113,14 +116,14 @@ namespace Rain {
 		//sets state as -1
 		void disconnectSocket();
 
-		//inheirited from SocketManager; sets logging on and off for communications on this socket
-		bool setLogging(bool enable, void *logger);
+		//frees all the memory allocated for addresses
+		void freePortAddrs();
 
 		//thread function to attempt reconnects with time intervals
-		static DWORD attemptConnectThread(LPVOID param);
+		static DWORD WINAPI attemptConnectThread(LPVOID param);
 
 		//thread function to attempt send messages on an interval
-		static DWORD attemptSendMessageThread(LPVOID param);
+		static DWORD WINAPI attemptSendMessageThread(LPVOID param);
 
 		//event handlers for internal recvThread, before passing to delegates
 		static int onRecvInit(void *param);

@@ -54,7 +54,7 @@ namespace Rain {
 
 		return ret;
 	}
-	int bindSocketAddr(struct addrinfo **addr, SOCKET &lSocket) {
+	int bindListenSocket(struct addrinfo **addr, SOCKET &lSocket) {
 		bind(lSocket, (*addr)->ai_addr, (int) (*addr)->ai_addrlen);
 		return listen(lSocket, SOMAXCONN);
 	}
