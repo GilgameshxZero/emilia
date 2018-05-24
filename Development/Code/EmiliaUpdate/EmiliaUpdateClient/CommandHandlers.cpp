@@ -88,14 +88,14 @@ namespace Monochrome3 {
 		}
 		int CHDeployStaging(std::map<std::string, std::string> &config) {
 			//request over the network
-			Rain::NetworkClientManager ncm;
-			ncm.setClientTarget(config["server-ip"], Rain::strToT<DWORD>(config["server-port-low"]), Rain::strToT<DWORD>(config["server-port-high"]));
-			ncm.blockForConnect(0);
+			Rain::ClientSocketManager csm;
+			csm.setClientTarget(config["server-ip"], Rain::strToT<DWORD>(config["server-port-low"]), Rain::strToT<DWORD>(config["server-port-high"]));
+			csm.blockForConnect(0);
 			Rain::outLogStd("Connected to server.\r\n");
 
-			Rain::sendBlockMessage(ncm, "authenticate " + config["client-auth-pass"]);
-			Rain::sendBlockMessage(ncm, "prod-stop");
-			Rain::sendBlockMessage(ncm, "prod-download");
+			Rain::sendBlockMessage(csm, "authenticate " + config["client-auth-pass"]);
+			Rain::sendBlockMessage(csm, "prod-stop");
+			Rain::sendBlockMessage(csm, "prod-download");
 
 			//upload files
 

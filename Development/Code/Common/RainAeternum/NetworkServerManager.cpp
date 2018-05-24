@@ -1,12 +1,195 @@
 #include "NetworkServerManager.h"
 
 namespace Rain {
+	ServerSocketManager::ServerSocketManager() {
+		this->socket = NULL;
+		this->blockSendRawMessage = false;
+		this->socketStatus = -1;
+		this->ipAddress = "";
+		this->lowPort = this->highPort = 0;
+		this->onConnect = this->onMessage = this->onDisconnect = NULL;
+		this->funcParam = NULL;
+		this->msReconnectWaitMax = this->msSendWaitMax = 3000;
+		this->recvBufLen = 65536;
+		this->logger = NULL;
+
+		this->connectEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+		this->messageDoneEvent = CreateEvent(NULL, TRUE, TRUE, NULL);
+
+		Rain::initWinsock22();
+	}
+	ServerSocketManager::~ServerSocketManager() {
+		CloseHandle(this->connectEvent);
+
+		//this automatically closes the send thread
+		CloseHandle(this->messageDoneEvent);
+
+		//shutsdown connect threads, if any
+		this->socketStatus = this->STATUS_DISCONNECTED;
+
+		Rain::shutdownSocketSend(this->socket);
+		closesocket(this->socket);
+	}
+	void ServerSocketManager::sendRawMessage(std::string request) {
+		this->sendRawMessage(&request);
+	}
+	void ServerSocketManager::sendRawMessage(std::string *request) {
+		//uses copy constructor
+		this->messageQueue.push(*request);
+
+		//if we are logging socket communications, do that here for outgoing communications
+		if (this->logger != NULL)
+			this->logger->logString(request);
+
+		if (WaitForSingleObject(this->messageDoneEvent, 1) == WAIT_OBJECT_0) { //means that the object was set/the thread is not active currently
+																			   //reset event outside of thread start so multiple calls to sendRawMessage won't create race conditions
+			ResetEvent(this->messageDoneEvent);
+
+			//start thread to send messages
+			Rain::simpleCreateThread(ClientSocketManager::attemptSendMessageThread, this);
+		}
+
+		if (this->blockSendRawMessage)
+			this->blockForMessageQueue(0);
+	}
+	SOCKET &ServerSocketManager::getSocket() {
+		return this->socket;
+	}
+	void ServerSocketManager::setEventHandlers(RecvHandlerParam::EventHandler onConnect, RecvHandlerParam::EventHandler onMessage, RecvHandlerParam::EventHandler onDisconnect, void *funcParam) {
+		this->onConnect = onConnect;
+		this->onMessage = onMessage;
+		this->onDisconnect = onDisconnect;
+		this->funcParam = funcParam;
+	}
+	bool ServerSocketManager::setLogging(bool enable, void *logger) {
+		bool ret = (this->logger != NULL);
+		this->logger = reinterpret_cast<RainLogger *>(logger);
+		return ret;
+	}
+	int ServerSocketManager::onRecvInit(void *param) {
+		Rain::ClientSocketManager &csm = *reinterpret_cast<Rain::ClientSocketManager *>(param);
+
+		csm.rParam.message = new std::string();
+		return csm.onConnect == NULL ? 0 : csm.onConnect(csm.funcParam);
+	}
+	int ServerSocketManager::onRecvExit(void *param) {
+		Rain::ClientSocketManager &csm = *reinterpret_cast<Rain::ClientSocketManager *>(param);
+
+		//retry to connect
+		csm.socketStatus = csm.STATUS_CONNECTING;
+
+		//create thread to attempt connect
+		//thread exits when connect success
+		Rain::simpleCreateThread(ClientSocketManager::attemptConnectThread, &csm);
+
+		delete csm.rParam.message;
+		return csm.onDisconnect == NULL ? 0 : csm.onDisconnect(csm.funcParam);
+	}
+	int ServerSocketManager::onProcessMessage(void *param) {
+		Rain::ClientSocketManager &csm = *reinterpret_cast<Rain::ClientSocketManager *>(param);
+
+		//if we are logging socket communications, do that here for incoming messages
+		if (csm.logger != NULL)
+			csm.logger->logString(csm.rParam.message);
+
+		return csm.onMessage == NULL ? 0 : csm.onMessage(csm.funcParam);
+	}
+
+	ServerManager::ServerManager() {
+		this->socket = NULL;
+		this->blockSendRawMessage = false;
+		this->socketStatus = -1;
+		this->ipAddress = "";
+		this->lowPort = this->highPort = 0;
+		this->onConnect = this->onMessage = this->onDisconnect = NULL;
+		this->funcParam = NULL;
+		this->msReconnectWaitMax = this->msSendWaitMax = 3000;
+		this->recvBufLen = 65536;
+		this->logger = NULL;
+
+		this->connectEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+		this->messageDoneEvent = CreateEvent(NULL, TRUE, TRUE, NULL);
+
+		Rain::initWinsock22();
+	}
+	ServerManager::~ServerManager() {
+		CloseHandle(this->connectEvent);
+
+		//this automatically closes the send thread
+		CloseHandle(this->messageDoneEvent);
+
+		//shutsdown connect threads, if any
+		this->socketStatus = this->STATUS_DISCONNECTED;
+
+		Rain::shutdownSocketSend(this->socket);
+		closesocket(this->socket);
+	}
+	SOCKET &ServerManager::getSocket() {
+		return this->socket;
+	}
+	void ServerManager::setServerListen(DWORD lowPort, DWORD highPort) {
+		this->disconnectSocket();
+		this->ipAddress = ipAddress;
+
+		if (this->ipAddress.length() == 0) {
+			this->lowPort = this->highPort = 0;
+		} else {
+			this->lowPort = lowPort;
+			this->highPort = highPort;
+
+			this->socketStatus = this->STATUS_CONNECTING;
+
+			//create thread to attempt connect
+			//thread exits when connect success
+			Rain::simpleCreateThread(ClientSocketManager::attemptConnectThread, this);
+		}
+	}
+	void ServerManager::setEventHandlers(RecvHandlerParam::EventHandler onConnect, RecvHandlerParam::EventHandler onMessage, RecvHandlerParam::EventHandler onDisconnect, void *funcParam) {
+		this->onConnect = onConnect;
+		this->onMessage = onMessage;
+		this->onDisconnect = onDisconnect;
+		this->funcParam = funcParam;
+	}
+	std::size_t ServerManager::setRecvBufLen(std::size_t newLen) {
+		std::size_t origValue = this->recvBufLen;
+		this->recvBufLen = newLen;
+		return origValue;
+	}
+	int ServerManager::onRecvInit(void *param) {
+		Rain::ClientSocketManager &csm = *reinterpret_cast<Rain::ClientSocketManager *>(param);
+
+		csm.rParam.message = new std::string();
+		return csm.onConnect == NULL ? 0 : csm.onConnect(csm.funcParam);
+	}
+	int ServerManager::onRecvExit(void *param) {
+		Rain::ClientSocketManager &csm = *reinterpret_cast<Rain::ClientSocketManager *>(param);
+
+		//retry to connect
+		csm.socketStatus = csm.STATUS_CONNECTING;
+
+		//create thread to attempt connect
+		//thread exits when connect success
+		Rain::simpleCreateThread(ClientSocketManager::attemptConnectThread, &csm);
+
+		delete csm.rParam.message;
+		return csm.onDisconnect == NULL ? 0 : csm.onDisconnect(csm.funcParam);
+	}
+	int ServerManager::onProcessMessage(void *param) {
+		Rain::ClientSocketManager &csm = *reinterpret_cast<Rain::ClientSocketManager *>(param);
+
+		//if we are logging socket communications, do that here for incoming messages
+		if (csm.logger != NULL)
+			csm.logger->logString(csm.rParam.message);
+
+		return csm.onMessage == NULL ? 0 : csm.onMessage(csm.funcParam);
+	}
+
 	HANDLE createListenThread(SOCKET &lSocket,
 							  void *recvFuncParam,
 							  std::size_t recvBufferLength,
-							  Rain::NetworkRecvHandlerParam::EventHandler onProcessMessage,
-							  Rain::NetworkRecvHandlerParam::EventHandler onRecvInit,
-							  Rain::NetworkRecvHandlerParam::EventHandler onRecvExit) {
+							  Rain::RecvHandlerParam::EventHandler onProcessMessage,
+							  Rain::RecvHandlerParam::EventHandler onRecvInit,
+							  Rain::RecvHandlerParam::EventHandler onRecvExit) {
 		WSA2ListenThreadParam *ltParam = new WSA2ListenThreadParam();
 		ltParam->lSocket = &lSocket;
 		ltParam->recvFuncParam = recvFuncParam;
@@ -33,7 +216,8 @@ namespace Rain {
 			//accept a socket
 			SOCKET *cSocket = new SOCKET();
 
-			int error = Rain::servAcceptClient(*cSocket, *ltParam.lSocket);
+			*ltParam.lSocket = Rain::acceptClientSocket(*cSocket);
+			int error = WSAGetLastError();
 			if (error == WSAEINTR) {//listening closed from outside the thread; prepare to exit thread
 				delete cSocket;
 				break;
@@ -44,7 +228,7 @@ namespace Rain {
 			}
 
 			//only when a client is accepted will we create new parameters and add them to the linked lists
-			NetworkRecvHandlerParam *rfParam = new NetworkRecvHandlerParam();
+			RecvHandlerParam *rfParam = new RecvHandlerParam();
 			WSA2ListenThreadRecvFuncParam *ltrfParam = new WSA2ListenThreadRecvFuncParam();
 
 			ltrfParam->llMutex = &llMutex;

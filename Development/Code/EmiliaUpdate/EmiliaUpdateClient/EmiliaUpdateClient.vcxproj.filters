@@ -51,9 +51,6 @@
     <ClInclude Include="..\..\Common\RainAeternum\NetworkLibraries.h">
       <Filter>RainAeternum</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\RainAeternum\NetworkRecvHandlerParam.h">
-      <Filter>RainAeternum</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Common\RainAeternum\NetworkRecvThread.h">
       <Filter>RainAeternum</Filter>
     </ClInclude>
@@ -148,9 +145,6 @@
       <Filter>RainAeternum</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Common\RainAeternum\NetworkLibraries.cpp">
-      <Filter>RainAeternum</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\RainAeternum\NetworkRecvHandlerParam.cpp">
       <Filter>RainAeternum</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Common\RainAeternum\NetworkRecvThread.cpp">

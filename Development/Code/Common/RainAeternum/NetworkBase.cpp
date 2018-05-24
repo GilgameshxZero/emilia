@@ -16,6 +16,18 @@ namespace Rain {
 
 		return getaddrinfo(host.c_str(), port.c_str(), &hints, target);
 	}
+	int getServerAddr(struct addrinfo **server, std::string port,
+					  int family, int sockType, int type, int flags) {
+		struct addrinfo hints;
+
+		ZeroMemory(&hints, sizeof(hints));
+		hints.ai_family = family;
+		hints.ai_socktype = sockType;
+		hints.ai_protocol = type;
+		hints.ai_flags = flags;
+
+		return getaddrinfo(NULL, port.c_str(), &hints, server);
+	}
 	int createSocket(SOCKET &newSocket,
 					 int family, int sockType, int type) {
 		newSocket = socket(family, sockType, type);
@@ -41,6 +53,16 @@ namespace Rain {
 		}
 
 		return ret;
+	}
+	int bindSocketAddr(struct addrinfo **addr, SOCKET &lSocket) {
+		bind(lSocket, (*addr)->ai_addr, (int) (*addr)->ai_addrlen);
+		return listen(lSocket, SOMAXCONN);
+	}
+	SOCKET acceptClientSocket(SOCKET &lSocket) {
+		return accept(lSocket, NULL, NULL);
+	}
+	void freeAddrInfo(struct addrinfo **addr) {
+		freeaddrinfo(*addr);
 	}
 	int shutdownSocketSend(SOCKET &cSocket) {
 		if (shutdown(cSocket, SD_SEND) == SOCKET_ERROR)

@@ -200,8 +200,9 @@ namespace Rain {
 	std::size_t getFileSize(std::string file) {
 		std::ifstream t(file, std::ios::binary);
 		t.seekg(0, std::ios::end);
+		std::size_t size = static_cast<std::size_t>(t.tellg());
 		t.close();
-		return static_cast<std::size_t>(t.tellg());
+		return size;
 	}
 
 	void readFileToStr(std::string filePath, std::string &fileData) {
