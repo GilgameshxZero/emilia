@@ -86,7 +86,6 @@
     <ClInclude Include="..\..\Common\RainAeternum\NetworkBase.h" />
     <ClInclude Include="..\..\Common\RainAeternum\NetworkClientManager.h" />
     <ClInclude Include="..\..\Common\RainAeternum\NetworkLibraries.h" />
-    <ClInclude Include="..\..\Common\RainAeternum\NetworkRecvHandlerParam.h" />
     <ClInclude Include="..\..\Common\RainAeternum\NetworkRecvThread.h" />
     <ClInclude Include="..\..\Common\RainAeternum\NetworkServerManager.h" />
     <ClInclude Include="..\..\Common\RainAeternum\NetworkSMTP.h" />
@@ -125,7 +124,6 @@
     <ClCompile Include="..\..\Common\RainAeternum\NetworkBase.cpp" />
     <ClCompile Include="..\..\Common\RainAeternum\NetworkClientManager.cpp" />
     <ClCompile Include="..\..\Common\RainAeternum\NetworkLibraries.cpp" />
-    <ClCompile Include="..\..\Common\RainAeternum\NetworkRecvHandlerParam.cpp" />
     <ClCompile Include="..\..\Common\RainAeternum\NetworkRecvThread.cpp" />
     <ClCompile Include="..\..\Common\RainAeternum\NetworkServerManager.cpp" />
     <ClCompile Include="..\..\Common\RainAeternum\NetworkSMTP.cpp" />
