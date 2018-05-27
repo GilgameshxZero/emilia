@@ -11,7 +11,10 @@ namespace Rain {
 		this->onConnect = onConnect;
 		this->onMessage = onMessage;
 		this->onDisconnect = onDisconnect;
-		this->funcParam = funcParam;
+
+		this->ssmdhParam.cSocket = this->socket;
+		this->ssmdhParam.message = NULL;
+		this->ssmdhParam.param = funcParam;
 	}
 	ServerSocketManager::~ServerSocketManager() {
 		Rain::shutdownSocketSend(*this->socket);
@@ -35,11 +38,12 @@ namespace Rain {
 		this->onConnect = onConnect;
 		this->onMessage = onMessage;
 		this->onDisconnect = onDisconnect;
-		this->funcParam = funcParam;
+
+		this->ssmdhParam.param = funcParam;
 	}
 	bool ServerSocketManager::setLogging(void *logger) {
 		bool ret = (this->logger != NULL);
-		this->logger = reinterpret_cast<RainLogger *>(logger);
+		this->logger = reinterpret_cast<LogStream *>(logger);
 		return ret;
 	}
 	std::tuple<RecvHandlerParam::EventHandler, RecvHandlerParam::EventHandler, RecvHandlerParam::EventHandler> ServerSocketManager::getInternalHandlers() {
@@ -50,14 +54,16 @@ namespace Rain {
 		ServerManager::ServerManagerRecvThreadParam &smrtParam = *reinterpret_cast<ServerManager::ServerManagerRecvThreadParam *>(rhParam.funcParam);
 
 		//depending on which delegate handlers are defined, call the right one
-		return smrtParam.ssm->onConnect == NULL ? 0 : smrtParam.ssm->onConnect(smrtParam.ssm->funcParam);
+		smrtParam.ssm->ssmdhParam.message = &smrtParam.message;
+		return smrtParam.ssm->onConnect == NULL ? 0 : smrtParam.ssm->onConnect(&smrtParam.ssm->ssmdhParam);
 	}
 	int ServerSocketManager::onRecvExit(void *param) {
 		RecvHandlerParam &rhParam = *reinterpret_cast<RecvHandlerParam *>(param);
 		ServerManager::ServerManagerRecvThreadParam &smrtParam = *reinterpret_cast<ServerManager::ServerManagerRecvThreadParam *>(rhParam.funcParam);
 
 		//depending on which delegate handlers are defined, call the right one
-		int delRtrn = smrtParam.ssm->onDisconnect == NULL ? 0 : smrtParam.ssm->onDisconnect(smrtParam.ssm->funcParam);
+		smrtParam.ssm->ssmdhParam.message = &smrtParam.message;
+		int delRtrn = smrtParam.ssm->onDisconnect == NULL ? 0 : smrtParam.ssm->onDisconnect(&smrtParam.ssm->ssmdhParam);
 
 		//modify linked list and remove current ltrfParam
 		smrtParam.llMutex->lock();
@@ -83,7 +89,8 @@ namespace Rain {
 			smrtParam.ssm->logger->logString(rhParam.message);
 
 		//depending on which delegate handlers are defined, call the right one
-		return smrtParam.ssm->onMessage == NULL ? 0 : smrtParam.ssm->onMessage(smrtParam.ssm->funcParam);
+		smrtParam.ssm->ssmdhParam.message = &smrtParam.message;
+		return smrtParam.ssm->onMessage == NULL ? 0 : smrtParam.ssm->onMessage(&smrtParam.ssm->ssmdhParam);
 	}
 
 	ServerManager::ServerManager() {

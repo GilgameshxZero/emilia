@@ -17,8 +17,14 @@ namespace Monochrome3 {
 			Rain::redirectCerrFile(config["aux-path"] + config["aux-error"], true);
 			HANDLE hFMemLeak = Rain::logMemoryLeaks(config["aux-path"] + config["aux-memory"]);
 
+			Rain::LogStream logger;
+			//logger.setStdHandleSrc(STD_INPUT_HANDLE, true);
+			logger.setStdHandleSrc(STD_OUTPUT_HANDLE, true);
+			logger.setFileDst(config["aux-path"] + config["aux-log"], true);
+			//logger.setStdoutDst(true);
+
 			//output parameters
-			Rain::outLogStd("Starting...\r\n" + Rain::tToStr(config.size()) + " configuration options:\r\n", config["aux-path"] + config["aux-log"]);
+			Rain::outLogStd("Starting...\r\n" + Rain::tToStr(config.size()) + " configuration options:\r\n");
 			for (std::map<std::string, std::string>::iterator it = config.begin(); it != config.end(); it++)
 				Rain::outLogStd("\t" + it->first + ": " + it->second + "\r\n");
 

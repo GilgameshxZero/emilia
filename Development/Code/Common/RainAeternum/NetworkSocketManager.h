@@ -16,7 +16,7 @@ namespace Rain {
 		virtual void sendRawMessage(std::string request) = 0;
 		virtual void sendRawMessage(std::string *request) = 0;
 
-		//implementations of SocketManager should include UtilityLogging to convert logger into a type RainLogger *, and call logString when necessary
+		//implementations of SocketManager should include UtilityLogging to convert logger into a type LogStream *, and call logString when necessary
 		virtual bool setLogging(void *logger) = 0;
 	};
 }
