@@ -21,7 +21,7 @@ namespace Monochrome3 {
 			//logger.setStdHandleSrc(STD_INPUT_HANDLE, true);
 			logger.setStdHandleSrc(STD_OUTPUT_HANDLE, true);
 			logger.setFileDst(config["aux-path"] + config["aux-log"], true);
-			//logger.setStdoutDst(true);
+			logger.setStdoutDst(true);
 
 			//output parameters
 			Rain::outLogStd("Starting...\r\n" + Rain::tToStr(config.size()) + " configuration options:\r\n");
@@ -75,7 +75,12 @@ namespace Monochrome3 {
 			}
 
 			Rain::outLogStd("The program has terminated. Exiting in 3 seconds...\r\n");
+
+			//clean up logger before we exit, or else we will get error
+			logger.setStdHandleSrc(STD_OUTPUT_HANDLE, false);
+
 			Sleep(3000);
+
 			return 0;
 		}
 	}

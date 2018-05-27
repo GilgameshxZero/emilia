@@ -12,5 +12,5 @@ Utility functions related to time formats.
 #include <time.h>
 
 namespace Rain {
-	std::string getTime(std::string format = "%Y-%m-%d.%X");
+	std::string getTime(std::string format = "%D.%T%Z");
 }
