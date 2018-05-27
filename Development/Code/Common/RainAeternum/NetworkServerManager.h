@@ -24,7 +24,14 @@ namespace Rain {
 		public:
 		//parameter passed to delegate handlers
 		struct ServerSocketManagerDelegateHandlerParam {
+			//socket of the current connection
+			SOCKET *cSocket;
 
+			//message related to current event
+			std::string *message;
+
+			//additional parameters
+			void *param;
 		};
 
 		//ServerSocketManager must be initialized with a ServerManager parent and default event handlers set by the ServerManager's setEventHandlers
@@ -57,11 +64,13 @@ namespace Rain {
 
 		private:
 		SOCKET *socket;
-		RainLogger *logger;
+		LogStream *logger;
+
+		//parameter to be passed to delegates
+		ServerSocketManagerDelegateHandlerParam ssmdhParam;
 
 		//recvThread parameter associated with the current recvThread
 		RecvHandlerParam::EventHandler onConnect, onMessage, onDisconnect;
-		void *funcParam;
 
 		//event handlers for recvThreads spwaned by ServerManager, which will call their delegates set by setEventHandlers of either ServerManager or ServerSocketManager
 		//responsible for managing linked list created in ServerManager

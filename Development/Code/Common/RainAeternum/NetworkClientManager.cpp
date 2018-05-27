@@ -114,7 +114,7 @@ namespace Rain {
 	}
 	bool ClientSocketManager::setLogging(void *logger) {
 		bool ret = (this->logger != NULL);
-		this->logger = reinterpret_cast<RainLogger *>(logger);
+		this->logger = reinterpret_cast<LogStream *>(logger);
 		return ret;
 	}
 	void ClientSocketManager::disconnectSocket() {

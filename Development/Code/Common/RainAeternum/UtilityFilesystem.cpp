@@ -243,8 +243,8 @@ namespace Rain {
 
 		while (key.length() != 0) {
 			std::getline(paramStream, value);
-			Rain::strTrimWhite(value);
-			Rain::strTrimWhite(key);
+			Rain::strTrimWhite(&value);
+			Rain::strTrimWhite(&key);
 			params[key] = value;
 			key = "";
 			std::getline(paramStream, key, ':');

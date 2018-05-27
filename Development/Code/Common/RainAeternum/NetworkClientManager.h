@@ -92,7 +92,7 @@ namespace Rain {
 		void *funcParam;
 		DWORD msReconnectWaitMax, msSendWaitMax;
 		std::size_t recvBufLen;
-		RainLogger *logger;
+		LogStream *logger;
 
 		//current wait between connect attempts
 		DWORD msReconnectWait;

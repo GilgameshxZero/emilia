@@ -1,116 +1,127 @@
 #include "UtilityLogging.h"
 
 namespace Rain {
-	RainLogger::RainLogger() {
+	LogStream::LogStream() {
 		this->outputStdout = false;
 		this->stdoutTrunc = 0;
-
-		this->stdinThreadEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-		this->stdoutThreadEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 	}
-	RainLogger::~RainLogger() {
+	LogStream::~LogStream() {
 		//terminate any threads
-		SetEvent(this->stdinThreadEvent);
-		SetEvent(this->stdoutThreadEvent);
+		for (auto it : this->stdPipeSrc) {
+			this->setStdHandleSrc(it.first, false);
+		}
 	}
-	void RainLogger::setSocketSrc(Rain::SocketManager *nsm, bool enable) {
+	void LogStream::setSocketSrc(Rain::SocketManager *nsm, bool enable) {
 		nsm->setLogging(enable ? reinterpret_cast<void *>(nsm) : NULL);
 	}
-	void RainLogger::setStdinSrc(bool enable) {
-		//start thread to capture stdin
-		if (enable) {
-			ResetEvent(this->stdoutThreadEvent);
-			CreateThread(NULL, 0, this->stdioLogThread, reinterpret_cast<LPVOID>(new std::pair<RainLogger *, HANDLE>(this, this->stdoutThreadEvent)), 0, NULL);
-		} else
-			SetEvent(this->stdoutThreadEvent);
+	bool LogStream::setStdHandleSrc(DWORD stdHandle, bool enable) {
+		bool ret = this->stdPipeSrc.find(stdHandle) != this->stdPipeSrc.end();
+		int stdFileNo;
+		if (stdHandle == STD_OUTPUT_HANDLE)
+			stdFileNo = _fileno(stdout);
+		else if (stdHandle == STD_INPUT_HANDLE)
+			stdFileNo = _fileno(stdin);
+		else
+			stdFileNo = _fileno(stderr);
+		if (enable && !ret) {
+			//redirect stdin to a pipe, then from that pipe to the original stdin pipe
+			HANDLE rd, wr;
+			CreatePipe(&rd, &wr, NULL, 0);
+			int fdDup = _dup(stdFileNo),
+				wrOsHandle = _open_osfhandle(reinterpret_cast<intptr_t>(wr), 0);
+			HANDLE hOrig = reinterpret_cast<HANDLE>(_get_osfhandle(fdDup)); //closed in thread
+			_dup2(wrOsHandle, stdFileNo);
+
+			//save handles to a map, to access later when the stdsrc is disabled
+			this->stdPipeSrc.insert(std::make_pair(stdHandle, std::make_tuple(
+				rd, 
+				wr, 
+				fdDup, 
+				wrOsHandle, 
+				CreateThread(NULL, 0, this->pipeRedirectThread, reinterpret_cast<LPVOID>(new std::tuple<HANDLE, HANDLE, LogStream *>(
+					rd, 
+					hOrig, 
+					this)), 0, NULL))));
+		} else if (!enable && ret) {
+			auto elem = this->stdPipeSrc.find(stdHandle)->second;
+			HANDLE rd = std::get<0>(elem),
+				wr = std::get<1>(elem);
+			int fdDup = std::get<2>(elem),
+				wrOsHandle = std::get<3>(elem);
+			HANDLE hThread = std::get<4>(elem);
+
+			_dup2(fdDup, stdFileNo);
+			_close(wrOsHandle);
+
+			//stop logging this pipe and terminate corresponding thread
+			this->stdPipeSrc.erase(stdHandle);
+			CloseHandle(wr);
+			CloseHandle(rd);
+			CancelSynchronousIo(hThread);
+			WaitForSingleObject(hThread, INFINITE);
+			CloseHandle(hThread);
+		}
+		return ret;
 	}
-	void RainLogger::setStdoutSrc(bool enable) {
-		//start thread to capture stdout
-		if (enable) {
-			ResetEvent(this->stdoutThreadEvent);
-			CreateThread(NULL, 0, this->stdioLogThread, reinterpret_cast<LPVOID>(new std::pair<RainLogger *, HANDLE>(this, this->stdinThreadEvent)), 0, NULL);
-		} else
-			SetEvent(this->stdoutThreadEvent);
-	}
-	void RainLogger::logString(std::string *s) {
+	void LogStream::logString(std::string *s) {
 		static std::string header;
-		header = Rain::getTime() + " " + Rain::tToStr(s->length()) + " bytes\r\n";
-		if (this->outputStdout)
-			std::cout << header
-			<< s->substr(0, this->stdoutTrunc == 0 ? std::string::npos : this->stdoutTrunc)
-			<< "\r\n\r\n";
+		header = Rain::getTime() + " " + Rain::tToStr(s->length()) + "B\r\n";
+		if (this->outputStdout) {
+			//shutdown stdout logging before doing cout, then turn it on again if it was on before
+			bool origValue = this->setStdHandleSrc(STD_OUTPUT_HANDLE, false);
+			Rain::tsCout(header, s->substr(0, this->stdoutTrunc == 0 ? std::string::npos : this->stdoutTrunc), "\r\n\r\n");
+			this->setStdHandleSrc(STD_OUTPUT_HANDLE, origValue);
+		}
 		for (std::string file: this->fileDst) {
 			Rain::printToFile(file, header, true);
 			Rain::printToFile(file, s, true);
 			Rain::printToFile(file, "\r\n\r\n", true);
 		}
 	}
-	void RainLogger::logString(std::string s) {
+	void LogStream::logString(std::string s) {
 		this->logString(&s);
 	}
-	void RainLogger::setFileDst(std::string path, bool enable) {
+	void LogStream::setFileDst(std::string path, bool enable) {
 		if (enable)
 			this->fileDst.insert(path);
 		else
 			this->fileDst.erase(path);
 	}
-	void RainLogger::setStdoutDst(bool enable, std::size_t len) {
+	void LogStream::setStdoutDst(bool enable, std::size_t len) {
 		this->outputStdout = enable;
 		this->stdoutTrunc = len;
 	}
-	DWORD WINAPI RainLogger::stdioLogThread(LPVOID lpParameter) {
-		std::pair<RainLogger *, HANDLE> &param = *reinterpret_cast<std::pair<RainLogger *, HANDLE> *>(lpParameter);
-		RainLogger &logger = *param.first;
-		HANDLE breakEvent = param.second,
-			hSrc = param.second == logger.stdinThreadEvent ? GetStdHandle(STD_INPUT_HANDLE) : GetStdHandle(STD_OUTPUT_HANDLE);
+	DWORD WINAPI LogStream::pipeRedirectThread(LPVOID lpParameter) {
+		static const std::size_t bufSize = 65536;
+		std::tuple<HANDLE, HANDLE, LogStream *> &param = *reinterpret_cast<std::tuple<HANDLE, HANDLE, LogStream *> *>(lpParameter);
+		HANDLE rd = std::get<0>(param), wr = std::get<1>(param);
+		LogStream &logger = *std::get<2>(param);
 
-		HANDLE hCommandWait[2] = {breakEvent, hSrc};
+		DWORD dwRead, dwWritten;
+		CHAR chBuf[bufSize];
+		BOOL bSuccess = FALSE;
+		std::string mAcc;
 
 		while (true) {
-			static std::string command, cmdLeftover;
-			static DWORD waitRtrn;
-			waitRtrn = WaitForMultipleObjects(2, hCommandWait, FALSE, INFINITE);
-			if (waitRtrn == WAIT_OBJECT_0) {
-				break;
-			} else if (waitRtrn == WAIT_OBJECT_0 + 1) {
-				//get user input from low-level console functions
-				static DWORD numberOfEvents;
-				GetNumberOfConsoleInputEvents(hCommandWait[1], &numberOfEvents);
+			bSuccess = ReadFile(rd, chBuf, bufSize, &dwRead, NULL);
+			if (!bSuccess || dwRead == 0) break; //if synchronious io is closed, we will break and exit thread
+			bSuccess = WriteFile(wr, chBuf, dwRead, &dwWritten, NULL);
+			if (!bSuccess) break;
 
-				if (numberOfEvents > 0) {
-					static INPUT_RECORD *inputs;
-					static DWORD eventsRead;
-					inputs = new INPUT_RECORD[numberOfEvents];
-					ReadConsoleInput(hCommandWait[1], inputs, numberOfEvents, &eventsRead);
-					for (int a = 0; a < static_cast<int>(numberOfEvents); a++) {
-						if (inputs[a].EventType == KEY_EVENT &&
-							inputs[a].Event.KeyEvent.bKeyDown == TRUE) {
-							command += inputs[a].Event.KeyEvent.uChar.AsciiChar;
+			//collect pipe ins for enter
+			mAcc += std::string(chBuf, dwRead);
 
-							//TODO: pressing enter only inputs \r for some reason, so append \n if that's the case
-							if (inputs[a].Event.KeyEvent.uChar.AsciiChar == '\r')
-								command += '\n';
-						}
-					}
-					delete[] inputs;
-
-					//check if there's a newline somewhere
-					static size_t newlinePos;
-					newlinePos = command.find('\n');
-					if (newlinePos != std::string::npos) {
-						logger.logString(command);
-						command.clear();
-					}
-				}
+			static size_t newlinePos;
+			newlinePos = mAcc.find('\n');
+			if (newlinePos != std::string::npos) {
+				logger.logString(&mAcc);
+				mAcc.clear();
 			}
 		}
 
-		delete &param;
+		//_close(reinterpret_cast<intptr_t>(wr));
+		//delete lpParameter;
 		return 0;
-	}
-
-	std::ostream &streamOutOne(std::ostream &os) {
-		return os;
 	}
 
 	std::mutex &getCoutMutex() {
@@ -118,21 +129,25 @@ namespace Rain {
 		return coutMutex;
 	}
 
-	void outLogStdTruncRef(std::string &info, int maxLen, std::string filePath, bool append) {
+	std::ostream &streamOutOne(std::ostream &os) {
+		return os;
+	}
+
+	void outLogStdTrunc(std::string *info, int maxLen, std::string filePath, bool append) {
 		static std::string persistentLogFilePath = "";
 		if (filePath != "")
 			persistentLogFilePath = filePath;
-		Rain::printToFile(persistentLogFilePath, &info, append);
+		Rain::printToFile(persistentLogFilePath, info, append);
 		if (maxLen != 0)
-			Rain::tsCout(info.substr(0, maxLen));
+			Rain::tsCout(info->substr(0, maxLen));
 		else
-			Rain::tsCout(info);
+			Rain::tsCout(*info);
 	}
 	void outLogStdTrunc(std::string info, int maxLen, std::string filePath, bool append) {
-		Rain::outLogStdTruncRef(info, maxLen, filePath, append);
+		Rain::outLogStdTrunc(&info, maxLen, filePath, append);
 	}
 	void outLogStd(std::string info, std::string filePath, bool append) {
-		Rain::outLogStdTruncRef(info, 0, filePath, append);
+		Rain::outLogStdTrunc(&info, 0, filePath, append);
 	}
 
 	HANDLE logMemoryLeaks(std::string out_file) {
