@@ -199,7 +199,7 @@ namespace Monochrome3 {
 			bool success = true;
 			for (int a = 0; a < ccParam.serverStatus.size(); a++) {
 				if (ccParam.serverStatus[a].status == "running") {
-					static std::string exitCode = "exit";
+					static std::string exitCode = "exit\r\n";
 					static DWORD dwWritten;
 					static BOOL bSuccess;
 					bSuccess = WriteFile(ccParam.serverStatus[a].stdInWr, exitCode.c_str(), static_cast<DWORD>(exitCode.length()), &dwWritten, NULL);

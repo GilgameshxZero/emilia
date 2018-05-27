@@ -1,6 +1,9 @@
-*.vs
 emilia-tan.com
+Development/Server
 Staging
 Production
 
+*.vs
 *.confidential*
+*.log
+*.exe
