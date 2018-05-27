@@ -16,7 +16,7 @@ Include this for all WinAPI Winsock2 libraries, instead of winsock2 directly.
 #define _WINSOCKAPI_
 #endif
 
-#include "RainWindowsLAM.h"
+#include "WindowsLAMInclude.h"
 
 #include <iphlpapi.h>
 #include <winsock2.h>

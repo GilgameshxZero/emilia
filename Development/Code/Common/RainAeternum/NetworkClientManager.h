@@ -3,7 +3,7 @@ Standard
 */
 
 /*
-Implements class NetworkClientManager, which maintains a socket connection to an address & port range, allowing for timeouts and error management along the way. If a socket connection is terminated, the class will attempt to reconnect until stopped or successful.
+Implements class ClientSocketManager, which maintains a socket connection to an address & port range, allowing for timeouts and error management along the way. If a socket connection is terminated, the class will attempt to reconnect until stopped or successful.
 */
 
 #pragma once
@@ -13,22 +13,21 @@ Implements class NetworkClientManager, which maintains a socket connection to an
 #include "NetworkSocketManager.h"
 #include "NetworkUtility.h"
 
+#include "UtilityLogging.h"
+
 #include <string>
 #include <queue>
 #include <vector>
 
 namespace Rain {
-	class NetworkClientManager : public NetworkSocketManager {
+	class ClientSocketManager : public SocketManager {
 		public:
-		typedef void(*SendMessagePtrFunc)(std::string *);
-
 		static const int STATUS_DISCONNECTED = -1,
 			STATUS_CONNECTED = 0,
 			STATUS_CONNECTING = 1;
-		static const std::size_t RECV_BUF_LEN = 65536;
 
-		NetworkClientManager();
-		~NetworkClientManager();
+		ClientSocketManager();
+		~ClientSocketManager();
 
 		//sends raw message over socket
 		//non-blocking by default; if socket is unusable, will delay send until socket is usable again
@@ -64,9 +63,9 @@ namespace Rain {
 
 		//set event handlers in addition to those of class
 		//pass NULL to any parameter to remove the custom handler
-		void setEventHandlers(NetworkRecvHandlerParam::EventHandler onConnect, 
-							  NetworkRecvHandlerParam::EventHandler onMessage, 
-							  NetworkRecvHandlerParam::EventHandler onDisconnect,
+		void setEventHandlers(RecvHandlerParam::EventHandler onConnect, 
+							  RecvHandlerParam::EventHandler onMessage, 
+							  RecvHandlerParam::EventHandler onDisconnect,
 							  void *funcParam);
 
 		//set reconnect attempt time max from default 3000
@@ -76,6 +75,12 @@ namespace Rain {
 		//set send message attempt time max
 		DWORD setSendAttemptTime(DWORD msMaxInterval);
 
+		//sets buffer length of recv thread
+		std::size_t setRecvBufLen(std::size_t newLen);
+
+		//inheirited from SocketManager; sets logging on and off for communications on this socket; pass NULL to disable
+		bool setLogging(void *logger);
+
 		private:
 		SOCKET socket;
 		std::queue<std::string> messageQueue;
@@ -83,9 +88,11 @@ namespace Rain {
 		int socketStatus;
 		std::string ipAddress;
 		DWORD lowPort, highPort;
-		NetworkRecvHandlerParam::EventHandler onConnect, onMessage, onDisconnect;
+		RecvHandlerParam::EventHandler onConnect, onMessage, onDisconnect;
 		void *funcParam;
 		DWORD msReconnectWaitMax, msSendWaitMax;
+		std::size_t recvBufLen;
+		LogStream *logger;
 
 		//current wait between connect attempts
 		DWORD msReconnectWait;
@@ -103,17 +110,20 @@ namespace Rain {
 		HANDLE messageDoneEvent;
 
 		//recvThread parameter associated with the current recvThread
-		Rain::NetworkRecvHandlerParam rParam;
+		Rain::RecvHandlerParam rParam;
 
 		//disconnects socket immediately, regardless of state
 		//sets state as -1
 		void disconnectSocket();
 
+		//frees all the memory allocated for addresses
+		void freePortAddrs();
+
 		//thread function to attempt reconnects with time intervals
-		static DWORD attemptConnectThread(LPVOID param);
+		static DWORD WINAPI attemptConnectThread(LPVOID param);
 
 		//thread function to attempt send messages on an interval
-		static DWORD attemptSendMessageThread(LPVOID param);
+		static DWORD WINAPI attemptSendMessageThread(LPVOID param);
 
 		//event handlers for internal recvThread, before passing to delegates
 		static int onRecvInit(void *param);

@@ -1,83 +1,227 @@
 #include "NetworkServerManager.h"
 
 namespace Rain {
-	HANDLE createListenThread(SOCKET &lSocket,
-							  void *recvFuncParam,
-							  std::size_t recvBufferLength,
-							  Rain::NetworkRecvHandlerParam::EventHandler onProcessMessage,
-							  Rain::NetworkRecvHandlerParam::EventHandler onRecvInit,
-							  Rain::NetworkRecvHandlerParam::EventHandler onRecvExit) {
-		WSA2ListenThreadParam *ltParam = new WSA2ListenThreadParam();
-		ltParam->lSocket = &lSocket;
-		ltParam->recvFuncParam = recvFuncParam;
-		ltParam->recvBufferLength = recvBufferLength;
-		ltParam->onProcessMessage = onProcessMessage;
-		ltParam->onRecvInit = onRecvInit;
-		ltParam->onRecvExit = onRecvExit;
-		return CreateThread(NULL, 0, listenThread, reinterpret_cast<LPVOID>(ltParam), 0, NULL);
+	ServerSocketManager::ServerSocketManager(SOCKET *cSocket,
+											 RecvHandlerParam::EventHandler onConnect,
+											 RecvHandlerParam::EventHandler onMessage,
+											 RecvHandlerParam::EventHandler onDisconnect,
+											 void *funcParam) {
+		this->socket = cSocket;
+		this->logger = NULL;
+		this->onConnect = onConnect;
+		this->onMessage = onMessage;
+		this->onDisconnect = onDisconnect;
+
+		this->ssmdhParam.cSocket = this->socket;
+		this->ssmdhParam.message = NULL;
+		this->ssmdhParam.param = funcParam;
+	}
+	ServerSocketManager::~ServerSocketManager() {
+		Rain::shutdownSocketSend(*this->socket);
+		closesocket(*this->socket);
+		delete this->socket;
+	}
+	void ServerSocketManager::sendRawMessage(std::string request) {
+		this->sendRawMessage(&request);
+	}
+	void ServerSocketManager::sendRawMessage(std::string *request) {
+		Rain::sendRawMessage(this->getSocket(), request);
+
+		//if we are logging socket communications, do that here for outgoing communications
+		if (this->logger != NULL)
+			this->logger->logString(request);
+	}
+	SOCKET &ServerSocketManager::getSocket() {
+		return *this->socket;
+	}
+	void ServerSocketManager::setEventHandlers(RecvHandlerParam::EventHandler onConnect, RecvHandlerParam::EventHandler onMessage, RecvHandlerParam::EventHandler onDisconnect, void *funcParam) {
+		this->onConnect = onConnect;
+		this->onMessage = onMessage;
+		this->onDisconnect = onDisconnect;
+
+		this->ssmdhParam.param = funcParam;
+	}
+	bool ServerSocketManager::setLogging(void *logger) {
+		bool ret = (this->logger != NULL);
+		this->logger = reinterpret_cast<LogStream *>(logger);
+		return ret;
+	}
+	std::tuple<RecvHandlerParam::EventHandler, RecvHandlerParam::EventHandler, RecvHandlerParam::EventHandler> ServerSocketManager::getInternalHandlers() {
+		return std::make_tuple(this->onConnect, this->onMessage, this->onDisconnect);
+	}
+	int ServerSocketManager::onRecvInit(void *param) {
+		RecvHandlerParam &rhParam = *reinterpret_cast<RecvHandlerParam *>(param);
+		ServerManager::ServerManagerRecvThreadParam &smrtParam = *reinterpret_cast<ServerManager::ServerManagerRecvThreadParam *>(rhParam.funcParam);
+
+		//depending on which delegate handlers are defined, call the right one
+		smrtParam.ssm->ssmdhParam.message = &smrtParam.message;
+		return smrtParam.ssm->onConnect == NULL ? 0 : smrtParam.ssm->onConnect(&smrtParam.ssm->ssmdhParam);
+	}
+	int ServerSocketManager::onRecvExit(void *param) {
+		RecvHandlerParam &rhParam = *reinterpret_cast<RecvHandlerParam *>(param);
+		ServerManager::ServerManagerRecvThreadParam &smrtParam = *reinterpret_cast<ServerManager::ServerManagerRecvThreadParam *>(rhParam.funcParam);
+
+		//depending on which delegate handlers are defined, call the right one
+		smrtParam.ssm->ssmdhParam.message = &smrtParam.message;
+		int delRtrn = smrtParam.ssm->onDisconnect == NULL ? 0 : smrtParam.ssm->onDisconnect(&smrtParam.ssm->ssmdhParam);
+
+		//modify linked list and remove current ltrfParam
+		smrtParam.llMutex->lock();
+		smrtParam.prev->next = smrtParam.next;
+		smrtParam.next->prev = smrtParam.prev;
+		smrtParam.llMutex->unlock();
+
+		//free memory allocated in SM's listenThread
+		CloseHandle(smrtParam.hRecvThread);
+		delete smrtParam.ssm;
+		delete &smrtParam;
+		delete &rhParam;
+
+		return delRtrn;
+	}
+	int ServerSocketManager::onProcessMessage(void *param) {
+		//call delegate handler
+		RecvHandlerParam &rhParam = *reinterpret_cast<RecvHandlerParam *>(param);
+		ServerManager::ServerManagerRecvThreadParam &smrtParam = *reinterpret_cast<ServerManager::ServerManagerRecvThreadParam *>(rhParam.funcParam);
+
+		//if we are logging socket communications, do that here for incoming communications
+		if (smrtParam.ssm->logger != NULL)
+			smrtParam.ssm->logger->logString(rhParam.message);
+
+		//depending on which delegate handlers are defined, call the right one
+		smrtParam.ssm->ssmdhParam.message = &smrtParam.message;
+		return smrtParam.ssm->onMessage == NULL ? 0 : smrtParam.ssm->onMessage(&smrtParam.ssm->ssmdhParam);
 	}
 
-	DWORD WINAPI listenThread(LPVOID lpParameter) {
-		WSA2ListenThreadParam &ltParam = *reinterpret_cast<WSA2ListenThreadParam *>(lpParameter); //specific to the listen thread
+	ServerManager::ServerManager() {
+		this->socket = NULL;
+		this->lowPort = this->highPort = 0;
+		this->onConnect = this->onMessage = this->onDisconnect = NULL;
+		this->recvBufLen = 65536;
+
+		this->ltEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+
+		Rain::initWinsock22();
+	}
+	ServerManager::~ServerManager() {
+		//stop the listenThread
+		this->disconnectSocket();
+
+		//block until the thread exits completely
+		WaitForSingleObject(this->ltEvent, 0);
+	}
+	SOCKET &ServerManager::getSocket() {
+		return this->socket;
+	}
+	int ServerManager::setServerListen(DWORD lowPort, DWORD highPort) {
+		this->lowPort = lowPort;
+		this->highPort = highPort;
+
+		this->disconnectSocket();
+		Rain::createSocket(this->socket);
+
+		//try to bind and listen on each port
+		int ret = -1;
+		for (DWORD a = this->lowPort; a <= this->highPort; a++) {
+			struct addrinfo *addr;
+			if (!Rain::getServerAddr(&addr, Rain::tToStr(a)) && !Rain::bindListenSocket(&addr, this->socket)) {
+				Rain::freeAddrInfo(&addr);
+				ret = 0;
+				break;
+			}
+			Rain::freeAddrInfo(&addr);
+		}
+		if (ret == 0) {//we successfully listened on a port, so create a thread to continuously accept clients
+			ResetEvent(this->ltEvent);
+			CreateThread(NULL, 0, listenThread, reinterpret_cast<LPVOID>(this), 0, NULL);
+		} else
+			ret = WSAGetLastError();
+		return ret;
+	}
+	void ServerManager::setNewClientFunc(NewClientFunc newClientCall) {
+		this->newClientCall = newClientCall;
+	}
+	void ServerManager::setEventHandlers(RecvHandlerParam::EventHandler onConnect, RecvHandlerParam::EventHandler onMessage, RecvHandlerParam::EventHandler onDisconnect, void *funcParam) {
+		this->onConnect = onConnect;
+		this->onMessage = onMessage;
+		this->onDisconnect = onDisconnect;
+		this->funcParam = funcParam;
+	}
+	std::size_t ServerManager::setRecvBufLen(std::size_t newLen) {
+		std::size_t origValue = this->recvBufLen;
+		this->recvBufLen = newLen;
+		return origValue;
+	}
+	DWORD WINAPI ServerManager::listenThread(LPVOID lpParameter) {
+		ServerManager &sm = *reinterpret_cast<ServerManager *>(lpParameter); //specific to the listen thread
 
 		//keep track of all WSA2ListenThreadRecvFuncParam spawned so that we can use them to end all recvThreads when thread needs to exit
-		WSA2ListenThreadRecvFuncParam llHead, llTail;
-		llHead.prevLTRFP = NULL;
-		llHead.nextLTRFP = &llTail;
-		llTail.prevLTRFP = &llHead;
-		llTail.nextLTRFP = NULL;
+		ServerManagerRecvThreadParam llHead, llTail;
+		llHead.prev = NULL;
+		llHead.next = &llTail;
+		llTail.prev = &llHead;
+		llTail.next = NULL;
 
+		//locked when linked list is being modified
 		std::mutex llMutex;
 
+		//listening only ends when it is closed from outside the thread, causing acceptClientSocket to unblock and WSAGetLastError to return WSAINTR
 		while (true) {
 			//accept a socket
 			SOCKET *cSocket = new SOCKET();
 
-			int error = Rain::servAcceptClient(*cSocket, *ltParam.lSocket);
-			if (error == WSAEINTR) {//listening closed from outside the thread; prepare to exit thread
-				delete cSocket;
-				break;
+			*cSocket = Rain::acceptClientSocket(sm.socket);
+			if (*cSocket == INVALID_SOCKET) {
+				int error = WSAGetLastError();
+				if (error == WSAEINTR) {//listening closed from outside the thread; prepare to exit thread
+					delete cSocket;
+					break;
+				} else if (error) { //unexpected
+					Rain::reportError(error, "unexpected error in Rain::listenThread, at Rain::servAcceptClient");
+					return -1;
+				}
 			}
-			else if (error) { //unexpected
-				Rain::reportError(error, "unexpected error in Rain::listenThread, at Rain::servAcceptClient");
-				return -1;
-			}
 
-			//only when a client is accepted will we create new parameters and add them to the linked lists
-			NetworkRecvHandlerParam *rfParam = new NetworkRecvHandlerParam();
-			WSA2ListenThreadRecvFuncParam *ltrfParam = new WSA2ListenThreadRecvFuncParam();
+			//once a client is accept, spawn a ServerSocketManager and call a function
+			ServerSocketManager *ssm = new ServerSocketManager(cSocket, sm.onConnect, sm.onMessage, sm.onDisconnect, sm.funcParam);
+			sm.newClientCall(ssm);
 
-			ltrfParam->llMutex = &llMutex;
-			ltrfParam->pRFParam = rfParam;
-			ltrfParam->ltrfdParam.callerParam = ltParam.recvFuncParam;
-			ltrfParam->ltrfdParam.cSocket = cSocket;
-			ltrfParam->pLTParam = &ltParam;
-			ltrfParam->llMutex->lock();
-			ltrfParam->prevLTRFP = llTail.prevLTRFP;
-			ltrfParam->nextLTRFP = &llTail;
-			ltrfParam->prevLTRFP->nextLTRFP = ltrfParam;
-			llTail.prevLTRFP = ltrfParam;
-			ltrfParam->llMutex->unlock();
+			ServerManagerRecvThreadParam *smrtParam = new ServerManagerRecvThreadParam();
+			smrtParam->llMutex = &llMutex;
+			smrtParam->ssm = ssm;
 
-			rfParam->bufLen = ltParam.recvBufferLength;
-			rfParam->funcParam = ltrfParam;
-			rfParam->message = &ltrfParam->ltrfdParam.message;
-			rfParam->onProcessMessage = onListenThreadRecvProcessMessage;
-			rfParam->onRecvInit = onListenThreadRecvInit;
-			rfParam->onRecvExit = onListenThreadRecvExit;
-			rfParam->socket = ltrfParam->ltrfdParam.cSocket;
+			//update linked list with new rthParam
+			llMutex.lock();
+			smrtParam->prev = llTail.prev;
+			smrtParam->next = &llTail;
+			smrtParam->prev->next = smrtParam;
+			llTail.prev = smrtParam;
+			llMutex.unlock();
 
-			ltrfParam->hRecvThread = createRecvThread(rfParam);
+			RecvHandlerParam *rhParam = new RecvHandlerParam();
+			rhParam->bufLen = sm.recvBufLen;
+			rhParam->funcParam = smrtParam;
+			rhParam->message = &smrtParam->message;
+			rhParam->socket = cSocket;
+
+			static std::tuple<RecvHandlerParam::EventHandler, RecvHandlerParam::EventHandler, RecvHandlerParam::EventHandler> internalHandlers;
+			internalHandlers = ssm->getInternalHandlers();
+			rhParam->onProcessMessage = std::get<0>(internalHandlers);
+			rhParam->onRecvInit = std::get<1>(internalHandlers);
+			rhParam->onRecvExit = std::get<2>(internalHandlers);
+
+			//start recvThread for the SSM
+			smrtParam->hRecvThread = createRecvThread(rhParam);
 		}
 
 		//wait on all spawned and active recvThreads to exit
-		while (llHead.nextLTRFP != &llTail) {
+		while (llHead.next != &llTail) {
 			//close client socket to force blocking WSA2 calls to finish
 			llMutex.lock();
-			Rain::shutdownSocketSend(*llHead.nextLTRFP->ltrfdParam.cSocket);
-			closesocket(*llHead.nextLTRFP->ltrfdParam.cSocket);
+			Rain::shutdownSocketSend(llHead.next->ssm->getSocket());
+			closesocket(llHead.next->ssm->getSocket());
 			//in case thread gets shutdown while some operations are happening with its handle
-			HANDLE curRecvThread = llHead.nextLTRFP->hRecvThread;
+			HANDLE curRecvThread = llHead.next->hRecvThread;
 			llMutex.unlock();
 
 			//join the recvThread
@@ -85,40 +229,15 @@ namespace Rain {
 			WaitForSingleObject(curRecvThread, 0);
 		}
 
-		//free ltParam which was dynamically created by createListenThread
-		delete &ltParam;
+		//set an event to notify listeners that the thread is exiting
+		SetEvent(sm.ltEvent);
 
 		return 0;
 	}
-
-	int onListenThreadRecvInit(void *funcParam) {
-		//call delegate handler
-		WSA2ListenThreadRecvFuncParam &ltrfParam = *reinterpret_cast<WSA2ListenThreadRecvFuncParam *>(funcParam);
-		return ltrfParam.pLTParam->onRecvInit(reinterpret_cast<void *>(&ltrfParam.ltrfdParam));
-	}
-	int onListenThreadRecvExit(void *funcParam) {
-		WSA2ListenThreadRecvFuncParam &ltrfParam = *reinterpret_cast<WSA2ListenThreadRecvFuncParam *>(funcParam);
-
-		//call delegate handler
-		int delRtrn = ltrfParam.pLTParam->onRecvExit(reinterpret_cast<void *>(&ltrfParam.ltrfdParam));
-
-		//modify linked list and remove current ltrfParam
-		ltrfParam.llMutex->lock();
-		ltrfParam.prevLTRFP->nextLTRFP = ltrfParam.nextLTRFP;
-		ltrfParam.nextLTRFP->prevLTRFP = ltrfParam.prevLTRFP;
-		ltrfParam.llMutex->unlock();
-
-		//free memory allocated in listenThread
-		CloseHandle(ltrfParam.hRecvThread);
-		delete ltrfParam.ltrfdParam.cSocket;
-		delete ltrfParam.pRFParam;
-		delete &ltrfParam;
-
-		return delRtrn;
-	}
-	int onListenThreadRecvProcessMessage(void *funcParam) {
-		//call delegate handler
-		WSA2ListenThreadRecvFuncParam &ltrfParam = *reinterpret_cast<WSA2ListenThreadRecvFuncParam *>(funcParam);
-		return ltrfParam.pLTParam->onProcessMessage(reinterpret_cast<void *>(&ltrfParam.ltrfdParam));
+	void ServerManager::disconnectSocket() {
+		if (this->socket == NULL) {
+			Rain::shutdownSocketSend(this->socket);
+			closesocket(this->socket);
+		}
 	}
 }

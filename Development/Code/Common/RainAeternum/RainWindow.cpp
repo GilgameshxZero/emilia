@@ -25,26 +25,26 @@ namespace Rain {
 	}
 	int RainWindow::create(
 		std::unordered_map<UINT, MSGFC> *msgm,
-		MSGFC	*intfc,
-		UINT      style,
-		int       cbClsExtra,
-		int	      cbWndExtra,
-		HINSTANCE hInstance,
-		HICON     hIcon,
-		HCURSOR   hCursor,
-		HBRUSH    hbrBackground,
-		LPCTSTR   lpszMenuName,
-		HICON     hIconSm,
-		DWORD     dwExStyle,
-		LPCTSTR   lpWindowName,
-		DWORD     dwStyle,
-		int       x,
-		int       y,
-		int       nWidth,
-		int       nHeight,
-		HWND      hWndParent,
-		HMENU     hMenu,
-		LPCTSTR   lpszClassName) {
+		MSGFC		*intfc,
+		UINT		style,
+		int			cbClsExtra,
+		int			cbWndExtra,
+		HINSTANCE	hInstance,
+		HICON		hIcon,
+		HCURSOR		hCursor,
+		HBRUSH		hbrBackground,
+		LPCTSTR		lpszMenuName,
+		HICON		hIconSm,
+		DWORD		dwExStyle,
+		LPCTSTR		lpWindowName,
+		DWORD		dwStyle,
+		int			x,
+		int			y,
+		int			nWidth,
+		int			nHeight,
+		HWND		hWndParent,
+		HMENU		hMenu,
+		LPCTSTR		lpszClassName) {
 		this->msgm = msgm;
 		this->intfc = intfc;
 
@@ -52,7 +52,7 @@ namespace Rain {
 			static LPCTSTR prefix = _T("Rain::Mono5::RainWindow ");
 			static const size_t prelen = _tcslen(prefix);
 			LPTSTR format = new TCHAR[prelen + 3]; //2 for the "%d", and 1 for the "\0"
-			int idlen = intLogLen(class_id); //length of class_id
+			int idlen = static_cast<int>(Rain::tToStr(class_id).length()); //length of class_id
 			classname = new TCHAR[idlen + prelen + 1]; //1 for the "\0", memory freed later
 			_tcscpy_s(format, prelen + 3, prefix);
 			_tcscat_s(format, prelen + 3, _T("%d"));

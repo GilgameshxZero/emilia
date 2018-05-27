@@ -1,8 +1,21 @@
 #include "NetworkRecvThread.h"
 
 namespace Rain {
+	RecvHandlerParam::RecvHandlerParam() {
+	}
+
+	RecvHandlerParam::RecvHandlerParam(SOCKET *socket, std::string *message, std::size_t buflen, void *funcParam, EventHandler onProcessMessage, EventHandler onRecvInit, EventHandler onRecvExit) {
+		this->socket = socket;
+		this->message = message;
+		this->bufLen = bufLen;
+		this->funcParam = funcParam;
+		this->onProcessMessage = onProcessMessage;
+		this->onRecvInit = onRecvInit;
+		this->onRecvExit = onRecvExit;
+	}
+
 	DWORD WINAPI recvThread(LPVOID lpParameter) {
-		NetworkRecvHandlerParam *recvparam = reinterpret_cast<NetworkRecvHandlerParam *>(lpParameter);
+		RecvHandlerParam *recvparam = reinterpret_cast<RecvHandlerParam *>(lpParameter);
 		char *buffer = new char[recvparam->bufLen];
 		int ret;
 
@@ -35,21 +48,21 @@ namespace Rain {
 		return ret;
 	}
 	HANDLE createRecvThread(
-		NetworkRecvHandlerParam *recvparam, //if NULL: returns pointer to RecvParam that must be freed when the thread ends
+		RecvHandlerParam *recvparam, //if NULL: returns pointer to RecvParam that must be freed when the thread ends
 											//if not NULL: ignores the the next 6 parameters, and uses this as the param for recvThread
 		SOCKET *connection,
 		std::string *message, //where the message is stored each time OnProcessMessage is called
 		int buflen, //the buffer size of the receive function
 		void *funcparam, //additional parameter to pass to the functions OnProcessMessage and OnRecvEnd
-		NetworkRecvHandlerParam::EventHandler OnProcessMessage,
-		NetworkRecvHandlerParam::EventHandler OnRecvInit, //called when thread starts
-		NetworkRecvHandlerParam::EventHandler OnRecvEnd, //called when the other side shuts down send
+		RecvHandlerParam::EventHandler OnProcessMessage,
+		RecvHandlerParam::EventHandler OnRecvInit, //called when thread starts
+		RecvHandlerParam::EventHandler OnRecvEnd, //called when the other side shuts down send
 		DWORD dwCreationFlags,
 		SIZE_T dwStackSize,
 		LPDWORD lpThreadId,
 		LPSECURITY_ATTRIBUTES lpThreadAttributes) {
 		if (recvparam == NULL)
-			recvparam = new NetworkRecvHandlerParam(connection, message, buflen, funcparam, OnProcessMessage, OnRecvInit, OnRecvEnd);
+			recvparam = new RecvHandlerParam(connection, message, buflen, funcparam, OnProcessMessage, OnRecvInit, OnRecvEnd);
 
 		return CreateThread(lpThreadAttributes, dwStackSize, recvThread, reinterpret_cast<LPVOID>(recvparam), dwCreationFlags, lpThreadId);
 	}

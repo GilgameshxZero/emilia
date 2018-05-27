@@ -12,7 +12,7 @@ namespace Monochrome3 {
 			Rain::outLogStd("Checking directory structure...\r\n");
 			std::string rootDir = "..\\..\\..\\..\\";
 			std::vector<std::string> rootDirs;
-			Rain::getDirectories(rootDir, rootDirs);
+			rootDirs = Rain::getDirs(rootDir);
 			if (std::find(rootDirs.begin(), rootDirs.end(), "Development") == rootDirs.end()) {
 				Rain::outLogStd("/Development not present\r\n");
 				return 0;
@@ -25,8 +25,8 @@ namespace Monochrome3 {
 			std::string devDir = rootDir + "Development\\",
 				stagingDir = rootDir + "Staging\\";
 			std::vector<std::string> devDirs, stagingDirs;
-			Rain::getDirectories(devDir, devDirs);
-			Rain::getDirectories(stagingDir, stagingDirs);
+			devDirs = Rain::getDirs(devDir);
+			stagingDirs = Rain::getDirs(stagingDir);
 			if (std::find(devDirs.begin(), devDirs.end(), "Code") == devDirs.end()) {
 				Rain::outLogStd("/Development/Code not present\r\n");
 				return 0;
@@ -44,21 +44,21 @@ namespace Monochrome3 {
 			//stage relevant files
 			Rain::outLogStd("Copying relevant files from /Development/Code to /Staging/Code...\r\n\r\n");
 			std::vector<std::string> stagingFiles;
-			Rain::readMultilineFile(config["config-path"] + config["staging-files"], stagingFiles);
+			stagingFiles = Rain::readMultilineFile(config["config-path"] + config["staging-files"]);
 
 			//if we are replacing the current executable, then delay the replace until after the program exits
-			std::string thisPath = Rain::getFullPathStr(Rain::getExecutablePath()),
+			std::string thisPath = Rain::pathToAbsolute(Rain::getExePath()),
 				delayPath = "";
 
 			for (std::string file : stagingFiles) {
 				if (!Rain::fileExists(devCodeDir + file)) {
 					Rain::outLogStd("Doesn't exist:\t");
 				} else {
-					if (thisPath == Rain::getFullPathStr(stagingCodeDir + file)) {
-						delayPath = Rain::getFullPathStr(devCodeDir + file);
+					if (thisPath == Rain::pathToAbsolute(stagingCodeDir + file)) {
+						delayPath = Rain::pathToAbsolute(devCodeDir + file);
 						Rain::outLogStd("Delayed:\t");
 					} else {
-						Rain::createDirRec(Rain::pathToDir(stagingCodeDir + file));
+						Rain::createDirRec(Rain::getPathDir(stagingCodeDir + file));
 						if (!CopyFile((devCodeDir + file).c_str(), (stagingCodeDir + file).c_str(), FALSE)) {
 							Rain::outLogStd("Error:\t\t");
 						} else {
@@ -71,8 +71,8 @@ namespace Monochrome3 {
 
 			//if we need to replace the current script, run CRHelper, which will restart the current script when complete
 			if (delayPath != "") {
-				std::string crhelperAbspath = Rain::getFullPathStr(config["crhelper"]),
-					crhWorkingDir = Rain::pathToDir(crhelperAbspath),
+				std::string crhelperAbspath = Rain::pathToAbsolute(config["crhelper"]),
+					crhWorkingDir = Rain::getPathDir(crhelperAbspath),
 					crhCmdLine = "\"" + delayPath + "\" \"" +
 					thisPath + "\"" +
 					"staging-crh-success";
@@ -88,14 +88,14 @@ namespace Monochrome3 {
 		}
 		int CHDeployStaging(std::map<std::string, std::string> &config) {
 			//request over the network
-			Rain::NetworkClientManager ncm;
-			ncm.setClientTarget(config["server-ip"], Rain::strToT<DWORD>(config["server-port-low"]), Rain::strToT<DWORD>(config["server-port-high"]));
-			ncm.blockForConnect(0);
+			Rain::ClientSocketManager csm;
+			csm.setClientTarget(config["server-ip"], Rain::strToT<DWORD>(config["server-port-low"]), Rain::strToT<DWORD>(config["server-port-high"]));
+			csm.blockForConnect(0);
 			Rain::outLogStd("Connected to server.\r\n");
 
-			Rain::sendBlockMessage(ncm, "authenticate " + config["client-auth-pass"]);
-			Rain::sendBlockMessage(ncm, "prod-stop");
-			Rain::sendBlockMessage(ncm, "prod-download");
+			Rain::sendBlockMessage(csm, "authenticate " + config["client-auth-pass"]);
+			Rain::sendBlockMessage(csm, "prod-stop");
+			Rain::sendBlockMessage(csm, "prod-download");
 
 			//upload files
 
