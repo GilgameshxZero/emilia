@@ -46,18 +46,46 @@ namespace Rain {
 		void setStdoutDst(bool enable, std::size_t len = 0);
 
 		private:
+		struct StdSrcRedirectThreadParam {
+			//pipe to read from and write to, in addition to logging the information in the process
+			HANDLE rd, wr;
+
+			//whether thread should immediately exit or not
+			bool running;
+
+			//object used to log
+			LogStream *logger;
+		};
+
+		struct StdSrcInfo {
+			//read and write of replacement pipe of standard source
+			HANDLE repPipeRd,
+				repPipeWr;
+
+			//os handles of original standard source
+			int oshOrigStdSrc;
+
+			//os handle for repPipeWr
+			int oshRepPipeWr;
+
+			//parameter that is passed to the thread
+			StdSrcRedirectThreadParam thParam;
+
+			//handle to the thread
+			HANDLE hThread;
+		};
+
 		std::set<std::string> fileDst;
 		bool outputStdout;
 		std::size_t stdoutTrunc;
 
 		//map of all std handles to input from
-		//std_handle_id: (replacement_handle_rd, replacement_handle_wr, original_std_fileno, write_pipe_os_handle, thread_handle)
-		std::map<DWORD, std::tuple<HANDLE, HANDLE, int, int, HANDLE>> stdPipeSrc;
+		std::map<DWORD, StdSrcInfo *> stdSrcMap;
 
 		//thread which captures information from a pipe, and redirects to another pipe, as well as the logger
-		//parameter is a pointer to a tuple: (rd_pipe *, wr_pipe *, LogStream *)
+		//parameter is a pointer to a tuple: (rd_pipe, wr_pipe, LogStream *, bool *)
 		//terminates when rd_pipe is closed
-		static DWORD WINAPI pipeRedirectThread(LPVOID lpParameter);
+		static DWORD WINAPI stdSrcRedirectThread(LPVOID lpParameter);
 	};
 	
 	//returns a shared mutex which locks cout for functions later
