@@ -7,18 +7,24 @@ namespace Monochrome3 {
 			std::map<std::string, std::string> config;
 
 			std::string configLocFile = "config-loc.ini";
-			Rain::readParameterFile(configLocFile, config);
+			Rain::concatMap(config, Rain::readParameterFile(configLocFile));
 			std::string configFile = config["config-path"] + config["config-file"];
-			Rain::readParameterFile(configFile, config);
+			Rain::concatMap(config, Rain::readParameterFile(configFile));
 			std::string authenticationFile = config["config-path"] + config["auth-file"];
-			Rain::readParameterFile(authenticationFile, config);
+			Rain::concatMap(config, Rain::readParameterFile(authenticationFile));
 
 			//debugging
 			Rain::redirectCerrFile(config["aux-path"] + config["aux-error"], true);
 			HANDLE hFMemLeak = Rain::logMemoryLeaks(config["aux-path"] + config["aux-memory"]);
 
+			Rain::LogStream logger;
+			//logger.setStdHandleSrc(STD_INPUT_HANDLE, true);
+			logger.setStdHandleSrc(STD_OUTPUT_HANDLE, true);
+			logger.setFileDst(config["aux-path"] + config["aux-log"], true);
+			logger.setStdoutDst(true);
+
 			//output parameters
-			Rain::outLogStd("Starting...\r\n" + Rain::tToStr(config.size()) + " configuration options:\r\n", config["aux-path"] + config["aux-log"]);
+			Rain::outLogStd("Starting...\r\n" + Rain::tToStr(config.size()) + " configuration options:\r\n");
 			for (std::map<std::string, std::string>::iterator it = config.begin(); it != config.end(); it++)
 				Rain::outLogStd("\t" + it->first + ": " + it->second + "\r\n");
 
@@ -31,7 +37,7 @@ namespace Monochrome3 {
 			//check command line, perhaps we are being restarted by helper and need to display a message
 			if (argc >= 2) {
 				std::string arg1 = argv[1];
-				Rain::strTrim(arg1);
+				Rain::strTrimWhite(arg1);
 				if (arg1 == "staging-crh-success")
 					Rain::outLogStd("IMPORTANT: Staging operation delayed helper script (EmiliaUpdateCRHelper) completed successfully.\r\n\r\n");
 			}
@@ -69,7 +75,12 @@ namespace Monochrome3 {
 			}
 
 			Rain::outLogStd("The program has terminated. Exiting in 3 seconds...\r\n");
+
+			//clean up logger before we exit, or else we will get error
+			logger.setStdHandleSrc(STD_OUTPUT_HANDLE, false);
+
 			Sleep(3000);
+
 			return 0;
 		}
 	}
