@@ -108,6 +108,9 @@ In the root, there will also be additional untracked files not part of the offic
 ## Changelog
 
 ### Emilia-tan
+* 1.1.3
+	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer, EmiliaUpdateCRHelper) = (3.7.2, 1.1.1, 1.2.2, 1.0.0, 1.0.0, 1.0.0)
+	* continued work on RainAeternum/EmiliaUpdate, as well as updated .gitignore
 * 1.1.2
 	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer, EmiliaUpdateCRHelper) = (3.7.2, 1.1.1, 1.2.2, 1.0.0, 1.0.0, 1.0.0)
 	* some updates to readme.md
