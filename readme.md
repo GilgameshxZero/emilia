@@ -25,15 +25,18 @@ In addition, there are archived files, from previous version of the repository.
 
 Files are organized in any development root as follows:
 * Development: Files currently in development. The files under development are not guaranteed to be functional at any point in time.
-	* Auxiliary
-	* Code
-		* EmiliaSite: HTTP/HTTPS webserver.
-		* EmiliaMail: SMTP client and server.
-		* EmiliaUpdate: Update server/client.
-		* Common: Shared code between all projects, such as the Rain Library
-	* Configuration
-	* Server
-* Staging: Intermediary between development and production. Functional most of the time.
+	* Development: Simulation environment under which all dev code goes.
+		* Auxiliary
+		* Code
+			* EmiliaSite: HTTP/HTTPS webserver.
+			* EmiliaMail: SMTP client and server.
+			* EmiliaUpdate: Update server/client.
+			* Common: Shared code between all projects, such as the Rain Library
+		* Configuration
+		* Server
+	* Staging: Simulated staging environment.
+	* Production: Simulated production environment.
+* Staging: Intermediary between development and production. Functional most of the time. 
 	* Auxiliary
 	* Code: Any code files, in the same structure as in production.
 	* Configuration: Any configuration files, same as in production.
