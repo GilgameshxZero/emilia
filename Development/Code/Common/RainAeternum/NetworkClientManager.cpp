@@ -8,10 +8,13 @@ namespace Rain {
 		this->ipAddress = "";
 		this->lowPort = this->highPort = 0;
 		this->onConnect = this->onMessage = this->onDisconnect = NULL;
-		this->funcParam = NULL;
 		this->msReconnectWaitMax = this->msSendWaitMax = 3000;
 		this->recvBufLen = 65536;
 		this->logger = NULL;
+
+		this->csmdhParam.csm = this;
+		this->csmdhParam.delegateParam = NULL;
+		this->csmdhParam.message = new std::string();
 
 		this->connectEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 		this->messageDoneEvent = CreateEvent(NULL, TRUE, TRUE, NULL);
@@ -31,6 +34,8 @@ namespace Rain {
 
 		Rain::shutdownSocketSend(this->socket);
 		closesocket(this->socket);
+
+		delete this->csmdhParam.message;
 	}
 	void ClientSocketManager::sendRawMessage(std::string request) {
 		this->sendRawMessage(&request);
@@ -95,7 +100,7 @@ namespace Rain {
 		this->onConnect = onConnect;
 		this->onMessage = onMessage;
 		this->onDisconnect = onDisconnect;
-		this->funcParam = funcParam;
+		this->csmdhParam.delegateParam = funcParam;
 	}
 	DWORD ClientSocketManager::setReconnectAttemptTime(DWORD msMaxInterval) {
 		DWORD origValue = this->msReconnectWaitMax;
@@ -156,7 +161,10 @@ namespace Rain {
 					break;
 
 				if (csm.portAddrs[a - csm.lowPort] == NULL) { //address not yet found, get it now
-					Rain::getTargetAddr(&csm.portAddrs[a - csm.lowPort], csm.ipAddress, Rain::tToStr(a));
+					if (Rain::getTargetAddr(&csm.portAddrs[a - csm.lowPort], csm.ipAddress, Rain::tToStr(a))) {
+						Rain::reportError(WSAGetLastError(), "getaddrinfo error while connecting ClientSocketManager");
+						continue;
+					}
 				}
 
 				//any socket that is connected will pass through this step
@@ -167,7 +175,7 @@ namespace Rain {
 					//attach the socket to a recvThread
 					csm.rParam.bufLen = csm.recvBufLen;
 					csm.rParam.funcParam = static_cast<void *>(&csm);
-					csm.rParam.message = NULL;
+					csm.rParam.message = csm.csmdhParam.message;
 					csm.rParam.onProcessMessage = csm.onProcessMessage;
 					csm.rParam.onRecvInit = csm.onRecvInit;
 					csm.rParam.onRecvExit = csm.onRecvExit;
@@ -207,8 +215,7 @@ namespace Rain {
 	int ClientSocketManager::onRecvInit(void *param) {
 		Rain::ClientSocketManager &csm = *reinterpret_cast<Rain::ClientSocketManager *>(param);
 
-		csm.rParam.message = new std::string();
-		return csm.onConnect == NULL ? 0 : csm.onConnect(csm.funcParam);
+		return csm.onConnect == NULL ? 0 : csm.onConnect(&csm.csmdhParam);
 	}
 	int ClientSocketManager::onRecvExit(void *param) {
 		Rain::ClientSocketManager &csm = *reinterpret_cast<Rain::ClientSocketManager *>(param);
@@ -220,8 +227,7 @@ namespace Rain {
 		//thread exits when connect success
 		Rain::simpleCreateThread(ClientSocketManager::attemptConnectThread, &csm);
 
-		delete csm.rParam.message;
-		return csm.onDisconnect == NULL ? 0 : csm.onDisconnect(csm.funcParam);
+		return csm.onDisconnect == NULL ? 0 : csm.onDisconnect(&csm.csmdhParam);
 	}
 	int ClientSocketManager::onProcessMessage(void *param) {
 		Rain::ClientSocketManager &csm = *reinterpret_cast<Rain::ClientSocketManager *>(param);
@@ -230,6 +236,6 @@ namespace Rain {
 		if (csm.logger != NULL)
 			csm.logger->logString(csm.rParam.message);
 
-		return csm.onMessage == NULL ? 0 : csm.onMessage(csm.funcParam);
+		return csm.onMessage == NULL ? 0 : csm.onMessage(&csm.csmdhParam);
 	}
 }

@@ -67,6 +67,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EnableFastChecks</BasicRuntimeChecks>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">EnableFastChecks</BasicRuntimeChecks>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
@@ -103,7 +105,9 @@
     <ClInclude Include="..\..\Common\RainAeternum\WindowsLAMInclude.h" />
     <ClInclude Include="BuildID.h" />
     <ClInclude Include="CommandHandlers.h" />
+    <ClInclude Include="ConnectionHandlers.h" />
     <ClInclude Include="Main.h" />
+    <ClInclude Include="RequestHandlers.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Start.h" />
   </ItemGroup>
@@ -140,7 +144,9 @@
     <ClCompile Include="..\..\Common\RainAeternum\UtilityTime.cpp" />
     <ClCompile Include="..\..\Common\RainAeternum\WindowsLAMInclude.cpp" />
     <ClCompile Include="CommandHandlers.cpp" />
+    <ClCompile Include="ConnectionHandlers.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="RequestHandlers.cpp" />
     <ClCompile Include="Start.cpp" />
   </ItemGroup>
   <ItemGroup>

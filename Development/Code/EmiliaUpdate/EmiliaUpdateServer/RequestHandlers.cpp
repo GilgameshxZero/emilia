@@ -2,7 +2,7 @@
 
 namespace Monochrome3 {
 	namespace EmiliaUpdateServer {
-		int HandleRequest(Rain::WSA2ListenThreadRecvFuncDelegateParam &ltrfdParam) {
+		int HandleRequest(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
 			static const std::map<std::string, RequestMethodHandler> methodHandlerMap{
 				{"authenticate", HRAuthenticate}, //validates a socket connection session
 				{"prod-upload", HRProdUpload}, //updates server-side production files with client files
@@ -12,8 +12,8 @@ namespace Monochrome3 {
 				{"sync-stop", HRSyncStop}, //stops constant updates and enables other commands
 				{"sync-start", HRSyncStart}, //request constant updates for changed production files; disables other commands except sync-stop
 			};
-			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ltrfdParam.delegateParam);
-			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ltrfdParam.callerParam);
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 
 			//takes until the end of string if ' ' can't be found
 			size_t firstSpace = cdParam.request.find(' ');
@@ -27,7 +27,7 @@ namespace Monochrome3 {
 			auto handler = methodHandlerMap.find(cdParam.requestMethod);
 			int handlerRet = 0;
 			if (handler != methodHandlerMap.end())
-				handlerRet = handler->second(ltrfdParam);
+				handlerRet = handler->second(ssmdhParam);
 
 			//clear request on exit
 			cdParam.request = "";
@@ -35,25 +35,25 @@ namespace Monochrome3 {
 			return handlerRet;
 		}
 
-		int HRAuthenticate(Rain::WSA2ListenThreadRecvFuncDelegateParam &ltrfdParam) {
-			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ltrfdParam.delegateParam);
-			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ltrfdParam.callerParam);
+		int HRAuthenticate(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 			if (cdParam.authenticated) {
-				Rain::sendBlockText(*ltrfdParam.cSocket, "Already authenticated.");
+				Rain::sendBlockMessage(*ssmdhParam.ssm, "Already authenticated.");
 			} else if (ccParam.config->at("client-auth-pass") != cdParam.request) {
-				Rain::sendBlockText(*ltrfdParam.cSocket, "Authentication failed.");
+				Rain::sendBlockMessage(*ssmdhParam.ssm, "Authentication failed.");
 			} else {
-				Rain::sendBlockText(*ltrfdParam.cSocket, "Authentication success.");
+				Rain::sendBlockMessage(*ssmdhParam.ssm, "Authentication success.");
 				cdParam.authenticated = true;
 			}
 
 			return 0;
 		}
-		int HRProdUpload(Rain::WSA2ListenThreadRecvFuncDelegateParam &ltrfdParam) {
-			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ltrfdParam.delegateParam);
-			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ltrfdParam.callerParam);
+		int HRProdUpload(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 			if (!cdParam.authenticated) {
-				Rain::sendBlockText(*ltrfdParam.cSocket, "Not yet authenticated.");
+				Rain::sendBlockMessage(*ssmdhParam.ssm, "Not yet authenticated.");
 				return 0;
 			}
 			//we assume the server is shut down at this point
@@ -62,7 +62,7 @@ namespace Monochrome3 {
 			//unprocessed request buffer, since request might be blocked
 			static std::string reqAcc = "",
 				//path to the current exe, which might cause problems when updating
-				thisPath = Rain::getFullPathStr(Rain::getExecutablePath());
+				thisPath = Rain::pathToAbsolute(Rain::getExePath());
 			//position of end of the header block
 			static std::size_t headerLen = 0,
 				//how many bytes of current file we have on disk already
@@ -91,7 +91,7 @@ namespace Monochrome3 {
 					header.resize(n);
 					for (int a = 0; a < n; a++) {
 						std::getline(headerSS, header[a].first, '\n'); //should extract up until and including \n
-						Rain::strTrim(header[a].first); //clean up \r
+						Rain::strTrimWhite(header[a].first); //clean up \r
 						static std::string tmp;
 						std::getline(headerSS, tmp, '\n'); //should extract up until and including \n
 						header[a].second = Rain::strToT<std::size_t>(tmp);
@@ -109,12 +109,12 @@ namespace Monochrome3 {
 
 				//as long as the file is modifiable (i.e. it's not the current exe), update it
 				//otherwise, save the data in a temp file, and mark a flag to delay the copying of the temp file to the exe file with CRHelper; then, restart the server
-				std::string filePath = Rain::getFullPathStr((*ccParam.config)["prod-root-dir"] + header[curFile].first);
+				std::string filePath = Rain::pathToAbsolute((*ccParam.config)["prod-root-dir"] + header[curFile].first);
 				if (filePath != thisPath) {
-					Rain::fastOutputFile(filePath,
+					Rain::printToFile(filePath,
 										 reqAcc.substr(0, curFileReqBlock), true);
 				} else {
-					Rain::fastOutputFile(filePath + (*ccParam.config)["upload-tmp-app"],
+					Rain::printToFile(filePath + (*ccParam.config)["upload-tmp-app"],
 										 reqAcc.substr(0, curFileReqBlock), true);
 					delayExeWrite = true;
 				}
@@ -125,10 +125,10 @@ namespace Monochrome3 {
 					if (curFile == header.size()) { //prod-upload request is done
 						//if the exe rewrite is delayed, we need to launch CRH helper now and terminate the program
 						if (delayExeWrite) {
-							Rain::sendBlockText(*ltrfdParam.cSocket, "Production upload request complete. Updating server requires server restart. Restarting now. Please reconnect to the server in a bit (a few seconds).");
+							Rain::sendBlockMessage(*ssmdhParam.ssm, "Production upload request complete. Updating server requires server restart. Restarting now. Please reconnect to the server in a bit (a few seconds).");
 
-							std::string crhelperAbspath = Rain::getFullPathStr((*ccParam.config)["crhelper"]),
-								crhWorkingDir = Rain::pathToDir(crhelperAbspath),
+							std::string crhelperAbspath = Rain::pathToAbsolute((*ccParam.config)["crhelper"]),
+								crhWorkingDir = Rain::getPathDir(crhelperAbspath),
 								//"source" "destination" "additional commands to pass to restart"
 								crhCmdLine = "\"" + thisPath + (*ccParam.config)["upload-tmp-app"] +
 								"\" \"" + thisPath + "\"" +
@@ -154,45 +154,45 @@ namespace Monochrome3 {
 
 			return 0;
 		}
-		int HRProdDownload(Rain::WSA2ListenThreadRecvFuncDelegateParam &ltrfdParam) {
-			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ltrfdParam.delegateParam);
-			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ltrfdParam.callerParam);
+		int HRProdDownload(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 			if (!cdParam.authenticated) {
-				Rain::sendBlockText(*ltrfdParam.cSocket, "Not yet authenticated.");
+				Rain::sendBlockMessage(*ssmdhParam.ssm, "Not yet authenticated.");
 				return 0;
 			}
 
 			//request should be empty
 			//send the files on the server production
 			std::vector<std::string> files;
-			Rain::getRelFilePathRec((*ccParam.config)["prod-root-dir"], files);
+			files = Rain::getFilesRec((*ccParam.config)["prod-root-dir"]);
 
 			//send header as one block, then block the files based on a block-size limit
 			std::string response = Rain::tToStr(files.size()) + "\r\n";
 			for (int a = 0; a < files.size(); a++)
 				response += files[a] + "\r\n" + Rain::tToStr(Rain::getFileSize((*ccParam.config)["prod-root-dir"] + files[a])) + "\r\n";
 			response += "\r\n";
-			Rain::sendBlockTextRef(*ltrfdParam.cSocket, response);
+			Rain::sendBlockMessage(*ssmdhParam.ssm, &response);
 
 			std::size_t blockMax = Rain::strToT<std::size_t>((*ccParam.config)["down-blocklen"]);
 			for (int a = 0; a < files.size(); a++) {
-				std::ifstream fileIn(files[a], std::ios::binary);
-				std::size_t fileSize = Rain::getFileSize(files[a]);
+				std::ifstream fileIn((*ccParam.config)["prod-root-dir"] + files[a], std::ios::binary);
+				std::size_t fileSize = Rain::getFileSize((*ccParam.config)["prod-root-dir"] + files[a]);
 				char *buffer = new char[blockMax];
 				for (std::size_t b = 0; b < fileSize; b += blockMax) {
 					fileIn.read(buffer, min(blockMax, fileSize - b));
-					Rain::sendBlockText(*ltrfdParam.cSocket, static_cast<std::string>(buffer));
+					Rain::sendBlockMessage(*ssmdhParam.ssm, static_cast<std::string>(buffer));
 				}
 				fileIn.close();
 			}
 
 			return 0;
 		}
-		int HRProdStop(Rain::WSA2ListenThreadRecvFuncDelegateParam &ltrfdParam) {
-			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ltrfdParam.delegateParam);
-			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ltrfdParam.callerParam);
+		int HRProdStop(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 			if (!cdParam.authenticated) {
-				Rain::sendBlockText(*ltrfdParam.cSocket, "Not yet authenticated.");
+				Rain::sendBlockMessage(*ssmdhParam.ssm, "Not yet authenticated.");
 				return 0;
 			}
 
@@ -221,18 +221,18 @@ namespace Monochrome3 {
 			}
 
 			if (success) {
-				Rain::sendBlockText(*ltrfdParam.cSocket, "All servers successfully stopped.");
+				Rain::sendBlockMessage(*ssmdhParam.ssm, "All servers successfully stopped.");
 			} else {
-				Rain::sendBlockText(*ltrfdParam.cSocket, "Error while stopping servers.");
+				Rain::sendBlockMessage(*ssmdhParam.ssm, "Error while stopping servers.");
 			}
 
 			return 0;
 		}
-		int HRProdStart(Rain::WSA2ListenThreadRecvFuncDelegateParam &ltrfdParam) {
-			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ltrfdParam.delegateParam);
-			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ltrfdParam.callerParam);
+		int HRProdStart(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 			if (!cdParam.authenticated) {
-				Rain::sendBlockText(*ltrfdParam.cSocket, "Not yet authenticated.");
+				Rain::sendBlockMessage(*ssmdhParam.ssm, "Not yet authenticated.");
 				return 0;
 			}
 
@@ -274,7 +274,7 @@ namespace Monochrome3 {
 						TRUE,
 						CREATE_NEW_CONSOLE,
 						NULL,
-						Rain::getPathDirectory(ccParam.serverStatus[a].path).c_str(),
+						Rain::getPathDir(ccParam.serverStatus[a].path).c_str(),
 						&sinfo,
 						&pinfo)) { //try to fail peacefully
 						Rain::reportError(GetLastError(), "Error while starting server at " + ccParam.serverStatus[a].path);
@@ -293,17 +293,17 @@ namespace Monochrome3 {
 			}
 
 			if (success) {
-				Rain::sendBlockText(*ltrfdParam.cSocket, "All servers successfully started.");
+				Rain::sendBlockMessage(*ssmdhParam.ssm, "All servers successfully started.");
 			} else {
-				Rain::sendBlockText(*ltrfdParam.cSocket, "Error while starting servers.");
+				Rain::sendBlockMessage(*ssmdhParam.ssm, "Error while starting servers.");
 			}
 
 			return 0;
 		}
-		int HRSyncStop(Rain::WSA2ListenThreadRecvFuncDelegateParam &ltrfdParam) {
+		int HRSyncStop(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
 			return 0;
 		}
-		int HRSyncStart(Rain::WSA2ListenThreadRecvFuncDelegateParam &ltrfdParam) {
+		int HRSyncStart(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
 			return 0;
 		}
 	}

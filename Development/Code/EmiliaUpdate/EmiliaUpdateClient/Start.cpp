@@ -13,33 +13,31 @@ namespace Monochrome3 {
 			std::string authenticationFile = config["config-path"] + config["auth-file"];
 			Rain::concatMap(config, Rain::readParameterFile(authenticationFile));
 
-			//debugging
+			//debugging & logging
 			Rain::redirectCerrFile(config["aux-path"] + config["aux-error"], true);
 			HANDLE hFMemLeak = Rain::logMemoryLeaks(config["aux-path"] + config["aux-memory"]);
 
 			Rain::LogStream logger;
-			//logger.setStdHandleSrc(STD_INPUT_HANDLE, true);
-			logger.setStdHandleSrc(STD_OUTPUT_HANDLE, true);
 			logger.setFileDst(config["aux-path"] + config["aux-log"], true);
-			logger.setStdoutDst(true);
+			logger.setStdHandleSrc(STD_OUTPUT_HANDLE, true);
 
 			//output parameters
-			Rain::outLogStd("Starting...\r\n" + Rain::tToStr(config.size()) + " configuration options:\r\n");
+			Rain::tsCout("Starting...\r\n", config.size(), " configuration options:\r\n");
 			for (std::map<std::string, std::string>::iterator it = config.begin(); it != config.end(); it++)
-				Rain::outLogStd("\t" + it->first + ": " + it->second + "\r\n");
+				Rain::tsCout("\t" + it->first + ": " + it->second + "\r\n");
 
-			Rain::outLogStd("\r\nCommand line arguments: " + Rain::tToStr(argc) + "\r\n\r\n");
+			Rain::tsCout("\r\nCommand line arguments: " + Rain::tToStr(argc) + "\r\n\r\n");
 			for (int a = 0; a < argc; a++) {
-				Rain::outLogStd(std::string(argv[a]) + "\r\n");
+				Rain::tsCout(std::string(argv[a]) + "\r\n");
 			}
-			Rain::outLogStd("\r\n");
+			Rain::tsCout("\r\n");
 
 			//check command line, perhaps we are being restarted by helper and need to display a message
 			if (argc >= 2) {
 				std::string arg1 = argv[1];
 				Rain::strTrimWhite(arg1);
 				if (arg1 == "staging-crh-success")
-					Rain::outLogStd("IMPORTANT: Staging operation delayed helper script (EmiliaUpdateCRHelper) completed successfully.\r\n\r\n");
+					Rain::tsCout("IMPORTANT: Staging operation delayed helper script (EmiliaUpdateCRHelper) completed successfully.\r\n\r\n");
 			}
 
 			//command loop
@@ -54,11 +52,14 @@ namespace Monochrome3 {
 				{"sync-stop", CHSyncStop},
 				{"sync-start", CHSyncStart},
 			};
+			CommandHandlerParam cmhParam;
+			cmhParam.config = &config;
+			cmhParam.logger = &logger;
 			while (true) {
 				static std::string command, tmp;
-				Rain::outLogStd("Accepting commands...\r\n");
+				Rain::tsCout("Accepting commands...\r\n");
 				std::cin >> command;
-				Rain::outLogStd("Command: " + command + "\r\n");
+				Rain::tsCout("Command: " + command + "\r\n");
 				std::getline(std::cin, tmp);
 
 				if (command == "exit") {
@@ -66,21 +67,20 @@ namespace Monochrome3 {
 				} else {
 					auto handler = commandHandlers.find(command);
 					if (handler != commandHandlers.end()) {
-						if (handler->second(config) != 0)
+						if (handler->second(cmhParam) != 0)
 							break;
 					} else {
-						Rain::outLogStd("Command not recognized\r\n");
+						Rain::tsCout("Command not recognized.\r\n");
 					}
 				}
 			}
 
-			Rain::outLogStd("The program has terminated. Exiting in 3 seconds...\r\n");
+			Rain::tsCout("The program has terminated. Exiting in 3 seconds...\r\n");
 
 			//clean up logger before we exit, or else we will get error
 			logger.setStdHandleSrc(STD_OUTPUT_HANDLE, false);
 
 			Sleep(3000);
-
 			return 0;
 		}
 	}
