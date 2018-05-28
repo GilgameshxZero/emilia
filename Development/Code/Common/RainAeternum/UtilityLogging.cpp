@@ -12,7 +12,7 @@ namespace Rain {
 		}
 	}
 	void LogStream::setSocketSrc(Rain::SocketManager *nsm, bool enable) {
-		nsm->setLogging(enable ? reinterpret_cast<void *>(nsm) : NULL);
+		nsm->setLogging(enable ? reinterpret_cast<void *>(this) : NULL);
 	}
 	bool LogStream::setStdHandleSrc(DWORD stdHandle, bool enable) {
 		bool ret = this->stdSrcMap.find(stdHandle) != this->stdSrcMap.end();
@@ -27,10 +27,10 @@ namespace Rain {
 			//redirect stdin to a pipe, then from that pipe to the original stdin pipe
 			HANDLE rd, wr;
 			CreatePipe(&rd, &wr, NULL, 0);
-			int fdDup = _dup(_fileno(stdFilePtr)),
-				wrOsHandle = _open_osfhandle(reinterpret_cast<intptr_t>(wr), 0);
-			HANDLE hOrig = reinterpret_cast<HANDLE>(_get_osfhandle(fdDup));
-			_dup2(wrOsHandle, _fileno(stdFilePtr));
+			int oshOrigStdSrc = _dup(_fileno(stdFilePtr)),
+				oshRepPipeWr = _open_osfhandle(reinterpret_cast<intptr_t>(wr), 0);
+			HANDLE hOrig = reinterpret_cast<HANDLE>(_get_osfhandle(oshOrigStdSrc));
+			_dup2(oshRepPipeWr, _fileno(stdFilePtr));
 
 			//save handles to a map, to access later when the stdsrc is disabled
 			StdSrcInfo &ssi = *this->stdSrcMap.insert(std::make_pair(stdHandle, new StdSrcInfo())).first->second;
@@ -39,8 +39,8 @@ namespace Rain {
 			ssi.thParam.wr = hOrig;
 			ssi.thParam.running = true;
 
-			ssi.oshOrigStdSrc = fdDup;
-			ssi.oshRepPipeWr = wrOsHandle;
+			ssi.oshOrigStdSrc = oshOrigStdSrc;
+			ssi.oshRepPipeWr = oshRepPipeWr;
 			ssi.repPipeRd = rd;
 			ssi.repPipeWr = wr;
 			ssi.hThread = CreateThread(NULL, 0, this->stdSrcRedirectThread, reinterpret_cast<LPVOID>(&ssi.thParam), 0, NULL);
@@ -49,7 +49,6 @@ namespace Rain {
 
 			//get params
 			StdSrcInfo &ssi = *this->stdSrcMap.find(stdHandle)->second;
-			this->stdSrcMap.erase(stdHandle);
 
 			//stop logging this pipe and terminate corresponding thread
 			ssi.thParam.running = false;
@@ -60,6 +59,7 @@ namespace Rain {
 			CloseHandle(ssi.hThread);
 
 			//reset std handles and free memory
+			this->stdSrcMap.erase(stdHandle); //erase here, so that we can log everything in stdout if we are logging to stdout as well
 			_dup2(ssi.oshOrigStdSrc, _fileno(stdFilePtr));
 			delete &ssi;
 		}
@@ -69,10 +69,17 @@ namespace Rain {
 		static std::string header;
 		header = Rain::getTime() + " " + Rain::tToStr(s->length()) + "\r\n";
 		if (this->outputStdout) {
-			//shutdown stdout logging before doing cout, then turn it on again if it was on before
-			bool origValue = this->setStdHandleSrc(STD_OUTPUT_HANDLE, false);
+			//if STD_OUTPUT_HANDLE is being logged, then temporarily replace with original output handles while outputting log, so that we don't log indefinitely
+			auto itMap = this->stdSrcMap.find(STD_OUTPUT_HANDLE);
+			if (itMap != this->stdSrcMap.end()) {
+				fflush(stdout);
+				_dup2(itMap->second->oshOrigStdSrc, _fileno(stdout));
+			}
 			Rain::tsCout(header, s->substr(0, this->stdoutTrunc == 0 ? std::string::npos : this->stdoutTrunc), "\r\n\r\n");
-			this->setStdHandleSrc(STD_OUTPUT_HANDLE, origValue);
+			if (itMap != this->stdSrcMap.end()) {
+				fflush(stdout);
+				_dup2(itMap->second->oshRepPipeWr, _fileno(stdout));
+			}
 		}
 		for (std::string file: this->fileDst) {
 			Rain::printToFile(file, &header, true);
@@ -105,10 +112,9 @@ namespace Rain {
 		while (param.running) {
 			bSuccess = ReadFile(param.rd, chBuf, bufSize, &dwRead, NULL); //blocks until cancelled or read
 			if (!bSuccess || dwRead == 0) break;
+			param.logger->logString(std::string(chBuf, dwRead)); //log here before console in case of error
 			bSuccess = WriteFile(param.wr, chBuf, dwRead, &dwWritten, NULL);
 			if (!bSuccess) break; //unexpected error
-
-			param.logger->logString(std::string(chBuf, dwRead));
 		}
 
 		//if we're here, read what's remaining in the pipe if possible before exiting
@@ -116,8 +122,8 @@ namespace Rain {
 		PeekNamedPipe(param.rd, NULL, 0, NULL, &bytesAvail, NULL);
 		while (bytesAvail > 0) { //the same procedure as the rest of the loop
 			ReadFile(param.rd, chBuf, bufSize, &dwRead, NULL); //don't check for error, since synchronious io is already cancelled, so this will probably error
-			if (!WriteFile(param.wr, chBuf, dwRead, &dwWritten, NULL)) break; //unexpected error
 			param.logger->logString(std::string(chBuf, dwRead));
+			if (!WriteFile(param.wr, chBuf, dwRead, &dwWritten, NULL)) break;
 			PeekNamedPipe(param.rd, NULL, 0, NULL, &bytesAvail, NULL);
 		}
 

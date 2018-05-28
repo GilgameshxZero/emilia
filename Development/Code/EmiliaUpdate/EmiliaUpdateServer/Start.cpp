@@ -7,73 +7,79 @@ namespace Monochrome3 {
 			std::map<std::string, std::string> config;
 
 			std::string configLocFile = "config-loc.ini";
-			Rain::readParameterFile(configLocFile, config);
+			Rain::concatMap(config, Rain::readParameterFile(configLocFile));
 			std::string configFile = config["config-path"] + config["config-file"];
-			Rain::readParameterFile(configFile, config);
+			Rain::concatMap(config, Rain::readParameterFile(configFile));
 			std::string authenticationFile = config["config-path"] + config["auth-file"];
-			Rain::readParameterFile(authenticationFile, config);
+			Rain::concatMap(config, Rain::readParameterFile(authenticationFile));
 
 			std::vector<std::string> prodServers;
-			Rain::readMultilineFile(config["config-path"] + config["prod-servers"], prodServers);
+			prodServers = Rain::readMultilineFile(config["config-path"] + config["prod-servers"]);
 
 			//debugging
 			Rain::redirectCerrFile(config["aux-path"] + config["aux-error"], true);
 			HANDLE hFMemLeak = Rain::logMemoryLeaks(config["aux-path"] + config["aux-memory"]);
 
-			//output parameters
-			Rain::outLogStd("Starting...\r\n" + Rain::tToStr(config.size()) + " configuration options:\r\n", config["aux-path"] + config["aux-log"]);
-			for (std::map<std::string, std::string>::iterator it = config.begin(); it != config.end(); it++)
-				Rain::outLogStd("\t" + it->first + ": " + it->second + "\r\n");
+			Rain::LogStream logger;
+			logger.setFileDst(config["aux-path"] + config["aux-log"], true);
+			logger.setStdHandleSrc(STD_OUTPUT_HANDLE, true);
 
-			Rain::outLogStd("\r\nCommand line arguments: " + Rain::tToStr(argc) + "\r\n\r\n");
+			//output parameters
+			Rain::tsCout("Starting...\r\n" + Rain::tToStr(config.size()) + " configuration options:\r\n");
+			for (std::map<std::string, std::string>::iterator it = config.begin(); it != config.end(); it++)
+				Rain::tsCout("\t" + it->first + ": " + it->second + "\r\n");
+
+			Rain::tsCout("\r\nCommand line arguments: " + Rain::tToStr(argc) + "\r\n\r\n");
 			for (int a = 0; a < argc; a++) {
-				Rain::outLogStd(std::string(argv[a]) + "\r\n");
+				Rain::tsCout(std::string(argv[a]) + "\r\n");
 			}
-			Rain::outLogStd("\r\n");
+			Rain::tsCout("\r\n");
 
 			//check command line for notifications
 			if (argc >= 2) {
 				if (argv[1] == "prod-upload-success") {
-					Rain::outLogStd("IMPORTANT: 'prod-upload' main and CRH operation completed successfully.\r\n\r\n");
+					Rain::tsCout("IMPORTANT: 'prod-upload' main and CRH operation completed successfully.\r\n\r\n");
 				}
 			}
 
 			//set up network stuff to continuously accept sockets
-			WSADATA wsaData;
-			struct addrinfo *sAddr;
-			SOCKET lSocket;
-			if (Rain::quickServerInit(wsaData, config["first-port"], &sAddr, lSocket)) {
-				Rain::reportError(GetLastError(), "error in quickServerInit");
-				return -1;
-			}
-			if (Rain::listenServSocket(lSocket)) {
-				Rain::reportError(GetLastError(), "error in listenServSocket");
-				return -1;
-			}
-			Rain::outLogStd("Socket listening...\r\n");
-
 			ConnectionCallerParam ccParam;
 			ccParam.config = &config;
 			ccParam.hInputExitEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 			ccParam.serverStatus.resize(prodServers.size());
 			ccParam.clientConnected = false;
 			for (int a = 0; a < prodServers.size(); a++) {
-				ccParam.serverStatus[a].path = Rain::getFullPathStr(prodServers[a]);
+				ccParam.serverStatus[a].path = Rain::pathToAbsolute(prodServers[a]);
 				ccParam.serverStatus[a].status = "stopped";
 			}
 
-			HANDLE hListenThread = Rain::createListenThread(lSocket, reinterpret_cast<void *>(&ccParam), Rain::strToT<std::size_t>(config["recv-buflen"]), onConnectionProcessMessage, onConnectionInit, onConnectionExit);
+			Rain::ServerManager sm;
+			sm.setEventHandlers(onConnectionInit, onConnectionProcessMessage, onConnectionExit, &ccParam);
+			sm.setRecvBufLen(Rain::strToT<std::size_t>(config["recv-buflen"]));
+			if (!sm.setServerListen(Rain::strToT<DWORD>(config["ports-low"]), Rain::strToT<DWORD>(config["ports-high"]))) {
+				Rain::tsCout("Server listening on port ", sm.getListeningPort(), "..\r\n");
+			} else {
+				Rain::tsCout("Fatal error: could not setup server listening.\r\n");
+				DWORD error = GetLastError();
+				Rain::reportError(error, "Fatal error: could not setup server listening.");
+				logger.setStdHandleSrc(STD_OUTPUT_HANDLE, false);
+				WSACleanup();
+				if (hFMemLeak != NULL)
+					CloseHandle(hFMemLeak);
+				return error;
+			}
 
 			HANDLE hCommandWait[2] = {ccParam.hInputExitEvent,
 				GetStdHandle(STD_INPUT_HANDLE)};
 
 			//command loop
-			Rain::outLogStd("Accepting commands...\r\n");
+			Rain::tsCout("Accepting commands...\r\n");
 			while (true) {
 				static std::string command, cmdLeftover;
 				static DWORD waitRtrn;
 				static bool commandComplete = false;
 
+				fflush(stdout);
 				waitRtrn = WaitForMultipleObjects(2, hCommandWait, FALSE, INFINITE);
 				if (waitRtrn == WAIT_OBJECT_0) {
 					command = "exit";
@@ -93,13 +99,15 @@ namespace Monochrome3 {
 							if (inputs[a].EventType == KEY_EVENT && 
 								inputs[a].Event.KeyEvent.bKeyDown == TRUE) {
 								command += inputs[a].Event.KeyEvent.uChar.AsciiChar;
-								Rain::rainCoutF(inputs[a].Event.KeyEvent.uChar.AsciiChar);
+								Rain::tsCout(inputs[a].Event.KeyEvent.uChar.AsciiChar);
 
 								//TODO: pressing enter only inputs \r for some reason, so append \n if that's the case
 								if (inputs[a].Event.KeyEvent.uChar.AsciiChar == '\r') {
 									command += '\n';
-									Rain::rainCoutF('\n');
+									Rain::tsCout('\n');
 								}
+
+								fflush(stdout);
 							}
 						}
 						delete[] inputs;
@@ -110,7 +118,7 @@ namespace Monochrome3 {
 						if (newlinePos != std::string::npos) {
 							cmdLeftover = command.substr(newlinePos + 1, command.length());
 							command = command.substr(0, newlinePos);
-							Rain::strTrim(command);
+							Rain::strTrimWhite(&command);
 							commandComplete = true;
 						}
 					}
@@ -118,31 +126,30 @@ namespace Monochrome3 {
 
 				if (commandComplete) {
 					commandComplete = false;
-					Rain::outLogStd("Command: " + command + "\r\n");
+					Rain::tsCout("Command: " + command + "\r\n");
 
 					if (command == "exit") {
-						//first, close the listening socket so that all calls to 'accept' terminate
-						closesocket(lSocket);
-						WaitForSingleObject(hListenThread, 0);
-						CloseHandle(hListenThread);
-						Rain::outLogStd("Listening shutdown and ListenThread joined.\r\n");
-
-						//no need to freeaddinfo here because RainWSA2 does that for us
-						WSACleanup();
+						Rain::tsCout("Preparing to exit...\r\n");
 						break;
 					} else {
-						Rain::outLogStd("Command not recognized.\r\n");
+						Rain::tsCout("Command not recognized.\r\n");
 					}
 
 					command = cmdLeftover;
-					Rain::outLogStd("Accepting commands...\r\n");
+					Rain::tsCout("Accepting commands...\r\n");
 				}
 			}
 
+			sm.~ServerManager();
+			WSACleanup();
 			if (hFMemLeak != NULL)
 				CloseHandle(hFMemLeak);
 
-			Rain::outLogStd("The program has terminated. Exiting in 3 seconds...\r\n");
+			Rain::tsCout("The program has terminated. Exiting in 3 seconds...\r\n");
+
+			//clean up logger before we exit, or else we will get error
+			logger.setStdHandleSrc(STD_OUTPUT_HANDLE, false);
+
 			Sleep(3000);
 			return 0;
 		}

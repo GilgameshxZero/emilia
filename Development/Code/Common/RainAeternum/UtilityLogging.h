@@ -43,6 +43,7 @@ namespace Rain {
 		//enable/disable stdout logging destination
 		//can also set a rule to truncate each log to a certian length; 0 is don't truncate
 		//don't capture what we log to stdout
+		//doesn't work with STD_INPUT_HANDLE for now, and STD_ERROR_HANDLE is untested
 		void setStdoutDst(bool enable, std::size_t len = 0);
 
 		private:

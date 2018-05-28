@@ -24,14 +24,20 @@ namespace Rain {
 		public:
 		//parameter passed to delegate handlers
 		struct ServerSocketManagerDelegateHandlerParam {
+			//this object
+			ServerSocketManager *ssm;
+
 			//socket of the current connection
 			SOCKET *cSocket;
 
 			//message related to current event
 			std::string *message;
 
-			//additional parameters
-			void *param;
+			//additional parameters set by the creater of the server
+			void *callerParam;
+
+			//parameters unique to each ServerSocketManager, which is NULL by default and to be used by the event handlers
+			void *delegateParam;
 		};
 
 		//ServerSocketManager must be initialized with a ServerManager parent and default event handlers set by the ServerManager's setEventHandlers
@@ -102,6 +108,9 @@ namespace Rain {
 
 			//handle to the current recvThread for use when waiting on end
 			HANDLE hRecvThread;
+
+			//pointer to the rhParam which has this object as its funcParam, so that the handler can free the recvParam
+			Rain::RecvHandlerParam *rhParam;
 		};
 
 		ServerManager();
@@ -110,8 +119,13 @@ namespace Rain {
 		//returns current socket immediately
 		SOCKET &getSocket();
 
+		//returns current listening port #
+		//returns -1 if not yet listening
+		DWORD getListeningPort();
+
 		//change socket to listen on different ports, or start socket listen on some ports
 		//returns zero if no error
+		//pass highPort = 0 to stop server listening
 		int setServerListen(DWORD lowPort, DWORD highPort);
 
 		//set the function to call when a new client is connected
@@ -128,6 +142,7 @@ namespace Rain {
 
 		private:
 		SOCKET socket;
+		DWORD listeningPort;
 		DWORD lowPort, highPort;
 		NewClientFunc newClientCall;
 		std::size_t recvBufLen;
