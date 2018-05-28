@@ -4,37 +4,41 @@ namespace Monochrome3 {
 	namespace EmiliaUpdateServer {
 		static const std::string headerDelim = "\r\n\r\n";
 
-		void onConnectionInit(void *funcParam) {
-			Rain::WSA2ListenThreadRecvFuncDelegateParam &ltrfdParam = *reinterpret_cast<Rain::WSA2ListenThreadRecvFuncDelegateParam *>(funcParam);
-			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ltrfdParam.callerParam);
+		int onConnectionInit(void *funcParam) {
+			Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam = *reinterpret_cast<Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam *>(funcParam);
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 
 			if (ccParam.clientConnected)
-				return; //TODO: if another connection is active, close this one
+				return 1;
+
 			ccParam.clientConnected = true;
+			Rain::tsCout("Client connected.\r\n");
 
 			//create the delegate parameter for the first time
 			ConnectionDelegateParam *cdParam = new ConnectionDelegateParam();
-			ltrfdParam.delegateParam = reinterpret_cast<void *>(cdParam);
+			ssmdhParam.delegateParam = reinterpret_cast<void *>(cdParam);
 
 			//initialize cdParam here
 			cdParam->request = "";
 			cdParam->requestLength = 0;
 
 			cdParam->authenticated = false;
+			return 0;
 		}
-		void onConnectionExit(void *funcParam) {
-			reinterpret_cast<ConnectionCallerParam *>(reinterpret_cast<Rain::WSA2ListenThreadRecvFuncDelegateParam *>(funcParam)->callerParam)->clientConnected = false;
+		int onConnectionExit(void *funcParam) {
+			reinterpret_cast<ConnectionCallerParam *>(reinterpret_cast<Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam *>(funcParam)->callerParam)->clientConnected = false;
 
 			//free the delegate parameter
-			delete reinterpret_cast<Rain::WSA2ListenThreadRecvFuncDelegateParam *>(funcParam)->delegateParam;
+			delete reinterpret_cast<Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam *>(funcParam)->delegateParam;
+			return 0;
 		}
 		int onConnectionProcessMessage(void *funcParam) {
-			Rain::WSA2ListenThreadRecvFuncDelegateParam &ltrfdParam = *reinterpret_cast<Rain::WSA2ListenThreadRecvFuncDelegateParam *>(funcParam);
-			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ltrfdParam.delegateParam);
+			Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam = *reinterpret_cast<Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam *>(funcParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 
 			//delegate to request handlers once the message is complete
 			//message/request length is at the beginning, as a base-10 string, before a space
-			cdParam.request += ltrfdParam.message;
+			cdParam.request += *ssmdhParam.message;
 
 			int ret = 0;
 			while (true) {
@@ -51,7 +55,7 @@ namespace Monochrome3 {
 					std::string fragment = cdParam.request.substr(cdParam.requestLength, cdParam.request.length());
 					cdParam.request = cdParam.request.substr(0, cdParam.requestLength);
 
-					int hrReturn = HandleRequest(ltrfdParam);
+					int hrReturn = HandleRequest(ssmdhParam);
 					if (hrReturn < 0 || (hrReturn > 0 && ret >= 0))
 						ret = hrReturn;
 

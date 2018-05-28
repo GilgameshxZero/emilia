@@ -27,7 +27,7 @@ namespace Rain {
 	//same thing as getTargetAddr, but with different default arguments, to be used for servers trying to listen on a port
 	//return 0 if no error
 	int getServerAddr(struct addrinfo **server, std::string port,
-					  int family = AF_UNSPEC, int sockType = SOCK_STREAM, int type = IPPROTO_TCP, int flags = AI_PASSIVE);
+					  int family = AF_INET, int sockType = SOCK_STREAM, int type = IPPROTO_TCP, int flags = AI_PASSIVE);
 
 	//if no error, returns 0
 	int createSocket(SOCKET &newSocket,
@@ -38,6 +38,7 @@ namespace Rain {
 	int connectTarget(SOCKET &cSocket, struct addrinfo **target);
 
 	//binds a socket to a local address
+	//returns 0 if no error
 	int bindListenSocket(struct addrinfo **addr, SOCKET &lSocket);
 
 	//returns a new socket for a connected client

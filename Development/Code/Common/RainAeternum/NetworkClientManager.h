@@ -22,6 +22,17 @@ Implements class ClientSocketManager, which maintains a socket connection to an 
 namespace Rain {
 	class ClientSocketManager : public SocketManager {
 		public:
+		struct ClientSocketManagerDelegateHandlerParam {
+			//the current csm
+			ClientSocketManager *csm;
+
+			//message received
+			std::string *message;
+
+			//additional parameters set by setHandlers
+			void *delegateParam;
+		};
+
 		static const int STATUS_DISCONNECTED = -1,
 			STATUS_CONNECTED = 0,
 			STATUS_CONNECTING = 1;
@@ -89,7 +100,6 @@ namespace Rain {
 		std::string ipAddress;
 		DWORD lowPort, highPort;
 		RecvHandlerParam::EventHandler onConnect, onMessage, onDisconnect;
-		void *funcParam;
 		DWORD msReconnectWaitMax, msSendWaitMax;
 		std::size_t recvBufLen;
 		LogStream *logger;
@@ -111,6 +121,9 @@ namespace Rain {
 
 		//recvThread parameter associated with the current recvThread
 		Rain::RecvHandlerParam rParam;
+
+		//parameter passed to delegate handlers
+		ClientSocketManagerDelegateHandlerParam csmdhParam;
 
 		//disconnects socket immediately, regardless of state
 		//sets state as -1
