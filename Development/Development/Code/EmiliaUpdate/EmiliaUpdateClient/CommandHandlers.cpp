@@ -12,25 +12,29 @@ namespace Monochrome3 {
 			std::string devDir = (*cmhParam.config)["dev-root-dir"],
 				stagingDir = (*cmhParam.config)["staging-root-dir"];
 			if (!Rain::dirExists(devDir)) {
-				Rain::tsCout("/Development/ not present\r\n");
+				Rain::tsCout("Failure: /Development/ not present\r\n");
+				fflush(stdout);
 				return 0;
 			}
 			if (!Rain::dirExists(stagingDir)) {
-				Rain::tsCout("/Staging/ not present\r\n");
+				Rain::tsCout("Failure: /Staging/ not present\r\n");
+				fflush(stdout);
 				return 0;
 			}
 
 			//remove everything in staging, except for those specified in staging-ignore
-			Rain::tsCout("Removing files in /Staging/, ignoring those specified in configuration...\r\n");
+			Rain::tsCout("Info: Removing files in /Staging/, ignoring those specified in configuration...\r\n");
+			fflush(stdout);
 			std::vector<std::string> ignored;
 			ignored = Rain::readMultilineFile((*cmhParam.config)["config-path"] + (*cmhParam.config)["staging-ignore"]);
 			std::set<std::string> ignSet;
 			for (int a = 0; a < ignored.size(); a++)
-				ignSet.insert(stagingDir + ignored[a]);
+				ignSet.insert(Rain::pathToAbsolute(stagingDir + ignored[a]));
 			Rain::rmDirRec(stagingDir, &ignSet);
 
 			//stage relevant files
-			Rain::tsCout("Copying relevant files from /Development/ to /Staging/...\r\n\r\n");
+			Rain::tsCout("Info: Copying relevant files from /Development/ to /Staging/...\r\n\r\n");
+			fflush(stdout);
 			std::vector<std::string> stagingFiles;
 			stagingFiles = Rain::readMultilineFile((*cmhParam.config)["config-path"] + (*cmhParam.config)["staging-files"]);
 
@@ -48,18 +52,22 @@ namespace Monochrome3 {
 					} else {
 						Rain::createDirRec(Rain::getPathDir(stagingDir + file));
 						if (!CopyFile((devDir + file).c_str(), (stagingDir + file).c_str(), FALSE)) {
-							Rain::tsCout("Error:\t\t");
+							Rain::tsCout("Failure:\t\t");
 						} else {
 							Rain::tsCout("Copied:\t\t");
 						}
 					}
 				}
 				Rain::tsCout(file + "\r\n");
+				fflush(stdout);
 			}
+
+			Rain::tsCout("\r\n");
 
 			//if we need to replace the current script, run CRHelper, which will restart the current script when complete
 			if (delayPath != "") {
-				Rain::tsCout("\r\nThe current executable needs to be replaced. It will be restarted when the operation is complete.\r\n");
+				Rain::tsCout("Info: The current executable needs to be replaced. It will be restarted when the operation is complete.\r\n");
+				fflush(stdout);
 
 				std::string crhelperAbspath = Rain::pathToAbsolute((*cmhParam.config)["crhelper"]),
 					crhWorkingDir = Rain::getPathDir(crhelperAbspath),
@@ -71,12 +79,13 @@ namespace Monochrome3 {
 				return 1;
 			}
 
-			Rain::tsCout("\r\nStaging complete.\r\n");
+			Rain::tsCout("Success: Staging complete.\r\n");
+			fflush(stdout);
 			return 0;
 		}
 		int CHDeployStaging(CommandHandlerParam &cmhParam) {
 			//setup network stuff
-			Rain::tsCout("Connecting to server...\r\n");
+			Rain::tsCout("Info: Connecting to server...\r\n");
 			fflush(stdout);
 			ConnectionHandlerParam chParam;
 			chParam.config = cmhParam.config;
@@ -98,10 +107,13 @@ namespace Monochrome3 {
 			ignored = Rain::readMultilineFile((*cmhParam.config)["config-path"] + (*cmhParam.config)["deploy-ignore"]);
 			std::set<std::string> ignSet;
 			for (int a = 0; a < ignored.size(); a++)
-				ignSet.insert((*cmhParam.config)["prod-root-dir"] + ignored[a]);
+				ignSet.insert(Rain::pathToAbsolute((*cmhParam.config)["prod-root-dir"] + ignored[a]));
 			Rain::rmDirRec((*cmhParam.config)["prod-root-dir"], &ignSet);
 
 			//copy staging to production, ignoring the same files
+			ignSet.clear();
+			for (int a = 0; a < ignored.size(); a++)
+				ignSet.insert(Rain::pathToAbsolute((*cmhParam.config)["staging-root-dir"] + ignored[a]));
 			Rain::cpyDirRec((*cmhParam.config)["staging-root-dir"], (*cmhParam.config)["prod-root-dir"], &ignSet);
 			Rain::tsCout("Success: Copied staging to production, ignoring specified files.\r\n");
 			fflush(stdout);
@@ -117,7 +129,7 @@ namespace Monochrome3 {
 			files = Rain::getFilesRec((*cmhParam.config)["prod-root-dir"]);
 
 			//send header as one block, then block the files based on a block-size limit
-			std::string response = Rain::tToStr(files.size()) + "\r\n";
+			std::string response = "prod-upload " + Rain::tToStr(files.size()) + "\r\n";
 			bool filesReadable = true;
 			for (int a = 0; a < files.size(); a++) {
 				std::size_t fileSize = Rain::getFileSize((*cmhParam.config)["prod-root-dir"] + files[a]);
@@ -127,7 +139,7 @@ namespace Monochrome3 {
 				}
 				response += files[a] + "\r\n" + Rain::tToStr(fileSize) + "\r\n";
 			}
-			if (!filesReadable) {
+			if (!filesReadable) { //should not have error here
 				Rain::sendBlockMessage(csm, "prod-upload file-read-error");
 				return 0;
 			}
@@ -147,7 +159,7 @@ namespace Monochrome3 {
 					fileIn.read(buffer, min(blockMax, fileSize - b));
 
 					//send this buffer as data, with the prod-upload methodname, all in a single block
-					Rain::sendBlockMessage(csm, "prod-upload" + std::string(buffer, min(blockMax, fileSize - b)));
+					Rain::sendBlockMessage(csm, "prod-upload " + std::string(buffer, min(blockMax, fileSize - b)));
 				}
 				fileIn.close();
 			}
@@ -204,7 +216,7 @@ namespace Monochrome3 {
 			//a unique command which first downloads production from remote, then replaces staging with production, ignoring nothing
 
 			//setup network stuff
-			Rain::tsCout("Connecting to server...\r\n");
+			Rain::tsCout("Info: Connecting to server...\r\n");
 			fflush(stdout);
 			ConnectionHandlerParam chParam;
 			chParam.config = cmhParam.config;
@@ -246,7 +258,7 @@ namespace Monochrome3 {
 		}
 		int CHProdStop(CommandHandlerParam &cmhParam) {
 			//setup network stuff
-			Rain::tsCout("Connecting to server...\r\n");
+			Rain::tsCout("Info: Connecting to server...\r\n");
 			fflush(stdout);
 			ConnectionHandlerParam chParam;
 			chParam.config = cmhParam.config;
@@ -263,7 +275,7 @@ namespace Monochrome3 {
 		}
 		int CHProdStart(CommandHandlerParam &cmhParam) {
 			//setup network stuff
-			Rain::tsCout("Connecting to server...\r\n");
+			Rain::tsCout("Info: Connecting to server...\r\n");
 			fflush(stdout);
 			ConnectionHandlerParam chParam;
 			chParam.config = cmhParam.config;
@@ -298,11 +310,11 @@ namespace Monochrome3 {
 				csm.setClientTarget((*cmhParam.config)["server-ip"], lowPort, highPort);
 				csm.blockForConnect(30000);
 				if (csm.getSocketStatus() != csm.STATUS_CONNECTED) {
-					Rain::tsCout("Error while connecting. Aborting...\r\n");
+					Rain::tsCout("Failure: Error while connecting. Aborting...\r\n");
 					fflush(stdout);
 					return 1;
 				}
-				Rain::tsCout("Connected to server.\r\n");
+				Rain::tsCout("Success: Connected to server.\r\n");
 				fflush(stdout);
 
 				//authenticate with server
@@ -313,11 +325,11 @@ namespace Monochrome3 {
 				WaitForSingleObject(chParam.doneWaitingEvent, 10000);
 				if (chParam.lastSuccess) {
 					if (csm.getConnectedPort() == highPort) {
-						Rain::tsCout("Error while authenticating. No more ports to try. Aborting...\r\n");
+						Rain::tsCout("Failure: Error while authenticating. No more ports to try. Aborting...\r\n");
 						fflush(stdout);
 						return 1;
 					} else {
-						Rain::tsCout("Error while authenticating. Trying next port...\r\n");
+						Rain::tsCout("Info: Error while authenticating. Trying next port...\r\n");
 						fflush(stdout);
 						lowPort++;
 						continue;
@@ -325,6 +337,7 @@ namespace Monochrome3 {
 				}
 				Rain::tsCout("Success: Authenticated.\r\n");
 				fflush(stdout);
+				break;
 			}
 
 			//CSM does not need to send message before terminating connection
@@ -342,7 +355,7 @@ namespace Monochrome3 {
 			Rain::sendBlockMessage(csm, "prod-download");
 			WaitForSingleObject(chParam.doneWaitingEvent, INFINITE);
 			if (chParam.lastSuccess) {
-				Rain::tsCout("Error while downloading server production files. Aborting...\r\n");
+				Rain::tsCout("Failure: Error while downloading server production files. Aborting...\r\n");
 				fflush(stdout);
 				return 1;
 			}
@@ -360,7 +373,7 @@ namespace Monochrome3 {
 			Rain::sendBlockMessage(csm, "prod-stop");
 			WaitForSingleObject(chParam.doneWaitingEvent, INFINITE);
 			if (chParam.lastSuccess) {
-				Rain::tsCout("Error while stopping production servers. Aborting...\r\n");
+				Rain::tsCout("Failure: Error while stopping production servers. Aborting...\r\n");
 				fflush(stdout);
 				return 1;
 			}
@@ -378,8 +391,8 @@ namespace Monochrome3 {
 			chParam.lastSuccess = -1;
 			Rain::sendBlockMessage(csm, "prod-start");
 			WaitForSingleObject(chParam.doneWaitingEvent, INFINITE);
-			if (!chParam.lastSuccess) {
-				Rain::tsCout("Error while starting production servers. Aborting...\r\n");
+			if (chParam.lastSuccess) {
+				Rain::tsCout("Failure: Error while starting production servers. Aborting...\r\n");
 				fflush(stdout);
 				return 1;
 			}

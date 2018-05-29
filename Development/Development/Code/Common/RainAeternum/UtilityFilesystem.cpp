@@ -103,14 +103,14 @@ namespace Rain {
 
 		std::vector<std::string> relpath;
 		for (std::size_t a = 0; a < files.size(); a++)
-			if (ignore != NULL && ignore->find(pathToAbsolute(files[a])) == ignore->end())
+			if (ignore == NULL || ignore->find(pathToAbsolute(files[a])) == ignore->end())
 				relpath.push_back(files[a]);
 
 		for (std::size_t a = 2; a < dirs.size(); a++) {
-			if (ignore != NULL && ignore->find(pathToAbsolute(directory + dirs[a] + "\\")) == ignore->end())
+			if (ignore != NULL && ignore->find(pathToAbsolute(directory + dirs[a] + "\\")) != ignore->end())
 				continue;
 			std::vector<std::string> subrel;
-			subrel = getFilesRec(directory + dirs[a] + "\\", format);
+			subrel = getFilesRec(directory + dirs[a] + "\\", format, ignore);
 
 			for (std::size_t b = 0; b < subrel.size(); b++)
 				relpath.push_back(dirs[a] + "\\" + subrel[b]);
@@ -123,12 +123,12 @@ namespace Rain {
 
 		std::vector<std::string> relpath;
 		for (size_t a = 2; a < dirs.size(); a++) {
-			if (ignore != NULL && ignore->find(pathToAbsolute(directory + dirs[a] + "\\")) == ignore->end())
+			if (ignore == NULL || ignore->find(pathToAbsolute(directory + dirs[a] + "\\")) != ignore->end())
 				continue;
 			relpath.push_back(dirs[a] + "\\");
 
 			std::vector<std::string> subrel;
-			subrel = getDirsRec(directory + dirs[a] + "\\", format);
+			subrel = getDirsRec(directory + dirs[a] + "\\", format, ignore);
 
 			for (size_t b = 0; b < subrel.size(); b++)
 				relpath.push_back(dirs[a] + "\\" + subrel[b]);
@@ -154,13 +154,13 @@ namespace Rain {
 
 		for (std::size_t a = 0; a < lfile.size(); a++) {
 			MultiByteToWideChar(CP_UTF8, 0, (dir + lfile[a]).c_str(), -1, unicode, MAX_PATH);
-			if (ignore != NULL && ignore->find(pathToAbsolute(dir + lfile[a])) == ignore->end())
+			if (ignore == NULL || ignore->find(pathToAbsolute(dir + lfile[a])) == ignore->end())
 				DeleteFileW(unicode);
 		}
 		for (std::size_t a = 2; a < ldir.size(); a++) //skip . and ..
 		{
 			MultiByteToWideChar(CP_UTF8, 0, (dir + ldir[a] + '\\').c_str(), -1, unicode, MAX_PATH);
-			if (ignore != NULL && ignore->find(pathToAbsolute(dir + ldir[a] + '\\')) == ignore->end()) {
+			if (ignore == NULL || ignore->find(pathToAbsolute(dir + ldir[a] + '\\')) == ignore->end()) {
 				rmDirRec(dir + ldir[a] + '\\', ignore);
 				RemoveDirectoryW(unicode);
 			}

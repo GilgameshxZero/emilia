@@ -40,11 +40,17 @@ namespace Monochrome3 {
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 			if (cdParam.authenticated) {
 				Rain::sendBlockMessage(*ssmdhParam.ssm, "authenticate auth-done");
+				Rain::tsCout("Info: Authenticated already.\r\n");
+				fflush(stdout);
 			} else if (ccParam.config->at("client-auth-pass") != cdParam.request) {
 				Rain::sendBlockMessage(*ssmdhParam.ssm, "authenticate fail");
+				Rain::tsCout("Failure: Authenticate fail.\r\n");
+				fflush(stdout);
 			} else {
 				Rain::sendBlockMessage(*ssmdhParam.ssm, "authenticate success");
 				cdParam.authenticated = true;
+				Rain::tsCout("Success: Authenticate success.\r\n");
+				fflush(stdout);
 			}
 
 			return 0;
@@ -54,6 +60,8 @@ namespace Monochrome3 {
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 			if (!cdParam.authenticated) {
 				Rain::sendBlockMessage(*ssmdhParam.ssm, "prod-upload auth-error");
+				Rain::tsCout("Failure: 'prod-upload' fail; not yet authenticated.\r\n");
+				fflush(stdout);
 				return 0;
 			}
 
@@ -72,6 +80,7 @@ namespace Monochrome3 {
 				cdParam.request == "file-read-error") {
 				//if there is a problem before the remote client has started transferring files, abort
 				Rain::tsCout("Failure: Client uncountered 'file-read-error' while attempting to upload files to production. Aborting...\r\n");
+				fflush(stdout);
 			} else if (receivingFiledata == false &&
 					   cdParam.request == "finish-success") {
 				//if we are here, then the client has finished transferring files, and has indicated success
@@ -94,6 +103,7 @@ namespace Monochrome3 {
 				} else {
 					Rain::sendBlockMessage(*ssmdhParam.ssm, "prod-upload success");
 					Rain::tsCout("Success: Client successfully uploaded new files to server production.\r\n");
+					fflush(stdout);
 				}
 			} else if (receivingFiledata == false &&
 					   cdParam.request == "start") {
@@ -204,12 +214,16 @@ namespace Monochrome3 {
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 			if (!cdParam.authenticated) {
 				Rain::sendBlockMessage(*ssmdhParam.ssm, "prod-download auth-error");
+				Rain::tsCout("Failure: 'prod-download' fail; not yet authenticated.\r\n");
+				fflush(stdout);
 				return 0;
 			}
 
 			//request should be empty
 			if (cdParam.request != "") {
 				Rain::sendBlockMessage(*ssmdhParam.ssm, "prod-download request-error");
+				Rain::tsCout("Failure: 'prod-download' fail; request from client in wrong format.\r\n");
+				fflush(stdout);
 				return 0;
 			}
 
@@ -218,7 +232,7 @@ namespace Monochrome3 {
 			files = Rain::getFilesRec((*ccParam.config)["prod-root-dir"]);
 
 			//send header as one block, then block the files based on a block-size limit
-			std::string response = Rain::tToStr(files.size()) + "\r\n";
+			std::string response = "prod-download " + Rain::tToStr(files.size()) + "\r\n";
 			bool filesReadable = true;
 			for (int a = 0; a < files.size(); a++) {
 				std::size_t fileSize = Rain::getFileSize((*ccParam.config)["prod-root-dir"] + files[a]);
@@ -230,6 +244,8 @@ namespace Monochrome3 {
 			}
 			if (!filesReadable) {
 				Rain::sendBlockMessage(*ssmdhParam.ssm, "prod-download file-read-error");
+				Rain::tsCout("Failure: 'prod-download' fail; some files were unreadable.\r\n");
+				fflush(stdout);
 				return 0;
 			}
 
@@ -248,13 +264,15 @@ namespace Monochrome3 {
 					fileIn.read(buffer, min(blockMax, fileSize - b));
 
 					//send this buffer as data, with the prod-upload methodname, all in a single block
-					Rain::sendBlockMessage(*ssmdhParam.ssm, "prod-download" + std::string(buffer, min(blockMax, fileSize - b)));
+					Rain::sendBlockMessage(*ssmdhParam.ssm, "prod-download " + std::string(buffer, min(blockMax, fileSize - b)));
 				}
 				fileIn.close();
 			}
 
 			//indicate we are done with the file upload
 			Rain::sendBlockMessage(*ssmdhParam.ssm, "prod-download finish-success");
+			Rain::tsCout("Success: 'prod-download' completed.\r\n");
+			fflush(stdout);
 
 			return 0;
 		}
@@ -263,6 +281,8 @@ namespace Monochrome3 {
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 			if (!cdParam.authenticated) {
 				Rain::sendBlockMessage(*ssmdhParam.ssm, "prod-stop auth-error");
+				Rain::tsCout("Failure: 'prod-stop' fail; not yet authenticated.\r\n");
+				fflush(stdout);
 				return 0;
 			}
 
@@ -292,8 +312,12 @@ namespace Monochrome3 {
 
 			if (success) {
 				Rain::sendBlockMessage(*ssmdhParam.ssm, "prod-stop success");
+				Rain::tsCout("Success: 'prod-stop' completed.\r\n");
+				fflush(stdout);
 			} else {
 				Rain::sendBlockMessage(*ssmdhParam.ssm, "prod-stop fail");
+				Rain::tsCout("Failure: 'prod-stop' failed; some servers were not stopped.\r\n");
+				fflush(stdout);
 			}
 
 			return 0;
@@ -303,6 +327,8 @@ namespace Monochrome3 {
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 			if (!cdParam.authenticated) {
 				Rain::sendBlockMessage(*ssmdhParam.ssm, "prod-start auth-error");
+				Rain::tsCout("Failure: 'prod-start' fail; not yet authenticated.\r\n");
+				fflush(stdout);
 				return 0;
 			}
 
@@ -364,8 +390,12 @@ namespace Monochrome3 {
 
 			if (success) {
 				Rain::sendBlockMessage(*ssmdhParam.ssm, "prod-start success");
+				Rain::tsCout("Success: 'prod-start' completed.\r\n");
+				fflush(stdout);
 			} else {
 				Rain::sendBlockMessage(*ssmdhParam.ssm, "prod-start fail");
+				Rain::tsCout("Failure: 'prod-start' failed; some servers were not started.\r\n");
+				fflush(stdout);
 			}
 
 			return 0;

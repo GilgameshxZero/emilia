@@ -242,7 +242,7 @@ namespace Rain {
 
 		//create thread to attempt connect
 		//thread exits when connect success
-		Rain::simpleCreateThread(ClientSocketManager::attemptConnectThread, &csm);
+		csm.hConnectThread = Rain::simpleCreateThread(ClientSocketManager::attemptConnectThread, &csm);
 
 		return csm.onDisconnect == NULL ? 0 : csm.onDisconnect(&csm.csmdhParam);
 	}
