@@ -29,7 +29,7 @@ namespace Monochrome3 {
 			HANDLE doneWaitingEvent;
 
 			//the success of the last request, as a code
-			//negatives/0 are failes
+			//nonzero for error
 			int lastSuccess;
 		};
 

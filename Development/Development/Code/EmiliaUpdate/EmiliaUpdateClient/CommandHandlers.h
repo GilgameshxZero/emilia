@@ -27,5 +27,17 @@ namespace Monochrome3 {
 		int CHProdStart(CommandHandlerParam &cmhParam);
 		int CHSyncStop(CommandHandlerParam &cmhParam);
 		int CHSyncStart(CommandHandlerParam &cmhParam);
+
+		//helper functions for the handlers to set up a socket connection
+		//returns nonzero for error
+		int CHHSetupCSM(CommandHandlerParam &cmhParam, Rain::ClientSocketManager &csm, ConnectionHandlerParam &chParam);
+
+		//helper functions for the handlers which include only the code to execute the command without setting up the CSM
+		//returns nonzero for error
+		int CHHProdDownload(CommandHandlerParam &cmhParam, Rain::ClientSocketManager &csm, ConnectionHandlerParam &chParam);
+		int CHHProdStop(CommandHandlerParam &cmhParam, Rain::ClientSocketManager &csm, ConnectionHandlerParam &chParam);
+		int CHHProdStart(CommandHandlerParam &cmhParam, Rain::ClientSocketManager &csm, ConnectionHandlerParam &chParam);
+		int CHHSyncStop(CommandHandlerParam &cmhParam, Rain::ClientSocketManager &csm, ConnectionHandlerParam &chParam);
+		int CHHSyncStart(CommandHandlerParam &cmhParam, Rain::ClientSocketManager &csm, ConnectionHandlerParam &chParam);
 	}
 }

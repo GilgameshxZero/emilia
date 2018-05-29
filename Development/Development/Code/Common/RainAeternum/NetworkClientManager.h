@@ -129,6 +129,10 @@ namespace Rain {
 		//parameter passed to delegate handlers
 		ClientSocketManagerDelegateHandlerParam csmdhParam;
 
+		//handle to the connect thread and send message thread
+		//close when threads end by the thread
+		HANDLE hConnectThread, hSendThread;
+
 		//disconnects socket immediately, regardless of state
 		//sets state as -1
 		void disconnectSocket();

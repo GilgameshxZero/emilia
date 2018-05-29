@@ -41,18 +41,22 @@ namespace Monochrome3 {
 		int HRAuthenticate(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam) {
 			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
 			if (chParam.request == "success" || chParam.request == "auth-done")
-				chParam.lastSuccess = 1;
-			else if (chParam.request == "fail")
 				chParam.lastSuccess = 0;
+			else if (chParam.request == "fail")
+				chParam.lastSuccess = 1;
+			else
+				chParam.lastSuccess = -1;
 			chParam.waitingRequests--;
 			return 0;
 		}
 		int HRProdUpload(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam) {
 			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
 			if (chParam.request == "success")
-				chParam.lastSuccess = 1;
+				chParam.lastSuccess = 0;
 			else if (chParam.request == "delay")
-				chParam.lastSuccess = 2;
+				chParam.lastSuccess = 1;
+			else
+				chParam.lastSuccess = -1;
 			chParam.waitingRequests--;
 			return 0;
 		}
@@ -65,11 +69,11 @@ namespace Monochrome3 {
 			//if there is a problem before the remote server has started transferring files
 			if (receivingFiledata == false &&
 				(chParam.request == "file-read-error" || chParam.request == "auth-error"))
-				chParam.lastSuccess = 0;
+				chParam.lastSuccess = 1;
 			else if (receivingFiledata == false &&
 					 chParam.request == "finish-success") {
 				//if we are here, then the server has finished transferring files, and has indicated success
-				chParam.lastSuccess = 1;
+				chParam.lastSuccess = 0;
 				chParam.waitingRequests--;
 			} else if (receivingFiledata == false &&
 					   chParam.request == "start") {
@@ -168,14 +172,24 @@ namespace Monochrome3 {
 		}
 		int HRProdStop(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam) {
 			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
-			if (chParam.request == "fail" || chParam.request == "auth-error")
+			if (chParam.request == "success")
 				chParam.lastSuccess = 0;
-			else
+			else if (chParam.request == "fail" || chParam.request == "auth-error")
 				chParam.lastSuccess = 1;
+			else
+				chParam.lastSuccess = -1;
 			chParam.waitingRequests--;
 			return 0;
 		}
 		int HRProdStart(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam) {
+			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
+			if (chParam.request == "success")
+				chParam.lastSuccess = 0;
+			else if (chParam.request == "fail" || chParam.request == "auth-error")
+				chParam.lastSuccess = 1;
+			else
+				chParam.lastSuccess = -1;
+			chParam.waitingRequests--;
 			return 0;
 		}
 		int HRSyncStop(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam) {

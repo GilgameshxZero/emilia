@@ -115,7 +115,7 @@
     <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\config.ini" />
     <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\credentials.confidential.ini" />
     <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\deploy-ignore.ini" />
-    <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\stage-ignore.ini" />
+    <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\staging-ignore.ini" />
     <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\staging-files.ini" />
     <None Include="BuildIDInc.bat" />
     <None Include="config-loc.ini" />

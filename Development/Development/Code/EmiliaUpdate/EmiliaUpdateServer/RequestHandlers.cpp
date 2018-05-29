@@ -88,7 +88,7 @@ namespace Monochrome3 {
 					crhWorkingDir = crhWorkingDir.substr(0, crhWorkingDir.length() - 1);
 					ShellExecute(NULL, "open", crhelperAbspath.c_str(), crhCmdLine.c_str(), crhWorkingDir.c_str(), SW_SHOWDEFAULT);
 
-					//terminate the program and the connection
+					//terminate the program and the connection, to be resurrected by CRH
 					SetEvent(ccParam.hInputExitEvent);
 					return 1;
 				} else {
