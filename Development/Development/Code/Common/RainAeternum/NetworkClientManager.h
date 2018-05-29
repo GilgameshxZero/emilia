@@ -61,8 +61,11 @@ namespace Rain {
 		int getSocketStatus();
 
 		//blocks until either timeout elapses or socket connects
-		//0 for infinite
+		//INFINITE for infinite
 		void blockForConnect(DWORD msTimeout = 10000);
+
+		//returns value of connected port, or -1 if not connected
+		DWORD getConnectedPort();
 
 		//returns current socket immediately
 		SOCKET &getSocket();
@@ -96,6 +99,7 @@ namespace Rain {
 		SOCKET socket;
 		std::queue<std::string> messageQueue;
 		bool blockSendRawMessage;
+		DWORD connectedPort;
 		int socketStatus;
 		std::string ipAddress;
 		DWORD lowPort, highPort;

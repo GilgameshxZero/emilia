@@ -28,11 +28,9 @@ namespace Monochrome3 {
 			//event triggered by waitingRequests
 			HANDLE doneWaitingEvent;
 
-			//the success of the last request
-			bool lastSuccess;
-
-			//if there is a multi-block request, this stores the method-name
-			std::string persistentRequestMethod;
+			//the success of the last request, as a code
+			//negatives/0 are failes
+			int lastSuccess;
 		};
 
 		//handlers for ClientSocketManager

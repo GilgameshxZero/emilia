@@ -21,6 +21,7 @@ namespace Monochrome3 {
 		*/
 		int HRAuthenticate(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
 		/*
+		Note: Only uploads/downloads files, not empty dirs
 		Method: prod-upload
 		Linebreaks: \r\n
 		Contains:
@@ -32,6 +33,7 @@ namespace Monochrome3 {
 		*/
 		int HRProdUpload(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
 		/*
+		Note: Only uploads/downloads files, not empty dirs
 		Method: prod-download
 		Contains:
 		same information as prod-upload

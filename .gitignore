@@ -1,8 +1,9 @@
 emilia-tan.com
-Development/Server
+Development/Development/Server
+Development/Staging
+Development/Production
 Staging
 Production
-Production-backup
 
 *.vs
 *.confidential*

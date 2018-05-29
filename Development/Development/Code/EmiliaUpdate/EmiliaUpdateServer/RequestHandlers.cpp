@@ -56,98 +56,143 @@ namespace Monochrome3 {
 				Rain::sendBlockMessage(*ssmdhParam.ssm, "prod-upload auth-error");
 				return 0;
 			}
-			//we assume the server is shut down at this point
 
-			//clear these variables on request end
-			//unprocessed request buffer, since request might be blocked
-			static std::string reqAcc = "",
-				//path to the current exe, which might cause problems when updating
-				thisPath = Rain::pathToAbsolute(Rain::getExePath());
-			//position of end of the header block
-			static std::size_t headerLen = 0,
-				//how many bytes of current file we have on disk already
-				curFileDone = 0;
-			//ordered list of files
-			static std::vector<std::pair<std::string, std::size_t>> header;
-			//file currently processing
-			static int curFile = 0;
+			//assume servers are shut down here
+
+			//test this to see if request is a normal message or additional filedata
+			static bool receivingFiledata = false;
+
 			//flag for if we need to use CRH
 			static bool delayExeWrite = false;
 
-			if (headerLen == 0) {
-				std::size_t emptyLine = Rain::rabinKarpMatch(cdParam.request, "\r\n");
-				if (emptyLine == -1) {
-					reqAcc += cdParam.request;
+			//path to the current exe
+			static std::string thisPath = Rain::pathToAbsolute(Rain::getExePath());
+
+			if (receivingFiledata == false &&
+				cdParam.request == "file-read-error") {
+				//if there is a problem before the remote client has started transferring files, abort
+				Rain::tsCout("Failure: Client uncountered 'file-read-error' while attempting to upload files to production. Aborting...\r\n");
+			} else if (receivingFiledata == false &&
+					   cdParam.request == "finish-success") {
+				//if we are here, then the client has finished transferring files, and has indicated success
+				//IMPORTANT: check if there were problems overwriting the current exe (which there should be). If so, start up the CRH
+				if (delayExeWrite) {
+					Rain::sendBlockMessage(*ssmdhParam.ssm, "prod-upload delay");
+
+					std::string crhelperAbspath = Rain::pathToAbsolute((*ccParam.config)["crhelper"]),
+						crhWorkingDir = Rain::getPathDir(crhelperAbspath),
+						//"source" "destination" "additional commands to pass to restart"
+						crhCmdLine = "\"" + thisPath + (*ccParam.config)["upload-tmp-app"] +
+						"\" \"" + thisPath + "\"" +
+						"prod-upload-success";
+					crhWorkingDir = crhWorkingDir.substr(0, crhWorkingDir.length() - 1);
+					ShellExecute(NULL, "open", crhelperAbspath.c_str(), crhCmdLine.c_str(), crhWorkingDir.c_str(), SW_SHOWDEFAULT);
+
+					//terminate the program and the connection
+					SetEvent(ccParam.hInputExitEvent);
+					return 1;
 				} else {
-					headerLen = reqAcc.length() + emptyLine + 1; //+1 because \r\n is two characters
-
-					//process header
-					std::stringstream headerSS;
-					headerSS << reqAcc << cdParam.request.substr(0, emptyLine);
-					reqAcc = cdParam.request.substr(emptyLine + 2, cdParam.request.length());
-
-					int n;
-					headerSS >> n;
-					header.resize(n);
-					for (int a = 0; a < n; a++) {
-						std::getline(headerSS, header[a].first, '\n'); //should extract up until and including \n
-						Rain::strTrimWhite(header[a].first); //clean up \r
-						static std::string tmp;
-						std::getline(headerSS, tmp, '\n'); //should extract up until and including \n
-						header[a].second = Rain::strToT<std::size_t>(tmp);
-					}
-
-					//nuke prod (which should work, except for the current executable)
-					Rain::recursiveRmDir((*ccParam.config)["prod-root-dir"]);
+					Rain::sendBlockMessage(*ssmdhParam.ssm, "prod-upload success");
+					Rain::tsCout("Success: Client successfully uploaded new files to server production.\r\n");
 				}
-			}
+			} else if (receivingFiledata == false &&
+					   cdParam.request == "start") {
+				//the server has indicated to start transferring files, so set the persistent request method so that we know that all data from now on is filedata
+				receivingFiledata = true;
+			} else if (receivingFiledata == true) {
+				//receiving files from client
 
-			//if the header is processed, append requests to correct files
-			if (headerLen != 0) {
-				reqAcc += cdParam.request;
-				std::size_t curFileReqBlock = min(reqAcc.length(), header[curFile].second - curFileDone);
-
-				//as long as the file is modifiable (i.e. it's not the current exe), update it
-				//otherwise, save the data in a temp file, and mark a flag to delay the copying of the temp file to the exe file with CRHelper; then, restart the server
-				std::string filePath = Rain::pathToAbsolute((*ccParam.config)["prod-root-dir"] + header[curFile].first);
-				if (filePath != thisPath) {
-					Rain::printToFile(filePath,
-										 reqAcc.substr(0, curFileReqBlock), true);
-				} else {
-					Rain::printToFile(filePath + (*ccParam.config)["upload-tmp-app"],
-										 reqAcc.substr(0, curFileReqBlock), true);
-					delayExeWrite = true;
-				}
-				curFileDone += curFileReqBlock;
-				if (curFileDone == header[curFile].second) {
-					curFile++;
+				//clear these variables on filedata receive end
+				//unprocessed request buffer, since request might be blocked
+				static std::string reqAcc = "";
+				//position of end of the header block
+				static std::size_t headerLen = 0,
+					//how many bytes of current file we have on disk already
 					curFileDone = 0;
-					if (curFile == header.size()) { //prod-upload request is done
-						//if the exe rewrite is delayed, we need to launch CRH helper now and terminate the program
-						if (delayExeWrite) {
-							Rain::sendBlockMessage(*ssmdhParam.ssm, "prod-upload delay");
+				//ordered list of files
+				static std::vector<std::pair<std::string, std::size_t>> header;
+				//file currently processing
+				static int curFile = 0;
 
-							std::string crhelperAbspath = Rain::pathToAbsolute((*ccParam.config)["crhelper"]),
-								crhWorkingDir = Rain::getPathDir(crhelperAbspath),
-								//"source" "destination" "additional commands to pass to restart"
-								crhCmdLine = "\"" + thisPath + (*ccParam.config)["upload-tmp-app"] +
-								"\" \"" + thisPath + "\"" +
-								"prod-upload-success";
-							crhWorkingDir = crhWorkingDir.substr(0, crhWorkingDir.length() - 1);
-							ShellExecute(NULL, "open", crhelperAbspath.c_str(), crhCmdLine.c_str(), crhWorkingDir.c_str(), SW_SHOWDEFAULT);
+				if (headerLen == 0) {
+					std::size_t emptyLine = Rain::rabinKarpMatch(cdParam.request, "\r\n\r\n");
+					if (emptyLine != -1) {
+						headerLen = reqAcc.length() + emptyLine + 1; //+1 because \r\n is two characters
 
-							//terminate the program
-							SetEvent(ccParam.hInputExitEvent);
+						//process header
+						std::stringstream headerSS;
+						headerSS << reqAcc << cdParam.request.substr(0, emptyLine);
+						reqAcc = cdParam.request.substr(emptyLine + 4, cdParam.request.length());
 
-							return 1;
+						int n;
+						headerSS >> n;
+						header.resize(n);
+						std::string tmp;
+						std::getline(headerSS, tmp); //ignore the newline
+						for (int a = 0; a < n; a++) {
+							std::getline(headerSS, header[a].first, '\n'); //should extract up until and including \n
+							Rain::strTrimWhite(&header[a].first); //clean up \r
+							static std::string tmp;
+							std::getline(headerSS, tmp, '\n'); //should extract up until and including \n
+							header[a].second = Rain::strToT<std::size_t>(tmp);
 						}
 
-						reqAcc = "";
-						headerLen = 0;
-						curFileDone = 0;
-						header.clear();
-						curFile = 0;
-						delayExeWrite = false;
+						//nuke prod (which should work, except for the current executable)
+						Rain::rmDirRec((*ccParam.config)["prod-root-dir"]);
+					} else {
+						reqAcc += cdParam.request;
+					}
+					cdParam.request = "";
+				}
+
+				//if the header is processed, append requests to correct files
+				if (headerLen != 0) {
+					reqAcc += cdParam.request;
+
+					while (header.size() == 0 ||
+						   header[curFile].second == 0 ||
+						   reqAcc.length() > 0) {
+						//care for edge cases
+						if (header.size() != 0) {
+							std::size_t curFileReqBlock = min(reqAcc.length(), header[curFile].second - curFileDone);
+
+							//as long as the file is modifiable (i.e. it's not the current exe), update it
+							//otherwise, save the data in a temp file, and mark a flag to delay the copying of the temp file to the exe file with CRHelper; then, restart the server
+							std::string filePath = Rain::pathToAbsolute((*ccParam.config)["prod-root-dir"] + header[curFile].first);
+							if (filePath != thisPath) {
+								Rain::createDirRec(Rain::getPathDir(filePath));
+								Rain::printToFile(filePath,
+												  reqAcc.substr(0, curFileReqBlock), true);
+							} else {
+								Rain::printToFile(filePath + (*ccParam.config)["upload-tmp-app"],
+												  reqAcc.substr(0, curFileReqBlock), true);
+								delayExeWrite = true;
+							}
+							reqAcc = reqAcc.substr(curFileReqBlock, reqAcc.length());
+
+							curFileDone += curFileReqBlock;
+							if (curFileDone == header[curFile].second) {
+								curFile++;
+								curFileDone = 0;
+							}
+						}
+
+						//test if filedata transfer is complete
+						if (curFile == header.size()) {
+							//filedata is done
+							receivingFiledata = false;
+
+							//reset statics
+							reqAcc = "";
+							headerLen = 0;
+							curFileDone = 0;
+							header.clear();
+							curFile = 0;
+							delayExeWrite = false;
+
+							//exit function and wait for another prod-download block with success
+							break;
+						}
 					}
 				}
 			}
@@ -163,7 +208,12 @@ namespace Monochrome3 {
 			}
 
 			//request should be empty
-			//send the files on the server production
+			if (cdParam.request != "") {
+				Rain::sendBlockMessage(*ssmdhParam.ssm, "prod-download request-error");
+				return 0;
+			}
+
+			//send over the files on server production, possibly in multiple blocks
 			std::vector<std::string> files;
 			files = Rain::getFilesRec((*ccParam.config)["prod-root-dir"]);
 
@@ -183,23 +233,28 @@ namespace Monochrome3 {
 				return 0;
 			}
 
-			//send the method name to make sure we are in multi-block mode
-			Rain::sendBlockMessage(*ssmdhParam.ssm, "prod-download");
+			//indicate we are starting the upload
+			Rain::sendBlockMessage(*ssmdhParam.ssm, "prod-download start");
 
 			response += "\r\n";
 			Rain::sendBlockMessage(*ssmdhParam.ssm, &response);
 
-			std::size_t blockMax = Rain::strToT<std::size_t>((*ccParam.config)["down-blocklen"]);
+			std::size_t blockMax = Rain::strToT<std::size_t>((*ccParam.config)["transfer-blocklen"]);
 			for (int a = 0; a < files.size(); a++) {
 				std::ifstream fileIn((*ccParam.config)["prod-root-dir"] + files[a], std::ios::binary);
 				std::size_t fileSize = Rain::getFileSize((*ccParam.config)["prod-root-dir"] + files[a]);
 				char *buffer = new char[blockMax];
 				for (std::size_t b = 0; b < fileSize; b += blockMax) {
 					fileIn.read(buffer, min(blockMax, fileSize - b));
-					Rain::sendBlockMessage(*ssmdhParam.ssm, static_cast<std::string>(buffer));
+
+					//send this buffer as data, with the prod-upload methodname, all in a single block
+					Rain::sendBlockMessage(*ssmdhParam.ssm, "prod-download" + std::string(buffer, min(blockMax, fileSize - b)));
 				}
 				fileIn.close();
 			}
+
+			//indicate we are done with the file upload
+			Rain::sendBlockMessage(*ssmdhParam.ssm, "prod-download finish-success");
 
 			return 0;
 		}
