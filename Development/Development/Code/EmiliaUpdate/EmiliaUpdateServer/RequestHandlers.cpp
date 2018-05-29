@@ -92,7 +92,7 @@ namespace Monochrome3 {
 						crhWorkingDir = Rain::getPathDir(crhelperAbspath),
 						//"source" "destination" "additional commands to pass to restart"
 						crhCmdLine = "\"" + thisPath + (*ccParam.config)["upload-tmp-app"] +
-						"\" \"" + thisPath + "\"" +
+						"\" \"" + thisPath + "\" " +
 						"prod-upload-success";
 					crhWorkingDir = crhWorkingDir.substr(0, crhWorkingDir.length() - 1);
 					ShellExecute(NULL, "open", crhelperAbspath.c_str(), crhCmdLine.c_str(), crhWorkingDir.c_str(), SW_SHOWDEFAULT);

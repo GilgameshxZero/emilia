@@ -234,6 +234,7 @@ In the root, there will also be additional untracked files not part of the offic
 ### EmiliaUpdate
 
 #### EmiliaUpdateClient
+* clean up memory leaks
 
 #### EmiliaUpdateCRHelper
 * switch to RainAeternum

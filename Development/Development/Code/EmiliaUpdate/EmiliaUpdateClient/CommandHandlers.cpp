@@ -72,7 +72,7 @@ namespace Monochrome3 {
 				std::string crhelperAbspath = Rain::pathToAbsolute((*cmhParam.config)["crhelper"]),
 					crhWorkingDir = Rain::getPathDir(crhelperAbspath),
 					crhCmdLine = "\"" + delayPath + "\" \"" +
-					thisPath + "\"" +
+					thisPath + "\" " +
 					"stage-dev-crh-success";
 				crhWorkingDir = crhWorkingDir.substr(0, crhWorkingDir.length() - 1);
 				ShellExecute(NULL, "open", crhelperAbspath.c_str(), crhCmdLine.c_str(), crhWorkingDir.c_str(), SW_SHOWDEFAULT);
@@ -245,7 +245,7 @@ namespace Monochrome3 {
 				std::string crhelperAbspath = Rain::pathToAbsolute((*cmhParam.config)["crhelper"]),
 					crhWorkingDir = Rain::getPathDir(crhelperAbspath),
 					crhCmdLine = "\"" + (*cmhParam.config)["prod-root-dir"] + relExePath + "\" \"" + //src
-					(*cmhParam.config)["staging-root-dir"] + relExePath + "\"" + //dst
+					(*cmhParam.config)["staging-root-dir"] + relExePath + "\" " + //dst
 					"stage-prod-crh-success";
 				crhWorkingDir = crhWorkingDir.substr(0, crhWorkingDir.length() - 1);
 				ShellExecute(NULL, "open", crhelperAbspath.c_str(), crhCmdLine.c_str(), crhWorkingDir.c_str(), SW_SHOWDEFAULT);
