@@ -12,7 +12,8 @@ namespace Monochrome3 {
 				return 1; //immediately terminate
 
 			ccParam.clientConnected = true;
-			Rain::tsCout("Client connected.\r\n");
+			Rain::tsCout("Info: client connected.\r\n");
+			fflush(stdout);
 
 			//create the delegate parameter for the first time
 			ConnectionDelegateParam *cdParam = new ConnectionDelegateParam();
@@ -30,6 +31,8 @@ namespace Monochrome3 {
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 
 			ccParam.clientConnected = false;
+			Rain::tsCout("Info: client disconnected.\r\n");
+			fflush(stdout);
 
 			//free the delegate parameter
 			delete ssmdhParam.delegateParam;
