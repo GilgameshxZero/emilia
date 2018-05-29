@@ -38,7 +38,9 @@ namespace Monochrome3 {
 
 			//check command line for notifications
 			if (argc >= 2) {
-				if (argv[1] == "prod-upload-success") {
+				std::string arg1 = argv[1];
+				Rain::strTrimWhite(&arg1);
+				if (arg1 == "prod-upload-success") {
 					Rain::tsCout("IMPORTANT: 'prod-upload' CRH operation completed successfully.\r\n\r\n");
 				}
 			}
