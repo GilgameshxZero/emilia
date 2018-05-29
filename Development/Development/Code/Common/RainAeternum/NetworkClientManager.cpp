@@ -13,6 +13,8 @@ namespace Rain {
 		this->recvBufLen = 65536;
 		this->logger = NULL;
 
+		this->hConnectThread = this->hSendThread = NULL;
+
 		this->csmdhParam.csm = this;
 		this->csmdhParam.delegateParam = NULL;
 		this->csmdhParam.message = new std::string();
@@ -25,13 +27,16 @@ namespace Rain {
 	ClientSocketManager::~ClientSocketManager() {
 		this->freePortAddrs();
 
-		CloseHandle(this->connectEvent);
-
-		//this automatically closes the send thread
-		CloseHandle(this->messageDoneEvent);
+		//shutdown send threads, if any
+		this->clearMessageQueue();
+		WaitForSingleObject(this->messageDoneEvent, INFINITE);
 
 		//shutsdown connect threads, if any
 		this->socketStatus = this->STATUS_DISCONNECTED;
+		WaitForSingleObject(this->connectEvent, INFINITE);
+
+		CloseHandle(this->connectEvent);
+		CloseHandle(this->messageDoneEvent);
 
 		Rain::shutdownSocketSend(this->socket);
 		closesocket(this->socket);
@@ -54,7 +59,7 @@ namespace Rain {
 			ResetEvent(this->messageDoneEvent);
 
 			//start thread to send messages
-			Rain::simpleCreateThread(ClientSocketManager::attemptSendMessageThread, this);
+			this->hSendThread = Rain::simpleCreateThread(ClientSocketManager::attemptSendMessageThread, this);
 		}
 
 		if (this->blockSendRawMessage)
@@ -64,7 +69,7 @@ namespace Rain {
 		this->messageQueue = std::queue<std::string>();
 	}
 	void ClientSocketManager::blockForMessageQueue(DWORD msTimeout) {
-		WaitForSingleObject(this->messageDoneEvent, msTimeout == 0 ? INFINITE : msTimeout);
+		WaitForSingleObject(this->messageDoneEvent, msTimeout);
 	}
 	bool ClientSocketManager::setSendRawMessageBlocking(bool blocking) {
 		bool origValue = this->blockSendRawMessage;
@@ -97,7 +102,7 @@ namespace Rain {
 
 			//create thread to attempt connect
 			//thread exits when connect success
-			Rain::simpleCreateThread(ClientSocketManager::attemptConnectThread, this);
+			this->hConnectThread = Rain::simpleCreateThread(ClientSocketManager::attemptConnectThread, this);
 		}
 	}
 	void ClientSocketManager::setEventHandlers(RecvHandlerParam::EventHandler onConnect, RecvHandlerParam::EventHandler onMessage, RecvHandlerParam::EventHandler onDisconnect, void *funcParam) {
@@ -135,6 +140,7 @@ namespace Rain {
 
 			//this will exit the connect thread
 			this->socketStatus = this->STATUS_DISCONNECTED;
+			WaitForSingleObject(this->connectEvent, INFINITE);
 
 			this->connectedPort = -1;
 		}
@@ -177,9 +183,6 @@ namespace Rain {
 				if (!Rain::connectTarget(csm.socket, &csm.portAddrs[a - csm.lowPort])) {
 					csm.connectedPort = a;
 
-					//set an event when connected for all listeners of the event
-					SetEvent(csm.connectEvent);
-
 					//attach the socket to a recvThread
 					csm.rParam.bufLen = csm.recvBufLen;
 					csm.rParam.funcParam = static_cast<void *>(&csm);
@@ -196,6 +199,10 @@ namespace Rain {
 			}
 		}
 
+		CloseHandle(csm.hConnectThread);
+
+		//this event signals that the thread has exited; check status to see if successful
+		SetEvent(csm.connectEvent);
 		return 0;
 	}
 	DWORD WINAPI ClientSocketManager::attemptSendMessageThread(LPVOID param) {
@@ -216,6 +223,8 @@ namespace Rain {
 				csm.messageQueue.pop();
 			}
 		}
+
+		CloseHandle(csm.hSendThread);
 
 		SetEvent(csm.messageDoneEvent);
 		return 0;

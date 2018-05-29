@@ -39,7 +39,7 @@ namespace Monochrome3 {
 			//check command line for notifications
 			if (argc >= 2) {
 				if (argv[1] == "prod-upload-success") {
-					Rain::tsCout("IMPORTANT: 'prod-upload' main and CRH operation completed successfully.\r\n\r\n");
+					Rain::tsCout("IMPORTANT: 'prod-upload' CRH operation completed successfully.\r\n\r\n");
 				}
 			}
 

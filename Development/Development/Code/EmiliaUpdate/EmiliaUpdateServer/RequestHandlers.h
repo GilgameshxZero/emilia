@@ -40,12 +40,18 @@ namespace Monochrome3 {
 		*/
 		int HRProdDownload(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
 		/*
+		Method: prod-download
+		Contains: nothing
 		*/
 		int HRProdStop(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
 		/*
+		Method: prod-stop
+		Contains: nothing
 		*/
 		int HRProdStart(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
 		/*
+		Method: prod-start
+		Contains: nothing
 		*/
 		int HRSyncStop(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
 		/*
