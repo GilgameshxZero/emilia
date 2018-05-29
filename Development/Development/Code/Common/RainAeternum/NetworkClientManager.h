@@ -133,6 +133,9 @@ namespace Rain {
 		//close when threads end by the thread
 		HANDLE hConnectThread, hSendThread;
 
+		//event which will be set when there have been as many calls to onRecvExit as there have been to onRecvInit
+		HANDLE recvExitComplete;
+
 		//disconnects socket immediately, regardless of state
 		//sets state as -1
 		void disconnectSocket();
