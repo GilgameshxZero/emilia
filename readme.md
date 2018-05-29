@@ -73,11 +73,11 @@ Before deployment from staging to production, any necessary configuration and se
 	* Wipe /Production and replace with /Staging, **ignoring files when wiping specified in the configuration for the update client in staging**.
 		* Ignored files should be auxiliary, configuration, or server, but never code.
 	* Upload /Production to remote.
-	* Replace /Staging with /Production, without ignoring any files. Might need to use CRH here.
+	* Replace /Staging with /Production, ignoring specified files. Might need to use CRH here.
 
 There are a few additional functions for ease of use:
 * Production Download (prod-download): Changes to production files (likely auxiliary and server) will be reflected in the development environment under /Production.
-* Stage Production (stage-prod): Downloads to /Production, then replaces /Staging with /Production.
+* Stage Production (stage-prod): Downloads to /Production, then replaces /Staging with /Production, ignoring specified files.
 * Production Stop (prod-stop): Stops production, by executing commands specified in the update script configuration.
 * Production Start (prod-start): Starts production, again by executing a set of commands specified in configuration.
 * Production Sync Start (sync-stop): Actively update /Production with any changes to production. While sync is active, commands other than Production Sync Stop cannot be executed.

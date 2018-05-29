@@ -76,42 +76,44 @@ namespace Monochrome3 {
 			//path to the current exe
 			static std::string thisPath = Rain::pathToAbsolute(Rain::getExePath());
 
-			if (receivingFiledata == false &&
+			if (!receivingFiledata &&
 				cdParam.request == "file-read-error") {
 				//if there is a problem before the remote client has started transferring files, abort
 				Rain::tsCout("Failure: Client uncountered 'file-read-error' while attempting to upload files to production. Aborting...\r\n");
 				fflush(stdout);
-			} else if (receivingFiledata == false &&
+			} else if (!receivingFiledata &&
 					   cdParam.request == "finish-success") {
 				//if we are here, then the client has finished transferring files, and has indicated success
 				//IMPORTANT: check if there were problems overwriting the current exe (which there should be). If so, start up the CRH
 				if (delayExeWrite) {
+					//send success code now, before server restarts, and wait on a restart okay receipt
 					Rain::sendBlockMessage(*ssmdhParam.ssm, "prod-upload delay");
 					Rain::tsCout("Info: 'prod-upload' needs to modify the current .exe. This program will exit, start the CRH, which will finish the upload process and restart this program. Please wait a moment...\r\n");
 					fflush(stdout);
-
-					std::string crhelperAbspath = Rain::pathToAbsolute((*ccParam.config)["crhelper"]),
-						crhWorkingDir = Rain::getPathDir(crhelperAbspath),
-						//"source" "destination" "additional commands to pass to restart"
-						crhCmdLine = "\"" + thisPath + (*ccParam.config)["upload-tmp-app"] +
-						"\" \"" + thisPath + "\" " +
-						"prod-upload-success";
-					crhWorkingDir = crhWorkingDir.substr(0, crhWorkingDir.length() - 1);
-					ShellExecute(NULL, "open", crhelperAbspath.c_str(), crhCmdLine.c_str(), crhWorkingDir.c_str(), SW_SHOWDEFAULT);
-
-					//terminate the program and the connection, to be resurrected by CRH
-					SetEvent(ccParam.hInputExitEvent);
-					return 1;
 				} else {
 					Rain::sendBlockMessage(*ssmdhParam.ssm, "prod-upload success");
 					Rain::tsCout("Success: 'prod-upload' success.\r\n");
 					fflush(stdout);
 				}
-			} else if (receivingFiledata == false &&
+			} else if (!receivingFiledata &&
+					   cdParam.request == "restart-okay") {
+				std::string crhelperAbspath = Rain::pathToAbsolute((*ccParam.config)["crhelper"]),
+					crhWorkingDir = Rain::getPathDir(crhelperAbspath),
+					//"source" "destination" "additional commands to pass to restart"
+					crhCmdLine = "\"" + thisPath + (*ccParam.config)["upload-tmp-app"] +
+					"\" \"" + thisPath + "\" " +
+					"prod-upload-success";
+				crhWorkingDir = crhWorkingDir.substr(0, crhWorkingDir.length() - 1);
+				ShellExecute(NULL, "open", crhelperAbspath.c_str(), crhCmdLine.c_str(), crhWorkingDir.c_str(), SW_SHOWDEFAULT);
+
+				//terminate the program and the connection, to be resurrected by CRH
+				SetEvent(ccParam.hInputExitEvent);
+				return 1;
+			} else if (!receivingFiledata &&
 					   cdParam.request == "start") {
 				//the server has indicated to start transferring files, so set the persistent request method so that we know that all data from now on is filedata
 				receivingFiledata = true;
-			} else if (receivingFiledata == true) {
+			} else if (receivingFiledata) {
 				//receiving files from client
 
 				//clear these variables on filedata receive end
