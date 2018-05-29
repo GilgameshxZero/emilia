@@ -110,6 +110,7 @@ In the root, there will also be additional untracked files not part of the offic
 ### Emilia-tan
 * 1.1.4
 	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer, EmiliaUpdateCRHelper) = (3.7.2, 1.1.1, 1.2.2, 1.0.1, 1.0.1, 1.0.0)
+	* all UpdateClient/UpdateServer functions are working, with the exception of the sync commands.
 * 1.1.3
 	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer, EmiliaUpdateCRHelper) = (3.7.2, 1.1.1, 1.2.2, 1.0.0, 1.0.0, 1.0.0)
 	* continued work on RainAeternum/EmiliaUpdate, as well as updated .gitignore
@@ -187,6 +188,7 @@ In the root, there will also be additional untracked files not part of the offic
 #### EmiliaUpdateClient
 * 1.0.1
 	* bugfixes to existing commands
+	* finished non-sync command implementation
 * 1.0.0
 	* dev to staging
 	* integration with CRH
@@ -199,6 +201,7 @@ In the root, there will also be additional untracked files not part of the offic
 #### EmiliaUpdateServer
 * 1.0.1
 	* bugfixes to existing commands
+	* finished non-sync command implementation
 * 1.0.0
 	* implemented all non-sync commands
 
