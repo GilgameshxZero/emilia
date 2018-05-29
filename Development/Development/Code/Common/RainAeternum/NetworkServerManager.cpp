@@ -73,8 +73,8 @@ namespace Rain {
 		//free memory allocated in SM's listenThread
 		CloseHandle(smrtParam.hRecvThread);
 		delete smrtParam.ssm;
-		delete &smrtParam;
 		delete smrtParam.rhParam;
+		delete &smrtParam;
 
 		return delRtrn;
 	}

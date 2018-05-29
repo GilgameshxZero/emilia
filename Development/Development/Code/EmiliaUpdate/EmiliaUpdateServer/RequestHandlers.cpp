@@ -299,7 +299,7 @@ namespace Monochrome3 {
 						success = false;
 					} else {
 						//wait for server handle to exit with a timeout
-						WaitForSingleObject(ccParam.serverStatus[a].process, Rain::strToT<DWORD>((*ccParam.config)["server-exit-to"]));
+						WaitForSingleObject(ccParam.serverStatus[a].process, Rain::strToT<DWORD>((*ccParam.config)["server-exit-timeout"]));
 
 						ccParam.serverStatus[a].status = "stopped";
 						CloseHandle(ccParam.serverStatus[a].stdInRd);

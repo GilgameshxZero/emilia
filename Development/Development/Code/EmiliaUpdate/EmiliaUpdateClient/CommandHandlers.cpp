@@ -367,6 +367,8 @@ namespace Monochrome3 {
 		int CHHProdStop(CommandHandlerParam &cmhParam, Rain::ClientSocketManager &csm, ConnectionHandlerParam &chParam) {
 			cmhParam.logger->setSocketSrc(&csm, true);
 
+			Rain::tsCout("Info: Stopping production servers...\r\n");
+			fflush(stdout);
 			chParam.waitingRequests = 1;
 			ResetEvent(chParam.doneWaitingEvent);
 			chParam.lastSuccess = -1;
@@ -386,6 +388,8 @@ namespace Monochrome3 {
 		int CHHProdStart(CommandHandlerParam &cmhParam, Rain::ClientSocketManager &csm, ConnectionHandlerParam &chParam) {
 			cmhParam.logger->setSocketSrc(&csm, true);
 
+			Rain::tsCout("Info: Starting production servers...\r\n");
+			fflush(stdout);
 			chParam.waitingRequests = 1;
 			ResetEvent(chParam.doneWaitingEvent);
 			chParam.lastSuccess = -1;
