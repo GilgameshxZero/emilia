@@ -9,7 +9,7 @@ namespace Monochrome3 {
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 
 			if (ccParam.clientConnected)
-				return 1;
+				return 1; //immediately terminate
 
 			ccParam.clientConnected = true;
 			Rain::tsCout("Client connected.\r\n");
@@ -26,10 +26,13 @@ namespace Monochrome3 {
 			return 0;
 		}
 		int onConnectionExit(void *funcParam) {
-			reinterpret_cast<ConnectionCallerParam *>(reinterpret_cast<Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam *>(funcParam)->callerParam)->clientConnected = false;
+			Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam = *reinterpret_cast<Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam *>(funcParam);
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+
+			ccParam.clientConnected = false;
 
 			//free the delegate parameter
-			delete reinterpret_cast<Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam *>(funcParam)->delegateParam;
+			delete ssmdhParam.delegateParam;
 			return 0;
 		}
 		int onConnectionProcessMessage(void *funcParam) {
@@ -65,7 +68,6 @@ namespace Monochrome3 {
 					break;
 			}
 
-			//< 0 is error, 0 is keep-alive, and > 0 is peacefully close
 			return 0;
 		}
 	}

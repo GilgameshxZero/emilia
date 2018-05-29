@@ -125,7 +125,7 @@
     <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\credentials.confidential.ini">
       <Filter>Configuration</Filter>
     </None>
-    <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\stage-ignore.ini">
+    <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\staging-ignore.ini">
       <Filter>Configuration</Filter>
     </None>
   </ItemGroup>
