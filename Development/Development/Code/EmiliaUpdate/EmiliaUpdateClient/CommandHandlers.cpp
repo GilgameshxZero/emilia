@@ -297,7 +297,7 @@ namespace Monochrome3 {
 			while (true) {
 				csm.setClientTarget((*cmhParam.config)["server-ip"], lowPort, highPort);
 				csm.blockForConnect(30000);
-				if (csm.getSocketStatus != csm.STATUS_CONNECTED) {
+				if (csm.getSocketStatus() != csm.STATUS_CONNECTED) {
 					Rain::tsCout("Error while connecting. Aborting...\r\n");
 					fflush(stdout);
 					return 1;
