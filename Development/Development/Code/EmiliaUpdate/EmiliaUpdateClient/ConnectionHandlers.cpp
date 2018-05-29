@@ -10,7 +10,6 @@ namespace Monochrome3 {
 
 			chParam.requestLength = 0;
 			chParam.doneWaitingEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-			chParam.persistentRequestMethod = "";
 
 			return 0;
 		}

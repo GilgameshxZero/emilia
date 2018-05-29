@@ -66,7 +66,13 @@ namespace Rain {
 		return ret;
 	}
 	void LogStream::logString(std::string *s) {
+		//logging will be thread-safe
+		static std::mutex logMutex;
+
 		static std::string header;
+
+		logMutex.lock();
+
 		header = Rain::getTime() + " " + Rain::tToStr(s->length()) + "\r\n";
 		if (this->outputStdout) {
 			//if STD_OUTPUT_HANDLE is being logged, then temporarily replace with original output handles while outputting log, so that we don't log indefinitely
@@ -86,6 +92,8 @@ namespace Rain {
 			Rain::printToFile(file, s, true);
 			Rain::printToFile(file, "\r\n\r\n", true);
 		}
+
+		logMutex.unlock();
 	}
 	void LogStream::logString(std::string s) {
 		this->logString(&s);

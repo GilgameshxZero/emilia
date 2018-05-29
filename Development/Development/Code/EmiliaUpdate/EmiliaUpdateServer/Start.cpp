@@ -50,7 +50,7 @@ namespace Monochrome3 {
 			ccParam.serverStatus.resize(prodServers.size());
 			ccParam.clientConnected = false;
 			for (int a = 0; a < prodServers.size(); a++) {
-				ccParam.serverStatus[a].path = Rain::pathToAbsolute(prodServers[a]);
+				ccParam.serverStatus[a].path = Rain::pathToAbsolute(config["prod-root-dir"] + prodServers[a]);
 				ccParam.serverStatus[a].status = "stopped";
 			}
 
