@@ -36,11 +36,13 @@ namespace Monochrome3 {
 			//check command line, perhaps we are being restarted by helper and need to display a message
 			if (argc >= 2) {
 				std::string arg1 = argv[1];
-				Rain::strTrimWhite(arg1);
+				Rain::strTrimWhite(&arg1);
 				if (arg1 == "stage-dev-crh-success")
 					Rain::tsCout("IMPORTANT: 'stage-dev' CRH completed successfully.\r\n\r\n");
 				else if (arg1 == "stage-prod-crh-success")
 					Rain::tsCout("IMPORTANT: 'stage-prod' CRH completed successfully.\r\n\r\n");
+				else if (arg1 == "deploy-staging-crh-success")
+					Rain::tsCout("IMPORTANT: 'deploy-staging' CRH completed successfully.\r\n\r\n");
 			}
 
 			//command loop

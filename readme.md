@@ -72,9 +72,8 @@ Before deployment from staging to production, any necessary configuration and se
 	* Download remote files to /Production (prod-download).
 	* Wipe /Production and replace with /Staging, **ignoring files when wiping specified in the configuration for the update client in staging**.
 		* Ignored files should be auxiliary, configuration, or server, but never code.
-	* Replace /Staging with /Production, without ignoring any files.
 	* Upload /Production to remote.
-	* Start remote (prod-start).
+	* Replace /Staging with /Production, without ignoring any files. Might need to use CRH here.
 
 There are a few additional functions for ease of use:
 * Production Download (prod-download): Changes to production files (likely auxiliary and server) will be reflected in the development environment under /Production.
@@ -111,6 +110,7 @@ In the root, there will also be additional untracked files not part of the offic
 * 1.1.4
 	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer, EmiliaUpdateCRHelper) = (3.7.2, 1.1.1, 1.2.2, 1.0.1, 1.0.1, 1.0.0)
 	* all UpdateClient/UpdateServer functions are working, with the exception of the sync commands.
+	* deployed EmiliaUpdate workflow officially, moving away from a previous Dropbox deployment workflow!
 * 1.1.3
 	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer, EmiliaUpdateCRHelper) = (3.7.2, 1.1.1, 1.2.2, 1.0.0, 1.0.0, 1.0.0)
 	* continued work on RainAeternum/EmiliaUpdate, as well as updated .gitignore
@@ -188,7 +188,8 @@ In the root, there will also be additional untracked files not part of the offic
 #### EmiliaUpdateClient
 * 1.0.1
 	* bugfixes to existing commands
-	* finished non-sync command implementation
+	* finished essential (non-sync) command implementation
+	* added download/upload progress indicators
 * 1.0.0
 	* dev to staging
 	* integration with CRH
@@ -201,7 +202,7 @@ In the root, there will also be additional untracked files not part of the offic
 #### EmiliaUpdateServer
 * 1.0.1
 	* bugfixes to existing commands
-	* finished non-sync command implementation
+	* finished essential (non-sync) command implementation
 * 1.0.0
 	* implemented all non-sync commands
 
@@ -240,3 +241,4 @@ In the root, there will also be additional untracked files not part of the offic
 * switch to RainAeternum
 
 #### EmiliaUpdateServer
+* remove tmp server file after CRH finishes

@@ -39,5 +39,10 @@ namespace Monochrome3 {
 		int CHHProdStart(CommandHandlerParam &cmhParam, Rain::ClientSocketManager &csm, ConnectionHandlerParam &chParam);
 		int CHHSyncStop(CommandHandlerParam &cmhParam, Rain::ClientSocketManager &csm, ConnectionHandlerParam &chParam);
 		int CHHSyncStart(CommandHandlerParam &cmhParam, Rain::ClientSocketManager &csm, ConnectionHandlerParam &chParam);
+
+		//aditional helpers
+		//wipes staging with prod, possibly activating CRH
+		//returns 1 if need to restart program
+		int CHHStageProd(CommandHandlerParam &cmhParam);
 	}
 }

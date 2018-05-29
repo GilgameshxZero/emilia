@@ -87,6 +87,8 @@ namespace Monochrome3 {
 				//IMPORTANT: check if there were problems overwriting the current exe (which there should be). If so, start up the CRH
 				if (delayExeWrite) {
 					Rain::sendBlockMessage(*ssmdhParam.ssm, "prod-upload delay");
+					Rain::tsCout("Info: 'prod-upload' needs to modify the current .exe. This program will exit, start the CRH, which will finish the upload process and restart this program. Please wait a moment...\r\n");
+					fflush(stdout);
 
 					std::string crhelperAbspath = Rain::pathToAbsolute((*ccParam.config)["crhelper"]),
 						crhWorkingDir = Rain::getPathDir(crhelperAbspath),
@@ -198,7 +200,6 @@ namespace Monochrome3 {
 							curFileDone = 0;
 							header.clear();
 							curFile = 0;
-							delayExeWrite = false;
 
 							//exit function and wait for another prod-download block with success
 							break;
@@ -360,8 +361,14 @@ namespace Monochrome3 {
 					ZeroMemory(&pinfo, sizeof(pinfo));
 					sinfo.cb = sizeof(sinfo);
 					sinfo.dwFlags |= STARTF_USESTDHANDLES;
-					sinfo.hStdOutput = g_hChildStd_OUT_Wr;
+
+					//don't pipe stdout, so that server output is still displayed in console
+					//sinfo.hStdOutput = g_hChildStd_OUT_Wr;
+					sinfo.hStdOutput = NULL;
+
+					//used to tell server to exit
 					sinfo.hStdInput = g_hChildStd_IN_Rd;
+
 					if (!CreateProcess(
 						ccParam.serverStatus[a].path.c_str(),
 						NULL,

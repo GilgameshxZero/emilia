@@ -119,6 +119,9 @@ namespace Monochrome3 {
 
 						//nuke prod (which should work, except for the current executable)
 						Rain::rmDirRec((*chParam.config)["prod-root-dir"]);
+
+						Rain::tsCout("Info: Header received: ", n, " files to be downloaded.\r\n");
+						fflush(stdout);
 					} else {
 						reqAcc += chParam.request;
 					}
@@ -134,6 +137,9 @@ namespace Monochrome3 {
 						   reqAcc.length() > 0) {
 						//care for edge cases
 						if (header.size() != 0) {
+							Rain::tsCout("Info: Receiving file ", curFile, " of ", header.size(), ". Done: ", curFileDone, " of ", header[curFile].second, ".\r\n");
+							fflush(stdout);
+
 							std::size_t curFileReqBlock = min(reqAcc.length(), header[curFile].second - curFileDone);
 
 							//all files in local production should be modifiable
@@ -146,6 +152,7 @@ namespace Monochrome3 {
 							if (curFileDone == header[curFile].second) {
 								curFile++;
 								curFileDone = 0;
+								Rain::tsCout("Info: File ", curFile, " of ", header.size(), " complete.\r\n");
 							}
 						}
 

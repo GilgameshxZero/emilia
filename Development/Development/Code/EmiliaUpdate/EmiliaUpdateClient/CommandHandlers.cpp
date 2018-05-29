@@ -102,6 +102,9 @@ namespace Monochrome3 {
 				return 0;
 
 			//replace production with staging, ignoring some files
+			Rain::tsCout("Info: Copying /Staging to /Production, ignoring specified files.\r\n");
+			fflush(stdout);
+
 			//first step is to nuke production except ignored files
 			std::vector<std::string> ignored;
 			ignored = Rain::readMultilineFile((*cmhParam.config)["config-path"] + (*cmhParam.config)["deploy-ignore"]);
@@ -115,7 +118,7 @@ namespace Monochrome3 {
 			for (int a = 0; a < ignored.size(); a++)
 				ignSet.insert(Rain::pathToAbsolute((*cmhParam.config)["staging-root-dir"] + ignored[a]));
 			Rain::cpyDirRec((*cmhParam.config)["staging-root-dir"], (*cmhParam.config)["prod-root-dir"], &ignSet);
-			Rain::tsCout("Success: Copied staging to production, ignoring specified files.\r\n");
+			Rain::tsCout("Success: Copied /Staging to /Production, ignoring specified files.\r\n");
 			fflush(stdout);
 
 			//upload files to remote
@@ -150,17 +153,26 @@ namespace Monochrome3 {
 			response += "\r\n";
 			Rain::sendBlockMessage(csm, &response);
 
+			Rain::tsCout("Info: ", files.size(), " files to upload.\r\n");
+			fflush(stdout);
+
 			std::size_t blockMax = Rain::strToT<std::size_t>((*cmhParam.config)["transfer-blocklen"]);
 			for (int a = 0; a < files.size(); a++) {
 				std::ifstream fileIn((*cmhParam.config)["prod-root-dir"] + files[a], std::ios::binary);
 				std::size_t fileSize = Rain::getFileSize((*cmhParam.config)["prod-root-dir"] + files[a]);
 				char *buffer = new char[blockMax];
 				for (std::size_t b = 0; b < fileSize; b += blockMax) {
+					Rain::tsCout("Info: Uploading file ", a, " of ", files.size(), ". Done: ", b, " of ", fileSize, ".\r\n");
+					fflush(stdout);
+
 					fileIn.read(buffer, min(blockMax, fileSize - b));
 
 					//send this buffer as data, with the prod-upload methodname, all in a single block
 					Rain::sendBlockMessage(csm, "prod-upload " + std::string(buffer, min(blockMax, fileSize - b)));
+					csm.blockForMessageQueue();
 				}
+				Rain::tsCout("Info: Done uploading file ", a + 1, " of ", files.size(), ".\r\n");
+				fflush(stdout);
 				fileIn.close();
 			}
 
@@ -168,7 +180,8 @@ namespace Monochrome3 {
 			Rain::sendBlockMessage(csm, "prod-upload finish-success");
 
 			//wait for response from server for our prod-upload
-			csm.blockForMessageQueue();
+			Rain::tsCout("Info: Upload done. Waiting for server confirmation...\r\n");
+			fflush(stdout);
 			WaitForSingleObject(chParam.doneWaitingEvent, INFINITE);
 			if (chParam.lastSuccess == -1) {
 				Rain::tsCout("Failure: Error while uploading production files. Aborting...\r\n");
@@ -180,20 +193,10 @@ namespace Monochrome3 {
 			} else if (chParam.lastSuccess == 1) {
 				Rain::tsCout("Success: Uploaded production files to remote. Remote server needs to restart. Please reconnect later.\r\n");
 				fflush(stdout);
-
-				//wait to reconnect
-				csm.blockForConnect(INFINITE);
-				Rain::tsCout("Success: Reconnected to remote server.\r\n");
-				fflush(stdout);
 			}
 
-			//start production servers
-			if (CHHProdStart(cmhParam, csm, chParam))
-				return 0;
-
-			Rain::tsCout("Success: Command executed.\r\n");
-			fflush(stdout);
-			return 0;
+			//replace all of staging with production: same routine as stage-prod
+			return CHHStageProd(cmhParam);
 		}
 		int CHProdDownload(CommandHandlerParam &cmhParam) {
 			//setup network stuff
@@ -230,31 +233,7 @@ namespace Monochrome3 {
 			//no longer need network
 			csm.~ClientSocketManager();
 
-			//while replacing staging, we might need to restart this client with CRH
-			Rain::tsCout("Info: Replacing /Staging with /Production...\r\n");
-			Rain::rmDirRec((*cmhParam.config)["staging-root-dir"]); //won't remove the current .exe, if in use
-			Rain::cpyDirRec((*cmhParam.config)["prod-root-dir"], (*cmhParam.config)["staging-root-dir"]);
-
-			//check if we need to use CRH
-			std::string exePath = Rain::pathToAbsolute(Rain::getExePath());
-			std::string relExePath = exePath.substr(Rain::pathToAbsolute((*cmhParam.config)["staging-root-dir"]).length(), exePath.length());
-			if (Rain::fileExists((*cmhParam.config)["prod-root-dir"] + relExePath)) {
-				//need to use CRH
-				Rain::tsCout("The current executable needs to be replaced. It will be restarted when the operation is complete.\r\n");
-
-				std::string crhelperAbspath = Rain::pathToAbsolute((*cmhParam.config)["crhelper"]),
-					crhWorkingDir = Rain::getPathDir(crhelperAbspath),
-					crhCmdLine = "\"" + (*cmhParam.config)["prod-root-dir"] + relExePath + "\" \"" + //src
-					(*cmhParam.config)["staging-root-dir"] + relExePath + "\" " + //dst
-					"stage-prod-crh-success";
-				crhWorkingDir = crhWorkingDir.substr(0, crhWorkingDir.length() - 1);
-				ShellExecute(NULL, "open", crhelperAbspath.c_str(), crhCmdLine.c_str(), crhWorkingDir.c_str(), SW_SHOWDEFAULT);
-				return 1;
-			}
-
-			Rain::tsCout("Success: /Staging replaced with /Production...\r\n");
-
-			return 0;
+			return CHHStageProd(cmhParam);
 		}
 		int CHProdStop(CommandHandlerParam &cmhParam) {
 			//setup network stuff
@@ -410,6 +389,34 @@ namespace Monochrome3 {
 			return 0;
 		}
 		int CHHSyncStart(CommandHandlerParam &cmhParam, Rain::ClientSocketManager &csm, ConnectionHandlerParam &chParam) {
+			return 0;
+		}
+
+		int CHHStageProd(CommandHandlerParam &cmhParam) {
+			//while replacing staging, we might need to restart this client with CRH
+			Rain::tsCout("Info: Replacing /Staging with /Production...\r\n");
+			Rain::rmDirRec((*cmhParam.config)["staging-root-dir"]); //won't remove the current .exe, if in use
+			Rain::cpyDirRec((*cmhParam.config)["prod-root-dir"], (*cmhParam.config)["staging-root-dir"]);
+
+			//check if we need to use CRH
+			std::string exePath = Rain::pathToAbsolute(Rain::getExePath());
+			std::string relExePath = exePath.substr(Rain::pathToAbsolute((*cmhParam.config)["staging-root-dir"]).length(), exePath.length());
+			if (Rain::fileExists((*cmhParam.config)["prod-root-dir"] + relExePath)) {
+				//need to use CRH
+				Rain::tsCout("The current executable needs to be replaced. It will be restarted when the operation is complete.\r\n");
+
+				std::string crhelperAbspath = Rain::pathToAbsolute((*cmhParam.config)["crhelper"]),
+					crhWorkingDir = Rain::getPathDir(crhelperAbspath),
+					crhCmdLine = "\"" + Rain::pathToAbsolute((*cmhParam.config)["prod-root-dir"] + relExePath) + "\" \"" + //src
+					Rain::pathToAbsolute((*cmhParam.config)["staging-root-dir"] + relExePath) + "\" " + //dst
+					"stage-prod-crh-success";
+				crhWorkingDir = crhWorkingDir.substr(0, crhWorkingDir.length() - 1);
+				ShellExecute(NULL, "open", crhelperAbspath.c_str(), crhCmdLine.c_str(), crhWorkingDir.c_str(), SW_SHOWDEFAULT);
+				return 1;
+			}
+
+			Rain::tsCout("Success: /Staging replaced with /Production...\r\n");
+			fflush(stdout);
 			return 0;
 		}
 	}
