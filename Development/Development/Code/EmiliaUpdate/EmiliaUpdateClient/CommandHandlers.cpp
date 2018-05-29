@@ -22,9 +22,12 @@ namespace Monochrome3 {
 
 			//remove everything in staging, except for those specified in staging-ignore
 			Rain::tsCout("Removing files in /Staging/, ignoring those specified in configuration...\r\n");
-			std::vector<std::string> ignoredFiles;
-			ignoredFiles = Rain::readMultilineFile((*cmhParam.config)["config-path"] + (*cmhParam.config)["staging-ignore"]);
-			Rain::recursiveRmDir(stagingDir, &ignoredFiles);
+			std::vector<std::string> ignored;
+			ignored = Rain::readMultilineFile((*cmhParam.config)["config-path"] + (*cmhParam.config)["staging-ignore"]);
+			std::set<std::string> ignSet;
+			for (int a = 0; a < ignored.size(); a++)
+				ignSet.insert(stagingDir + ignored[a]);
+			Rain::rmDirRec(stagingDir, &ignSet);
 
 			//stage relevant files
 			Rain::tsCout("Copying relevant files from /Development/ to /Staging/...\r\n\r\n");
@@ -80,56 +83,174 @@ namespace Monochrome3 {
 			fflush(stdout);
 			Rain::ClientSocketManager csm;
 			csm.setEventHandlers(onConnectionInit, onConnectionProcessMessage, onConnectionProcessMessage, &chParam);
-			csm.setClientTarget((*cmhParam.config)["server-ip"], Rain::strToT<DWORD>((*cmhParam.config)["server-port-low"]), Rain::strToT<DWORD>((*cmhParam.config)["server-port-high"]));
-			csm.blockForConnect(INFINITE);
-			Rain::tsCout("Connected to server.\r\n");
-			fflush(stdout);
 
-			//authenticate with server
-			cmhParam.logger->setSocketSrc(&csm, true);
-			chParam.waitingRequests = 1;
-			ResetEvent(chParam.doneWaitingEvent);
-			chParam.lastSuccess = false;
-			Rain::sendBlockMessage(csm, "authenticate " + (*cmhParam.config)["client-auth-pass"]);
-			WaitForSingleObject(chParam.doneWaitingEvent, INFINITE);
-			if (!chParam.lastSuccess) {
-				Rain::tsCout("Error while authenticating. Aborting...\r\n");
-				return 0;
+			//try connecting with each port in the range, and make sure our server is listening on the other end by authenticating with the port.
+			DWORD lowPort = Rain::strToT<DWORD>((*cmhParam.config)["server-port-low"]),
+				highPort = Rain::strToT<DWORD>((*cmhParam.config)["server-port-high"]);
+			while (true) {
+				csm.setClientTarget((*cmhParam.config)["server-ip"], lowPort, highPort);
+				csm.blockForConnect(30000);
+				if (csm.getSocketStatus != csm.STATUS_CONNECTED) {
+					Rain::tsCout("Error while connecting. Aborting...\r\n");
+					fflush(stdout);
+					return 0;
+				}
+				Rain::tsCout("Connected to server.\r\n");
+				fflush(stdout);
+
+				//authenticate with server
+				cmhParam.logger->setSocketSrc(&csm, true);
+				chParam.waitingRequests = 1;
+				ResetEvent(chParam.doneWaitingEvent);
+				chParam.lastSuccess = 0;
+				Rain::sendBlockMessage(csm, "authenticate " + (*cmhParam.config)["client-auth-pass"]);
+				WaitForSingleObject(chParam.doneWaitingEvent, 10000);
+				if (!chParam.lastSuccess) {
+					if (csm.getConnectedPort() == highPort) {
+						Rain::tsCout("Error while authenticating. No more ports to try. Aborting...\r\n");
+						fflush(stdout);
+						return 0;
+					} else {
+						Rain::tsCout("Error while authenticating. Trying next port...\r\n");
+						fflush(stdout);
+						lowPort++;
+						continue;
+					}
+				}
+				Rain::tsCout("Success: Authenticated.\r\n");
+				fflush(stdout);
 			}
-			Rain::tsCout("SUCCESS: Authenticated.\r\n");
-			fflush(stdout);
 
 			//stop the production servers
 			chParam.waitingRequests = 1;
 			ResetEvent(chParam.doneWaitingEvent);
-			chParam.lastSuccess = false;
+			chParam.lastSuccess = 0;
 			Rain::sendBlockMessage(csm, "prod-stop");
 			WaitForSingleObject(chParam.doneWaitingEvent, INFINITE);
 			if (!chParam.lastSuccess) {
 				Rain::tsCout("Error while stopping production servers. Aborting...\r\n");
+				fflush(stdout);
 				return 0;
 			}
-			Rain::tsCout("SUCCESS: Stopped production servers.\r\n");
-			cmhParam.logger->setSocketSrc(&csm, false);
+			Rain::tsCout("Success: Stopped production servers.\r\n");
 			fflush(stdout);
+			cmhParam.logger->setSocketSrc(&csm, false);
 
 			//refresh production files
+			Rain::tsCout("Info: Downloading server production to local production.\r\n");
+			fflush(stdout);
 			chParam.waitingRequests = 1;
 			ResetEvent(chParam.doneWaitingEvent);
-			chParam.lastSuccess = false;
+			chParam.lastSuccess = 0;
 			Rain::sendBlockMessage(csm, "prod-download");
 			WaitForSingleObject(chParam.doneWaitingEvent, INFINITE);
 			if (!chParam.lastSuccess) {
 				Rain::tsCout("Error while downloading server production files. Aborting...\r\n");
+				fflush(stdout);
 				return 0;
 			}
-			Rain::tsCout("SUCCESS: Downloaded server production to local production.\r\n");
+			Rain::tsCout("Success: Downloaded server production to local production.\r\n");
 			fflush(stdout);
 
-			//upload files
+			//replace production with staging, ignoring some files
+			//first step is to nuke production except ignored files
+			std::vector<std::string> ignored;
+			ignored = Rain::readMultilineFile((*cmhParam.config)["config-path"] + (*cmhParam.config)["deploy-ignore"]);
+			std::set<std::string> ignSet;
+			for (int a = 0; a < ignored.size(); a++)
+				ignSet.insert((*cmhParam.config)["prod-root-dir"] + ignored[a]);
+			Rain::rmDirRec((*cmhParam.config)["prod-root-dir"], &ignSet);
 
-			Sleep(100000);
-			//cmhParam.logger->setSocketSrc(&csm, false);
+			//copy staging to production, ignoring the same files
+			Rain::cpyDirRec((*cmhParam.config)["staging-root-dir"], (*cmhParam.config)["prod-root-dir"], &ignSet);
+			Rain::tsCout("Success: Copied staging to production, ignoring specified files.\r\n");
+			fflush(stdout);
+
+			//upload files to remote
+			Rain::tsCout("Info: Uploading local production to server remote production.\r\n");
+			fflush(stdout);
+			std::vector<std::string> files;
+			files = Rain::getFilesRec((*cmhParam.config)["prod-root-dir"]);
+
+			//send header as one block, then block the files based on a block-size limit
+			std::string response = Rain::tToStr(files.size()) + "\r\n";
+			bool filesReadable = true;
+			for (int a = 0; a < files.size(); a++) {
+				std::size_t fileSize = Rain::getFileSize((*cmhParam.config)["prod-root-dir"] + files[a]);
+				if (fileSize == std::size_t(-1)) { //error
+					filesReadable = false;
+					break;
+				}
+				response += files[a] + "\r\n" + Rain::tToStr(fileSize) + "\r\n";
+			}
+			if (!filesReadable) {
+				Rain::sendBlockMessage(csm, "prod-upload file-read-error");
+				return 0;
+			}
+
+			//indicate we are starting the upload
+			Rain::sendBlockMessage(csm, "prod-upload start");
+
+			response += "\r\n";
+			Rain::sendBlockMessage(csm, &response);
+
+			std::size_t blockMax = Rain::strToT<std::size_t>((*cmhParam.config)["transfer-blocklen"]);
+			for (int a = 0; a < files.size(); a++) {
+				std::ifstream fileIn((*cmhParam.config)["prod-root-dir"] + files[a], std::ios::binary);
+				std::size_t fileSize = Rain::getFileSize((*cmhParam.config)["prod-root-dir"] + files[a]);
+				char *buffer = new char[blockMax];
+				for (std::size_t b = 0; b < fileSize; b += blockMax) {
+					fileIn.read(buffer, min(blockMax, fileSize - b));
+
+					//send this buffer as data, with the prod-upload methodname, all in a single block
+					Rain::sendBlockMessage(csm, "prod-upload" + std::string(buffer, min(blockMax, fileSize - b)));
+				}
+				fileIn.close();
+			}
+
+			//indicate we are done with the file upload
+			Rain::sendBlockMessage(csm, "prod-upload finish-success");
+
+			//wait for response from server for our prod-upload
+			csm.blockForMessageQueue();
+			chParam.waitingRequests = 1;
+			ResetEvent(chParam.doneWaitingEvent);
+			chParam.lastSuccess = 0;
+			WaitForSingleObject(chParam.doneWaitingEvent, INFINITE);
+			if (chParam.lastSuccess == 0) {
+				Rain::tsCout("Failure: Error while uploading production files. Aborting...\r\n");
+				fflush(stdout);
+				return 0;
+			} else if (chParam.lastSuccess == 1) {
+				Rain::tsCout("Success: Uploaded production files to remote.\r\n");
+				fflush(stdout);
+			} else if (chParam.lastSuccess == 2) {
+				Rain::tsCout("Success: Uploaded production files to remote. Remote server needs to restart. Please reconnect later.\r\n");
+				fflush(stdout);
+
+				//wait to reconnect
+				csm.blockForConnect(INFINITE);
+				Rain::tsCout("Success: Reconnected to remote server.\r\n");
+				fflush(stdout);
+			}
+
+			//start production servers
+			chParam.waitingRequests = 1;
+			ResetEvent(chParam.doneWaitingEvent);
+			chParam.lastSuccess = 0;
+			Rain::sendBlockMessage(csm, "prod-start");
+			WaitForSingleObject(chParam.doneWaitingEvent, INFINITE);
+			if (!chParam.lastSuccess) {
+				Rain::tsCout("Error while starting production servers. Aborting...\r\n");
+				fflush(stdout);
+				return 0;
+			}
+			Rain::tsCout("Success: Started production servers.\r\n");
+			fflush(stdout);
+
+			Rain::tsCout("Success: Command executed.\r\n");
+			fflush(stdout);
+
 			return 0;
 		}
 		int CHProdDownload(CommandHandlerParam &cmhParam) {

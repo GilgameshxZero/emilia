@@ -57,7 +57,7 @@ namespace Rain {
 	void getLastModTime(std::vector<std::string> &files, std::vector<FILETIME> &lastmod);
 
 	//takes and returns UTF8 strings, but uses unicode
-	void recursiveRmDir(std::string path);
+	void rmDirRec(std::string path);
 
 	//shorthand function to output things to a file
 	void fastOutputFileRef(std::string filename, std::string &output, bool append = false);

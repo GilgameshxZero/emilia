@@ -34,6 +34,10 @@ namespace Rain {
 	bool fileExists(std::string file);
 	bool dirExists(std::string dir);
 
+	//append \\ on the end if doesn't have
+	std::string *standardizeDirPath(std::string *dir);
+	std::string standardizeDirPath(std::string dir);
+
 	//returns current directory of the executable (not the same as the path to the executable, sometimes)
 	std::string getWorkingDirectory();
 
@@ -48,13 +52,23 @@ namespace Rain {
 	std::vector<std::string> getFiles(std::string directory, std::string format = "*");
 	std::vector<std::string> getDirs(std::string directory, std::string format = "*");
 
+	//gets all files and directories under a directory, recursively
+	//works with unicode/multibyte UTF8
+	//use absolute paths in ignore
+	std::vector<std::string> getFilesRec(std::string directory, std::string format = "*", std::set<std::string> *ignore = NULL);
+	std::vector<std::string> getDirsRec(std::string directory, std::string format = "*", std::set<std::string> *ignore = NULL);
+
 	//creates parent directories until specified directory created
 	void createDirRec(std::string dir);
 
 	//removes all directories and files under a directory, but not the directory itself
 	//works with unicode/multibyte UTF8
-	//second argument specifies files to not remove
-	void recursiveRmDir(std::string dir, std::vector<std::string> *ignore = NULL);
+	//second argument specifies files/directories to not remove; use \ end to specify dir
+	//use absolute paths in ignore
+	void rmDirRec(std::string dir, std::set<std::string> *ignore = NULL);
+
+	//copies directory structure over, replacing any files in the destination, but not deleting any unrelated files
+	void cpyDirRec(std::string src, std::string dst, std::set<std::string> *ignore = NULL);
 
 	//converts any path to an absolute path
 	std::string pathToAbsolute(std::string path);
@@ -66,11 +80,6 @@ namespace Rain {
 	//get last modified time of files
 	//works with unicode/multibyte UTF8
 	FILETIME getLastModTime(std::string path);
-
-	//gets all files and directories under a directory, recursively
-	//works with unicode/multibyte UTF8
-	std::vector<std::string> getFilesRec(std::string directory, std::string format = "*");
-	std::vector<std::string> getDirsRec(std::string directory, std::string format = "*");
 
 	//output information to a file, shorthand
 	void printToFile(std::string filename, std::string *output, bool append = false);
