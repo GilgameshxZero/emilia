@@ -26,8 +26,6 @@ namespace Rain {
 		Rain::initWinsock22();
 	}
 	ClientSocketManager::~ClientSocketManager() {
-		this->freePortAddrs();
-
 		//shutdown send threads, if any
 		this->clearMessageQueue();
 		WaitForSingleObject(this->messageDoneEvent, INFINITE);
@@ -35,7 +33,12 @@ namespace Rain {
 		//shutsdown connect threads, if any
 		this->disconnectSocket();
 
-		delete this->csmdhParam.message;
+		//critical: free addrs after shutting down connect threads, or there will be multithreading problems
+		this->freePortAddrs();
+
+		if (this->csmdhParam.message != NULL)
+			delete this->csmdhParam.message;
+		this->csmdhParam.message = NULL;
 	}
 	void ClientSocketManager::sendRawMessage(std::string request) {
 		this->sendRawMessage(&request);
@@ -96,6 +99,7 @@ namespace Rain {
 
 			//create thread to attempt connect
 			//thread exits when connect success
+			ResetEvent(this->connectEvent);
 			this->hConnectThread = Rain::simpleCreateThread(ClientSocketManager::attemptConnectThread, this);
 		}
 	}
@@ -151,10 +155,11 @@ namespace Rain {
 	DWORD WINAPI ClientSocketManager::attemptConnectThread(LPVOID param) {
 		Rain::ClientSocketManager &csm = *reinterpret_cast<Rain::ClientSocketManager *>(param);
 
+		//resetting the connect event should be placed outside this thread, before it is created, to make sure that any calls to the thread are waited upon as intended
+
 		csm.msReconnectWait = 1;
 		csm.freePortAddrs();
 		csm.portAddrs.resize(csm.highPort - csm.lowPort + 1, NULL);
-		ResetEvent(csm.connectEvent);
 
 		Rain::createSocket(csm.socket);
 		
@@ -244,6 +249,7 @@ namespace Rain {
 
 			//create thread to attempt connect
 			//thread exits when connect success
+			ResetEvent(csm.connectEvent);
 			csm.hConnectThread = Rain::simpleCreateThread(ClientSocketManager::attemptConnectThread, &csm);
 		}
 
