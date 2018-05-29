@@ -109,6 +109,7 @@ In the root, there will also be additional untracked files not part of the offic
 ### Emilia-tan
 * 1.1.4
 	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer, EmiliaUpdateCRHelper) = (3.7.2, 1.1.1, 1.2.2, 1.0.1, 1.0.1, 1.0.0)
+	* Line count: 7030
 	* all UpdateClient/UpdateServer functions are working, with the exception of the sync commands.
 	* deployed EmiliaUpdate workflow officially, moving away from a previous Dropbox deployment workflow!
 * 1.1.3
