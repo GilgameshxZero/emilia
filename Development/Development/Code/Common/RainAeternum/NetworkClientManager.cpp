@@ -21,6 +21,7 @@ namespace Rain {
 
 		this->connectEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 		this->messageDoneEvent = CreateEvent(NULL, TRUE, TRUE, NULL);
+		this->recvExitComplete = CreateEvent(NULL, TRUE, TRUE, NULL);
 
 		Rain::initWinsock22();
 	}
@@ -32,14 +33,7 @@ namespace Rain {
 		WaitForSingleObject(this->messageDoneEvent, INFINITE);
 
 		//shutsdown connect threads, if any
-		this->socketStatus = this->STATUS_DISCONNECTED;
-		WaitForSingleObject(this->connectEvent, INFINITE);
-
-		CloseHandle(this->connectEvent);
-		CloseHandle(this->messageDoneEvent);
-
-		Rain::shutdownSocketSend(this->socket);
-		closesocket(this->socket);
+		this->disconnectSocket();
 
 		delete this->csmdhParam.message;
 	}
@@ -139,10 +133,13 @@ namespace Rain {
 			closesocket(this->socket);
 
 			//this will exit the connect thread
-			this->socketStatus = this->STATUS_DISCONNECTED;
+			this->socketStatus = this->STATUS_DISCONNECTED; //manually disconnect, so that we won't try to disconnect
 			WaitForSingleObject(this->connectEvent, INFINITE);
 
 			this->connectedPort = -1;
+
+			//wait for onRecvExit if socket was connected before
+			WaitForSingleObject(this->recvExitComplete, INFINITE);
 		}
 	}
 	void ClientSocketManager::freePortAddrs() {
@@ -231,20 +228,32 @@ namespace Rain {
 	}
 	int ClientSocketManager::onRecvInit(void *param) {
 		Rain::ClientSocketManager &csm = *reinterpret_cast<Rain::ClientSocketManager *>(param);
+		
+		//reset an event for listeners of the end of onRecvExit
+		ResetEvent(csm.recvExitComplete);
 
 		return csm.onConnect == NULL ? 0 : csm.onConnect(&csm.csmdhParam);
 	}
 	int ClientSocketManager::onRecvExit(void *param) {
 		Rain::ClientSocketManager &csm = *reinterpret_cast<Rain::ClientSocketManager *>(param);
 
-		//retry to connect
-		csm.socketStatus = csm.STATUS_CONNECTING;
+		//retry to connect, if original status was connected
+		//if original status was disconnected, then don't reconnect
+		if (csm.socketStatus == csm.STATUS_CONNECTED) {
+			csm.socketStatus = csm.STATUS_CONNECTING;
 
-		//create thread to attempt connect
-		//thread exits when connect success
-		csm.hConnectThread = Rain::simpleCreateThread(ClientSocketManager::attemptConnectThread, &csm);
+			//create thread to attempt connect
+			//thread exits when connect success
+			csm.hConnectThread = Rain::simpleCreateThread(ClientSocketManager::attemptConnectThread, &csm);
+		}
 
-		return csm.onDisconnect == NULL ? 0 : csm.onDisconnect(&csm.csmdhParam);
+		//call delegate if it exists
+		int ret = csm.onDisconnect == NULL ? 0 : csm.onDisconnect(&csm.csmdhParam);
+
+		//set an event to listeners, that this function has been called
+		SetEvent(csm.recvExitComplete);
+
+		return ret;
 	}
 	int ClientSocketManager::onProcessMessage(void *param) {
 		Rain::ClientSocketManager &csm = *reinterpret_cast<Rain::ClientSocketManager *>(param);
