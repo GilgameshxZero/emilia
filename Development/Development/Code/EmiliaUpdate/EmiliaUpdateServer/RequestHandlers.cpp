@@ -102,7 +102,7 @@ namespace Monochrome3 {
 					return 1;
 				} else {
 					Rain::sendBlockMessage(*ssmdhParam.ssm, "prod-upload success");
-					Rain::tsCout("Success: Client successfully uploaded new files to server production.\r\n");
+					Rain::tsCout("Success: 'prod-upload' success.\r\n");
 					fflush(stdout);
 				}
 			} else if (receivingFiledata == false &&

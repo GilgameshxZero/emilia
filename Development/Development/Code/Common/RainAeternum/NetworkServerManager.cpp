@@ -147,6 +147,7 @@ namespace Rain {
 			break;
 		}
 		if (ret == 0) {//we successfully listened on a port, so create a thread to continuously accept clients
+			//very important to reset event outside of thread beginning to avoid race conditions
 			ResetEvent(this->ltEvent);
 			CreateThread(NULL, 0, listenThread, reinterpret_cast<LPVOID>(this), 0, NULL);
 		} else
