@@ -21,8 +21,6 @@ There are four types of files: auxiliary, configuration, code, and server.
 * Configuration: Files which provide options for the server; different between development & production. This may include some sensitive information. Also includes update server and client scripts.
 * Server: Files served by the server, including databases. Will contain sensitive information.
 
-In addition, there are archived files, from previous version of the repository.
-
 Files are organized in any development root as follows:
 * Development: Files currently in development. The files under development are not guaranteed to be functional at any point in time.
 	* Development: Simulation environment under which all dev code goes.
@@ -36,6 +34,7 @@ Files are organized in any development root as follows:
 		* Server
 	* Staging: Simulated staging environment.
 	* Production: Simulated production environment.
+	* Remote: Simulated remote production environment.
 * Staging: Intermediary between development and production. Functional most of the time. 
 	* Auxiliary
 	* Code: Any code files, in the same structure as in production.
@@ -47,8 +46,10 @@ Files are organized in any development root as follows:
 	* Configuration
 	* Server
 
+Production files running on the server are referred to as Remote.
+
 ### Flow Terminology
-Downstream-Development-Staging-Productoin-Upstream
+Downstream-Development-Staging-Production-Upstream
 
 ### Updating & Deploying (to AWS e.g. emilia-tan.com, with e.g. EmiliaUpdate)
 Deployment should be non-continuous. The production server will have an update server. Development will run an update client which connects with the server update script and transfers any changes. This way, we can avoid having more private information accesible through github while granting full control over deployment.
@@ -67,15 +68,13 @@ The update server/client will be referred to as the update script. When updating
 
 Before deployment from staging to production, any necessary configuration and server file changes should be made in staging. Staging will inevitably modify files in production that production also modifies. We have an ignore list in the udpate client configuraiton which can prevent merge conflicts.
 * Staging to Production (deploy-staging): Before running this command, the staging files should be identical to those to be used in production. This command will do a few things in the following order:
-	* Shut down production.
-	* Download production files to /Production.
+	* Shut down remote (prod-stop).
+	* Download remote files to /Production (prod-download).
 	* Wipe /Production and replace with /Staging, **ignoring files when wiping specified in the configuration for the update client in staging**.
 		* Ignored files should be auxiliary, configuration, or server, but never code.
 	* Replace /Staging with /Production, without ignoring any files.
-	* Restart the update script.
-		* Likely, the update script and its configurations should not be ignored in updating /Production, so this step is not necessary most of the time. However, restarting may be necessary if we wish to replace the executable.
-	* Upload /Production to production.
-	* Start production.
+	* Upload /Production to remote.
+	* Start remote (prod-start).
 
 There are a few additional functions for ease of use:
 * Production Download (prod-download): Changes to production files (likely auxiliary and server) will be reflected in the development environment under /Production.
@@ -93,24 +92,24 @@ The changelog for the versions will be in this readme document.
 ### Version Control & Github
 Only the following directory structures will be version controlled, primarily for privacy reasons:
 * Development
-	* Auxiliary
-	* Code
-	* Configuration
-	* Server
-* Staging
-	* Code
-* Production
-	* Code
+	* Development
+		* Auxiliary
+		* Code
+		* Configuration
+		* Server
 
 Git commits to master encouraged to contain updated versioning of each component of the repository.
+Generated files will not be put under VC.
 
 ## Additional Files
 In the root, there will also be additional untracked files not part of the official repository.
-* emilia-tan.com: Files specific to emilia-tan.com's management
+* emilia-tan.com: Files specific to emilia-tan.com's management.
 
 ## Changelog
 
 ### Emilia-tan
+* 1.1.4
+	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer, EmiliaUpdateCRHelper) = (3.7.2, 1.1.1, 1.2.2, 1.0.1, 1.0.1, 1.0.0)
 * 1.1.3
 	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer, EmiliaUpdateCRHelper) = (3.7.2, 1.1.1, 1.2.2, 1.0.0, 1.0.0, 1.0.0)
 	* continued work on RainAeternum/EmiliaUpdate, as well as updated .gitignore
@@ -186,6 +185,8 @@ In the root, there will also be additional untracked files not part of the offic
 ### EmiliaUpdate
 
 #### EmiliaUpdateClient
+* 1.0.1
+	* bugfixes to existing commands
 * 1.0.0
 	* dev to staging
 	* integration with CRH
@@ -196,6 +197,8 @@ In the root, there will also be additional untracked files not part of the offic
 	* allows a copy + run operation delayed until the destination is writable
 
 #### EmiliaUpdateServer
+* 1.0.1
+	* bugfixes to existing commands
 * 1.0.0
 	* implemented all non-sync commands
 
@@ -206,23 +209,30 @@ In the root, there will also be additional untracked files not part of the offic
 * implement a monitoring framework for production.
 
 ### RainLibrary
-* upgrade to 4 sometime, to clean up logging and implement subscriber flows
+
+#### RainAeternum
+
+#### RainLibrary3
 
 ### EmiliaSite
 
 #### EmiliaSite
 * clean up memory leaks
+* switch to RainAeternum
 
 ### EmiliaMail
 
 #### EmiliaMailServer
-* standardize to new rain library
+* switch to RainAeternum
 
 #### EmiliaMailClient
-* standardize to new rain library
+* switch to RainAeternum
 
 ### EmiliaUpdate
 
 #### EmiliaUpdateClient
+
+#### EmiliaUpdateCRHelper
+* switch to RainAeternum
 
 #### EmiliaUpdateServer

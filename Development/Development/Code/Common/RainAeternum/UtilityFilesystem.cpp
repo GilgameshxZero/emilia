@@ -15,6 +15,15 @@ namespace Rain {
 		return false;    //this is not a directory!
 	}
 
+	std::string *standardizeDirPath(std::string *dir) {
+		if (dir->back() != '\\')
+			dir->push_back('\\');
+		return dir;
+	}
+	std::string standardizeDirPath(std::string dir) {
+		return *standardizeDirPath(&dir);
+	}
+
 	std::string getWorkingDirectory() {
 		DWORD bufferLen = GetCurrentDirectory(0, NULL);
 		TCHAR *buffer = new TCHAR[bufferLen];
@@ -87,6 +96,46 @@ namespace Rain {
 		return ret;
 	}
 
+	std::vector<std::string> getFilesRec(std::string directory, std::string format, std::set<std::string> *ignore) {
+		std::vector<std::string> dirs, files;
+		dirs = Rain::getDirs(directory, "*");
+		files = Rain::getFiles(directory, format);
+
+		std::vector<std::string> relpath;
+		for (std::size_t a = 0; a < files.size(); a++)
+			if (ignore != NULL && ignore->find(pathToAbsolute(files[a])) == ignore->end())
+				relpath.push_back(files[a]);
+
+		for (std::size_t a = 2; a < dirs.size(); a++) {
+			if (ignore != NULL && ignore->find(pathToAbsolute(directory + dirs[a] + "\\")) == ignore->end())
+				continue;
+			std::vector<std::string> subrel;
+			subrel = getFilesRec(directory + dirs[a] + "\\", format);
+
+			for (std::size_t b = 0; b < subrel.size(); b++)
+				relpath.push_back(dirs[a] + "\\" + subrel[b]);
+		}
+		return relpath;
+	}
+	std::vector<std::string> getDirsRec(std::string directory, std::string format, std::set<std::string> *ignore) {
+		std::vector<std::string> dirs;
+		dirs = Rain::getDirs(directory, "*");
+
+		std::vector<std::string> relpath;
+		for (size_t a = 2; a < dirs.size(); a++) {
+			if (ignore != NULL && ignore->find(pathToAbsolute(directory + dirs[a] + "\\")) == ignore->end())
+				continue;
+			relpath.push_back(dirs[a] + "\\");
+
+			std::vector<std::string> subrel;
+			subrel = getDirsRec(directory + dirs[a] + "\\", format);
+
+			for (size_t b = 0; b < subrel.size(); b++)
+				relpath.push_back(dirs[a] + "\\" + subrel[b]);
+		}
+		return relpath;
+	}
+
 	void createDirRec(std::string dir) {
 		size_t pos = 0;
 		dir = dir.substr(0, dir.length() - 1); //remove the '\\'
@@ -96,7 +145,7 @@ namespace Rain {
 		} while (pos != std::string::npos);
 	}
 
-	void recursiveRmDir(std::string dir, std::vector<std::string> *ignore) {
+	void rmDirRec(std::string dir, std::set<std::string> *ignore) {
 		wchar_t unicode[MAX_PATH];
 		std::vector<std::string> ldir, lfile;
 
@@ -105,30 +154,33 @@ namespace Rain {
 
 		for (std::size_t a = 0; a < lfile.size(); a++) {
 			MultiByteToWideChar(CP_UTF8, 0, (dir + lfile[a]).c_str(), -1, unicode, MAX_PATH);
-
-			bool ignored = false;
-			if (ignore != NULL) {
-				for (std::size_t a = 0; a < ignore->size(); a++) {
-					if (Rain::pathToAbsolute(dir + lfile[a]) == (*ignore)[a]) {
-						ignored = true;
-						break;
-					}
-				}
-			}
-
-			if (!ignored)
+			if (ignore != NULL && ignore->find(pathToAbsolute(dir + lfile[a])) == ignore->end())
 				DeleteFileW(unicode);
 		}
 		for (std::size_t a = 2; a < ldir.size(); a++) //skip . and ..
 		{
 			MultiByteToWideChar(CP_UTF8, 0, (dir + ldir[a] + '\\').c_str(), -1, unicode, MAX_PATH);
-			recursiveRmDir(dir + ldir[a] + '\\', ignore);
-			RemoveDirectoryW(unicode);
+			if (ignore != NULL && ignore->find(pathToAbsolute(dir + ldir[a] + '\\')) == ignore->end()) {
+				rmDirRec(dir + ldir[a] + '\\', ignore);
+				RemoveDirectoryW(unicode);
+			}
+		}
+	}
+
+	void cpyDirRec(std::string src, std::string dst, std::set<std::string> *ignore) {
+		//relative path (wrt src) of each of the files in the source directory
+		src = standardizeDirPath(pathToAbsolute(src));
+		dst = standardizeDirPath(pathToAbsolute(dst));
+		std::vector<std::string> filesRel = getFilesRec(src, "*", ignore);
+
+		for (std::string s : filesRel) {
+			createDirRec(getPathDir(dst + s));
+			CopyFile((src + s).c_str(), (dst + s).c_str(), FALSE);
 		}
 	}
 
 	std::string pathToAbsolute(std::string path) {
-		TCHAR tcFullPath[32767];
+		static TCHAR tcFullPath[32767];
 		GetFullPathName(path.c_str(), 32767, tcFullPath, NULL);
 		return tcFullPath;
 	}
@@ -168,41 +220,6 @@ namespace Rain {
 		}
 
 		return ret;
-	}
-
-	std::vector<std::string> getFilesRec(std::string directory, std::string format) {
-		std::vector<std::string> dirs, files;
-		dirs = Rain::getDirs(directory, "*");
-		files = Rain::getFiles(directory, format);
-
-		std::vector<std::string> relpath;
-		for (std::size_t a = 0; a < files.size(); a++)
-			relpath.push_back(files[a]);
-
-		for (std::size_t a = 2; a < dirs.size(); a++) {
-			std::vector<std::string> subrel;
-			subrel = getFilesRec(directory + dirs[a] + "\\", format);
-
-			for (std::size_t b = 0; b < subrel.size(); b++)
-				relpath.push_back(dirs[a] + "\\" + subrel[b]);
-		}
-		return relpath;
-	}
-	std::vector<std::string> getDiresRec(std::string directory, std::string format) {
-		std::vector<std::string> dirs;
-		dirs = Rain::getDirs(directory, "*");
-
-		std::vector<std::string> relpath;
-		for (size_t a = 2; a < dirs.size(); a++) {
-			relpath.push_back(dirs[a] + "\\");
-
-			std::vector<std::string> subrel;
-			subrel = getDiresRec(directory + dirs[a] + "\\", format);
-
-			for (size_t b = 0; b < subrel.size(); b++)
-				relpath.push_back(dirs[a] + "\\" + subrel[b]);
-		}
-		return relpath;
 	}
 
 	void printToFile(std::string filename, std::string *output, bool append) {

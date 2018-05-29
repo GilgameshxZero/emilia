@@ -160,7 +160,7 @@ namespace Rain {
 		}
 	}
 
-	void recursiveRmDir(std::string path) {
+	void rmDirRec(std::string path) {
 		wchar_t unicode[MAX_PATH];
 		std::vector<std::string> ldir, lfile;
 
@@ -174,7 +174,7 @@ namespace Rain {
 		for (std::size_t a = 2; a < ldir.size(); a++) //skip . and ..
 		{
 			MultiByteToWideChar(CP_UTF8, 0, (path + ldir[a] + '\\').c_str(), -1, unicode, MAX_PATH);
-			recursiveRmDir(path + ldir[a] + '\\');
+			rmDirRec(path + ldir[a] + '\\');
 			RemoveDirectoryW(unicode);
 		}
 	}

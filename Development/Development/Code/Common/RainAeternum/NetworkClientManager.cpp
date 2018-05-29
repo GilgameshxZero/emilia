@@ -4,6 +4,7 @@ namespace Rain {
 	ClientSocketManager::ClientSocketManager() {
 		this->socket = NULL;
 		this->blockSendRawMessage = false;
+		this->connectedPort = -1;
 		this->socketStatus = -1;
 		this->ipAddress = "";
 		this->lowPort = this->highPort = 0;
@@ -74,7 +75,10 @@ namespace Rain {
 		return this->socketStatus;
 	}
 	void ClientSocketManager::blockForConnect(DWORD msTimeout) {
-		WaitForSingleObject(this->connectEvent, msTimeout == 0 ? INFINITE : msTimeout);
+		WaitForSingleObject(this->connectEvent, msTimeout);
+	}
+	DWORD ClientSocketManager::getConnectedPort() {
+		return this->connectedPort;
 	}
 	SOCKET &ClientSocketManager::getSocket() {
 		return this->socket;
@@ -131,6 +135,8 @@ namespace Rain {
 
 			//this will exit the connect thread
 			this->socketStatus = this->STATUS_DISCONNECTED;
+
+			this->connectedPort = -1;
 		}
 	}
 	void ClientSocketManager::freePortAddrs() {
@@ -169,6 +175,8 @@ namespace Rain {
 
 				//any socket that is connected will pass through this step
 				if (!Rain::connectTarget(csm.socket, &csm.portAddrs[a - csm.lowPort])) {
+					csm.connectedPort = a;
+
 					//set an event when connected for all listeners of the event
 					SetEvent(csm.connectEvent);
 
