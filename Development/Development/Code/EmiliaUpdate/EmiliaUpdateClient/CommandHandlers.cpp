@@ -176,12 +176,13 @@ namespace Monochrome3 {
 				fileIn.close();
 			}
 
-			//indicate we are done with the file upload
-			Rain::sendBlockMessage(csm, "prod-upload finish-success");
-
-			//wait for response from server for our prod-upload
+			//indicate we are done with the file upload and waiting on a success code
 			Rain::tsCout("Info: Upload done. Waiting for server confirmation...\r\n");
 			fflush(stdout);
+			chParam.waitingRequests = 1;
+			ResetEvent(chParam.doneWaitingEvent);
+			chParam.lastSuccess = -1;
+			Rain::sendBlockMessage(csm, "prod-upload finish-success");
 			WaitForSingleObject(chParam.doneWaitingEvent, INFINITE);
 			if (chParam.lastSuccess == -1) {
 				Rain::tsCout("Failure: Error while uploading production files. Aborting...\r\n");
@@ -194,6 +195,10 @@ namespace Monochrome3 {
 				Rain::tsCout("Success: Uploaded production files to remote. Remote server needs to restart. Please reconnect later.\r\n");
 				fflush(stdout);
 			}
+
+			Rain::tsCout("Info: Sending okay receipt to server, allowing it to restart...\r\n");
+			Rain::sendBlockMessage(csm, "prod-upload restart-okay");
+			fflush(stdout);
 
 			//replace all of staging with production: same routine as stage-prod
 			return CHHStageProd(cmhParam);
@@ -395,8 +400,18 @@ namespace Monochrome3 {
 		int CHHStageProd(CommandHandlerParam &cmhParam) {
 			//while replacing staging, we might need to restart this client with CRH
 			Rain::tsCout("Info: Replacing /Staging with /Production...\r\n");
-			Rain::rmDirRec((*cmhParam.config)["staging-root-dir"]); //won't remove the current .exe, if in use
-			Rain::cpyDirRec((*cmhParam.config)["prod-root-dir"], (*cmhParam.config)["staging-root-dir"]);
+			std::vector<std::string> ignored;
+			ignored = Rain::readMultilineFile((*cmhParam.config)["config-path"] + (*cmhParam.config)["deploy-ignore"]);
+			std::set<std::string> ignSetStaging;
+			for (int a = 0; a < ignored.size(); a++)
+				ignSetStaging.insert(Rain::pathToAbsolute((*cmhParam.config)["staging-root-dir"] + ignored[a]));
+			Rain::rmDirRec((*cmhParam.config)["staging-root-dir"], &ignSetStaging); //won't remove the current .exe, if in use
+
+			//ignore some files while copying
+			std::set<std::string> ignSetProd;
+			for (int a = 0; a < ignored.size(); a++)
+				ignSetProd.insert(Rain::pathToAbsolute((*cmhParam.config)["prod-root-dir"] + ignored[a]));
+			Rain::cpyDirRec((*cmhParam.config)["prod-root-dir"], (*cmhParam.config)["staging-root-dir"], &ignSetProd);
 
 			//check if we need to use CRH
 			std::string exePath = Rain::pathToAbsolute(Rain::getExePath());
