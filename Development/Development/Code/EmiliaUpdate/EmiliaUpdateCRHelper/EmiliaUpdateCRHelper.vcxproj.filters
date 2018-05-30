@@ -13,14 +13,14 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="RainLibrary3">
-      <UniqueIdentifier>{8eead3b4-aa4d-4e12-a042-a4ebc474a7f8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Auxiliary">
       <UniqueIdentifier>{74c068a6-f300-4d6a-ac39-e64dde0583f9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Configuration">
       <UniqueIdentifier>{2c359b39-3915-4172-ad91-0a9be5165532}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RainAeternum">
+      <UniqueIdentifier>{287a0ecd-eff3-40ef-ad73-f761b893a736}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -30,65 +30,71 @@
     <ClInclude Include="resource.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\RainLibrary3\RainAlgorithm.h">
-      <Filter>RainLibrary3</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Common\RainLibrary3\RainError.h">
-      <Filter>RainLibrary3</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Common\RainLibrary3\RainGdiPlusInclude.h">
-      <Filter>RainLibrary3</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Common\RainLibrary3\RainLibraries.h">
-      <Filter>RainLibrary3</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Common\RainLibrary3\RainLogging.h">
-      <Filter>RainLibrary3</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Common\RainLibrary3\RainUtility.h">
-      <Filter>RainLibrary3</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Common\RainLibrary3\RainUtilityFile.h">
-      <Filter>RainLibrary3</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Common\RainLibrary3\RainUtilityGeneral.h">
-      <Filter>RainLibrary3</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Common\RainLibrary3\RainUtilityHexString.h">
-      <Filter>RainLibrary3</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Common\RainLibrary3\RainUtilityString.h">
-      <Filter>RainLibrary3</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Common\RainLibrary3\RainWindow.h">
-      <Filter>RainLibrary3</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Common\RainLibrary3\RainWindowsLAM.h">
-      <Filter>RainLibrary3</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2.h">
-      <Filter>RainLibrary3</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2Include.h">
-      <Filter>RainLibrary3</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2SendRecv.h">
-      <Filter>RainLibrary3</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2Server.h">
-      <Filter>RainLibrary3</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2SMTP.h">
-      <Filter>RainLibrary3</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2Utility.h">
-      <Filter>RainLibrary3</Filter>
-    </ClInclude>
     <ClInclude Include="Main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Start.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\RainAeternum\AlgorithmLibraries.h">
+      <Filter>RainAeternum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\RainAeternum\GdiplusInclude.h">
+      <Filter>RainAeternum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkBase.h">
+      <Filter>RainAeternum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkClientManager.h">
+      <Filter>RainAeternum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkLibraries.h">
+      <Filter>RainAeternum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkRecvThread.h">
+      <Filter>RainAeternum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkServerManager.h">
+      <Filter>RainAeternum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkSMTP.h">
+      <Filter>RainAeternum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkSocketManager.h">
+      <Filter>RainAeternum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkUtility.h">
+      <Filter>RainAeternum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkWSAInclude.h">
+      <Filter>RainAeternum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\RainAeternum\RainLibraries.h">
+      <Filter>RainAeternum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\RainAeternum\RainWindow.h">
+      <Filter>RainAeternum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\RainAeternum\UtilityError.h">
+      <Filter>RainAeternum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\RainAeternum\UtilityFilesystem.h">
+      <Filter>RainAeternum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\RainAeternum\UtilityLibraries.h">
+      <Filter>RainAeternum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\RainAeternum\UtilityLogging.h">
+      <Filter>RainAeternum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\RainAeternum\UtilityString.h">
+      <Filter>RainAeternum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\RainAeternum\UtilityTime.h">
+      <Filter>RainAeternum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\RainAeternum\WindowsLAMInclude.h">
+      <Filter>RainAeternum</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -108,65 +114,71 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Common\RainLibrary3\RainAlgorithm.cpp">
-      <Filter>RainLibrary3</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\RainLibrary3\RainError.cpp">
-      <Filter>RainLibrary3</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\RainLibrary3\RainGdiPlusInclude.cpp">
-      <Filter>RainLibrary3</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\RainLibrary3\RainLibraries.cpp">
-      <Filter>RainLibrary3</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\RainLibrary3\RainLogging.cpp">
-      <Filter>RainLibrary3</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\RainLibrary3\RainUtility.cpp">
-      <Filter>RainLibrary3</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\RainLibrary3\RainUtilityFile.cpp">
-      <Filter>RainLibrary3</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\RainLibrary3\RainUtilityGeneral.cpp">
-      <Filter>RainLibrary3</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\RainLibrary3\RainUtilityHexString.cpp">
-      <Filter>RainLibrary3</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\RainLibrary3\RainUtilityString.cpp">
-      <Filter>RainLibrary3</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\RainLibrary3\RainWindow.cpp">
-      <Filter>RainLibrary3</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\RainLibrary3\RainWindowsLAM.cpp">
-      <Filter>RainLibrary3</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2.cpp">
-      <Filter>RainLibrary3</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2Include.cpp">
-      <Filter>RainLibrary3</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2SendRecv.cpp">
-      <Filter>RainLibrary3</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2Server.cpp">
-      <Filter>RainLibrary3</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2SMTP.cpp">
-      <Filter>RainLibrary3</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2Utility.cpp">
-      <Filter>RainLibrary3</Filter>
-    </ClCompile>
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Start.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\RainAeternum\AlgorithmLibraries.cpp">
+      <Filter>RainAeternum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\RainAeternum\GdiplusInclude.cpp">
+      <Filter>RainAeternum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkBase.cpp">
+      <Filter>RainAeternum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkClientManager.cpp">
+      <Filter>RainAeternum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkLibraries.cpp">
+      <Filter>RainAeternum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkRecvThread.cpp">
+      <Filter>RainAeternum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkServerManager.cpp">
+      <Filter>RainAeternum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkSMTP.cpp">
+      <Filter>RainAeternum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkSocketManager.cpp">
+      <Filter>RainAeternum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkUtility.cpp">
+      <Filter>RainAeternum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkWSAInclude.cpp">
+      <Filter>RainAeternum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\RainAeternum\RainLibraries.cpp">
+      <Filter>RainAeternum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\RainAeternum\RainWindow.cpp">
+      <Filter>RainAeternum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\RainAeternum\UtilityError.cpp">
+      <Filter>RainAeternum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\RainAeternum\UtilityFilesystem.cpp">
+      <Filter>RainAeternum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\RainAeternum\UtilityLibraries.cpp">
+      <Filter>RainAeternum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\RainAeternum\UtilityLogging.cpp">
+      <Filter>RainAeternum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\RainAeternum\UtilityString.cpp">
+      <Filter>RainAeternum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\RainAeternum\UtilityTime.cpp">
+      <Filter>RainAeternum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\RainAeternum\WindowsLAMInclude.cpp">
+      <Filter>RainAeternum</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

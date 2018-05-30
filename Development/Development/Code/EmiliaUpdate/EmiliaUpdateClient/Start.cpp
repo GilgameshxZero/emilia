@@ -40,9 +40,7 @@ namespace Monochrome3 {
 				if (arg1 == "stage-dev-crh-success")
 					Rain::tsCout("IMPORTANT: 'stage-dev' CRH completed successfully.\r\n\r\n");
 				else if (arg1 == "stage-prod-crh-success")
-					Rain::tsCout("IMPORTANT: 'stage-prod' CRH completed successfully.\r\n\r\n");
-				else if (arg1 == "deploy-staging-crh-success")
-					Rain::tsCout("IMPORTANT: 'deploy-staging' CRH completed successfully.\r\n\r\n");
+					Rain::tsCout("IMPORTANT: 'stage-prod' or 'deploy-staging' CRH completed successfully.\r\n\r\n");
 			}
 
 			//command loop

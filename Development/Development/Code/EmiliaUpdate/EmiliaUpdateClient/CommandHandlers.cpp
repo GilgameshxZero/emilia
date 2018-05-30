@@ -162,7 +162,7 @@ namespace Monochrome3 {
 				std::size_t fileSize = Rain::getFileSize((*cmhParam.config)["prod-root-dir"] + files[a]);
 				char *buffer = new char[blockMax];
 				for (std::size_t b = 0; b < fileSize; b += blockMax) {
-					Rain::tsCout("Info: Uploading file ", a, " of ", files.size(), ". Done: ", b, " of ", fileSize, ".\r\n");
+					Rain::tsCout("Info: Uploading file ", a + 1, " of ", files.size(), ". Done: ", b, " of ", fileSize, ".\r\n");
 					fflush(stdout);
 
 					fileIn.read(buffer, min(blockMax, fileSize - b));
