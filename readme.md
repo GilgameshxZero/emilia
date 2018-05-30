@@ -34,7 +34,7 @@ Files are organized in any development root as follows:
 		* Server
 	* Staging: Simulated staging environment.
 	* Production: Simulated production environment.
-	* Remote: Simulated remote production environment.
+	* Production-Remote: Simulated remote production environment.
 * Staging: Intermediary between development and production. Functional most of the time. 
 	* Auxiliary
 	* Code: Any code files, in the same structure as in production.
@@ -107,6 +107,11 @@ In the root, there will also be additional untracked files not part of the offic
 ## Changelog
 
 ### Emilia-tan
+* 1.2.0
+	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer, EmiliaUpdateCRHelper) = (3.7.2, 1.1.1, 1.3.0, 1.0.2, 1.0.1, 1.0.2)
+	* Line count: 
+	* fix for EmiliaMailServer
+	* updated readme
 * 1.1.4
 	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer, EmiliaUpdateCRHelper) = (3.7.2, 1.1.1, 1.2.2, 1.0.1, 1.0.1, 1.0.0)
 	* Line count: 7030
@@ -138,10 +143,14 @@ In the root, there will also be additional untracked files not part of the offic
 
 ### RainLibrary
 * Aeternum
-	* not very backwards-compatible with v3
-	* added NetworkClientManager class for client connections
-	* added abstract NetworkSocketManager
-	* restructured some flows and renamed some things
+	* better logging
+	* added ClientSocketManager class for client connections
+	* added ServerManager & ServerSocketManager for servers
+	* added abstract SocketManager
+	* updated filesystem utilities
+	* better time utilities
+	* restructured some flows
+	* major refactoring
 
 ### EmiliaSite
 
@@ -176,6 +185,9 @@ In the root, there will also be additional untracked files not part of the offic
 	* updated fileversion detail on .exe
 
 #### EmiliaMailServer
+* 1.3.0
+	* hotfix to allow multiple clients to be active at the same time
+	* show console and stdout from client
 * 1.2.2
 	* cleaned up resource.h
 	* hotfixed RainLibrary3 links
@@ -187,6 +199,10 @@ In the root, there will also be additional untracked files not part of the offic
 ### EmiliaUpdate
 
 #### EmiliaUpdateClient
+* 1.0.2
+	* bugfixes on progress indicators
+	* bugfix on CRH completion message
+	* changed code generation to /MT
 * 1.0.1
 	* bugfixes to existing commands
 	* finished essential (non-sync) command implementation
@@ -197,10 +213,16 @@ In the root, there will also be additional untracked files not part of the offic
 	* staging to prod WIP
 
 #### EmiliaUpdateCRHelper
+* 1.0.1
+	* switched to RainAeternum
+	* changed code generation to /MT
 * 1.0.0
 	* allows a copy + run operation delayed until the destination is writable
 
 #### EmiliaUpdateServer
+* 1.0.2
+	* deletes tmp file created during 'prod-upload' now
+	* changed code generation to /MT
 * 1.0.1
 	* bugfixes to existing commands
 	* finished essential (non-sync) command implementation
@@ -229,6 +251,7 @@ In the root, there will also be additional untracked files not part of the offic
 
 #### EmiliaMailServer
 * switch to RainAeternum
+* stdout from sockets isn't showing in console?
 
 #### EmiliaMailClient
 * switch to RainAeternum
@@ -239,7 +262,5 @@ In the root, there will also be additional untracked files not part of the offic
 * clean up memory leaks
 
 #### EmiliaUpdateCRHelper
-* switch to RainAeternum
 
 #### EmiliaUpdateServer
-* remove tmp server file after CRH finishes
