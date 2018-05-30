@@ -115,7 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\config.ini" />
-    <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\credentials.confidential.ini" />
+    <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\auth-file.confidential.ini" />
     <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\deploy-ignore.ini" />
     <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\staging-ignore.ini" />
     <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateClient\staging-files.ini" />
