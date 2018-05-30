@@ -52,8 +52,8 @@ namespace Monochrome3 {
 		};
 
 		//handlers for RecvThread
-		int onConnectionInit(void *funcParam);
-		int onConnectionExit(void *funcParam);
-		int onConnectionProcessMessage(void *funcParam);
+		int onConnect(void *funcParam);
+		int onMessage(void *funcParam);
+		int onDisconnect(void *funcParam);
 	}
 }

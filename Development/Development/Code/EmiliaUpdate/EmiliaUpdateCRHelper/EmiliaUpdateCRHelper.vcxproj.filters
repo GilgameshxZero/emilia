@@ -22,6 +22,9 @@
     <Filter Include="RainAeternum">
       <UniqueIdentifier>{287a0ecd-eff3-40ef-ad73-f761b893a736}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Dynamic">
+      <UniqueIdentifier>{256708d4-a248-4be8-9cac-99477e398116}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BuildID.h">

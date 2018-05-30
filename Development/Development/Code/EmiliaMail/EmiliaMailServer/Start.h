@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../../Common/RainLibrary3/RainLibraries.h"
+#include "../../Common/RainAeternum/RainLibraries.h"
+
 #include "RecvThreadHandlers.h"
 #include "RecvThreadParam.h"
 #include "ListenThread.h"
@@ -10,7 +11,7 @@
 #pragma comment (lib, "Dnsapi.lib")
 
 namespace Monochrome3 {
-	namespace EMTSMTPServer {
-		int start();
+	namespace EmiliaMailServer {
+		int start(int argc, char* argv[]);
 	}
 }

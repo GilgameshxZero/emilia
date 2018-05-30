@@ -34,8 +34,8 @@ namespace Monochrome3 {
 		};
 
 		//handlers for ClientSocketManager
-		int onConnectionInit(void *funcParam);
-		int onConnectionExit(void *funcParam);
-		int onConnectionProcessMessage(void *funcParam);
+		int onConnect(void *funcParam);
+		int onDisconnect(void *funcParam);
+		int onMessage(void *funcParam);
 	}
 }

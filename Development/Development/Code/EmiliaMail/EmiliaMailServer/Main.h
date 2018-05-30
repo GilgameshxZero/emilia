@@ -1,5 +1,10 @@
-#pragma once
+/*
+EmiliaMailServer opens ports for both receiving and sending mail. Requests to receive mail are processed through port 25. Requests to receive mail are processed through a series of ports. Check the configuration for more details.
+*/
 
+#pragma once
 #include "Start.h"
 
-int main();
+#include <iostream>
+
+int main(int argc, char* argv[]);

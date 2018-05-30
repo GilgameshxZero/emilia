@@ -4,7 +4,7 @@ Responsible for maintaining a socket open for listening on a specified port, as 
 
 #pragma once
 
-#include "../../Common/RainLibrary3/RainLibraries.h"
+#include "../../Common/RainAeternum/RainLibraries.h"
 #include "ListenThreadParam.h"
 #include "RecvThreadParam.h"
 #include "RecvThreadHandlers.h"
@@ -19,7 +19,7 @@ Responsible for maintaining a socket open for listening on a specified port, as 
 #include <Windows.h>
 
 namespace Monochrome3 {
-	namespace EMTSMTPServer {
+	namespace EmiliaMailServer {
 		//called from Start to create a thread
 		DWORD WINAPI listenThread(LPVOID lpParameter);
 

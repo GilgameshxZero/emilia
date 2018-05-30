@@ -107,9 +107,11 @@ In the root, there will also be additional untracked files not part of the offic
 ## Changelog
 
 ### Emilia-tan
+* 2.0.0
+	* updated file organizational structure
+	* changed Aeternum naming
 * 1.2.0
 	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer, EmiliaUpdateCRHelper) = (3.7.2, 1.1.1, 1.3.0, 1.0.2, 1.0.1, 1.0.2)
-	* Line count: 
 	* fix for EmiliaMailServer
 	* updated readme
 * 1.1.4
@@ -149,12 +151,15 @@ In the root, there will also be additional untracked files not part of the offic
 	* added abstract SocketManager
 	* updated filesystem utilities
 	* better time utilities
+	* standardized naming slightly
 	* restructured some flows
 	* major refactoring
 
 ### EmiliaSite
 
 #### EmiliaSiteServer
+* -
+	* 
 * 3.7.2
 	* fixed POST request header length parsing
 	* cleaned up resource.h
@@ -179,12 +184,18 @@ In the root, there will also be additional untracked files not part of the offic
 ### EmiliaMail
 
 #### EmiliaMailClient
+* -
+	* removed; capabilities merged into EmiliaMailServer
 * 1.1.1
 	* light refactoring
 	* project structure changes
 	* updated fileversion detail on .exe
 
 #### EmiliaMailServer
+* -
+	* implemented RainAeternum upgrades
+	* added EmiliaMailClient capabilities onto a network socket port for easy API access
+	* 
 * 1.3.0
 	* hotfix to allow multiple clients to be active at the same time
 	* show console and stdout from client
@@ -200,6 +211,8 @@ In the root, there will also be additional untracked files not part of the offic
 ### EmiliaUpdate
 
 #### EmiliaUpdateClient
+* -
+	* standardized naming
 * 1.0.2
 	* bugfixes on progress indicators
 	* bugfix on CRH completion message
@@ -214,6 +227,8 @@ In the root, there will also be additional untracked files not part of the offic
 	* staging to prod WIP
 
 #### EmiliaUpdateCRHelper
+* -
+	* standardized naming
 * 1.0.1
 	* switched to RainAeternum
 	* changed code generation to /MT
@@ -221,6 +236,8 @@ In the root, there will also be additional untracked files not part of the offic
 	* allows a copy + run operation delayed until the destination is writable
 
 #### EmiliaUpdateServer
+* -
+	* standardized naming
 * 1.0.2
 	* deletes tmp file created during 'prod-upload' now
 	* changed code generation to /MT

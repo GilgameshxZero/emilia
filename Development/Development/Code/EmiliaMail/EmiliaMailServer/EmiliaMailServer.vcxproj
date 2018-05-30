@@ -81,24 +81,26 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Common\RainLibrary3\RainAlgorithm.h" />
-    <ClInclude Include="..\..\Common\RainLibrary3\RainError.h" />
-    <ClInclude Include="..\..\Common\RainLibrary3\RainGdiPlusInclude.h" />
-    <ClInclude Include="..\..\Common\RainLibrary3\RainLibraries.h" />
-    <ClInclude Include="..\..\Common\RainLibrary3\RainLogging.h" />
-    <ClInclude Include="..\..\Common\RainLibrary3\RainUtility.h" />
-    <ClInclude Include="..\..\Common\RainLibrary3\RainUtilityFile.h" />
-    <ClInclude Include="..\..\Common\RainLibrary3\RainUtilityGeneral.h" />
-    <ClInclude Include="..\..\Common\RainLibrary3\RainUtilityHexString.h" />
-    <ClInclude Include="..\..\Common\RainLibrary3\RainUtilityString.h" />
-    <ClInclude Include="..\..\Common\RainLibrary3\RainWindow.h" />
-    <ClInclude Include="..\..\Common\RainLibrary3\RainWindowsLAM.h" />
-    <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2.h" />
-    <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2Include.h" />
-    <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2SendRecv.h" />
-    <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2Server.h" />
-    <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2SMTP.h" />
-    <ClInclude Include="..\..\Common\RainLibrary3\RainWSA2Utility.h" />
+    <ClInclude Include="..\..\Common\RainAeternum\AlgorithmLibraries.h" />
+    <ClInclude Include="..\..\Common\RainAeternum\GdiplusInclude.h" />
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkBase.h" />
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkClientManager.h" />
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkLibraries.h" />
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkRecvThread.h" />
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkServerManager.h" />
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkSMTP.h" />
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkSocketManager.h" />
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkUtility.h" />
+    <ClInclude Include="..\..\Common\RainAeternum\NetworkWSAInclude.h" />
+    <ClInclude Include="..\..\Common\RainAeternum\RainLibraries.h" />
+    <ClInclude Include="..\..\Common\RainAeternum\RainWindow.h" />
+    <ClInclude Include="..\..\Common\RainAeternum\UtilityError.h" />
+    <ClInclude Include="..\..\Common\RainAeternum\UtilityFilesystem.h" />
+    <ClInclude Include="..\..\Common\RainAeternum\UtilityLibraries.h" />
+    <ClInclude Include="..\..\Common\RainAeternum\UtilityLogging.h" />
+    <ClInclude Include="..\..\Common\RainAeternum\UtilityString.h" />
+    <ClInclude Include="..\..\Common\RainAeternum\UtilityTime.h" />
+    <ClInclude Include="..\..\Common\RainAeternum\WindowsLAMInclude.h" />
     <ClInclude Include="BuildID.h" />
     <ClInclude Include="ListenThread.h" />
     <ClInclude Include="ListenThreadParam.h" />
@@ -109,9 +111,10 @@
     <ClInclude Include="Start.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Configuration\EmiliaMail\EmiliaMailServer\forward-config.ini" />
+    <None Include="..\..\..\Configuration\EmiliaMail\EmiliaMailServer\config.ini" />
+    <None Include="..\..\..\Dynamic\EmiliaMail\EmiliaMailServer\forward-config.ini" />
     <None Include="BuildIDInc.bat" />
-    <None Include="config.ini" />
+    <None Include="config-loc.ini" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
@@ -120,24 +123,26 @@
     <Image Include="Icon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Common\RainLibrary3\RainAlgorithm.cpp" />
-    <ClCompile Include="..\..\Common\RainLibrary3\RainError.cpp" />
-    <ClCompile Include="..\..\Common\RainLibrary3\RainGdiPlusInclude.cpp" />
-    <ClCompile Include="..\..\Common\RainLibrary3\RainLibraries.cpp" />
-    <ClCompile Include="..\..\Common\RainLibrary3\RainLogging.cpp" />
-    <ClCompile Include="..\..\Common\RainLibrary3\RainUtility.cpp" />
-    <ClCompile Include="..\..\Common\RainLibrary3\RainUtilityFile.cpp" />
-    <ClCompile Include="..\..\Common\RainLibrary3\RainUtilityGeneral.cpp" />
-    <ClCompile Include="..\..\Common\RainLibrary3\RainUtilityHexString.cpp" />
-    <ClCompile Include="..\..\Common\RainLibrary3\RainUtilityString.cpp" />
-    <ClCompile Include="..\..\Common\RainLibrary3\RainWindow.cpp" />
-    <ClCompile Include="..\..\Common\RainLibrary3\RainWindowsLAM.cpp" />
-    <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2.cpp" />
-    <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2Include.cpp" />
-    <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2SendRecv.cpp" />
-    <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2Server.cpp" />
-    <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2SMTP.cpp" />
-    <ClCompile Include="..\..\Common\RainLibrary3\RainWSA2Utility.cpp" />
+    <ClCompile Include="..\..\Common\RainAeternum\AlgorithmLibraries.cpp" />
+    <ClCompile Include="..\..\Common\RainAeternum\GdiplusInclude.cpp" />
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkBase.cpp" />
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkClientManager.cpp" />
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkLibraries.cpp" />
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkRecvThread.cpp" />
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkServerManager.cpp" />
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkSMTP.cpp" />
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkSocketManager.cpp" />
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkUtility.cpp" />
+    <ClCompile Include="..\..\Common\RainAeternum\NetworkWSAInclude.cpp" />
+    <ClCompile Include="..\..\Common\RainAeternum\RainLibraries.cpp" />
+    <ClCompile Include="..\..\Common\RainAeternum\RainWindow.cpp" />
+    <ClCompile Include="..\..\Common\RainAeternum\UtilityError.cpp" />
+    <ClCompile Include="..\..\Common\RainAeternum\UtilityFilesystem.cpp" />
+    <ClCompile Include="..\..\Common\RainAeternum\UtilityLibraries.cpp" />
+    <ClCompile Include="..\..\Common\RainAeternum\UtilityLogging.cpp" />
+    <ClCompile Include="..\..\Common\RainAeternum\UtilityString.cpp" />
+    <ClCompile Include="..\..\Common\RainAeternum\UtilityTime.cpp" />
+    <ClCompile Include="..\..\Common\RainAeternum\WindowsLAMInclude.cpp" />
     <ClCompile Include="ListenThread.cpp" />
     <ClCompile Include="ListenThreadParam.cpp" />
     <ClCompile Include="Main.cpp" />

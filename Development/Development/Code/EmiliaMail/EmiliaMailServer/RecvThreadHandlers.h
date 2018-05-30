@@ -3,7 +3,7 @@
 #include "RecvThreadParam.h"
 
 namespace Monochrome3 {
-	namespace EMTSMTPServer {
+	namespace EmiliaMailServer {
 		int onProcessMessage(void *funcParam);
 		void onRecvThreadInit(void *funcParam);
 		void onRecvThreadEnd(void *funcParam);

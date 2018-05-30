@@ -8,9 +8,9 @@ namespace Rain {
 											 void *funcParam) {
 		this->socket = cSocket;
 		this->logger = NULL;
-		this->onConnect = onConnect;
-		this->onMessage = onMessage;
-		this->onDisconnect = onDisconnect;
+		this->onConnectDelegate = onConnect;
+		this->onMessageDelegate = onMessage;
+		this->onDisconnectDelegate = onDisconnect;
 
 		this->ssmdhParam.ssm = this;
 		this->ssmdhParam.cSocket = this->socket;
@@ -37,9 +37,9 @@ namespace Rain {
 		return *this->socket;
 	}
 	void ServerSocketManager::setEventHandlers(RecvHandlerParam::EventHandler onConnect, RecvHandlerParam::EventHandler onMessage, RecvHandlerParam::EventHandler onDisconnect, void *funcParam) {
-		this->onConnect = onConnect;
-		this->onMessage = onMessage;
-		this->onDisconnect = onDisconnect;
+		this->onConnectDelegate = onConnect;
+		this->onMessageDelegate = onMessage;
+		this->onDisconnectDelegate = onDisconnect;
 
 		this->ssmdhParam.callerParam = funcParam;
 	}
@@ -49,20 +49,31 @@ namespace Rain {
 		return ret;
 	}
 	std::tuple<RecvHandlerParam::EventHandler, RecvHandlerParam::EventHandler, RecvHandlerParam::EventHandler> ServerSocketManager::getInternalHandlers() {
-		return std::make_tuple(this->onProcessMessage, this->onRecvInit, this->onRecvExit);
+		return std::make_tuple(this->onConnect, this->onMessage, this->onDisconnect);
 	}
-	int ServerSocketManager::onRecvInit(void *param) {
+	int ServerSocketManager::onConnect(void *param) {
 		ServerManager::ServerManagerRecvThreadParam &smrtParam = *reinterpret_cast<ServerManager::ServerManagerRecvThreadParam *>(param);
 
 		//depending on which delegate handlers are defined, call the right one
 		smrtParam.ssm->ssmdhParam.message = &smrtParam.message;
-		return smrtParam.ssm->onConnect == NULL ? 0 : smrtParam.ssm->onConnect(&smrtParam.ssm->ssmdhParam);
+		return smrtParam.ssm->onConnectDelegate == NULL ? 0 : smrtParam.ssm->onConnectDelegate(&smrtParam.ssm->ssmdhParam);
 	}
-	int ServerSocketManager::onRecvExit(void *param) {
+	int ServerSocketManager::onMessage(void *param) {
+		//call delegate handler
+		ServerManager::ServerManagerRecvThreadParam &smrtParam = *reinterpret_cast<ServerManager::ServerManagerRecvThreadParam *>(param);
+
+		//if we are logging socket communications, do that here for incoming communications
+		if (smrtParam.ssm->logger != NULL)
+			smrtParam.ssm->logger->logString(smrtParam.rhParam->message);
+
+		//depending on which delegate handlers are defined, call the right one
+		return smrtParam.ssm->onMessageDelegate == NULL ? 0 : smrtParam.ssm->onMessageDelegate(&smrtParam.ssm->ssmdhParam);
+	}
+	int ServerSocketManager::onDisconnect(void *param) {
 		ServerManager::ServerManagerRecvThreadParam &smrtParam = *reinterpret_cast<ServerManager::ServerManagerRecvThreadParam *>(param);
 
 		//depending on which delegate handlers are defined, call the right one
-		int delRtrn = smrtParam.ssm->onDisconnect == NULL ? 0 : smrtParam.ssm->onDisconnect(&smrtParam.ssm->ssmdhParam);
+		int delRtrn = smrtParam.ssm->onDisconnectDelegate == NULL ? 0 : smrtParam.ssm->onDisconnectDelegate(&smrtParam.ssm->ssmdhParam);
 
 		//modify linked list and remove current ltrfParam
 		smrtParam.llMutex->lock();
@@ -78,23 +89,12 @@ namespace Rain {
 
 		return delRtrn;
 	}
-	int ServerSocketManager::onProcessMessage(void *param) {
-		//call delegate handler
-		ServerManager::ServerManagerRecvThreadParam &smrtParam = *reinterpret_cast<ServerManager::ServerManagerRecvThreadParam *>(param);
-
-		//if we are logging socket communications, do that here for incoming communications
-		if (smrtParam.ssm->logger != NULL)
-			smrtParam.ssm->logger->logString(smrtParam.rhParam->message);
-
-		//depending on which delegate handlers are defined, call the right one
-		return smrtParam.ssm->onMessage == NULL ? 0 : smrtParam.ssm->onMessage(&smrtParam.ssm->ssmdhParam);
-	}
 
 	ServerManager::ServerManager() {
 		this->socket = NULL;
 		this->listeningPort = -1;
 		this->lowPort = this->highPort = 0;
-		this->onConnect = this->onMessage = this->onDisconnect = NULL;
+		this->onConnectDelegate = this->onMessageDelegate = this->onDisconnectDelegate = NULL;
 		this->recvBufLen = 65536;
 
 		this->ltEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
@@ -158,9 +158,9 @@ namespace Rain {
 		this->newClientCall = newClientCall;
 	}
 	void ServerManager::setEventHandlers(RecvHandlerParam::EventHandler onConnect, RecvHandlerParam::EventHandler onMessage, RecvHandlerParam::EventHandler onDisconnect, void *funcParam) {
-		this->onConnect = onConnect;
-		this->onMessage = onMessage;
-		this->onDisconnect = onDisconnect;
+		this->onConnectDelegate = onConnect;
+		this->onMessageDelegate = onMessage;
+		this->onDisconnectDelegate = onDisconnect;
 		this->funcParam = funcParam;
 	}
 	std::size_t ServerManager::setRecvBufLen(std::size_t newLen) {
@@ -199,7 +199,7 @@ namespace Rain {
 			}
 
 			//once a client is accept, spawn a ServerSocketManager and call a function
-			ServerSocketManager *ssm = new ServerSocketManager(cSocket, sm.onConnect, sm.onMessage, sm.onDisconnect, sm.funcParam);
+			ServerSocketManager *ssm = new ServerSocketManager(cSocket, sm.onConnectDelegate, sm.onMessageDelegate, sm.onDisconnectDelegate, sm.funcParam);
 			if (sm.newClientCall != NULL)
 				sm.newClientCall(ssm);
 
@@ -225,9 +225,9 @@ namespace Rain {
 
 			static std::tuple<RecvHandlerParam::EventHandler, RecvHandlerParam::EventHandler, RecvHandlerParam::EventHandler> internalHandlers;
 			internalHandlers = ssm->getInternalHandlers();
-			rhParam->onProcessMessage = std::get<0>(internalHandlers);
-			rhParam->onRecvInit = std::get<1>(internalHandlers);
-			rhParam->onRecvExit = std::get<2>(internalHandlers);
+			rhParam->onConnect = std::get<0>(internalHandlers);
+			rhParam->onMessage = std::get<1>(internalHandlers);
+			rhParam->onDisconnect = std::get<2>(internalHandlers);
 
 			//start recvThread for the SSM
 			smrtParam->hRecvThread = createRecvThread(rhParam);
