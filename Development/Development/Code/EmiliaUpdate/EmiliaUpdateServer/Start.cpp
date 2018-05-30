@@ -62,7 +62,7 @@ namespace Monochrome3 {
 			}
 
 			Rain::ServerManager sm;
-			sm.setEventHandlers(onConnectionInit, onConnectionProcessMessage, onConnectionExit, &ccParam);
+			sm.setEventHandlers(onConnect, onMessage, onDisconnect, &ccParam);
 			sm.setRecvBufLen(Rain::strToT<std::size_t>(config["recv-buflen"]));
 			if (!sm.setServerListen(Rain::strToT<DWORD>(config["ports-low"]), Rain::strToT<DWORD>(config["ports-high"]))) {
 				Rain::tsCout("Server listening on port ", sm.getListeningPort(), "..\r\n");

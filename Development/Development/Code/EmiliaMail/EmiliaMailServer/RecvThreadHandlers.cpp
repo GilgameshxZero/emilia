@@ -1,7 +1,7 @@
 #include "RecvThreadHandlers.h"
 
 namespace Monochrome3 {
-	namespace EMTSMTPServer {
+	namespace EmiliaMailServer {
 		int onProcessMessage(void *funcParam) {
 			RecvThreadParam &rtParam = *reinterpret_cast<RecvThreadParam *>(funcParam);
 			std::map<std::string, std::string> &config = *rtParam.pLTParam->config;

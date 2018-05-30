@@ -1,7 +1,7 @@
 #include "ListenThread.h"
 
 namespace Monochrome3 {
-	namespace EMTSMTPServer {
+	namespace EmiliaMailServer {
 		DWORD WINAPI listenThread(LPVOID lpParameter) {
 			ListenThreadParam &ltParam = *reinterpret_cast<ListenThreadParam *>(lpParameter);
 

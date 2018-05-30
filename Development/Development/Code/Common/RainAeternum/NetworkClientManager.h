@@ -103,7 +103,7 @@ namespace Rain {
 		int socketStatus;
 		std::string ipAddress;
 		DWORD lowPort, highPort;
-		RecvHandlerParam::EventHandler onConnect, onMessage, onDisconnect;
+		RecvHandlerParam::EventHandler onConnectDelegate, onMessageDelegate, onDisconnectDelegate;
 		DWORD msReconnectWaitMax, msSendWaitMax;
 		std::size_t recvBufLen;
 		LogStream *logger;
@@ -133,7 +133,7 @@ namespace Rain {
 		//close when threads end by the thread
 		HANDLE hConnectThread, hSendThread;
 
-		//event which will be set when there have been as many calls to onRecvExit as there have been to onRecvInit
+		//event which will be set when there have been as many calls to onDisconnect as there have been to onConnect
 		HANDLE recvExitComplete;
 
 		//disconnects socket immediately, regardless of state
@@ -150,8 +150,8 @@ namespace Rain {
 		static DWORD WINAPI attemptSendMessageThread(LPVOID param);
 
 		//event handlers for internal recvThread, before passing to delegates
-		static int onRecvInit(void *param);
-		static int onRecvExit(void *param);
-		static int onProcessMessage(void *param);
+		static int onConnect(void *param);
+		static int onMessage(void *param);
+		static int onDisconnect(void *param);
 	};
 }

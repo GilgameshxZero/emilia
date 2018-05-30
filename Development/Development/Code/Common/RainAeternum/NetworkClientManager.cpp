@@ -8,7 +8,7 @@ namespace Rain {
 		this->socketStatus = -1;
 		this->ipAddress = "";
 		this->lowPort = this->highPort = 0;
-		this->onConnect = this->onMessage = this->onDisconnect = NULL;
+		this->onConnectDelegate = this->onMessageDelegate = this->onDisconnectDelegate = NULL;
 		this->msReconnectWaitMax = this->msSendWaitMax = 3000;
 		this->recvBufLen = 65536;
 		this->logger = NULL;
@@ -104,9 +104,9 @@ namespace Rain {
 		}
 	}
 	void ClientSocketManager::setEventHandlers(RecvHandlerParam::EventHandler onConnect, RecvHandlerParam::EventHandler onMessage, RecvHandlerParam::EventHandler onDisconnect, void *funcParam) {
-		this->onConnect = onConnect;
-		this->onMessage = onMessage;
-		this->onDisconnect = onDisconnect;
+		this->onConnectDelegate = onConnect;
+		this->onMessageDelegate = onMessage;
+		this->onDisconnectDelegate = onDisconnect;
 		this->csmdhParam.delegateParam = funcParam;
 	}
 	DWORD ClientSocketManager::setReconnectAttemptTime(DWORD msMaxInterval) {
@@ -142,7 +142,7 @@ namespace Rain {
 
 			this->connectedPort = -1;
 
-			//wait for onRecvExit if socket was connected before
+			//wait for onDisconnect if socket was connected before
 			WaitForSingleObject(this->recvExitComplete, INFINITE);
 		}
 	}
@@ -189,9 +189,9 @@ namespace Rain {
 					csm.rParam.bufLen = csm.recvBufLen;
 					csm.rParam.funcParam = static_cast<void *>(&csm);
 					csm.rParam.message = csm.csmdhParam.message;
-					csm.rParam.onProcessMessage = csm.onProcessMessage;
-					csm.rParam.onRecvInit = csm.onRecvInit;
-					csm.rParam.onRecvExit = csm.onRecvExit;
+					csm.rParam.onMessage = csm.onMessage;
+					csm.rParam.onConnect = csm.onConnect;
+					csm.rParam.onDisconnect = csm.onDisconnect;
 					csm.rParam.socket = &csm.socket;
 					Rain::createRecvThread(&csm.rParam);
 
@@ -231,15 +231,24 @@ namespace Rain {
 		SetEvent(csm.messageDoneEvent);
 		return 0;
 	}
-	int ClientSocketManager::onRecvInit(void *param) {
+	int ClientSocketManager::onConnect(void *param) {
 		Rain::ClientSocketManager &csm = *reinterpret_cast<Rain::ClientSocketManager *>(param);
 		
-		//reset an event for listeners of the end of onRecvExit
+		//reset an event for listeners of the end of onDisconnect
 		ResetEvent(csm.recvExitComplete);
 
-		return csm.onConnect == NULL ? 0 : csm.onConnect(&csm.csmdhParam);
+		return csm.onConnectDelegate == NULL ? 0 : csm.onConnectDelegate(&csm.csmdhParam);
 	}
-	int ClientSocketManager::onRecvExit(void *param) {
+	int ClientSocketManager::onMessage(void *param) {
+		Rain::ClientSocketManager &csm = *reinterpret_cast<Rain::ClientSocketManager *>(param);
+
+		//if we are logging socket communications, do that here for incoming messages
+		if (csm.logger != NULL)
+			csm.logger->logString(csm.rParam.message);
+
+		return csm.onMessageDelegate == NULL ? 0 : csm.onMessageDelegate(&csm.csmdhParam);
+	}
+	int ClientSocketManager::onDisconnect(void *param) {
 		Rain::ClientSocketManager &csm = *reinterpret_cast<Rain::ClientSocketManager *>(param);
 
 		//retry to connect, if original status was connected
@@ -254,20 +263,11 @@ namespace Rain {
 		}
 
 		//call delegate if it exists
-		int ret = csm.onDisconnect == NULL ? 0 : csm.onDisconnect(&csm.csmdhParam);
+		int ret = csm.onDisconnectDelegate == NULL ? 0 : csm.onDisconnectDelegate(&csm.csmdhParam);
 
 		//set an event to listeners, that this function has been called
 		SetEvent(csm.recvExitComplete);
 
 		return ret;
-	}
-	int ClientSocketManager::onProcessMessage(void *param) {
-		Rain::ClientSocketManager &csm = *reinterpret_cast<Rain::ClientSocketManager *>(param);
-
-		//if we are logging socket communications, do that here for incoming messages
-		if (csm.logger != NULL)
-			csm.logger->logString(csm.rParam.message);
-
-		return csm.onMessage == NULL ? 0 : csm.onMessage(&csm.csmdhParam);
 	}
 }

@@ -283,7 +283,7 @@ namespace Monochrome3 {
 
 		int CHHSetupCSM(CommandHandlerParam &cmhParam, Rain::ClientSocketManager &csm, ConnectionHandlerParam &chParam) {
 			//all commands use the same handlers
-			csm.setEventHandlers(onConnectionInit, onConnectionProcessMessage, onConnectionExit, &chParam);
+			csm.setEventHandlers(onConnect, onMessage, onDisconnect, &chParam);
 
 			cmhParam.logger->setSocketSrc(&csm, true);
 
