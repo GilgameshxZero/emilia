@@ -65,7 +65,7 @@ namespace Monochrome3 {
 			sm.setEventHandlers(onConnect, onMessage, onDisconnect, &ccParam);
 			sm.setRecvBufLen(Rain::strToT<std::size_t>(config["recv-buflen"]));
 			if (!sm.setServerListen(Rain::strToT<DWORD>(config["ports-low"]), Rain::strToT<DWORD>(config["ports-high"]))) {
-				Rain::tsCout("Server listening on port ", sm.getListeningPort(), "..\r\n");
+				Rain::tsCout("Server listening on port ", sm.getListeningPort(), ".\r\n");
 			} else {
 				Rain::tsCout("Fatal error: could not setup server listening.\r\n");
 				DWORD error = GetLastError();

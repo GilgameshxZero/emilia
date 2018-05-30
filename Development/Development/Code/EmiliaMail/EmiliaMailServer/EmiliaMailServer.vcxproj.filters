@@ -33,19 +33,7 @@
     <ClInclude Include="resource.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
-    <ClInclude Include="ListenThread.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ListenThreadParam.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Main.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RecvThreadHandlers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RecvThreadParam.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Start.h">
@@ -111,6 +99,15 @@
     <ClInclude Include="..\..\Common\RainAeternum\WindowsLAMInclude.h">
       <Filter>RainAeternum</Filter>
     </ClInclude>
+    <ClInclude Include="CommandHandlers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConnectionHandlers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RequestHandlers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="BuildIDInc.bat">
@@ -122,7 +119,7 @@
     <None Include="..\..\..\Configuration\EmiliaMail\EmiliaMailServer\config.ini">
       <Filter>Configuration</Filter>
     </None>
-    <None Include="..\..\..\Dynamic\EmiliaMail\EmiliaMailServer\forward-config.ini">
+    <None Include="..\..\..\Dynamic\EmiliaMail\EmiliaMailServer\forwards.ini">
       <Filter>Dynamic</Filter>
     </None>
   </ItemGroup>
@@ -137,19 +134,7 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ListenThread.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ListenThreadParam.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RecvThreadHandlers.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RecvThreadParam.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Start.cpp">
@@ -214,6 +199,15 @@
     </ClCompile>
     <ClCompile Include="..\..\Common\RainAeternum\WindowsLAMInclude.cpp">
       <Filter>RainAeternum</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandHandlers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ConnectionHandlers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RequestHandlers.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

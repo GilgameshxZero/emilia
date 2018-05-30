@@ -2,11 +2,8 @@
 
 #include "../../Common/RainAeternum/RainLibraries.h"
 
-#include "RecvThreadHandlers.h"
-#include "RecvThreadParam.h"
-#include "ListenThread.h"
-
-#include <WinDNS.h>
+#include "CommandHandlers.h"
+#include "ConnectionHandlers.h"
 
 #pragma comment (lib, "Dnsapi.lib")
 

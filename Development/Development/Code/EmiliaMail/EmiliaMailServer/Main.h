@@ -1,5 +1,5 @@
 /*
-EmiliaMailServer opens ports for both receiving and sending mail. Requests to receive mail are processed through port 25. Requests to receive mail are processed through a series of ports. Check the configuration for more details.
+EmiliaMailServer opens ports for both receiving and sending mail. Requests to receive mail are processed through port 25. Requests to receive mail are processed through port 25 as well.
 */
 
 #pragma once

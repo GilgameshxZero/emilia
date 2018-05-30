@@ -102,17 +102,16 @@
     <ClInclude Include="..\..\Common\RainAeternum\UtilityTime.h" />
     <ClInclude Include="..\..\Common\RainAeternum\WindowsLAMInclude.h" />
     <ClInclude Include="BuildID.h" />
-    <ClInclude Include="ListenThread.h" />
-    <ClInclude Include="ListenThreadParam.h" />
+    <ClInclude Include="CommandHandlers.h" />
     <ClInclude Include="Main.h" />
-    <ClInclude Include="RecvThreadHandlers.h" />
-    <ClInclude Include="RecvThreadParam.h" />
+    <ClInclude Include="ConnectionHandlers.h" />
+    <ClInclude Include="RequestHandlers.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Start.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Configuration\EmiliaMail\EmiliaMailServer\config.ini" />
-    <None Include="..\..\..\Dynamic\EmiliaMail\EmiliaMailServer\forward-config.ini" />
+    <None Include="..\..\..\Dynamic\EmiliaMail\EmiliaMailServer\forwards.ini" />
     <None Include="BuildIDInc.bat" />
     <None Include="config-loc.ini" />
   </ItemGroup>
@@ -143,11 +142,10 @@
     <ClCompile Include="..\..\Common\RainAeternum\UtilityString.cpp" />
     <ClCompile Include="..\..\Common\RainAeternum\UtilityTime.cpp" />
     <ClCompile Include="..\..\Common\RainAeternum\WindowsLAMInclude.cpp" />
-    <ClCompile Include="ListenThread.cpp" />
-    <ClCompile Include="ListenThreadParam.cpp" />
+    <ClCompile Include="CommandHandlers.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="RecvThreadHandlers.cpp" />
-    <ClCompile Include="RecvThreadParam.cpp" />
+    <ClCompile Include="ConnectionHandlers.cpp" />
+    <ClCompile Include="RequestHandlers.cpp" />
     <ClCompile Include="Start.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
