@@ -1,6 +1,29 @@
 #include "UtilityString.h"
 
 namespace Rain {
+	std::wstring mbStrToWStr(std::string s) {
+		static wchar_t *buffer;
+		static int bytes;
+		static std::wstring ret;
+		
+		buffer = new wchar_t[s.length()];
+		bytes = MultiByteToWideChar(CP_UTF8, 0, s.c_str(), s.length(), buffer, s.length());
+		ret = std::wstring(buffer, bytes);
+		delete[] buffer;
+		return ret;
+	}
+	std::string wStrToMBStr(std::wstring s) {
+		static char *buffer;
+		static int bytes;
+		static std::string ret;
+
+		buffer = new char[s.length() * 4];
+		bytes = WideCharToMultiByte(CP_UTF8, 0, s.c_str(), s.length(), buffer, s.length() * 4, NULL, NULL);
+		ret = std::string(buffer, bytes);
+		delete[] buffer;
+		return ret;
+	}
+
 	std::string *strToLower(std::string *s) {
 		for (std::size_t a = 0; a < s->length(); a++)
 			(*s)[a] = tolower((*s)[a]);

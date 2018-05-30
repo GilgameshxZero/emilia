@@ -2,98 +2,195 @@
 
 namespace Monochrome3 {
 	namespace EmiliaMailServer {
-		int HRRecvEhlo(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
-			//todo: confirm ehlo
-			response << "250-Emilia is best girl!\r\n"
-				"250 AUTH LOGIN PLAIN CRAM-MD5" << "\r\n";
-			rtParam.smtpWaitFunc = waitData;
+		int HRREhlo(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
+
+			ssmdhParam.ssm->sendRawMessage("250-Emilia is best girl!\r\n");
+			ssmdhParam.ssm->sendRawMessage("250 AUTH LOGIN\r\n");
+			cdParam.rcd.reqHandler = HRRPreData;
+
 			return 0;
 		}
-		int HRRecvData(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
-			//wait for the DATA message to come in
-			std::string messCpy = rtParam.accMess;
-			Rain::strTrim(messCpy);
-			if (messCpy == "DATA") {
-				rtParam.smtpWaitFunc = waitSendMail;
-				response << config["data354"] << "\r\n";
-			} else if (messCpy.find("AUTH PLAIN") != std::string::npos)
-				return waitAuthLogin(rtParam, config, response);
-			else { //otherwise interpret headers
-				std::size_t colonLoc = rtParam.accMess.find(":");
-				if (colonLoc == std::string::npos) //no colon, not valid header
-					return 1;
-				std::string key = rtParam.accMess.substr(0, colonLoc),
-					value = rtParam.accMess.substr(colonLoc + 1, std::string::npos);
-				Rain::strTrim(key);
-				Rain::strTrim(value);
-				value = value.substr(1, value.length() - 2); //trim the <>
-				rtParam.smtpHeaders[key] = value;
-				response << config["headers250"] << "\r\n";
+		int HRRPreData(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
+
+			//process commands before DATA
+			std::string command = cdParam.request.substr(0, 4);
+			if (command == "DATA") {
+				ssmdhParam.ssm->sendRawMessage("354 Emilia ready for data\r\n");
+				cdParam.rcd.reqHandler = HRRData;
+			} else if (command == "AUTH")  {
+				return HRRAuthLogin(ssmdhParam);
+			} else if (command == "MAIL") {
+				return HRRMailFrom(ssmdhParam);
+			} else if (command == "RCPT") {
+				return HRRRcptTo(ssmdhParam);
+			} else {
+				ssmdhParam.ssm->sendRawMessage("502 Emilia hasn't learned this yet\r\n");
 			}
+
 			return 0;
 		}
-		int HRRecvSendMail(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
-			if (rtParam.accMess.length() < 5 || rtParam.accMess.substr(rtParam.accMess.length() - 5, 5) != "\r\n.\r\n") {//message not complete, save it somewhere and receive more
-				rtParam.emailBody += rtParam.accMess;
+		int HRRData(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
+
+			cdParam.rcd.mailData = cdParam.request;
+
+			//check if everything looks right and prepare to close connection
+			//one of the email addresses in rcpt or from must be @domain
+			bool isAtDomain = false;
+			if (Rain::getEmailDomain(cdParam.rcd.mailFrom) == (*ccParam.config)["operating-domain"])
+				isAtDomain = true;
+			if (!isAtDomain) {
+				bool allAtDomain = true;
+				for (auto it : cdParam.rcd.rcptTo) {
+					if (Rain::getEmailDomain(it) != (*ccParam.config)["operating-domain"]) {
+						allAtDomain = false;
+						break;
+					}
+				}
+				isAtDomain = allAtDomain;
+			}
+
+			if (isAtDomain) {
+				ssmdhParam.ssm->sendRawMessage("250 OK\r\n");
+			} else {
+				ssmdhParam.ssm->sendRawMessage("510 Emilia doesn't like talking for strangers\r\n");
+				cdParam.rcd.mailData.clear();
+			}
+
+			return 1;
+		}
+
+		int HRRAuthLogin(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
+
+			if (cdParam.request.substr(0, 10) != "AUTH LOGIN") {
+				ssmdhParam.ssm->sendRawMessage("500 Emilia doesn't understand AUTH request\r\n");
 				return 0;
 			}
-			response << config["data250"] << "\r\n";
-			rtParam.emailBody += rtParam.accMess;
-			rtParam.smtpWaitFunc = waitQuit;
-			rtParam.smtpSuccess = true;
+
+			cdParam.request = Rain::strTrimWhite(cdParam.request.substr(10, cdParam.request.length()));
+			if (cdParam.request.length() > 0) {
+				//might be sending login request username in first go
+				return HRRAuthLoginUsername(ssmdhParam);
+			} else {
+				ssmdhParam.ssm->sendRawMessage("334 VXNlcm5hbWU6\r\n");
+				cdParam.rcd.reqHandler = HRRAuthLoginUsername;
+			}
 			return 0;
 		}
-		int HRRecvQuit(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
-			std::string messCpy = rtParam.accMess;
-			Rain::strTrim(messCpy);
-			if (messCpy == "QUIT") {
-				response << config["waitQuit221"] << "\r\n";
+		int HRRAuthLoginUsername(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
+
+			Rain::strTrimWhite(&cdParam.request);
+
+			//don't check if user exists here, wait until password to hide information
+			cdParam.rcd.b64User = cdParam.request;
+			ssmdhParam.ssm->sendRawMessage("334 UGFzc3dvcmQ6\r\n");
+			cdParam.rcd.reqHandler = HRRAuthLoginPassword;
+
+			return 0;
+		}
+		int HRRAuthLoginPassword(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
+
+			Rain::strTrimWhite(&cdParam.request);
+
+			//refresh userdata
+			std::map<std::string, std::string> users = Rain::readParameterFile((*ccParam.config)["dyn-path"] + (*ccParam.config)["dyn-users"]);
+			for (auto it : users) {
+				ccParam.b64Users[Rain::strEncodeB64(it.first)] = Rain::strEncodeB64(it.second);
+			}
+
+			//check if userdata exists
+			auto it = ccParam.b64Users.find(cdParam.rcd.b64User);
+			if (it != ccParam.b64Users.end() &&
+				it->second == cdParam.request) {
+				ssmdhParam.ssm->sendRawMessage("235 Emilia authentication success\r\n");
+			} else {
+				ssmdhParam.ssm->sendRawMessage("530 Emilia could not authenticate the user\r\n");
+				cdParam.rcd.b64User.clear();
+			}
+			cdParam.rcd.reqHandler = HRRPreData;
+		}
+		int HRRMailFrom(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
+
+			if (cdParam.request.substr(0, 9) != "MAIL FROM") {
+				ssmdhParam.ssm->sendRawMessage("500 Emilia doesn't understand MAIL request\r\n");
+				return 0;
+			}
+
+			//gets after the colon
+			cdParam.rcd.mailFrom = Rain::strTrimWhite(cdParam.request.substr(10, cdParam.request.length()));
+
+			//if sending from current domain, need to be authenticated
+			if (Rain::getEmailDomain(cdParam.rcd.mailFrom) == (*ccParam.config)["operating-domain"] && 
+				cdParam.rcd.b64User.length() == 0) {
+				ssmdhParam.ssm->sendRawMessage("502 Emilia hasn't authenticated you to do that\r\n");
+			} else
+				ssmdhParam.ssm->sendRawMessage("250 OK\r\n");
+			return 0;
+		}
+		int HRRRcptTo(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
+
+			if (cdParam.request.substr(0, 7) != "RCPT TO") {
+				ssmdhParam.ssm->sendRawMessage("500 Emilia doesn't understand RCPT request\r\n");
+				return 0;
+			}
+
+			//gets after the colon
+			cdParam.rcd.rcptTo.insert(Rain::strTrimWhite(cdParam.request.substr(8, cdParam.request.length())));
+
+			ssmdhParam.ssm->sendRawMessage("250 OK\r\n");
+			return 0;
+		}
+
+		int HRSAuth(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
+
+			//all requests to the client come here
+
+			if (cdParam.request != (*ccParam.config)["client-auth"])
 				return 1;
-			} else {
-				response << config["waitQuit502"] << "\r\n";
-				return 0;
-			}
 
-			//send a request to port 25 on localhost to create a thread to send the mail
-		}
-		int HRRecvAuthLogin(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
-			response << "235 Emilia loves the world!\r\n";
-			rtParam.smtpWaitFunc = waitData;
+			cdParam.scd.reqHandler = HRSFrom;
 			return 0;
 		}
+		int HRSFrom(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 
-		int HRSendRequest(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
-			RecvThreadParam &rtParam = *reinterpret_cast<RecvThreadParam *>(funcParam);
-			std::map<std::string, std::string> &config = *rtParam.pLTParam->config;
-
-			//start up client to forward mail to forwarding address, if smtp was sucessful
-			if (rtParam.smtpSuccess) {
-				rtParam.log += Rain::getTime() + " SMTP success with " + Rain::getClientNumIP(rtParam.pLTParam->cSocket) + "\r\n";
-
-				//use the smtp client to send the email to the forward address
-				//make sure the forward options are known
-				//read these options every time we come here
-				std::map<std::string, std::string> forwardConfig;
-				Rain::readParameterFile(config["forwardConfig"], forwardConfig);
-
-
-				//create CSM to send the mail
-
-			} else {
-				rtParam.log += Rain::getTime() + " SMTP was not successful with " + Rain::getClientNumIP(rtParam.pLTParam->cSocket) + "\r\n";
-			}
-
-			//output the entire log of the recvThread to the console and file now
-			Rain::rainCoutF(rtParam.log);
-			Rain::fastOutputFileRef(config["logFile"], rtParam.log, true);
-
-			//use postmessage here because we want the thread of the window to process the message, allowing destroywindow to be called
-			//WM_RAINAVAILABLE + 1 is the end message
-			PostMessage(rtParam.pLTParam->rainWnd.hwnd, WM_LISTENWNDEND, 0, 0);
-
-			//free WSA2RecvFuncParam here, since recvThread won't need it anymore
-			delete &rtParam;
+			cdParam.scd.from = cdParam.request;
 			return 0;
+		}
+		int HRSTo(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
+
+			cdParam.scd.to = cdParam.request;
+			return 0;
+		}
+		int HRSBody(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
+
+			cdParam.scd.data = cdParam.request;
+
+			//use CSM to send the mail
+
+			return 1;
 		}
 	}
 }

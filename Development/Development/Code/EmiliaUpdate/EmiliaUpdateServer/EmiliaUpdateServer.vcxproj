@@ -112,7 +112,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateServer\config.ini" />
-    <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateServer\credentials.confidential.ini" />
+    <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateServer\auth-file.confidential.ini" />
     <None Include="..\..\..\Configuration\EmiliaUpdate\EmiliaUpdateServer\prod-servers.ini" />
     <None Include="BuildIDInc.bat" />
     <None Include="config-loc.ini" />

@@ -30,6 +30,10 @@ Windows-specific.
 #include <sstream>
 
 namespace Rain {
+	//turn a string into LPCWSTR with a "\\?\" prefix, for use in long paths unicode functions
+	std::wstring pathToLongPath(std::string path);
+	std::wstring pathToLongPath(std::wstring path);
+
 	//test if file exists; either relative or absolute path work
 	bool fileExists(std::string file);
 	bool dirExists(std::string dir);

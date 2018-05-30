@@ -18,4 +18,11 @@ namespace Rain {
 	int getSMTPStatus(std::string message) {
 		return getSMTPStatus(&message);
 	}
+
+	std::string getEmailDomain(std::string email) {
+		return email.substr(email.find('@') + 1, email.length());
+	}
+	std::string getEmailUser(std::string email) {
+		return email.substr(0, email.find('@'));
+	}
 }
