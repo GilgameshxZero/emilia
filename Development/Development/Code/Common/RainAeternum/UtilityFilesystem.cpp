@@ -1,13 +1,20 @@
 #include "UtilityFilesystem.h"
 
 namespace Rain {
+	std::wstring pathToLongPath(std::string path) {
+		return Rain::mbStrToWStr("\\\\?\\" + path);
+	}
+	std::wstring pathToLongPath(std::wstring path) {
+		static std::wstring prefix = Rain::mbStrToWStr("\\\\?\\");
+		return prefix + path;
+	}
 	bool fileExists(std::string file) {
 		struct stat buffer;
 		return (stat(file.c_str(), &buffer) == 0);
 	}
 
 	bool dirExists(std::string dir) {
-		DWORD ftyp = GetFileAttributes(dir.c_str());
+		DWORD ftyp = GetFileAttributesW(pathToLongPath(pathToAbsolute(dir)).c_str());
 		if (ftyp == INVALID_FILE_ATTRIBUTES)
 			return false;  //something is wrong with your path!
 		if (ftyp & FILE_ATTRIBUTE_DIRECTORY)
@@ -34,11 +41,11 @@ namespace Rain {
 	}
 
 	std::string getExePath() {
-		char multibyte[MAX_PATH];
-		wchar_t buffer[MAX_PATH];
+		static char multibyte[32767];
+		static wchar_t buffer[32767];
 
-		GetModuleFileNameW(NULL, buffer, MAX_PATH);
-		WideCharToMultiByte(CP_UTF8, 0, buffer, -1, multibyte, MAX_PATH, NULL, NULL);
+		GetModuleFileNameW(NULL, buffer, 32767);
+		WideCharToMultiByte(CP_UTF8, 0, buffer, -1, multibyte, 32767, NULL, NULL);
 		return std::string(multibyte);
 	}
 
@@ -50,12 +57,12 @@ namespace Rain {
 	}
 
 	std::vector<std::string> getFiles(std::string directory, std::string format) {
-		char search_path[MAX_PATH], multibyte[MAX_PATH];
-		wchar_t unicodesp[MAX_PATH];
+		static char search_path[32767], multibyte[32767];
+		static wchar_t unicodesp[32767];
 		sprintf_s(search_path, ("%s/" + format).c_str(), directory.c_str());
 		WIN32_FIND_DATAW fd;
 
-		MultiByteToWideChar(CP_UTF8, 0, search_path, -1, unicodesp, MAX_PATH);
+		MultiByteToWideChar(CP_UTF8, 0, search_path, -1, unicodesp, 32767);
 		int k = GetLastError();
 		HANDLE hFind = ::FindFirstFileW(unicodesp, &fd);
 
@@ -63,7 +70,7 @@ namespace Rain {
 		if (hFind != INVALID_HANDLE_VALUE) {
 			do {
 				if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-					WideCharToMultiByte(CP_UTF8, 0, fd.cFileName, -1, multibyte, MAX_PATH, NULL, NULL);
+					WideCharToMultiByte(CP_UTF8, 0, fd.cFileName, -1, multibyte, 32767, NULL, NULL);
 					ret.push_back(multibyte);
 				}
 			} while (::FindNextFileW(hFind, &fd));
@@ -73,12 +80,12 @@ namespace Rain {
 		return ret;
 	}
 	std::vector<std::string> getDirs(std::string directory, std::string format) {
-		char search_path[MAX_PATH], multibyte[MAX_PATH];
-		wchar_t unicodesp[MAX_PATH];
+		static char search_path[32767], multibyte[32767];
+		static wchar_t unicodesp[32767];
 		sprintf_s(search_path, ("%s/" + format).c_str(), directory.c_str());
 		WIN32_FIND_DATAW fd;
 
-		MultiByteToWideChar(CP_UTF8, 0, search_path, -1, unicodesp, MAX_PATH);
+		MultiByteToWideChar(CP_UTF8, 0, search_path, -1, unicodesp, 32767);
 		int k = GetLastError();
 		HANDLE hFind = ::FindFirstFileW(unicodesp, &fd);
 
@@ -86,7 +93,7 @@ namespace Rain {
 		if (hFind != INVALID_HANDLE_VALUE) {
 			do {
 				if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-					WideCharToMultiByte(CP_UTF8, 0, fd.cFileName, -1, multibyte, MAX_PATH, NULL, NULL);
+					WideCharToMultiByte(CP_UTF8, 0, fd.cFileName, -1, multibyte, 32767, NULL, NULL);
 					ret.push_back(multibyte);
 				}
 			} while (::FindNextFileW(hFind, &fd));
@@ -98,6 +105,7 @@ namespace Rain {
 
 	std::vector<std::string> getFilesRec(std::string directory, std::string format, std::set<std::string> *ignore) {
 		std::vector<std::string> dirs, files;
+		directory = Rain::pathToAbsolute(directory);
 		dirs = Rain::getDirs(directory, "*");
 		files = Rain::getFiles(directory, format);
 
@@ -119,6 +127,7 @@ namespace Rain {
 	}
 	std::vector<std::string> getDirsRec(std::string directory, std::string format, std::set<std::string> *ignore) {
 		std::vector<std::string> dirs;
+		directory = Rain::pathToAbsolute(directory);
 		dirs = Rain::getDirs(directory, "*");
 
 		std::vector<std::string> relpath;
@@ -138,28 +147,28 @@ namespace Rain {
 
 	void createDirRec(std::string dir) {
 		size_t pos = 0;
-		dir = dir.substr(0, dir.length() - 1); //remove the '\\'
+		dir = pathToAbsolute(dir.substr(0, dir.length() - 1)); //remove the '\\'
 		do {
 			pos = dir.find_first_of("\\/", pos + 1);
-			CreateDirectory(dir.substr(0, pos).c_str(), NULL);
+			CreateDirectoryW(pathToLongPath(dir.substr(0, pos)).c_str(), NULL);
 		} while (pos != std::string::npos);
 	}
 
 	void rmDirRec(std::string dir, std::set<std::string> *ignore) {
-		wchar_t unicode[MAX_PATH];
+		wchar_t unicode[32767];
 		std::vector<std::string> ldir, lfile;
 
 		ldir = getDirs(dir, "*");
 		lfile = getFiles(dir, "*");
 
 		for (std::size_t a = 0; a < lfile.size(); a++) {
-			MultiByteToWideChar(CP_UTF8, 0, (dir + lfile[a]).c_str(), -1, unicode, MAX_PATH);
+			MultiByteToWideChar(CP_UTF8, 0, (dir + lfile[a]).c_str(), -1, unicode, 32767);
 			if (ignore == NULL || ignore->find(pathToAbsolute(dir + lfile[a])) == ignore->end())
 				DeleteFileW(unicode);
 		}
 		for (std::size_t a = 2; a < ldir.size(); a++) //skip . and ..
 		{
-			MultiByteToWideChar(CP_UTF8, 0, (dir + ldir[a] + '\\').c_str(), -1, unicode, MAX_PATH);
+			MultiByteToWideChar(CP_UTF8, 0, (dir + ldir[a] + '\\').c_str(), -1, unicode, 32767);
 			if (ignore == NULL || ignore->find(pathToAbsolute(dir + ldir[a] + '\\')) == ignore->end()) {
 				rmDirRec(dir + ldir[a] + '\\', ignore);
 				RemoveDirectoryW(unicode);
@@ -175,18 +184,18 @@ namespace Rain {
 
 		for (std::string s : filesRel) {
 			createDirRec(getPathDir(dst + s));
-			CopyFile((src + s).c_str(), (dst + s).c_str(), FALSE);
+			CopyFileW(pathToLongPath(src + s).c_str(), pathToLongPath(dst + s).c_str(), FALSE);
 		}
 	}
 
 	std::string pathToAbsolute(std::string path) {
-		static TCHAR tcFullPath[32767];
-		GetFullPathName(path.c_str(), 32767, tcFullPath, NULL);
-		return tcFullPath;
+		static WCHAR tcFullPath[32767];
+		GetFullPathNameW(mbStrToWStr(path).c_str(), 32767, tcFullPath, NULL);
+		return wStrToMBStr(tcFullPath);
 	}
 
 	BY_HANDLE_FILE_INFORMATION getFileInformation(std::string path) {
-		HANDLE handle = CreateFile(path.c_str(),
+		HANDLE handle = CreateFileW(pathToLongPath(pathToAbsolute(path)).c_str(),
 								   0,
 								   FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
 								   NULL,
@@ -206,10 +215,10 @@ namespace Rain {
 	}
 
 	FILETIME getLastModTime(std::string path) {
-		wchar_t unicode[MAX_PATH];
+		wchar_t unicode[32767];
 		FILETIME ret;
 
-		MultiByteToWideChar(CP_UTF8, 0, path.c_str(), -1, unicode, MAX_PATH);
+		MultiByteToWideChar(CP_UTF8, 0, path.c_str(), -1, unicode, 32767);
 		HANDLE hfile = CreateFileW(unicode, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
 		if (hfile == INVALID_HANDLE_VALUE)
@@ -236,7 +245,7 @@ namespace Rain {
 	}
 
 	std::size_t getFileSize(std::string file) {
-		std::ifstream t(file, std::ios::binary);
+		std::ifstream t(Rain::pathToAbsolute(file), std::ios::binary);
 		t.seekg(0, std::ios::end);
 		std::size_t size = static_cast<std::size_t>(t.tellg());
 		t.close();

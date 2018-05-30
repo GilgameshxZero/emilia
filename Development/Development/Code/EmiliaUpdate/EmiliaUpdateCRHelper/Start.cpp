@@ -21,7 +21,7 @@ namespace Monochrome3 {
 			logger.setStdHandleSrc(STD_OUTPUT_HANDLE, true);
 
 			//output parameters
-			Rain::tsCout("Starting...\r\n" + Rain::tToStr(config.size()) + " configuration options:\r\n", config["aux-path"] + config["aux-log"]);
+			Rain::tsCout("Starting...\r\n" + Rain::tToStr(config.size()) + " configuration options:\r\n");
 			for (std::map<std::string, std::string>::iterator it = config.begin(); it != config.end(); it++)
 				Rain::tsCout("\t" + it->first + ": " + it->second + "\r\n");
 

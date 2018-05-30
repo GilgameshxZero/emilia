@@ -33,6 +33,10 @@ namespace Rain {
 		return r;
 	}
 
+	//converts to/from unicode/multibyte
+	std::wstring mbStrToWStr(std::string path);
+	std::string wStrToMBStr(std::wstring s);
+
 	//convert string to lowercase
 	std::string *strToLower(std::string *s);
 	std::string strToLower(std::string s);

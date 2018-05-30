@@ -193,12 +193,10 @@ namespace Monochrome3 {
 				fflush(stdout);
 			} else if (chParam.lastSuccess == 1) {
 				Rain::tsCout("Success: Uploaded production files to remote. Remote server needs to restart. Please reconnect later.\r\n");
+				Rain::tsCout("Info: Sending okay receipt to server, allowing it to restart...\r\n");
+				Rain::sendBlockMessage(csm, "prod-upload restart-okay");
 				fflush(stdout);
 			}
-
-			Rain::tsCout("Info: Sending okay receipt to server, allowing it to restart...\r\n");
-			Rain::sendBlockMessage(csm, "prod-upload restart-okay");
-			fflush(stdout);
 
 			//replace all of staging with production: same routine as stage-prod
 			return CHHStageProd(cmhParam);
