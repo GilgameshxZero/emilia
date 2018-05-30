@@ -163,26 +163,6 @@ namespace Monochrome3 {
 				//wait for client to finish to a timeout
 				WaitForInputIdle(pinfo.hProcess, Rain::strToT<DWORD>(config["smtpClientMaxIdle"]));
 
-				//get output from client
-				std::string clientOut;
-				static std::size_t cgiOutPipeBufLen = Rain::strToT<std::size_t>(config["smtpClientOutBufLen"]);
-				CHAR *chBuf = new CHAR[cgiOutPipeBufLen];
-				for (;;) {
-					static DWORD dwRead;
-					if (!ReadFile(g_hChildStd_OUT_Rd, chBuf, static_cast<DWORD>(cgiOutPipeBufLen), &dwRead, NULL)) { //maybe error
-						DWORD error = GetLastError();
-						if (error == ERROR_BROKEN_PIPE) //the pipe broke because the process has shut it down, this is okay
-							break;
-						else { //actually bad
-							Rain::reportError(error, "something went wrong with ReadFile");
-							break;
-						}
-					}
-					if (dwRead == 0) //nothing left in pipe
-						break;
-					clientOut += std::string(chBuf, dwRead);
-				}
-				delete[] chBuf;
 				CloseHandle(g_hChildStd_OUT_Rd);
 
 				//wait for client to end, up to some time
@@ -198,9 +178,6 @@ namespace Monochrome3 {
 
 				//TODO: fix this
 				//rtParam.pLTParam->smtpClientMutex->unlock();
-
-				//done, log
-				rtParam.log += "--------------------------------------------------------------------------------\r\nSMTPClient\r\n\r\n" + clientOut + "\r\n--------------------------------------------------------------------------------\r\n\r\n";
 			} else {
 				rtParam.log += Rain::getTime() + " SMTP was not successful with " + Rain::getClientNumIP(rtParam.pLTParam->cSocket) + "\r\n";
 			}
