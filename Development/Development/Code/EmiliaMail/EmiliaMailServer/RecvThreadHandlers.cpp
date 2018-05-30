@@ -93,7 +93,8 @@ namespace Monochrome3 {
 				clientIn = clientInSS.str();
 
 				//make sure smtp client only runs one at a time, so that we don't overload ports and cause errors
-				rtParam.pLTParam->smtpClientMutex->lock();
+				//TODO: fix this
+				//rtParam.pLTParam->smtpClientMutex->lock();
 
 				//similar to cgi stuff in EMTServer
 				std::string clientExePath = Rain::getWorkingDirectory() + config["clientExePath"],
@@ -124,7 +125,7 @@ namespace Monochrome3 {
 				ZeroMemory(&pinfo, sizeof(pinfo));
 				sinfo.cb = sizeof(sinfo);
 				sinfo.dwFlags |= STARTF_USESTDHANDLES;
-				sinfo.hStdOutput = g_hChildStd_OUT_Wr;
+				sinfo.hStdOutput = NULL;
 				sinfo.hStdInput = g_hChildStd_IN_Rd;
 				if (!CreateProcess(
 					clientExePath.c_str(),
@@ -132,7 +133,7 @@ namespace Monochrome3 {
 					NULL,
 					NULL,
 					TRUE,
-					DETACHED_PROCESS,
+					CREATE_NEW_CONSOLE,
 					NULL,
 					clientExeDir.c_str(),
 					&sinfo,
@@ -161,10 +162,6 @@ namespace Monochrome3 {
 
 				//wait for client to finish to a timeout
 				WaitForInputIdle(pinfo.hProcess, Rain::strToT<DWORD>(config["smtpClientMaxIdle"]));
-
-				CloseHandle(pinfo.hThread);
-				CloseHandle(g_hChildStd_OUT_Wr);
-				CloseHandle(g_hChildStd_IN_Rd);
 
 				//get output from client
 				std::string clientOut;
@@ -195,7 +192,12 @@ namespace Monochrome3 {
 				TerminateProcess(pinfo.hProcess, 0);
 				CloseHandle(pinfo.hProcess);
 
-				rtParam.pLTParam->smtpClientMutex->unlock();
+				CloseHandle(pinfo.hThread);
+				CloseHandle(g_hChildStd_OUT_Wr);
+				CloseHandle(g_hChildStd_IN_Rd);
+
+				//TODO: fix this
+				//rtParam.pLTParam->smtpClientMutex->unlock();
 
 				//done, log
 				rtParam.log += "--------------------------------------------------------------------------------\r\nSMTPClient\r\n\r\n" + clientOut + "\r\n--------------------------------------------------------------------------------\r\n\r\n";
