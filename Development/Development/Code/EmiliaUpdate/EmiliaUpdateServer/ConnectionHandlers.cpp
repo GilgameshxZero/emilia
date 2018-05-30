@@ -4,7 +4,7 @@ namespace Monochrome3 {
 	namespace EmiliaUpdateServer {
 		static const std::string headerDelim = "\r\n\r\n";
 
-		int onConnectionInit(void *funcParam) {
+		int onConnect(void *funcParam) {
 			Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam = *reinterpret_cast<Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam *>(funcParam);
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 
@@ -26,19 +26,7 @@ namespace Monochrome3 {
 			cdParam->authenticated = false;
 			return 0;
 		}
-		int onConnectionExit(void *funcParam) {
-			Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam = *reinterpret_cast<Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam *>(funcParam);
-			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
-
-			ccParam.clientConnected = false;
-			Rain::tsCout("Info: client disconnected.\r\n");
-			fflush(stdout);
-
-			//free the delegate parameter
-			delete ssmdhParam.delegateParam;
-			return 0;
-		}
-		int onConnectionProcessMessage(void *funcParam) {
+		int onMessage(void *funcParam) {
 			Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam = *reinterpret_cast<Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam *>(funcParam);
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 
@@ -71,6 +59,18 @@ namespace Monochrome3 {
 					break;
 			}
 
+			return 0;
+		}
+		int onDisconnect(void *funcParam) {
+			Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam = *reinterpret_cast<Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam *>(funcParam);
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+
+			ccParam.clientConnected = false;
+			Rain::tsCout("Info: client disconnected.\r\n");
+			fflush(stdout);
+
+			//free the delegate parameter
+			delete ssmdhParam.delegateParam;
 			return 0;
 		}
 	}

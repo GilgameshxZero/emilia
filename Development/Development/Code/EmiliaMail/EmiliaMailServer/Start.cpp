@@ -1,15 +1,67 @@
 #include "Start.h"
 
 namespace Monochrome3 {
-	namespace EMTSMTPServer {
-		int start() {
-			//read config
+	namespace EmiliaMailServer {
+		int start(int argc, char* argv[]) {
+			//parameters
 			std::map<std::string, std::string> config;
-			Rain::readParameterFile("config.ini", config);
+
+			std::string configLocFile = "config-loc.ini";
+			Rain::concatMap(config, Rain::readParameterFile(configLocFile));
+			std::string configFile = config["config-path"] + config["config-file"];
+			Rain::concatMap(config, Rain::readParameterFile(configFile));
+			std::string authenticationFile = config["config-path"] + config["auth-file"];
+			Rain::concatMap(config, Rain::readParameterFile(authenticationFile));
+
+			std::vector<std::string> prodServers;
+			prodServers = Rain::readMultilineFile(config["config-path"] + config["prod-servers"]);
 
 			//debugging
-			Rain::redirectCerrFile(config["errorLog"]);
-			Rain::logMemoryLeaks(config["memoryLeakLog"]);
+			Rain::createDirRec(config["aux-path"]);
+			Rain::redirectCerrFile(config["aux-path"] + config["aux-error"], true);
+			HANDLE hFMemLeak = Rain::logMemoryLeaks(config["aux-path"] + config["aux-memory"]);
+
+			Rain::LogStream logger;
+			logger.setFileDst(config["aux-path"] + config["aux-log"], true);
+			logger.setStdHandleSrc(STD_OUTPUT_HANDLE, true);
+
+			//output parameters
+			Rain::tsCout("Starting...\r\n" + Rain::tToStr(config.size()) + " configuration options:\r\n");
+			for (std::map<std::string, std::string>::iterator it = config.begin(); it != config.end(); it++)
+				Rain::tsCout("\t" + it->first + ": " + it->second + "\r\n");
+
+			Rain::tsCout("\r\nCommand line arguments: " + Rain::tToStr(argc) + "\r\n\r\n");
+			for (int a = 0; a < argc; a++) {
+				Rain::tsCout(std::string(argv[a]) + "\r\n");
+			}
+			Rain::tsCout("\r\n");
+
+			//set up network stuff to continuously accept sockets
+			ConnectionCallerParam ccParam;
+			ccParam.config = &config;
+			ccParam.hInputExitEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+			ccParam.serverStatus.resize(prodServers.size());
+			ccParam.clientConnected = false;
+			for (int a = 0; a < prodServers.size(); a++) {
+				ccParam.serverStatus[a].path = Rain::pathToAbsolute(config["prod-root-dir"] + prodServers[a]);
+				ccParam.serverStatus[a].status = "stopped";
+			}
+
+			Rain::ServerManager sm;
+			sm.setEventHandlers(onConnectionInit, onConnectionProcessMessage, onConnectionExit, &ccParam);
+			sm.setRecvBufLen(Rain::strToT<std::size_t>(config["recv-buflen"]));
+			if (!sm.setServerListen(Rain::strToT<DWORD>(config["ports-low"]), Rain::strToT<DWORD>(config["ports-high"]))) {
+				Rain::tsCout("Server listening on port ", sm.getListeningPort(), "..\r\n");
+			} else {
+				Rain::tsCout("Fatal error: could not setup server listening.\r\n");
+				DWORD error = GetLastError();
+				Rain::reportError(error, "Fatal error: could not setup server listening.");
+				logger.setStdHandleSrc(STD_OUTPUT_HANDLE, false);
+				WSACleanup();
+				if (hFMemLeak != NULL)
+					CloseHandle(hFMemLeak);
+				return error;
+			}
 
 			//setup listening on the port
 			WSADATA wsaData;
@@ -106,8 +158,8 @@ namespace Monochrome3 {
 				}
 			}
 
-			std::cout << "EMTSMTPServer has exited. Exiting in 2 seconds...\r\n\r\n";
-			Rain::fastOutputFile(config["logFile"], "EMTSMTPServer has exited. Exiting in 2 seconds...\r\n\r\n", true);
+			std::cout << "EmiliaMailServer has exited. Exiting in 2 seconds...\r\n\r\n";
+			Rain::fastOutputFile(config["logFile"], "EmiliaMailServer has exited. Exiting in 2 seconds...\r\n\r\n", true);
 			Sleep(2000);
 
 			return 0;

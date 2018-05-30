@@ -76,13 +76,13 @@ namespace Rain {
 		ServerSocketManagerDelegateHandlerParam ssmdhParam;
 
 		//recvThread parameter associated with the current recvThread
-		RecvHandlerParam::EventHandler onConnect, onMessage, onDisconnect;
+		RecvHandlerParam::EventHandler onConnectDelegate, onMessageDelegate, onDisconnectDelegate;
 
 		//event handlers for recvThreads spwaned by ServerManager, which will call their delegates set by setEventHandlers of either ServerManager or ServerSocketManager
 		//responsible for managing linked list created in ServerManager
-		static int onRecvInit(void *param);
-		static int onRecvExit(void *param);
-		static int onProcessMessage(void *param);
+		static int onConnect(void *param);
+		static int onMessage(void *param);
+		static int onDisconnect(void *param);
 	};
 
 	//spawns a ServerSocketManager for each new connection
@@ -149,14 +149,14 @@ namespace Rain {
 		HANDLE ltEvent;
 
 		//default handlers and params which ServerSocketManager should use
-		RecvHandlerParam::EventHandler onConnect, onMessage, onDisconnect;
+		RecvHandlerParam::EventHandler onConnectDelegate, onMessageDelegate, onDisconnectDelegate;
 		void *funcParam;
 
 		void disconnectSocket();
 
 		//creates thread which accepts on a specified listening socket, until the socket is closed from outside the thread
 		//accepted connections will spawn a recvThread for each connection with specified parameters
-		//any parameters that the onProc functions will need to use will need to be created in onRecvInit - there will be space to store the parameters to be passed on the functions through the use of a void * in ListenThreadRecvParam
+		//any parameters that the onProc functions will need to use will need to be created in onConnect - there will be space to store the parameters to be passed on the functions through the use of a void * in ListenThreadRecvParam
 		//when listening socket is closed, thread will close all connection sockets and wait until all spawned recvThreads exit
 		static DWORD WINAPI listenThread(LPVOID lpParameter);
 	};

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../../Common/RainLibrary3/RainLibraries.h"
+#include "../../Common/RainAeternum/RainLibraries.h"
 #include "ListenThreadParam.h"
 
 namespace Monochrome3 {
-	namespace EMTSMTPServer {
+	namespace EmiliaMailServer {
 		struct RecvThreadParam {
 			typedef int(*pSMTPWaitFunc) (RecvThreadParam &, std::map<std::string, std::string> &, std::stringstream &);
 
