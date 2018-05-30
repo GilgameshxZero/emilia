@@ -111,7 +111,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Configuration\EmiliaMail\EmiliaMailServer\config.ini" />
-    <None Include="..\..\..\Dynamic\EmiliaMail\EmiliaMailServer\forwards.ini" />
+    <None Include="..\..\..\Dynamic\EmiliaMail\EmiliaMailServer\forwards.confidential.ini" />
     <None Include="BuildIDInc.bat" />
     <None Include="config-loc.ini" />
   </ItemGroup>

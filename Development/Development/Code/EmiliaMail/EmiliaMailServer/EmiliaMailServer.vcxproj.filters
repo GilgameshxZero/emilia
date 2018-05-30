@@ -119,7 +119,7 @@
     <None Include="..\..\..\Configuration\EmiliaMail\EmiliaMailServer\config.ini">
       <Filter>Configuration</Filter>
     </None>
-    <None Include="..\..\..\Dynamic\EmiliaMail\EmiliaMailServer\forwards.ini">
+    <None Include="..\..\..\Dynamic\EmiliaMail\EmiliaMailServer\forwards.confidential.ini">
       <Filter>Dynamic</Filter>
     </None>
   </ItemGroup>
