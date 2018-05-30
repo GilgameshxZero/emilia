@@ -41,7 +41,12 @@ namespace Monochrome3 {
 				std::string arg1 = argv[1];
 				Rain::strTrimWhite(&arg1);
 				if (arg1 == "prod-upload-success") {
-					Rain::tsCout("IMPORTANT: 'prod-upload' CRH operation completed successfully.\r\n\r\n");
+					Rain::tsCout("IMPORTANT: 'prod-upload' CRH operation completed successfully.\r\n");
+
+					//remove tmp file of the prod-upload operation
+					std::string filePath = Rain::pathToAbsolute(Rain::getExePath() + config["upload-tmp-app"]);
+					DeleteFile(filePath.c_str());
+					Rain::tsCout("Temporary file for 'prod-upload' deleted.\r\n\r\n");
 				}
 			}
 
