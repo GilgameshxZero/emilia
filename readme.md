@@ -188,6 +188,7 @@ In the root, there will also be additional untracked files not part of the offic
 * 1.3.0
 	* hotfix to allow multiple clients to be active at the same time
 	* show console and stdout from client
+	* stdout from server now shows in console (after fixing pipe bug)
 * 1.2.2
 	* cleaned up resource.h
 	* hotfixed RainLibrary3 links
@@ -251,7 +252,6 @@ In the root, there will also be additional untracked files not part of the offic
 
 #### EmiliaMailServer
 * switch to RainAeternum
-* stdout from sockets isn't showing in console (flushing issue?)
 
 #### EmiliaMailClient
 * switch to RainAeternum
