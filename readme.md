@@ -251,7 +251,6 @@ In the root, there will also be additional untracked files not part of the offic
 
 #### EmiliaMailServer
 * switch to RainAeternum
-* stdout from sockets isn't showing in console?
 
 #### EmiliaMailClient
 * switch to RainAeternum
