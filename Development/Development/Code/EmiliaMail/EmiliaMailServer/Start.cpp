@@ -37,6 +37,7 @@ namespace Monochrome3 {
 			ConnectionCallerParam ccParam;
 			ccParam.config = &config;
 			ccParam.logger = &logger;
+			ccParam.connectedClients = 0;
 
 			Rain::ServerManager sm;
 			sm.setEventHandlers(onConnect, onMessage, onDisconnect, &ccParam);
