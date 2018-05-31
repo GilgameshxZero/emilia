@@ -13,9 +13,6 @@ namespace Monochrome3 {
 			std::string authenticationFile = config["config-path"] + config["auth-file"];
 			Rain::concatMap(config, Rain::readParameterFile(authenticationFile));
 
-			std::vector<std::string> prodServers;
-			prodServers = Rain::readMultilineFile(config["config-path"] + config["prod-servers"]);
-
 			//debugging
 			Rain::createDirRec(config["aux-path"]);
 			Rain::redirectCerrFile(config["aux-path"] + config["aux-error"], true);
@@ -39,16 +36,17 @@ namespace Monochrome3 {
 			//network setup for receiving mail
 			ConnectionCallerParam ccParam;
 			ccParam.config = &config;
+			ccParam.logger = &logger;
 
 			Rain::ServerManager sm;
 			sm.setEventHandlers(onConnect, onMessage, onDisconnect, &ccParam);
 			sm.setRecvBufLen(Rain::strToT<std::size_t>(config["transfer-buflen"]));
 			if (!sm.setServerListen(25, 25)) {
-				Rain::tsCout("Mail receive server listening on port ", sm.getListeningPort(), ".\r\n");
+				Rain::tsCout("Server listening on port ", sm.getListeningPort(), ".\r\n");
 			} else {
-				Rain::tsCout("Fatal error: could not setup mail receive server listening.\r\n");
+				Rain::tsCout("Fatal error: could not setup server listening.\r\n");
 				DWORD error = GetLastError();
-				Rain::reportError(error, "Fatal error: could not setup mail receive server listening.");
+				Rain::reportError(error, "Fatal error: could not setup server listening.");
 				logger.setStdHandleSrc(STD_OUTPUT_HANDLE, false);
 				WSACleanup();
 				if (hFMemLeak != NULL)
