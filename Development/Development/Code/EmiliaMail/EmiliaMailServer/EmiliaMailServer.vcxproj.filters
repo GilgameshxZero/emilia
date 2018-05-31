@@ -105,7 +105,10 @@
     <ClInclude Include="ConnectionHandlers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RequestHandlers.h">
+    <ClInclude Include="InternalConnectionHandlers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ExternalConnectionHandlers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -209,8 +212,22 @@
     <ClCompile Include="ConnectionHandlers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RequestHandlers.cpp">
+    <ClCompile Include="InternalConnectionHandlers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ExternalConnectionHandlers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\..\Auxiliary\EmiliaMail\EmiliaMailServer\error.log">
+      <Filter>Auxiliary</Filter>
+    </Text>
+    <Text Include="..\..\..\Auxiliary\EmiliaMail\EmiliaMailServer\log.log">
+      <Filter>Auxiliary</Filter>
+    </Text>
+    <Text Include="..\..\..\Auxiliary\EmiliaMail\EmiliaMailServer\memory-leaks.log">
+      <Filter>Auxiliary</Filter>
+    </Text>
   </ItemGroup>
 </Project>

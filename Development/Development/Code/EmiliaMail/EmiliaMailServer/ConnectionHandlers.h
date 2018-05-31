@@ -1,12 +1,16 @@
 #pragma once
 #include "../../Common/RainAeternum/RainLibraries.h"
 
-#include "RequestHandlers.h"
+#include "InternalConnectionHandlers.h"
+#include "ExternalConnectionHandlers.h"
 
 #include <map>
+#include <WinDNS.h>
 
 namespace Monochrome3 {
 	namespace EmiliaMailServer {
+		typedef int(*RequestMethodHandler)(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &);
+
 		struct SendConnectionDelegateParam {
 			//if send request, length of whole request block
 			std::size_t requestLength;
@@ -42,6 +46,9 @@ namespace Monochrome3 {
 
 			//username/password pairs in base-64
 			std::map<std::string, std::string> b64Users;
+
+			//used to log socket coms from main
+			Rain::LogStream *logger;
 		};
 
 		struct ConnectionDelegateParam {
@@ -59,5 +66,20 @@ namespace Monochrome3 {
 		int onConnect(void *param);
 		int onMessage(void *param);
 		int onDisconnect(void *param);
+
+		int HRREhlo(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
+		int HRRPreData(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
+		int HRRData(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
+
+		int HRRAuthLogin(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
+		int HRRAuthLoginUsername(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
+		int HRRAuthLoginPassword(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
+		int HRRMailFrom(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
+		int HRRRcptTo(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
+
+		int HRSAuth(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
+		int HRSFrom(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
+		int HRSTo(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
+		int HRSBody(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
 	}
 }

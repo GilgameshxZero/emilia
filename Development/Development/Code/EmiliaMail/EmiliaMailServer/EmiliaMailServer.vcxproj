@@ -105,9 +105,10 @@
     <ClInclude Include="..\..\Common\RainAeternum\WindowsLAMInclude.h" />
     <ClInclude Include="BuildID.h" />
     <ClInclude Include="CommandHandlers.h" />
+    <ClInclude Include="ExternalConnectionHandlers.h" />
+    <ClInclude Include="InternalConnectionHandlers.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="ConnectionHandlers.h" />
-    <ClInclude Include="RequestHandlers.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Start.h" />
   </ItemGroup>
@@ -146,10 +147,16 @@
     <ClCompile Include="..\..\Common\RainAeternum\UtilityTime.cpp" />
     <ClCompile Include="..\..\Common\RainAeternum\WindowsLAMInclude.cpp" />
     <ClCompile Include="CommandHandlers.cpp" />
+    <ClCompile Include="ExternalConnectionHandlers.cpp" />
+    <ClCompile Include="InternalConnectionHandlers.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ConnectionHandlers.cpp" />
-    <ClCompile Include="RequestHandlers.cpp" />
     <ClCompile Include="Start.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\..\Auxiliary\EmiliaMail\EmiliaMailServer\error.log" />
+    <Text Include="..\..\..\Auxiliary\EmiliaMail\EmiliaMailServer\log.log" />
+    <Text Include="..\..\..\Auxiliary\EmiliaMail\EmiliaMailServer\memory-leaks.log" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
