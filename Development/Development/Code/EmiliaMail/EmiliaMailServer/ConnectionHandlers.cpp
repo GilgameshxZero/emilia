@@ -9,8 +9,12 @@ namespace Monochrome3 {
 			ccParam.logger->setSocketSrc(ssmdhParam.ssm, true);
 
 			ssmdhParam.delegateParam = new ConnectionDelegateParam();
-			Rain::tsCout("Info: Client ", Rain::getClientNumIP(*ssmdhParam.cSocket), " connected.\r\n");
+			Rain::tsCout("Info: Client ", Rain::getClientNumIP(*ssmdhParam.cSocket), " connected. Total: ", ++ccParam.connectedClients, ".\r\n");
 			fflush(stdout);
+
+			//in either request type, send a 220
+			//in send requests, the 220 will be ignored, but that's fine
+			ssmdhParam.ssm->sendRawMessage("220 Emilia is ready\r\n");
 
 			return 0;
 		}
@@ -25,12 +29,15 @@ namespace Monochrome3 {
 				std::size_t firstSpace = cdParam.request.find(' ');
 				if (firstSpace != std::string::npos) {
 					std::string method = cdParam.request.substr(0, firstSpace);
-					if (method == "EHLO") {
+					if (method == "EHLO" || method == "HELO") {
 						cdParam.cType = "recv";
 						cdParam.rcd.reqHandler = HRREhlo;
 					} else {
 						cdParam.cType = "send";
 						cdParam.scd.reqHandler = HRSAuth;
+
+						//start off as fail
+						cdParam.scd.status = -1;
 					}
 				}
 			}
@@ -58,6 +65,9 @@ namespace Monochrome3 {
 						std::size_t firstSpace = cdParam.request.find(' ');
 						if (firstSpace != std::string::npos) {
 							cdParam.scd.requestLength = Rain::strToT<std::size_t>(cdParam.request.substr(0, firstSpace));
+
+							//care: requestLength may be invalid
+
 							cdParam.request = cdParam.request.substr(firstSpace + 1, cdParam.request.length());
 						} else
 							break;
@@ -66,7 +76,14 @@ namespace Monochrome3 {
 						cdParam.scd.requestLength <= cdParam.request.length()) {
 						std::string fragment = cdParam.request.substr(cdParam.scd.requestLength, cdParam.request.length());
 						cdParam.request = cdParam.request.substr(0, cdParam.scd.requestLength);
-						ret = cdParam.scd.reqHandler(ssmdhParam);
+
+						//cdParam.request may be invalid at this point
+						//shouldn't be NULL, but just in case
+						if (cdParam.scd.reqHandler == NULL)
+							ret = -1;
+						else
+							ret = cdParam.scd.reqHandler(ssmdhParam);
+
 						cdParam.request = fragment;
 						cdParam.scd.requestLength = 0;
 					} else
@@ -84,7 +101,7 @@ namespace Monochrome3 {
 
 			ccParam.logger->setSocketSrc(ssmdhParam.ssm, false);
 
-			Rain::tsCout("Info: Client ", Rain::getClientNumIP(*ssmdhParam.cSocket), " disconnected.\r\n");
+			Rain::tsCout("Info: Client ", Rain::getClientNumIP(*ssmdhParam.cSocket), " disconnected. Total: ", --ccParam.connectedClients, ".\r\n");
 			fflush(stdout);
 
 			//if receiving mail, process it now if possible
@@ -94,8 +111,14 @@ namespace Monochrome3 {
 				Rain::tsCout("Info: Forwarding receive mail request to respective recipients.\r\n");
 				fflush(stdout);
 
+				//refresh userdata
+				std::map<std::string, std::string> users = Rain::readParameterFile((*ccParam.config)["dyn-path"] + (*ccParam.config)["dyn-users"]);
+				for (auto it : users) {
+					ccParam.b64Users[Rain::strEncodeB64(it.first)] = Rain::strEncodeB64(it.second);
+				}
+
 				//different csm's used to send requests to internal client
-				std::vector<Rain::ClientSocketManager> vCSM;
+				std::vector<Rain::ClientSocketManager *> vCSM;
 				std::vector<InternalConnectionParam *> vICParam;
 
 				//break down the receive request into one for each rcpt to
@@ -103,31 +126,41 @@ namespace Monochrome3 {
 					//we know one of from or rcpt is @domain
 					//if to is @domain, get the real to
 					std::string trueTo = rcpt;
-					if (Rain::getEmailDomain(trueTo) == (*ccParam.config)["operating-domain"]) {
-						trueTo = Rain::strDecodeB64(ccParam.b64Users[Rain::strEncodeB64(Rain::getEmailUser(rcpt))]);
+					if (Rain::getEmailDomain(rcpt) == (*ccParam.config)["operating-domain"]) {
+						if (ccParam.b64Users.find(Rain::strEncodeB64(Rain::getEmailUser(rcpt))) == ccParam.b64Users.end()) {
+							//if the user doesn't exist, throw away the email
+							Rain::tsCout("Failure: Client could not find local user ", rcpt, "; email recipient ignored and email discarded.\r\n");
+							fflush(stdout);
+							continue;
+						} else {
+							//user exists, so get the email
+							trueTo = Rain::strDecodeB64(ccParam.b64Users[Rain::strEncodeB64(Rain::getEmailUser(rcpt))]);
+							Rain::tsCout("Info: Forwarding email intended for user ", rcpt, " to ", trueTo, ".\r\n");
+							fflush(stdout);
+						}
 					}
 
 					//create a CSM to send a request to EmiliaMailServer's same port to send this email to the right location
-					vCSM.push_back(Rain::ClientSocketManager());
+					vCSM.push_back(new Rain::ClientSocketManager());
 					vICParam.push_back(new InternalConnectionParam());
 					vICParam.back()->hFinish = CreateEvent(NULL, TRUE, FALSE, NULL);
 					vICParam.back()->toAddress = trueTo;
 
 					//don't need to verify; just send the information and exit
-					vCSM.back().setEventHandlers(onInternalConnect, onInternalMessage, onInternalDisconnect, vICParam.back());
-					vCSM.back().setClientTarget("localhost", 25, 25);
+					vCSM.back()->setEventHandlers(onInternalConnect, onInternalMessage, onInternalDisconnect, vICParam.back());
+					vCSM.back()->setClientTarget("localhost", 25, 25);
 
 					//authentication
-					Rain::sendBlockMessage(vCSM.back(), (*ccParam.config)["client-auth"]);
+					Rain::sendBlockMessage(*vCSM.back(), (*ccParam.config)["client-auth"]);
 					
 					//from address
-					Rain::sendBlockMessage(vCSM.back(), "server@emilia-tan.com");
+					Rain::sendBlockMessage(*vCSM.back(), "server@emilia-tan.com");
 
 					//to address
-					Rain::sendBlockMessage(vCSM.back(), trueTo);
+					Rain::sendBlockMessage(*vCSM.back(), trueTo);
 
 					//entire email body, including end
-					Rain::sendBlockMessage(vCSM.back(), cdParam.rcd.mailData);
+					Rain::sendBlockMessage(*vCSM.back(), cdParam.rcd.mailData);
 				}
 
 				//wait on all CSMs to return with a code (and, thus report their success to the console)
@@ -136,15 +169,24 @@ namespace Monochrome3 {
 					CloseHandle(vICParam.back()->hFinish);
 					delete vICParam.back();
 					vICParam.pop_back();
+					delete vCSM.back();
+					vCSM.pop_back();
 				}
 
 				Rain::tsCout("Info: Finished processing receive mail request from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ".\r\n");
-				fflush(stdout);
+			} else if (cdParam.cType == "send") {
+				if (cdParam.scd.status == 0) {
+					Rain::tsCout("Success: Processed 'send' mail request from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ".\r\n");
+				} else {
+					Rain::tsCout("Failure: Invalid 'send' mail request from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ".\r\n");
+				}
+			} else if (cdParam.cType == "recv") {
+				Rain::tsCout("Failure: Invalid 'recv' mail request from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ".\r\n");
 			} else {
-				Rain::tsCout("Failure: Invalid receive mail request from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ".\r\n");
-				fflush(stdout);
+				Rain::tsCout("Failure: Invalid mail request from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ".\r\n");
 			}
 
+			fflush(stdout);
 			delete ssmdhParam.delegateParam;
 			return 0;
 		}
@@ -152,6 +194,14 @@ namespace Monochrome3 {
 		int HRREhlo(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
+
+			std::string command = cdParam.request.substr(0, 4);
+
+			//we don't want to deal with HELO commands, which are not RFC compliant anyway
+			if (command == "HELO") {
+				ssmdhParam.ssm->sendRawMessage("500 Emilia doesn't accept HELO, only EHLO\r\n");
+				return 0;
+			}
 
 			ssmdhParam.ssm->sendRawMessage("250-Emilia is best girl!\r\n");
 			ssmdhParam.ssm->sendRawMessage("250 AUTH LOGIN\r\n");
@@ -205,7 +255,7 @@ namespace Monochrome3 {
 			if (isAtDomain) {
 				ssmdhParam.ssm->sendRawMessage("250 OK\r\n");
 			} else {
-				ssmdhParam.ssm->sendRawMessage("510 Emilia doesn't like talking for strangers\r\n");
+				ssmdhParam.ssm->sendRawMessage("510 Emilia doesn't like talking for strangers (one of either 'RCPT TO' or 'MAIL FROM' must be at the local domain\r\n");
 				cdParam.rcd.mailData.clear();
 			}
 
@@ -260,9 +310,9 @@ namespace Monochrome3 {
 			auto it = ccParam.b64Users.find(cdParam.rcd.b64User);
 			if (it != ccParam.b64Users.end() &&
 				it->second == cdParam.request) {
-				ssmdhParam.ssm->sendRawMessage("235 Emilia authentication success\r\n");
+				ssmdhParam.ssm->sendRawMessage("235 Emilia authenticated you\r\n");
 			} else {
-				ssmdhParam.ssm->sendRawMessage("530 Emilia could not authenticate the user\r\n");
+				ssmdhParam.ssm->sendRawMessage("530 Emilia could not authenticate you\r\n");
 				cdParam.rcd.b64User.clear();
 			}
 			cdParam.rcd.reqHandler = HRRPreData;
@@ -273,18 +323,25 @@ namespace Monochrome3 {
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 
-			if (cdParam.request.substr(0, 9) != "MAIL FROM") {
+			if (cdParam.request.substr(0, 9) != "MAIL FROM" || cdParam.request.length() <= 10) {
 				ssmdhParam.ssm->sendRawMessage("500 Emilia doesn't understand MAIL request\r\n");
 				return 0;
 			}
 
-			//gets after the colon
-			cdParam.rcd.mailFrom = Rain::strTrimWhite(cdParam.request.substr(10, cdParam.request.length()));
+			//gets after the colon, between the brackets
+			std::string afterColon = Rain::strTrimWhite(cdParam.request.substr(10, cdParam.request.length()));
+			std::size_t b1 = afterColon.find("<"),
+				b2 = afterColon.rfind(">");
+			if (b1 == std::string::npos || b2 == std::string::npos) {
+				ssmdhParam.ssm->sendRawMessage("500 Emilia doesn't understand MAIL request\r\n");
+				return 0;
+			}
+			cdParam.rcd.mailFrom = Rain::strTrimWhite(afterColon.substr(b1 + 1, b2 - b1 - 1));
 
 			//if sending from current domain, need to be authenticated
 			if (Rain::getEmailDomain(cdParam.rcd.mailFrom) == (*ccParam.config)["operating-domain"] &&
 				cdParam.rcd.b64User.length() == 0) {
-				ssmdhParam.ssm->sendRawMessage("502 Emilia hasn't authenticated you to do that\r\n");
+				ssmdhParam.ssm->sendRawMessage("502 Emilia hasn't authenticated you to do that (sending from a managed domain requires authentication)\r\n");
 			} else
 				ssmdhParam.ssm->sendRawMessage("250 OK\r\n");
 			return 0;
@@ -293,13 +350,20 @@ namespace Monochrome3 {
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 
-			if (cdParam.request.substr(0, 7) != "RCPT TO") {
+			if (cdParam.request.substr(0, 7) != "RCPT TO" || cdParam.request.length() <= 8) {
 				ssmdhParam.ssm->sendRawMessage("500 Emilia doesn't understand RCPT request\r\n");
 				return 0;
 			}
 
-			//gets after the colon
-			cdParam.rcd.rcptTo.insert(Rain::strTrimWhite(cdParam.request.substr(8, cdParam.request.length())));
+			//gets after the colon, between the brackets
+			std::string afterColon = Rain::strTrimWhite(cdParam.request.substr(8, cdParam.request.length()));
+			std::size_t b1 = afterColon.find("<"),
+				b2 = afterColon.rfind(">");
+			if (b1 == std::string::npos || b2 == std::string::npos) {
+				ssmdhParam.ssm->sendRawMessage("500 Emilia doesn't understand RCPT request\r\n");
+				return 0;
+			}
+			cdParam.rcd.rcptTo.insert(Rain::strTrimWhite(afterColon.substr(b1 + 1, b2 - b1 - 1)));
 
 			ssmdhParam.ssm->sendRawMessage("250 OK\r\n");
 			return 0;
@@ -311,8 +375,12 @@ namespace Monochrome3 {
 
 			//all requests to the client come here
 
-			if (cdParam.request != (*ccParam.config)["client-auth"])
+			if (cdParam.request != (*ccParam.config)["client-auth"]) {
+				Rain::tsCout("Failure: Authentication to client failed.\r\n");
+				fflush(stdout);
+				ssmdhParam.ssm->sendRawMessage("-1");
 				return 1;
+			}
 
 			cdParam.scd.reqHandler = HRSFrom;
 			return 0;
@@ -322,6 +390,7 @@ namespace Monochrome3 {
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 
 			cdParam.scd.from = cdParam.request;
+			cdParam.scd.reqHandler = HRSTo;
 			return 0;
 		}
 		int HRSTo(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
@@ -329,6 +398,7 @@ namespace Monochrome3 {
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 
 			cdParam.scd.to = cdParam.request;
+			cdParam.scd.reqHandler = HRSBody;
 			return 0;
 		}
 		int HRSBody(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
@@ -336,13 +406,27 @@ namespace Monochrome3 {
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 
 			cdParam.scd.data = cdParam.request;
+			cdParam.scd.reqHandler = NULL;
 
 			//get DNS information
 			std::string emailHostDomain = Rain::getEmailDomain(cdParam.scd.to);
+			std::vector<std::string> smtpServers;
 			DNS_RECORD *dnsRecord;
-			DnsQuery(emailHostDomain.c_str(), DNS_TYPE_MX, DNS_QUERY_STANDARD, NULL, &dnsRecord, NULL);
-			std::string smtpServer = dnsRecord->Data.MX.pNameExchange;
-			DnsRecordListFree(dnsRecord, DnsFreeRecordList);
+			if (!DnsQuery(emailHostDomain.c_str(), DNS_TYPE_MX, DNS_QUERY_STANDARD, NULL, &dnsRecord, NULL)) {
+				DNS_RECORD *curDNSR = dnsRecord;
+				while (curDNSR != NULL) {
+					smtpServers.push_back(curDNSR->Data.MX.pNameExchange);
+					curDNSR = curDNSR->pNext;
+				}
+				DnsRecordListFree(dnsRecord, DnsFreeRecordList);
+				Rain::tsCout("Success: Successfully queried ", smtpServers.size(), " MX DNS record(s) for domain ", emailHostDomain, ". Connecting to SMTP server...\r\n");
+				fflush(stdout);
+			} else {
+				Rain::tsCout("Failure: Failed query for MX DNS record for domain ", emailHostDomain, ". Client will discard email and terminate...\r\n");
+				fflush(stdout);
+				ssmdhParam.ssm->sendRawMessage("-2");
+				return 1;
+			}
 
 			//use CSM to send the mail and block for results
 			Rain::ClientSocketManager csm;
@@ -357,9 +441,33 @@ namespace Monochrome3 {
 			ecParam.data = &cdParam.scd.data;
 
 			csm.setEventHandlers(onExternalConnect, onExternalMessage, onExternalDisconnect, &ecParam);
-			csm.setClientTarget(smtpServer, 25, 25);
 
-			//block for communications
+			//attempt to connect to each of the MX records in order, each with a timeout, until all of them fail or one of them succeeds
+			bool connected = false;
+			for (std::string server : smtpServers) {
+				csm.setClientTarget(server, 25, 25);
+
+				//only allow connecting to client for a timeout before discarding email
+				csm.blockForConnect(Rain::strToT<DWORD>((*ccParam.config)["client-conn-timeout"]));
+				if (csm.getSocketStatus() != csm.STATUS_CONNECTED) {
+					Rain::tsCout("Failure: Could not connect to SMTP server ", server, ". Client will try next MX SMTP server if available...\r\n");
+					fflush(stdout);
+				} else {
+					Rain::tsCout("Success: Connected to SMTP server ", server, ". Sending email...\r\n");
+					fflush(stdout);
+					connected = true;
+					break;
+				}
+			}
+
+			if (!connected) {
+				Rain::tsCout("Failure: All MX record SMTP servers failed to connect. Client will discard email and terminate.\r\n");
+				fflush(stdout);
+				ssmdhParam.ssm->sendRawMessage("-3");
+				return 1;
+			}
+
+			//block for communications, which the event handlers will send
 			WaitForSingleObject(ecParam.hFinish, INFINITE);
 			CloseHandle(ecParam.hFinish);
 
@@ -368,6 +476,9 @@ namespace Monochrome3 {
 			//output a status code and terminate the connection
 			//0 is success
 			ssmdhParam.ssm->sendRawMessage(Rain::tToStr(ecParam.status));
+
+			//also mark locally the return code
+			cdParam.scd.status = ecParam.status;
 
 			return 1;
 		}
