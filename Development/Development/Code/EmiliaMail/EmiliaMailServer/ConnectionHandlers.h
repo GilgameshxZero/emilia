@@ -22,6 +22,9 @@ namespace Monochrome3 {
 			std::string to;
 			std::string from;
 			std::string data;
+
+			//whether the communication was successful or failure (most likely bogus).
+			int status;
 		};
 
 		struct RecvConnectionDelegateParam {
@@ -49,6 +52,9 @@ namespace Monochrome3 {
 
 			//used to log socket coms from main
 			Rain::LogStream *logger;
+
+			//total number of connected clients
+			int connectedClients;
 		};
 
 		struct ConnectionDelegateParam {
@@ -67,7 +73,9 @@ namespace Monochrome3 {
 		int onMessage(void *param);
 		int onDisconnect(void *param);
 
+		//Ehlo manages both EHLO and HELO requests
 		int HRREhlo(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
+
 		int HRRPreData(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
 		int HRRData(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
 

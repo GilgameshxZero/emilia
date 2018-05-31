@@ -22,24 +22,28 @@ namespace Monochrome3 {
 			ecParam.request += *csmdhParam.message;
 			std::size_t pos = ecParam.request.rfind("\r\n");
 			if (pos == ecParam.request.length() - 2) {
-				std::size_t pos2 = ecParam.request.rfind("\r\n", pos);
+				std::size_t pos2 = ecParam.request.rfind("\r\n", pos - 1);
+				std::string finalLine;
 				if (pos2 != ecParam.request.npos) {
-					std::string finalLine = ecParam.request.substr(pos2 + 2, pos);
-					char firstNonNumer = '-';
-					for (char c : finalLine) {
-						if (!(c >= '0' && c <= '9')) {
-							firstNonNumer = c;
-							break;
-						}
+					finalLine = ecParam.request.substr(pos2 + 2, pos);
+				} else {
+					finalLine = ecParam.request.substr(0, pos);
+				}
+
+				char firstNonNumer = '-';
+				for (char c : finalLine) {
+					if (!(c >= '0' && c <= '9')) {
+						firstNonNumer = c;
+						break;
 					}
-					if (firstNonNumer == ' ') {
-						//request is complete, send it off to the right request handler
-						if (ecParam.reqHandler == NULL) //this shouldn't happen, but there might be multithreading issues that cause this
-							ret = -1;
-						else
-							ret = ecParam.reqHandler(csmdhParam);
-						ecParam.request.clear();
-					}
+				}
+				if (firstNonNumer == ' ') {
+					//request is complete, send it off to the right request handler
+					if (ecParam.reqHandler == NULL) //this shouldn't happen, but there might be multithreading issues that cause this
+						ret = -1;
+					else
+						ret = ecParam.reqHandler(csmdhParam);
+					ecParam.request.clear();
 				}
 			}
 

@@ -48,19 +48,7 @@ namespace Rain {
 		return *strTrimWhite(&s);
 	}
 
-	char chrEncodeB64(char c) {
-		if (c == '/')
-			return 63;
-		if (c == '+')
-			return 62;
-		if (c < 58)
-			return c - '0' + 52;
-		if (c < 91)
-			return c - 'A';
-		else //if (c < 123)
-			return c - 'a' + 26;
-	}
-	char chrDecodeB64(char x) {
+	char intEncodeB64(int x) {
 		if (x < 26)
 			return x + 'A';
 		if (x < 52)
@@ -72,6 +60,18 @@ namespace Rain {
 		else //if (x == 63)
 			return '/';
 	}
+	int chrDecodeB64(char c) {
+		if (c == '/')
+			return 63;
+		if (c == '+')
+			return 62;
+		if (c < 58)
+			return c - '0' + 52;
+		if (c < 91)
+			return c - 'A';
+		else //if (c < 123)
+			return c - 'a' + 26;
+	}
 	std::string strEncodeB64(const std::string *str) {
 		static const int MAXBITS = 6;
 		static const unsigned char MASK = 0xFF;
@@ -81,20 +81,20 @@ namespace Rain {
 		int curChr = 0;
 		for (std::size_t a = 0; a < str->length(); a++) {
 			curChr |= (((*str)[a] & (MASK << (bitsInChr + 2))) >> (bitsInChr + 2));
-			ret.push_back(chrEncodeB64(static_cast<char>(static_cast<int>(curChr))));
+			ret.push_back(intEncodeB64(static_cast<char>(static_cast<int>(curChr))));
 			curChr = ((*str)[a] & (MASK >> (MAXBITS - bitsInChr)));
 			bitsInChr = bitsInChr + 2;
 			curChr <<= MAXBITS - bitsInChr;
 
 			if (bitsInChr == MAXBITS) {
-				ret.push_back(chrEncodeB64(chrEncodeB64(static_cast<char>(static_cast<int>(curChr)))));
+				ret.push_back(intEncodeB64(curChr));
 				curChr = 0;
 				bitsInChr = 0;
 			}
 		}
 
 		if (bitsInChr != 0)
-			ret.push_back(chrEncodeB64(chrEncodeB64(static_cast<char>(static_cast<int>(curChr)))));
+			ret.push_back(intEncodeB64(curChr));
 		return ret;
 	}
 	std::string strEncodeB64(std::string str) {

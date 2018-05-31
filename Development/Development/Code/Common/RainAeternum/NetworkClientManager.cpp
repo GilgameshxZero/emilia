@@ -184,6 +184,7 @@ namespace Rain {
 				//any socket that is connected will pass through this step
 				if (!Rain::connectTarget(csm.socket, &csm.portAddrs[a - csm.lowPort])) {
 					csm.connectedPort = a;
+					csm.socketStatus = csm.STATUS_CONNECTED;
 
 					//attach the socket to a recvThread
 					csm.rParam.bufLen = csm.recvBufLen;
@@ -195,7 +196,6 @@ namespace Rain {
 					csm.rParam.socket = &csm.socket;
 					Rain::createRecvThread(&csm.rParam);
 
-					csm.socketStatus = csm.STATUS_CONNECTED;
 					break;
 				}
 			}

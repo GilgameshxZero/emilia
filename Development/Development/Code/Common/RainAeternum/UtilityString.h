@@ -47,8 +47,8 @@ namespace Rain {
 
 	//encodes and decodes Base-64 format
 	//pointer versions return normal strings, since none of them modify parameters
-	char chrEncodeB64(char c);
-	char chrDecodeB64(char x);
+	char intEncodeB64(int x);
+	int chrDecodeB64(char c);
 	std::string strEncodeB64(const std::string *str);
 	std::string strEncodeB64(std::string str);
 	std::string strDecodeB64(const std::string *str);
