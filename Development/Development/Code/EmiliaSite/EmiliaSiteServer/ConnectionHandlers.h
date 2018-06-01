@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../Common/RainLibrary3/RainLibraries.h"
+#include "../../Common/RainAeternum/RainLibraries.h"
 
 #include "BuildID.h"
 
@@ -8,10 +8,16 @@
 #include <set>
 
 namespace Monochrome3 {
-	namespace EMTServer {
+	namespace EmiliaSiteServer {
 		struct ConnectionCallerParam {
 			//global config options
 			std::map<std::string, std::string> *config;
+
+			//used to log socket coms from main
+			Rain::LogStream *logger;
+
+			//total number of connected clients
+			int connectedClients;
 		};
 
 		struct ConnectionDelegateParam {
@@ -30,9 +36,9 @@ namespace Monochrome3 {
 		};
 
 		//handlers for RecvThread
-		void onConnectionInit(void *funcParam);
-		void onConnectionExit(void *funcParam);
-		int onConnectionProcessMessage(void *funcParam);
+		int onConnect(void *funcParam);
+		int onMessage(void *funcParam);
+		int onDisconnect(void *funcParam);
 
 		//called by RecvThread handlers when a full message comes in
 		//header keys are all lowercase
@@ -44,6 +50,7 @@ namespace Monochrome3 {
 						   std::map<std::string, std::string> &headers,
 						   std::string &bodyBlock);
 
+		//helper function to parse a header block in a SS
 		void parseHeaders(std::stringstream &headerStream, std::map<std::string, std::string> &headers);
 	}
 }
