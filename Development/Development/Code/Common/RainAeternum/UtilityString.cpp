@@ -73,55 +73,40 @@ namespace Rain {
 			return c - 'a' + 26;
 	}
 	std::string strEncodeB64(const std::string *str) {
-		static const int MAXBITS = 6;
-		static const unsigned char MASK = 0xFF;
-
-		std::string ret;
-		int bitsInChr = 0;
-		int curChr = 0;
-		for (std::size_t a = 0; a < str->length(); a++) {
-			curChr |= (((*str)[a] & (MASK << (bitsInChr + 2))) >> (bitsInChr + 2));
-			ret.push_back(intEncodeB64(static_cast<char>(static_cast<int>(curChr))));
-			curChr = ((*str)[a] & (MASK >> (MAXBITS - bitsInChr)));
-			bitsInChr = bitsInChr + 2;
-			curChr <<= MAXBITS - bitsInChr;
-
-			if (bitsInChr == MAXBITS) {
-				ret.push_back(intEncodeB64(curChr));
-				curChr = 0;
-				bitsInChr = 0;
+		static std::string b64Map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+		std::string out;
+		int val = 0, valb = -6;
+		for (unsigned char c : *str) {
+			val = (val << 8) + c;
+			valb += 8;
+			while (valb >= 0) {
+				out.push_back(b64Map[(val >> valb) & 0x3F]);
+				valb -= 6;
 			}
 		}
-
-		if (bitsInChr != 0)
-			ret.push_back(intEncodeB64(curChr));
-		return ret;
+		if (valb > -6) out.push_back(b64Map[((val << 8) >> (valb + 8)) & 0x3F]);
+		while (out.size() % 4) out.push_back('=');
+		return out;
 	}
 	std::string strEncodeB64(std::string str) {
 		return strEncodeB64(&str);
 	}
 	std::string strDecodeB64(const std::string *str) {
-		static const int MAXBITS = 8;
-		static const unsigned char MASK = 0xFF;
-
-		std::string ret;
-		int bitsInChr = 0;
-		char curChr = 0, curint;
-		for (std::size_t a = 0; a < str->length(); a++) {
-			curint = chrDecodeB64((*str)[a]);
-			if (bitsInChr == 0) {
-				curChr = (curint << 2);
-				bitsInChr = 6;
-				continue;
+		static std::string b64Map = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+		std::string out;
+		std::vector<int> T(256, -1);
+		for (int i = 0; i < 64; i++) T[b64Map[i]] = i;
+		int val = 0, valb = -8;
+		for (unsigned char c : *str) {
+			if (T[c] == -1) break;
+			val = (val << 6) + T[c];
+			valb += 6;
+			if (valb >= 0) {
+				out.push_back(char((val >> valb) & 0xFF));
+				valb -= 8;
 			}
-			curChr |= (((curint << 2) & (MASK << bitsInChr)) >> bitsInChr);
-			ret.push_back(curChr);
-			curChr = (curint & (MASK >> (10 - bitsInChr)));
-			bitsInChr = bitsInChr - 2;
-			curChr <<= MAXBITS - bitsInChr;
 		}
-
-		return ret;
+		return out;
 	}
 	std::string strDecodeB64(std::string str) {
 		return strDecodeB64(&str);

@@ -104,6 +104,9 @@ In the root, there will also be additional untracked files not part of the offic
 ## Changelog
 
 ### Emilia-tan
+* 2.1.0
+	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (4.0.0, 2.0.2, 1.0.3, 1.0.2, 1.0.3)
+	* bugfixed B64 issues in Aeternum
 * 2.0.1
 	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (3.7.2, 2.0.1, 1.0.3, 1.0.2, 1.0.3)
 * 2.0.0
@@ -162,6 +165,10 @@ In the root, there will also be additional untracked files not part of the offic
 ### EmiliaSite
 
 #### EmiliaSiteServer
+* 4.0.0
+	* switched to Aeternum
+	* standardized configuration options consistent with other scripts
+	* fixed issue where CGI script would not cause a request to finish and eternally load
 * 3.7.2
 	* fixed POST request header length parsing
 	* cleaned up resource.h
@@ -194,6 +201,8 @@ In the root, there will also be additional untracked files not part of the offic
 	* updated fileversion detail on .exe
 
 #### EmiliaMailServer
+* 2.0.2
+	* fixed bug with encoding/decoding B64
 * 2.0.1
 	* minimum viable product; finished implementation
 	* now queries additional MX records instead of just first one
@@ -275,15 +284,13 @@ In the root, there will also be additional untracked files not part of the offic
 
 #### EmiliaSite
 * clean up memory leaks
-* switch to RainAeternum
 
 ### EmiliaMail
+* create a CGI script for utilizing the client through HTTP
 
 #### EmiliaMailServer
 * sometimes, clients just want to authenticate, but now we log it as a failed recv request
 * successful internal client requests still give Failure output log Failure: Invalid 'send' mail request from 127.0.0.1.
-
-#### EmiliaMailClient
 
 ### EmiliaUpdate
 

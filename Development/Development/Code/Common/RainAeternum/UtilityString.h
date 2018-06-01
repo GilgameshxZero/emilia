@@ -15,6 +15,7 @@ Compatiable with all OS.
 #include <string>
 #include <algorithm> 
 #include <cctype>
+#include <vector>
 
 namespace Rain {
 	//converts from any type to string using stringstream
