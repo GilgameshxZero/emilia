@@ -104,6 +104,8 @@ In the root, there will also be additional untracked files not part of the offic
 ## Changelog
 
 ### Emilia-tan
+* 2.1.1
+	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (4.0.1, 2.0.2, 1.0.3, 1.0.2, 1.0.3)
 * 2.1.0
 	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (4.0.0, 2.0.2, 1.0.3, 1.0.2, 1.0.3)
 	* bugfixed B64 issues in Aeternum
@@ -165,6 +167,8 @@ In the root, there will also be additional untracked files not part of the offic
 ### EmiliaSite
 
 #### EmiliaSiteServer
+* 4.0.1
+	* flush after cout logging in ConnectionHandlers
 * 4.0.0
 	* switched to Aeternum
 	* standardized configuration options consistent with other scripts
