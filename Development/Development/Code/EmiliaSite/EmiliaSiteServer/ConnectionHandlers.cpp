@@ -101,8 +101,9 @@ namespace Monochrome3 {
 									   bodyBlock);
 
 			//log the request manually so that we don't log responses
-			ccParam.logger->logString(&cdParam.request);
 			Rain::tsCout(Rain::getClientNumIP(*ssmdhParam.cSocket), ": ", cdParam.requestMethod, " ", requestURI, "\r\n");
+			fflush(stdout);
+			ccParam.logger->logString(&cdParam.request);
 
 			//if it decides to keep the connection open after this full request, then reset request-specific parameters for the recvThread
 			if (prRet == 0) {
