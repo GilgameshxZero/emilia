@@ -1,37 +1,39 @@
 #include "ConnectionHandlers.h"
 
 namespace Monochrome3 {
-	namespace EMTServer {
+	namespace EmiliaSiteServer {
 		static const std::string headerDelim = "\r\n\r\n";
 
-		void onConnectionInit(void *funcParam) {
-			Rain::WSA2ListenThreadRecvFuncDelegateParam &ltrfdParam = *reinterpret_cast<Rain::WSA2ListenThreadRecvFuncDelegateParam *>(funcParam);
-			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ltrfdParam.callerParam);
+		int onConnect(void *funcParam) {
+			Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam = *reinterpret_cast<Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam *>(funcParam);
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+
+			//logging
+			Rain::tsCout("Info: Client connected from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ". Total: ", ++ccParam.connectedClients, ".\r\n");
+			fflush(stdout);
 
 			//create the delegate parameter for the first time
 			ConnectionDelegateParam *cdParam = new ConnectionDelegateParam();
-			ltrfdParam.delegateParam = reinterpret_cast<void *>(cdParam);
+			ssmdhParam.delegateParam = reinterpret_cast<void *>(cdParam);
 
 			//delay all possible initialization of rtParam to here
 			cdParam->request = "";
 			cdParam->requestMethod = "";
 			cdParam->contentLength = -1;
 			cdParam->headerBlockLength = -1;
+
+			return 0;
 		}
-		void onConnectionExit(void *funcParam) {
-			//free the delegate parameter
-			delete reinterpret_cast<Rain::WSA2ListenThreadRecvFuncDelegateParam *>(funcParam)->delegateParam;
-		}
-		int onConnectionProcessMessage(void *funcParam) {
-			Rain::WSA2ListenThreadRecvFuncDelegateParam &ltrfdParam = *reinterpret_cast<Rain::WSA2ListenThreadRecvFuncDelegateParam *>(funcParam);
-			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ltrfdParam.callerParam);
-			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ltrfdParam.delegateParam);
+		int onMessage(void *funcParam) {
+			Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam = *reinterpret_cast<Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam *>(funcParam);
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 
 			//accumulate messages until a complete request is found
 			//for now, only accept GET requests and non-chunked POST requests (those with a content-length header)
 			//of course, for POST requests, we will need to accumulate not just the header but also the body of the request
 			//onProcessMessage is also responsible for parsing the header before passing it on to processRequest
-			cdParam.request += ltrfdParam.message;
+			cdParam.request += *ssmdhParam.message;
 
 			//if we don't know the requestMethod yet, attempt to calculate it now
 			if (cdParam.requestMethod == "") {
@@ -89,24 +91,19 @@ namespace Monochrome3 {
 			ss >> cdParam.requestMethod >> requestURI >> httpVersion;
 			parseHeaders(ss, headers);
 
-			//log data
-			std::string clientIP = Rain::getClientNumIP(*ltrfdParam.cSocket),
-				consoleLog = (clientIP + ": " + cdParam.requestMethod + " " + requestURI).substr(0, 80) + "\n"; //cut off the console log if its too long so that it doesn't stall the other threads
-			Rain::rainCoutF(consoleLog);
-
-			Rain::fastOutputFile(ccParam.config->at("serverLog"),
-								 Rain::getTime() + "\t" + clientIP + "\t" + Rain::tToStr(cdParam.request.length()) + " bytes\r\n" +
-								 cdParam.request + "\r\n" +
-								 "--------------------------------------------------------------------------------\r\n", true);
-
 			//send the parsed headers and bodyBlock and other parameters over to processRequest
-			int prRet = processRequest(*ltrfdParam.cSocket,
+			int prRet = processRequest(*ssmdhParam.cSocket,
 									   *ccParam.config,
 									   cdParam.requestMethod,
 									   requestURI,
 									   httpVersion,
 									   headers,
 									   bodyBlock);
+
+			//log the request manually so that we don't log responses
+			ccParam.logger->logString(&cdParam.request);
+			Rain::tsCout(Rain::getClientNumIP(*ssmdhParam.cSocket), ": ", cdParam.requestMethod, " ", requestURI, "\r\n");
+
 			//if it decides to keep the connection open after this full request, then reset request-specific parameters for the recvThread
 			if (prRet == 0) {
 				cdParam.request = "";
@@ -117,6 +114,19 @@ namespace Monochrome3 {
 
 			//< 0 is error, 0 is keep-alive, and > 0 is peacefully close
 			return prRet;
+		}
+		int onDisconnect(void *funcParam) {
+			Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam = *reinterpret_cast<Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam *>(funcParam);
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+
+			//logging
+			Rain::tsCout("Info: Client disconnected from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ". Total: ", --ccParam.connectedClients, ".\r\n");
+			fflush(stdout);
+
+			//free the delegate parameter
+			delete ssmdhParam.delegateParam;
+
+			return 0;
 		}
 
 		int processRequest(SOCKET &cSocket,
@@ -146,9 +156,9 @@ namespace Monochrome3 {
 			//parse the URIs
 			if (requestFilePath[0] == '/') //relative filepaths should not begin with a slash
 				requestFilePath = requestFilePath.substr(1, std::string::npos);
-			requestFilePath = Rain::decodeURL(requestFilePath);
-			requestQuery = Rain::decodeURL(requestQuery);
-			requestFragment = Rain::decodeURL(requestFragment);
+			requestFilePath = Rain::strDecodeURL(requestFilePath);
+			requestQuery = Rain::strDecodeURL(requestQuery);
+			requestFragment = Rain::strDecodeURL(requestFragment);
 			for (int a = 0; a < requestFilePath.size(); a++)
 				if (requestFilePath[a] == '/')
 					requestFilePath[a] = '\\';
@@ -157,20 +167,20 @@ namespace Monochrome3 {
 			std::string requestFile = requestFilePath.substr(requestFilePath.rfind("\\") + 1, std::string::npos),
 				requestFileDir = requestFilePath.substr(0, requestFilePath.length() - requestFile.length());
 			if (requestFile.length() == 0)
-				requestFile = config["dirDefaultFile"];
+				requestFile = config["def-server-file"];
 			std::string requestFilePathRel = requestFileDir + requestFile; //short server path
-			requestFileDir = Rain::getWorkingDirectory() + config["serverRootDir"] + requestFileDir;
+			requestFileDir = Rain::getWorkingDirectory() + config["server-root-path"] + requestFileDir;
 			requestFilePath = requestFileDir + requestFile; //recompose the combined filepath; it is now absolute path
 
-			//make sure cgi scripts are parsed
+															//make sure cgi scripts are parsed
 			static bool cgiScriptsParsed = false;
 			static std::set<std::string> cgiScripts;
 			if (!cgiScriptsParsed) { //if this is the first time we're here, we also need to read the cgiScripts config file and get a list of all the cgiScripts
-				std::ifstream cgiScriptsConfigIn(config["cgiScripts"], std::ios::binary);
+				std::ifstream cgiScriptsConfigIn(config["config-path"] + config["config-cgi-scripts"], std::ios::binary);
 				while (cgiScriptsConfigIn.good()) {
 					static std::string line;
 					std::getline(cgiScriptsConfigIn, line);
-					Rain::strTrim(line);
+					Rain::strTrimWhite(&line);
 					if (line.length() > 0)
 						cgiScripts.insert(line);
 				}
@@ -182,7 +192,7 @@ namespace Monochrome3 {
 			static bool customHeadersParsed = false;
 			static std::map<std::string, std::string> customHeaders;
 			if (!customHeadersParsed) {
-				Rain::readParameterFile(config["customHeaders"], customHeaders);
+				customHeaders = Rain::readParameterFile(config["config-path"] + config["config-custom-headers"]);
 
 				//add server versioning info to "server" header
 				customHeaders["server"] = customHeaders["server"] + " (ver. " + Rain::tToStr(VERSION_MAJOR) + "." + Rain::tToStr(VERSION_MINOR) + "." + Rain::tToStr(VERSION_REVISION) + "." + Rain::tToStr(VERSION_BUILD) + ")";
@@ -194,7 +204,7 @@ namespace Monochrome3 {
 			static bool notFound404Parsed = false;
 			static std::string notFound404HTML;
 			if (!notFound404Parsed) {
-				Rain::readFullFile(config["404HTML"], notFound404HTML);
+				Rain::readFileToStr(config["config-path"] + config["config-404"], notFound404HTML);
 				notFound404Parsed = true;
 			}
 
@@ -213,31 +223,39 @@ namespace Monochrome3 {
 				for (auto it : responseHeaders)
 					response += it.first + ":" + it.second + "\r\n";
 				response += "\r\n" + responseBody;
-				if (Rain::sendText(cSocket, response.c_str(), response.length())) {
+				if (!Rain::sendRawMessage(cSocket, response.c_str(), static_cast<int>(response.length()))) {
 					Rain::reportError(GetLastError(), "error while sending response to client; response: " + response);
 					return -7;
 				}
 			} else if (cgiScripts.find(requestFilePathRel) != cgiScripts.end()) { //branch if the file is a cgi script
-				//run the file at FilePath as a cgi script, and respond with its content
-				//set the current environment block as well as additional environment parameters for the script
+																				  //run the file at FilePath as a cgi script, and respond with its content
+																				  //set the current environment block as well as additional environment parameters for the script
 				std::string envBlock;
-				Rain::appendEnvVar(envBlock, "QUERY_STRING=" + requestQuery);
+				envBlock += "QUERY_STRING=" + requestQuery;
+				envBlock.push_back('\0');
 				std::map<std::string, std::string>::iterator iterator = headers.find("referer");
-				if (iterator != headers.end())
-					Rain::appendEnvVar(envBlock, "HTTP_REFERER=" + iterator->second);
+				if (iterator != headers.end()) {
+					envBlock += "HTTP_REFERER=" + iterator->second;
+					envBlock.push_back('\0');
+				}
 				iterator = headers.find("content-length");
-				if (iterator != headers.end())
-					Rain::appendEnvVar(envBlock, "CONTENT_LENGTH=" + iterator->second);
+				if (iterator != headers.end()) {
+					envBlock += "CONTENT_LENGTH=" + iterator->second;
+					envBlock.push_back('\0');
+				}
 				iterator = headers.find("host");
-				if (iterator != headers.end())
-					Rain::appendEnvVar(envBlock, "HTTP_HOST=" + iterator->second);
+				if (iterator != headers.end()) {
+					envBlock += "HTTP_HOST=" + iterator->second;
+					envBlock.push_back('\0');
+				}
 
 				//append current environment block
 				LPCH curEnvBlock = GetEnvironmentStrings();
 				int prevVarBeg = 0;
 				for (int a = 0; ; a++) {
 					if (curEnvBlock[a] == '\0') {
-						Rain::appendEnvVar(envBlock, std::string(curEnvBlock + prevVarBeg + 1, curEnvBlock + a));
+						envBlock += std::string(curEnvBlock + prevVarBeg + 1, curEnvBlock + a);
+						envBlock.push_back('\0');
 						prevVarBeg = a;
 						if (curEnvBlock[a + 1] == '\0')
 							break;
@@ -282,9 +300,9 @@ namespace Monochrome3 {
 					NULL,
 					NULL,
 					TRUE,
-					DETACHED_PROCESS,
+					CREATE_NEW_CONSOLE,
 					reinterpret_cast<LPVOID>(const_cast<char *>(envBlock.c_str())),
-					Rain::getPathDirectory(requestFilePath).c_str(),
+					Rain::getPathDir(requestFilePath).c_str(),
 					&sinfo,
 					&pinfo)) { //try to fail peacefully
 					Rain::reportError(GetLastError(), "error while starting cgi script " + requestFilePath);
@@ -294,7 +312,7 @@ namespace Monochrome3 {
 				//pipe the requestBody to the in pipe of the script
 
 				//if we are processing a POST request, pipe the request body into the in pipe and redirect it to the script
-				static std::size_t cgiInPipeBufLen = Rain::strToT<std::size_t>(config["cgiInPipeBufLen"]);
+				static std::size_t cgiInPipeBufLen = Rain::strToT<std::size_t>(config["transfer-buflen"]);
 				for (std::size_t a = 0; a < bodyBlock.length();) {
 					static DWORD dwWritten;
 					static BOOL bSuccess;
@@ -312,7 +330,7 @@ namespace Monochrome3 {
 				CloseHandle(g_hChildStd_IN_Wr);
 
 				//wait for cgi script to finish, up to a timeout
-				WaitForInputIdle(pinfo.hProcess, Rain::strToT<DWORD>(config["cgiMaxIdleTime"]));
+				WaitForInputIdle(pinfo.hProcess, Rain::strToT<DWORD>(config["cgi-max-timeout"]));
 
 				CloseHandle(pinfo.hThread);
 				CloseHandle(g_hChildStd_OUT_Wr);
@@ -321,12 +339,12 @@ namespace Monochrome3 {
 				//compose response
 				//get buffered output from the script, and send it over the socket buffered
 				responseStatus = "HTTP/1.1 200 OK";
-				if (Rain::sendText(cSocket, responseStatus)) {
+				if (!Rain::sendRawMessage(cSocket, &responseStatus)) {
 					Rain::reportError(GetLastError(), "error while sending response to client; responseStatus: " + responseStatus);
 					return -7;
 				}
 
-				static std::size_t cgiOutPipeBufLen = Rain::strToT<std::size_t>(config["cgiOutPipeBufLen"]);
+				static std::size_t cgiOutPipeBufLen = Rain::strToT<std::size_t>(config["transfer-buflen"]);
 				CHAR *chBuf = new CHAR[cgiOutPipeBufLen];
 				for (;;) {
 					static DWORD dwRead;
@@ -345,7 +363,7 @@ namespace Monochrome3 {
 
 					//send buffer through socket
 					responseBody = std::string(chBuf, dwRead);
-					if (Rain::sendText(cSocket, responseBody)) {
+					if (!Rain::sendRawMessage(cSocket, &responseBody)) {
 						Rain::reportError(GetLastError(), "error while sending response to client; responseBody part: " + responseBody);
 						return -7;
 					}
@@ -353,23 +371,26 @@ namespace Monochrome3 {
 				delete[] chBuf;
 				CloseHandle(g_hChildStd_OUT_Rd);
 				CloseHandle(pinfo.hProcess);
+
+				//return 1 to terminate socket here
+				return 1;
 			} else { //not a cgi script, must be a file request
-				//extract file extension
+					 //extract file extension
 				std::string requestFileExt = requestFile.substr(requestFile.rfind(".") + 1, std::string::npos);
-				Rain::toLowercase(requestFileExt);
+				Rain::strToLower(&requestFileExt);
 
 				//read config to determine contenttype
 				static bool contentTypeParsed = false;
 				static std::map<std::string, std::string> contentTypeSpec;
 				if (!contentTypeParsed) {
-					Rain::readParameterFile(config["contentTypeSpec"], contentTypeSpec);
+					contentTypeSpec = Rain::readParameterFile(config["config-path"] + config["config-content-type"]);
 					contentTypeParsed = true;
 				}
 
 				std::string contentType;
 				std::map<std::string, std::string>::iterator iterator = contentTypeSpec.find(requestFileExt);
 				if (iterator == contentTypeSpec.end())
-					contentType = config["defaultContentType"];
+					contentType = config["def-content-type"];
 				else
 					contentType = iterator->second;
 
@@ -390,19 +411,19 @@ namespace Monochrome3 {
 				for (auto it : responseHeaders)
 					response += it.first + ":" + it.second + "\r\n";
 				response += "\r\n";
-				if (Rain::sendText(cSocket, response)) {
+				if (!Rain::sendRawMessage(cSocket, &response)) {
 					Rain::reportError(GetLastError(), "error while sending response to client; response: " + response);
 					return -7;
 				}
 
 				//send file buffered
-				static std::size_t fileBufLen = Rain::strToT<std::size_t>(config["fileBufLen"]);
+				static std::size_t fileBufLen = Rain::strToT<std::size_t>(config["transfer-buflen"]);
 				char *buffer = new char[fileBufLen];
 				std::size_t fileLen = Rain::strToT<std::size_t>(responseHeaders["content-length"]);
 				for (std::size_t a = 0; a < fileLen; a += fileBufLen) {
 					std::size_t actualRead = min(fileBufLen, fileLen - a);
 					fileIn.read(buffer, actualRead);
-					if (Rain::sendText(cSocket, buffer, actualRead)) {
+					if (!Rain::sendRawMessage(cSocket, buffer, static_cast<int>(actualRead))) {
 						Rain::reportError(GetLastError(), "error while sending response to client; response segment: " + std::string(buffer, actualRead));
 						return -7;
 					}
@@ -412,7 +433,7 @@ namespace Monochrome3 {
 			}
 
 			//depending on the "connection" header, close or keep open the socket
-			if (Rain::toLowercase(headers["connection"]) == "keep-alive")
+			if (Rain::strToLower(headers["connection"]) == "keep-alive")
 				return 0;
 			else
 				return 1;
@@ -424,9 +445,9 @@ namespace Monochrome3 {
 
 			while (key.length() != 0) {
 				std::getline(headerStream, value);
-				Rain::strTrim(value);
-				Rain::strTrim(key);
-				headers[Rain::toLowercase(key)] = value;
+				Rain::strTrimWhite(&value);
+				Rain::strTrimWhite(&key);
+				headers[Rain::strToLower(key)] = value;
 				key = "";
 				std::getline(headerStream, key, ':');
 			}

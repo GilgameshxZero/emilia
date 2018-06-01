@@ -52,6 +52,7 @@ namespace Rain {
 	int shutdownSocketSend(SOCKET &cSocket);
 
 	//send raw message over a socket
+	//returns 0 if no error
 	int sendRawMessage(SOCKET &sock, const char *cstrtext, int len);
 	int sendRawMessage(SOCKET &sock, std::string strText);
 	int sendRawMessage(SOCKET &sock, std::string *strText);
