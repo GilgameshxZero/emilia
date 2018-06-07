@@ -309,12 +309,14 @@ In the root, there will also be additional untracked files not part of the offic
 
 ### EmiliaMail
 * create a CGI script for utilizing the client through HTTP/80
-* still a bug that causes the server to crash, but i don't know what ???
-	* only happened when I accessed server using RDP?
 
 #### EmiliaMailServer
 * sometimes, clients just want to authenticate, but now we log it as a failed recv request
+* create a standard way to test if the server is online
 * successful internal client requests still give Failure output log Failure: Invalid 'send' mail request from 127.0.0.1.
+	* doesn't seem to be a problem anymore
+* still a bug that causes the server to crash, but i don't know what ???
+	* only happened when I accessed server using RDP?
 
 ### EmiliaUpdate
 
