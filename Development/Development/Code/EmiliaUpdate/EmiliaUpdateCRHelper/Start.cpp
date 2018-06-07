@@ -34,7 +34,7 @@ namespace Monochrome3 {
 
 			if (argc < 3) {//need a copy source and destination
 				Rain::tsCout("\r\nThere are not the correct number of command line arguments. Exiting in 3 seconds...\r\n");
-				logger.setStdHandleSrc(STD_OUTPUT_HANDLE, false);
+				fflush(stdout);
 				Sleep(3000);
 				return 0;
 			}
@@ -55,7 +55,7 @@ namespace Monochrome3 {
 						delay = delay * 3 / 2;
 				} else {
 					Rain::tsCout("Unknown error occured. Exiting in 3 seconds...\r\n");
-					logger.setStdHandleSrc(STD_OUTPUT_HANDLE, false);
+					fflush(stdout);
 					Sleep(3000);
 					return 0;
 				}
@@ -77,10 +77,6 @@ namespace Monochrome3 {
 
 			Rain::tsCout("The program has terminated. Exiting in 3 seconds...\r\n");
 			fflush(stdout);
-
-			//clean up logger before we exit, or else we will get error
-			logger.setStdHandleSrc(STD_OUTPUT_HANDLE, false);
-
 			Sleep(3000);
 			return 0;
 		}

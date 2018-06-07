@@ -3,5 +3,5 @@
 #define STRINGIZE(s) STRINGIZE2(s)
 #define VERSION_MAJOR            1
 #define VERSION_MINOR            0
-#define VERSION_REVISION         3
-#define VERSION_BUILD            410
+#define VERSION_REVISION         4
+#define VERSION_BUILD            412

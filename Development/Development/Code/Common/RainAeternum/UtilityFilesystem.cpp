@@ -8,11 +8,11 @@ namespace Rain {
 		static std::wstring prefix = Rain::mbStrToWStr("\\\\?\\");
 		return prefix + path;
 	}
+
 	bool fileExists(std::string file) {
 		struct stat buffer;
 		return (stat(file.c_str(), &buffer) == 0);
 	}
-
 	bool dirExists(std::string dir) {
 		DWORD ftyp = GetFileAttributesW(pathToLongPath(pathToAbsolute(dir)).c_str());
 		if (ftyp == INVALID_FILE_ATTRIBUTES)
@@ -20,6 +20,12 @@ namespace Rain {
 		if (ftyp & FILE_ATTRIBUTE_DIRECTORY)
 			return true;   //this is a directory!
 		return false;    //this is not a directory!
+	}
+
+	bool isSubPath(std::string parentPath, std::string childPath) {
+		parentPath = pathToAbsolute(parentPath);
+		childPath = pathToAbsolute(childPath);
+		return childPath.substr(0, parentPath.length()) == parentPath;
 	}
 
 	std::string *standardizeDirPath(std::string *dir) {
