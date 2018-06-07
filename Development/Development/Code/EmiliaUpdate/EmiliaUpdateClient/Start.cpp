@@ -33,31 +33,39 @@ namespace Monochrome3 {
 			}
 			Rain::tsCout("\r\n");
 
+			//set up command handlers
+			static std::map<std::string, CommandMethodHandler> commandHandlers{
+				{"help", CHHelp},
+			{"stage-dev", CHStageDev},
+			{"deploy-staging", CHDeployStaging},
+			{"prod-download", CHProdDownload},
+			{"stage-prod", CHStageProd},
+			{"prod-stop", CHProdStop},
+			{"prod-start", CHProdStart},
+			{"sync-stop", CHSyncStop},
+			{"sync-start", CHSyncStart},
+			};
+			CommandHandlerParam cmhParam;
+			cmhParam.config = &config;
+			cmhParam.logger = &logger;
+
 			//check command line, perhaps we are being restarted by helper and need to display a message
 			if (argc >= 2) {
 				std::string arg1 = argv[1];
 				Rain::strTrimWhite(&arg1);
 				if (arg1 == "stage-dev-crh-success")
-					Rain::tsCout("IMPORTANT: 'stage-dev' CRH completed successfully.\r\n\r\n");
+					Rain::tsCout("IMPORTANT: 'stage-dev' CRH completed successfully.\r\n");
 				else if (arg1 == "stage-prod-crh-success")
-					Rain::tsCout("IMPORTANT: 'stage-prod' or 'deploy-staging' CRH completed successfully.\r\n\r\n");
+					Rain::tsCout("IMPORTANT: 'stage-prod' CRH completed successfully.\r\n");
+				else if (arg1 == "deploy-staging-crh-success") {
+					Rain::tsCout("IMPORTANT: 'deploy-staging' CRH completed successfully.\r\n");
+					CHProdStart(cmhParam);
+				}
 			}
 
+			Rain::tsCout("\r\n");
+
 			//command loop
-			static std::map<std::string, CommandMethodHandler> commandHandlers{
-				{"help", CHHelp},
-				{"stage-dev", CHStageDev},
-				{"deploy-staging", CHDeployStaging},
-				{"prod-download", CHProdDownload},
-				{"stage-prod", CHStageProd},
-				{"prod-stop", CHProdStop},
-				{"prod-start", CHProdStart},
-				{"sync-stop", CHSyncStop},
-				{"sync-start", CHSyncStart},
-			};
-			CommandHandlerParam cmhParam;
-			cmhParam.config = &config;
-			cmhParam.logger = &logger;
 			while (true) {
 				static std::string command, tmp;
 				Rain::tsCout("Accepting commands...\r\n");
