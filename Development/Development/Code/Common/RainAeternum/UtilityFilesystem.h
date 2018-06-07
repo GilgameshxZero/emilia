@@ -38,6 +38,9 @@ namespace Rain {
 	bool fileExists(std::string file);
 	bool dirExists(std::string dir);
 
+	//test if a path is under another path
+	bool isSubPath(std::string parentPath, std::string childPath);
+
 	//append \\ on the end if doesn't have
 	std::string *standardizeDirPath(std::string *dir);
 	std::string standardizeDirPath(std::string dir);

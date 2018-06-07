@@ -87,10 +87,7 @@ namespace Monochrome3 {
 			}
 
 			Rain::tsCout("The program has terminated. Exiting in 3 seconds...\r\n");
-
-			//clean up logger before we exit, or else we will get error
-			logger.setStdHandleSrc(STD_OUTPUT_HANDLE, false);
-
+			fflush(stdout);
 			Sleep(3000);
 			return 0;
 		}

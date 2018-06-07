@@ -148,7 +148,8 @@ namespace Monochrome3 {
 			std::size_t questionMarkPos = requestURI.find("?"),
 				hashtagPos = requestURI.find("#");
 			std::string requestFilePath = requestURI.substr(0, questionMarkPos),
-				requestQuery = "", requestFragment = "";
+				requestQuery = "", 
+				requestFragment = "";
 			if (questionMarkPos != std::string::npos)
 				requestQuery = requestURI.substr(questionMarkPos + 1, hashtagPos);
 			if (hashtagPos != std::string::npos)
@@ -169,21 +170,26 @@ namespace Monochrome3 {
 				requestFileDir = requestFilePath.substr(0, requestFilePath.length() - requestFile.length());
 			if (requestFile.length() == 0)
 				requestFile = config["def-server-file"];
-			std::string requestFilePathRel = requestFileDir + requestFile; //short server path
-			requestFileDir = Rain::getWorkingDirectory() + config["server-root-path"] + requestFileDir;
-			requestFilePath = requestFileDir + requestFile; //recompose the combined filepath; it is now absolute path
 
-															//make sure cgi scripts are parsed
+			//compose the final path
+			requestFileDir = Rain::pathToAbsolute(Rain::getWorkingDirectory() + config["server-root-path"] + requestFileDir);
+			requestFilePath = Rain::pathToAbsolute(requestFileDir + requestFile);
+			//recompose the combined filepath; it is now absolute path
+			std::string requestFilePathAbs = requestFileDir + requestFile;
+
+			//make sure cgi scripts are parsed
 			static bool cgiScriptsParsed = false;
 			static std::set<std::string> cgiScripts;
-			if (!cgiScriptsParsed) { //if this is the first time we're here, we also need to read the cgiScripts config file and get a list of all the cgiScripts
+			if (!cgiScriptsParsed) {
+				//if this is the first time we're here, we also need to read the cgiScripts config file and get a list of all the cgiScripts
 				std::ifstream cgiScriptsConfigIn(config["config-path"] + config["config-cgi-scripts"], std::ios::binary);
 				while (cgiScriptsConfigIn.good()) {
 					static std::string line;
 					std::getline(cgiScriptsConfigIn, line);
 					Rain::strTrimWhite(&line);
 					if (line.length() > 0)
-						cgiScripts.insert(line);
+						//transform the cgi script paths into absolute paths
+						cgiScripts.insert(Rain::pathToAbsolute(config["server-root-path"] + line));
 				}
 				cgiScriptsConfigIn.close();
 				cgiScriptsParsed = true;
@@ -214,7 +220,11 @@ namespace Monochrome3 {
 			std::string responseStatus, responseBody;
 
 			//assert that the requestFile exists; if not, send back prespecified 404 file
-			if (!Rain::fileExists(requestFilePath)) {
+			//moreover, the path has to be under the server root path, unless its a cgi script
+			//ensures that the server will not serve outside its root directory unless a cgi script is specified
+			if (!Rain::fileExists(requestFilePath) ||
+				(!Rain::isSubPath(config["server-root-path"], requestFilePathAbs) && 
+				cgiScripts.find(requestFilePathAbs) == cgiScripts.end())) {
 				responseStatus = "HTTP/1.1 404 Not Found";
 				responseBody = notFound404HTML;
 				responseHeaders["content-length"] = Rain::tToStr(responseBody.length());
@@ -228,9 +238,10 @@ namespace Monochrome3 {
 					Rain::reportError(GetLastError(), "error while sending response to client; response: " + response);
 					return -7;
 				}
-			} else if (cgiScripts.find(requestFilePathRel) != cgiScripts.end()) { //branch if the file is a cgi script
-																				  //run the file at FilePath as a cgi script, and respond with its content
-																				  //set the current environment block as well as additional environment parameters for the script
+			} else if (cgiScripts.find(requestFilePathAbs) != cgiScripts.end()) {
+				//branch if the file is a cgi script
+				//run the file at FilePath as a cgi script, and respond with its content
+				//set the current environment block as well as additional environment parameters for the script
 				std::string envBlock;
 				envBlock += "QUERY_STRING=" + requestQuery;
 				envBlock.push_back('\0');
@@ -375,8 +386,9 @@ namespace Monochrome3 {
 
 				//return 1 to terminate socket here
 				return 1;
-			} else { //not a cgi script, must be a file request
-					 //extract file extension
+			} else {
+				//not a cgi script, must be a file request
+				//extract file extension
 				std::string requestFileExt = requestFile.substr(requestFile.rfind(".") + 1, std::string::npos);
 				Rain::strToLower(&requestFileExt);
 

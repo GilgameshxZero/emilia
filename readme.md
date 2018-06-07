@@ -105,7 +105,7 @@ In the root, there will also be additional untracked files not part of the offic
 
 ### Emilia-tan
 * 2.1.2
-	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (4.0.2, 2.0.2, 1.0.4, 1.0.2, 1.0.4)
+	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (4.0.2, 2.0.3, 1.0.4, 1.0.3, 1.0.4)
 * 2.1.1
 	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (4.0.1, 2.0.2, 1.0.3, 1.0.2, 1.0.3)
 * 2.1.0
@@ -170,7 +170,8 @@ In the root, there will also be additional untracked files not part of the offic
 
 #### EmiliaSiteServer
 * 4.0.2
-	* 
+	* hotfixed pathing logic when handling requests to not serve files outside server root anymore
+	* removed unecessary line to stop logging stdout in start
 * 4.0.1
 	* flush after cout logging in ConnectionHandlers
 * 4.0.0
@@ -209,6 +210,8 @@ In the root, there will also be additional untracked files not part of the offic
 	* updated fileversion detail on .exe
 
 #### EmiliaMailServer
+* 2.0.3
+	* removed unecessary line to stop logging stdout in start
 * 2.0.2
 	* fixed bug with encoding/decoding B64
 * 2.0.1
@@ -237,6 +240,7 @@ In the root, there will also be additional untracked files not part of the offic
 	* fixed some download progress indicator index bugs
 	* restructured code among files
 	* removed blocking limitation during progress indicators for downloading/uploading
+	* removed unecessary line to stop logging stdout in start
 * 1.0.3
 	* standardized naming
 	* updated auth-file
@@ -255,6 +259,8 @@ In the root, there will also be additional untracked files not part of the offic
 	* staging to prod WIP
 
 #### EmiliaUpdateCRHelper
+* 1.0.3
+	* removed unecessary line to stop logging stdout in start
 * 1.0.2
 	* standardized naming
 	* fixed start console output for config options
@@ -269,6 +275,7 @@ In the root, there will also be additional untracked files not part of the offic
 #### EmiliaUpdateServer
 * 1.0.4
 	* restructured code in files
+	* removed unecessary line to stop logging stdout in start
 * 1.0.3
 	* standardized naming
 	* updated auth-file
@@ -301,7 +308,9 @@ In the root, there will also be additional untracked files not part of the offic
 * clean up memory leaks
 
 ### EmiliaMail
-* create a CGI script for utilizing the client through HTTP
+* create a CGI script for utilizing the client through HTTP/80
+* still a bug that causes the server to crash, but i don't know what ???
+	* only happened when I accessed server using RDP?
 
 #### EmiliaMailServer
 * sometimes, clients just want to authenticate, but now we log it as a failed recv request
