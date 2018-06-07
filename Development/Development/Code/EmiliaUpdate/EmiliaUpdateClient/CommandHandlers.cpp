@@ -169,8 +169,11 @@ namespace Monochrome3 {
 
 					//send this buffer as data, with the prod-upload methodname, all in a single block
 					Rain::sendBlockMessage(csm, "prod-upload " + std::string(buffer, min(blockMax, fileSize - b)));
+
+					//TODO: why is this critical, even under TCP?
 					csm.blockForMessageQueue();
 				}
+				delete[]buffer;
 				Rain::tsCout("Info: Done uploading file ", a + 1, " of ", files.size(), ".\r\n");
 				fflush(stdout);
 				fileIn.close();
@@ -199,7 +202,7 @@ namespace Monochrome3 {
 			}
 
 			//replace all of staging with production: same routine as stage-prod
-			return CHHStageProd(cmhParam);
+			return CHHStageProd(cmhParam, "deploy-staging-crh-success");
 		}
 		int CHProdDownload(CommandHandlerParam &cmhParam) {
 			//setup network stuff
@@ -236,7 +239,7 @@ namespace Monochrome3 {
 			//no longer need network
 			csm.~ClientSocketManager();
 
-			return CHHStageProd(cmhParam);
+			return CHHStageProd(cmhParam, "stage-prod-crh-success");
 		}
 		int CHProdStop(CommandHandlerParam &cmhParam) {
 			//setup network stuff
@@ -395,7 +398,7 @@ namespace Monochrome3 {
 			return 0;
 		}
 
-		int CHHStageProd(CommandHandlerParam &cmhParam) {
+		int CHHStageProd(CommandHandlerParam &cmhParam, std::string restartCode) {
 			//while replacing staging, we might need to restart this client with CRH
 			Rain::tsCout("Info: Replacing /Staging with /Production...\r\n");
 			std::vector<std::string> ignored;
@@ -422,7 +425,7 @@ namespace Monochrome3 {
 					crhWorkingDir = Rain::getPathDir(crhelperAbspath),
 					crhCmdLine = "\"" + Rain::pathToAbsolute((*cmhParam.config)["prod-root-dir"] + relExePath) + "\" \"" + //src
 					Rain::pathToAbsolute((*cmhParam.config)["staging-root-dir"] + relExePath) + "\" " + //dst
-					"stage-prod-crh-success";
+					restartCode;
 				crhWorkingDir = crhWorkingDir.substr(0, crhWorkingDir.length() - 1);
 				ShellExecute(NULL, "open", crhelperAbspath.c_str(), crhCmdLine.c_str(), crhWorkingDir.c_str(), SW_SHOWDEFAULT);
 				return 1;

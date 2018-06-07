@@ -42,9 +42,6 @@
     <ClInclude Include="ConnectionHandlers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RequestHandlers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Common\RainAeternum\AlgorithmLibraries.h">
       <Filter>RainAeternum</Filter>
     </ClInclude>
@@ -136,9 +133,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ConnectionHandlers.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RequestHandlers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Common\RainAeternum\AlgorithmLibraries.cpp">
