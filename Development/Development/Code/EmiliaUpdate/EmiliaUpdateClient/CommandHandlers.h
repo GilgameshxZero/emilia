@@ -43,6 +43,7 @@ namespace Monochrome3 {
 		//aditional helpers
 		//wipes staging with prod, possibly activating CRH
 		//returns 1 if need to restart program
-		int CHHStageProd(CommandHandlerParam &cmhParam);
+		//pass a restartCode to pass as command line to the restarted program
+		int CHHStageProd(CommandHandlerParam &cmhParam, std::string restartCode);
 	}
 }

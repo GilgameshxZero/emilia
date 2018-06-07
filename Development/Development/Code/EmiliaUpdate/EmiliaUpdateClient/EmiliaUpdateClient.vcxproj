@@ -109,7 +109,6 @@
     <ClInclude Include="CommandHandlers.h" />
     <ClInclude Include="ConnectionHandlers.h" />
     <ClInclude Include="Main.h" />
-    <ClInclude Include="RequestHandlers.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Start.h" />
   </ItemGroup>
@@ -149,7 +148,6 @@
     <ClCompile Include="CommandHandlers.cpp" />
     <ClCompile Include="ConnectionHandlers.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="RequestHandlers.cpp" />
     <ClCompile Include="Start.cpp" />
   </ItemGroup>
   <ItemGroup>

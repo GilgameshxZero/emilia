@@ -104,6 +104,8 @@ In the root, there will also be additional untracked files not part of the offic
 ## Changelog
 
 ### Emilia-tan
+* 2.1.2
+	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (4.0.2, 2.0.2, 1.0.4, 1.0.2, 1.0.4)
 * 2.1.1
 	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (4.0.1, 2.0.2, 1.0.3, 1.0.2, 1.0.3)
 * 2.1.0
@@ -167,6 +169,8 @@ In the root, there will also be additional untracked files not part of the offic
 ### EmiliaSite
 
 #### EmiliaSiteServer
+* 4.0.2
+	* 
 * 4.0.1
 	* flush after cout logging in ConnectionHandlers
 * 4.0.0
@@ -229,6 +233,10 @@ In the root, there will also be additional untracked files not part of the offic
 ### EmiliaUpdate
 
 #### EmiliaUpdateClient
+* 1.0.4
+	* fixed some download progress indicator index bugs
+	* restructured code among files
+	* removed blocking limitation during progress indicators for downloading/uploading
 * 1.0.3
 	* standardized naming
 	* updated auth-file
@@ -259,6 +267,8 @@ In the root, there will also be additional untracked files not part of the offic
 	* allows a copy + run operation delayed until the destination is writable
 
 #### EmiliaUpdateServer
+* 1.0.4
+	* restructured code in files
 * 1.0.3
 	* standardized naming
 	* updated auth-file
@@ -281,6 +291,7 @@ In the root, there will also be additional untracked files not part of the offic
 ### RainLibrary
 
 #### RainAeternum
+* why can't logger call its destructor properly and instead needs to be manually freed at the end of start?
 
 #### RainLibrary3
 
@@ -301,9 +312,13 @@ In the root, there will also be additional untracked files not part of the offic
 #### EmiliaUpdateClient
 * clean up memory leaks
 * add program icon
+* bug waiting for server confirmation after prod-upload
+* multithreading bugs while uploading
+* add MD5 verification
 
 #### EmiliaUpdateCRHelper
 * add program icon
 
 #### EmiliaUpdateServer
 * add program icon
+* add MD5 verification
