@@ -70,7 +70,6 @@ namespace Monochrome3 {
 				Rain::tsCout("Fatal error: could not setup server listening.\r\n");
 				DWORD error = GetLastError();
 				Rain::reportError(error, "Fatal error: could not setup server listening.");
-				logger.setStdHandleSrc(STD_OUTPUT_HANDLE, false);
 				WSACleanup();
 				if (hFMemLeak != NULL)
 					CloseHandle(hFMemLeak);
@@ -155,10 +154,7 @@ namespace Monochrome3 {
 				CloseHandle(hFMemLeak);
 
 			Rain::tsCout("The program has terminated. Exiting in 3 seconds...\r\n");
-
-			//clean up logger before we exit, or else we will get error
-			logger.setStdHandleSrc(STD_OUTPUT_HANDLE, false);
-
+			fflush(stdout);
 			Sleep(3000);
 			return 0;
 		}
