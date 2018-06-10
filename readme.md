@@ -104,6 +104,9 @@ In the root, there will also be additional untracked files not part of the offic
 ## Changelog
 
 ### Emilia-tan
+* 3.0.0
+	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (4.0.2, 2.0.3, 1.0.4, 1.0.3, 1.0.4)
+	* Updates to EmiliaSiteServer configuration i.e. redesigned the site.
 * 2.1.2
 	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (4.0.2, 2.0.3, 1.0.4, 1.0.3, 1.0.4)
 * 2.1.1
