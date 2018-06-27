@@ -11,6 +11,209 @@ SMTP & HTTP server written in native C++ for the Windows platform, primarily for
 ### Conformity
 Emilia-tan conforms to RFC protocol as much as possible, but not completely, as it is still work-in-progress.
 
+## Changelog
+
+### Emilia-tan
+* 3.1.0
+	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (4.0.3, 2.0.4, 1.0.5, 1.0.3, 1.0.5)
+* 3.0.0
+	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (4.0.2, 2.0.3, 1.0.4, 1.0.3, 1.0.4)
+	* Updates to EmiliaSiteServer configuration i.e. redesigned the site.
+* 2.1.2
+	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (4.0.2, 2.0.3, 1.0.4, 1.0.3, 1.0.4)
+* 2.1.1
+	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (4.0.1, 2.0.2, 1.0.3, 1.0.2, 1.0.3)
+* 2.1.0
+	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (4.0.0, 2.0.2, 1.0.3, 1.0.2, 1.0.3)
+	* bugfixed B64 issues in Aeternum
+* 2.0.1
+	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (3.7.2, 2.0.1, 1.0.3, 1.0.2, 1.0.3)
+* 2.0.0
+	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (3.7.2, 2.0.0, 1.0.3, 1.0.2, 1.0.3)
+	* updated file organizational structure
+	* changed Aeternum naming
+	* started EmiliaMail revamp
+	* updated credentials
+	* removed EmiliaMailServer from server list
+* 1.2.0
+	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer, EmiliaUpdateCRHelper) = (3.7.2, 1.1.1, 1.3.0, 1.0.2, 1.0.1, 1.0.2)
+	* fix for EmiliaMailServer
+	* updated readme
+* 1.1.4
+	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer, EmiliaUpdateCRHelper) = (3.7.2, 1.1.1, 1.2.2, 1.0.1, 1.0.1, 1.0.0)
+	* Line count: 7030
+	* all UpdateClient/UpdateServer functions are working, with the exception of the sync commands.
+	* deployed EmiliaUpdate workflow officially, moving away from a previous Dropbox deployment workflow!
+* 1.1.3
+	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer, EmiliaUpdateCRHelper) = (3.7.2, 1.1.1, 1.2.2, 1.0.0, 1.0.0, 1.0.0)
+	* continued work on RainAeternum/EmiliaUpdate, as well as updated .gitignore
+* 1.1.2
+	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer, EmiliaUpdateCRHelper) = (3.7.2, 1.1.1, 1.2.2, 1.0.0, 1.0.0, 1.0.0)
+	* some updates to readme.md
+* 1.1.1
+	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer) = (3.7.2, 1.1.1, 1.2.2, -, -)
+	* removed .vs from git
+* 1.1.0
+	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer) = (3.7.2, 1.1.1, 1.2.2, -, -)
+	* established Development, Staging, Production branches
+		* Production maintained with live production environment
+		* Staging maintained with in dev code
+		* old projects re-organized into Development in preparation for EmiliaUpdate and staging and production deployment
+* 1.0.0
+	* established new workflows for staging, production, and deployment
+	* introduced EmiliaUpdate
+	* modified names
+		* EMTServer -> EmiliaSite
+		* EMTSMTPServer/EMTSMTPClient -> EmiliaMail
+	* hotfixed EmiliaMail and EmiliaSite using old workflows
+	* hotfixed Github repository.
+
+### RainLibrary
+* Aeternum
+	* better logging
+	* added ClientSocketManager class for client connections
+	* added ServerManager & ServerSocketManager for servers
+	* added abstract SocketManager
+	* updated filesystem utilities
+	* more compatibility with unicode filenames and long paths
+	* better time utilities
+	* standardized naming slightly
+	* restructured some flows
+	* major refactoring
+
+### EmiliaSite
+
+#### EmiliaSiteServer
+* 4.0.3
+	* hotfixed added back line to turn off logging - it was causing server to stall?
+* 4.0.2
+	* hotfixed pathing logic when handling requests to not serve files outside server root anymore
+	* removed unecessary line to stop logging stdout in start
+* 4.0.1
+	* flush after cout logging in ConnectionHandlers
+* 4.0.0
+	* switched to Aeternum
+	* standardized configuration options consistent with other scripts
+	* fixed issue where CGI script would not cause a request to finish and eternally load
+* 3.7.2
+	* fixed POST request header length parsing
+	* cleaned up resource.h
+* 3.7.1
+	* added .py content-type spec
+* 3.7.0
+	* updated fileversion detail on .exe
+	* standardized logging more
+	* added header "connection: keep-alive" support
+	* increased default buffer sizes
+* 3.6.0
+	* standardized Server application flow into Rain Libraries, and refactored code accordingly
+* 3.5.1
+	* updated content-type setting for .mkv files to video/webm
+	* light refactoring
+	* project structure changes
+* 3.5.0
+	* added append option in error output
+	* standardized some logging
+	* now buffered socket communications from server
+
+### EmiliaMail
+
+#### EmiliaMailClient
+* Removed
+	* removed; capabilities merged into EmiliaMailServer
+* 1.1.1
+	* light refactoring
+	* project structure changes
+	* updated fileversion detail on .exe
+
+#### EmiliaMailServer
+* 2.0.4
+	* hotfix and removed previous change
+* 2.0.3
+	* removed unecessary line to stop logging stdout in start
+* 2.0.2
+	* fixed bug with encoding/decoding B64
+* 2.0.1
+	* minimum viable product; finished implementation
+	* now queries additional MX records instead of just first one
+* 2.0.0
+	* WIP
+	* implemented RainAeternum upgrades
+	* added EmiliaMailClient capabilities onto a network socket port for easy API access
+* 1.3.0
+	* hotfix to allow multiple clients to be active at the same time
+	* show console and stdout from client
+	* stdout from server now shows in console (after fixing pipe bug)
+* 1.2.2
+	* cleaned up resource.h
+	* hotfixed RainLibrary3 links
+	* changed some parameters to the client
+* 1.2.1
+	* light refactoring
+	* project structure changes
+
+### EmiliaUpdate
+
+#### EmiliaUpdateClient
+* 1.0.5
+	* hotfix and removed previous change
+	* fixed issues with some longer directory names not being deleted
+* 1.0.4
+	* fixed some download progress indicator index bugs
+	* restructured code among files
+	* removed blocking limitation during progress indicators for downloading/uploading
+	* removed unecessary line to stop logging stdout in start
+* 1.0.3
+	* standardized naming
+	* updated auth-file
+	* fixed long paths issue
+* 1.0.2
+	* bugfixes on progress indicators
+	* bugfix on CRH completion message
+	* changed code generation to /MT
+* 1.0.1
+	* bugfixes to existing commands
+	* finished essential (non-sync) command implementation
+	* added download/upload progress indicators
+* 1.0.0
+	* dev to staging
+	* integration with CRH
+	* staging to prod WIP
+
+#### EmiliaUpdateCRHelper
+* 1.0.3
+	* removed unecessary line to stop logging stdout in start
+* 1.0.2
+	* standardized naming
+	* fixed start console output for config options
+	* updated auth-file
+	* fixed long paths issue
+* 1.0.1
+	* switched to RainAeternum
+	* changed code generation to /MT
+* 1.0.0
+	* allows a copy + run operation delayed until the destination is writable
+
+#### EmiliaUpdateServer
+* 1.0.5
+	* reverted previous change for logging line
+	* fixed issues with some longer directory names not being deleted
+* 1.0.4
+	* restructured code in files
+	* removed unecessary line to stop logging stdout in start
+* 1.0.3
+	* standardized naming
+	* updated auth-file
+	* fixed long paths issue
+* 1.0.2
+	* deletes tmp file created during 'prod-upload' now
+	* changed code generation to /MT
+* 1.0.1
+	* bugfixes to existing commands
+	* finished essential (non-sync) command implementation
+* 1.0.0
+	* implemented all non-sync commands
+
 ## Workflows
 
 ### Development
@@ -100,197 +303,6 @@ Generated files will not be put under VC.
 ## Additional Files
 In the root, there will also be additional untracked files not part of the official repository.
 * emilia-tan.com: Files specific to emilia-tan.com's management.
-
-## Changelog
-
-### Emilia-tan
-* 3.0.0
-	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (4.0.2, 2.0.3, 1.0.4, 1.0.3, 1.0.4)
-	* Updates to EmiliaSiteServer configuration i.e. redesigned the site.
-* 2.1.2
-	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (4.0.2, 2.0.3, 1.0.4, 1.0.3, 1.0.4)
-* 2.1.1
-	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (4.0.1, 2.0.2, 1.0.3, 1.0.2, 1.0.3)
-* 2.1.0
-	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (4.0.0, 2.0.2, 1.0.3, 1.0.2, 1.0.3)
-	* bugfixed B64 issues in Aeternum
-* 2.0.1
-	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (3.7.2, 2.0.1, 1.0.3, 1.0.2, 1.0.3)
-* 2.0.0
-	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (3.7.2, 2.0.0, 1.0.3, 1.0.2, 1.0.3)
-	* updated file organizational structure
-	* changed Aeternum naming
-	* started EmiliaMail revamp
-	* updated credentials
-	* removed EmiliaMailServer from server list
-* 1.2.0
-	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer, EmiliaUpdateCRHelper) = (3.7.2, 1.1.1, 1.3.0, 1.0.2, 1.0.1, 1.0.2)
-	* fix for EmiliaMailServer
-	* updated readme
-* 1.1.4
-	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer, EmiliaUpdateCRHelper) = (3.7.2, 1.1.1, 1.2.2, 1.0.1, 1.0.1, 1.0.0)
-	* Line count: 7030
-	* all UpdateClient/UpdateServer functions are working, with the exception of the sync commands.
-	* deployed EmiliaUpdate workflow officially, moving away from a previous Dropbox deployment workflow!
-* 1.1.3
-	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer, EmiliaUpdateCRHelper) = (3.7.2, 1.1.1, 1.2.2, 1.0.0, 1.0.0, 1.0.0)
-	* continued work on RainAeternum/EmiliaUpdate, as well as updated .gitignore
-* 1.1.2
-	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer, EmiliaUpdateCRHelper) = (3.7.2, 1.1.1, 1.2.2, 1.0.0, 1.0.0, 1.0.0)
-	* some updates to readme.md
-* 1.1.1
-	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer) = (3.7.2, 1.1.1, 1.2.2, -, -)
-	* removed .vs from git
-* 1.1.0
-	* (EmiliaSiteServer, EmiliaMailClient, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateServer) = (3.7.2, 1.1.1, 1.2.2, -, -)
-	* established Development, Staging, Production branches
-		* Production maintained with live production environment
-		* Staging maintained with in dev code
-		* old projects re-organized into Development in preparation for EmiliaUpdate and staging and production deployment
-* 1.0.0
-	* established new workflows for staging, production, and deployment
-	* introduced EmiliaUpdate
-	* modified names
-		* EMTServer -> EmiliaSite
-		* EMTSMTPServer/EMTSMTPClient -> EmiliaMail
-	* hotfixed EmiliaMail and EmiliaSite using old workflows
-	* hotfixed Github repository.
-
-### RainLibrary
-* Aeternum
-	* better logging
-	* added ClientSocketManager class for client connections
-	* added ServerManager & ServerSocketManager for servers
-	* added abstract SocketManager
-	* updated filesystem utilities
-	* more compatibility with unicode filenames and long paths
-	* better time utilities
-	* standardized naming slightly
-	* restructured some flows
-	* major refactoring
-
-### EmiliaSite
-
-#### EmiliaSiteServer
-* 4.0.2
-	* hotfixed pathing logic when handling requests to not serve files outside server root anymore
-	* removed unecessary line to stop logging stdout in start
-* 4.0.1
-	* flush after cout logging in ConnectionHandlers
-* 4.0.0
-	* switched to Aeternum
-	* standardized configuration options consistent with other scripts
-	* fixed issue where CGI script would not cause a request to finish and eternally load
-* 3.7.2
-	* fixed POST request header length parsing
-	* cleaned up resource.h
-* 3.7.1
-	* added .py content-type spec
-* 3.7.0
-	* updated fileversion detail on .exe
-	* standardized logging more
-	* added header "connection: keep-alive" support
-	* increased default buffer sizes
-* 3.6.0
-	* standardized Server application flow into Rain Libraries, and refactored code accordingly
-* 3.5.1
-	* updated content-type setting for .mkv files to video/webm
-	* light refactoring
-	* project structure changes
-* 3.5.0
-	* added append option in error output
-	* standardized some logging
-	* now buffered socket communications from server
-
-### EmiliaMail
-
-#### EmiliaMailClient
-* Removed
-	* removed; capabilities merged into EmiliaMailServer
-* 1.1.1
-	* light refactoring
-	* project structure changes
-	* updated fileversion detail on .exe
-
-#### EmiliaMailServer
-* 2.0.3
-	* removed unecessary line to stop logging stdout in start
-* 2.0.2
-	* fixed bug with encoding/decoding B64
-* 2.0.1
-	* minimum viable product; finished implementation
-	* now queries additional MX records instead of just first one
-* 2.0.0
-	* WIP
-	* implemented RainAeternum upgrades
-	* added EmiliaMailClient capabilities onto a network socket port for easy API access
-* 1.3.0
-	* hotfix to allow multiple clients to be active at the same time
-	* show console and stdout from client
-	* stdout from server now shows in console (after fixing pipe bug)
-* 1.2.2
-	* cleaned up resource.h
-	* hotfixed RainLibrary3 links
-	* changed some parameters to the client
-* 1.2.1
-	* light refactoring
-	* project structure changes
-
-### EmiliaUpdate
-
-#### EmiliaUpdateClient
-* 1.0.4
-	* fixed some download progress indicator index bugs
-	* restructured code among files
-	* removed blocking limitation during progress indicators for downloading/uploading
-	* removed unecessary line to stop logging stdout in start
-* 1.0.3
-	* standardized naming
-	* updated auth-file
-	* fixed long paths issue
-* 1.0.2
-	* bugfixes on progress indicators
-	* bugfix on CRH completion message
-	* changed code generation to /MT
-* 1.0.1
-	* bugfixes to existing commands
-	* finished essential (non-sync) command implementation
-	* added download/upload progress indicators
-* 1.0.0
-	* dev to staging
-	* integration with CRH
-	* staging to prod WIP
-
-#### EmiliaUpdateCRHelper
-* 1.0.3
-	* removed unecessary line to stop logging stdout in start
-* 1.0.2
-	* standardized naming
-	* fixed start console output for config options
-	* updated auth-file
-	* fixed long paths issue
-* 1.0.1
-	* switched to RainAeternum
-	* changed code generation to /MT
-* 1.0.0
-	* allows a copy + run operation delayed until the destination is writable
-
-#### EmiliaUpdateServer
-* 1.0.4
-	* restructured code in files
-	* removed unecessary line to stop logging stdout in start
-* 1.0.3
-	* standardized naming
-	* updated auth-file
-	* fixed long paths issue
-* 1.0.2
-	* deletes tmp file created during 'prod-upload' now
-	* changed code generation to /MT
-* 1.0.1
-	* bugfixes to existing commands
-	* finished essential (non-sync) command implementation
-* 1.0.0
-	* implemented all non-sync commands
 
 ## Todo
 

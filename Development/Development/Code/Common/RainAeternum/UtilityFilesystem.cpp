@@ -65,12 +65,11 @@ namespace Rain {
 	std::vector<std::string> getFiles(std::string directory, std::string format) {
 		static char search_path[32767], multibyte[32767];
 		static wchar_t unicodesp[32767];
-		sprintf_s(search_path, ("%s/" + format).c_str(), directory.c_str());
+		sprintf_s(search_path, ("%s" + format).c_str(), directory.c_str());
 		WIN32_FIND_DATAW fd;
 
 		MultiByteToWideChar(CP_UTF8, 0, search_path, -1, unicodesp, 32767);
-		int k = GetLastError();
-		HANDLE hFind = ::FindFirstFileW(unicodesp, &fd);
+		HANDLE hFind = ::FindFirstFileW(pathToLongPath(std::wstring(unicodesp)).c_str(), &fd);
 
 		std::vector<std::string> ret;
 		if (hFind != INVALID_HANDLE_VALUE) {
@@ -88,12 +87,11 @@ namespace Rain {
 	std::vector<std::string> getDirs(std::string directory, std::string format) {
 		static char search_path[32767], multibyte[32767];
 		static wchar_t unicodesp[32767];
-		sprintf_s(search_path, ("%s/" + format).c_str(), directory.c_str());
+		sprintf_s(search_path, ("%s" + format).c_str(), directory.c_str());
 		WIN32_FIND_DATAW fd;
 
 		MultiByteToWideChar(CP_UTF8, 0, search_path, -1, unicodesp, 32767);
-		int k = GetLastError();
-		HANDLE hFind = ::FindFirstFileW(unicodesp, &fd);
+		HANDLE hFind = ::FindFirstFileW(pathToLongPath(std::wstring(unicodesp)).c_str(), &fd);
 
 		std::vector<std::string> ret;
 		if (hFind != INVALID_HANDLE_VALUE) {
@@ -164,20 +162,20 @@ namespace Rain {
 		wchar_t unicode[32767];
 		std::vector<std::string> ldir, lfile;
 
-		ldir = getDirs(dir, "*");
-		lfile = getFiles(dir, "*");
+		ldir = getDirs(pathToAbsolute(dir), "*");
+		lfile = getFiles(pathToAbsolute(dir), "*");
 
 		for (std::size_t a = 0; a < lfile.size(); a++) {
-			MultiByteToWideChar(CP_UTF8, 0, (dir + lfile[a]).c_str(), -1, unicode, 32767);
+			MultiByteToWideChar(CP_UTF8, 0, pathToAbsolute(dir + lfile[a]).c_str(), -1, unicode, 32767);
 			if (ignore == NULL || ignore->find(pathToAbsolute(dir + lfile[a])) == ignore->end())
-				DeleteFileW(unicode);
+				DeleteFileW(pathToLongPath(std::wstring(unicode)).c_str());
 		}
 		for (std::size_t a = 2; a < ldir.size(); a++) //skip . and ..
 		{
-			MultiByteToWideChar(CP_UTF8, 0, (dir + ldir[a] + '\\').c_str(), -1, unicode, 32767);
+			MultiByteToWideChar(CP_UTF8, 0, pathToAbsolute(dir + ldir[a] + '\\').c_str(), -1, unicode, 32767);
 			if (ignore == NULL || ignore->find(pathToAbsolute(dir + ldir[a] + '\\')) == ignore->end()) {
 				rmDirRec(dir + ldir[a] + '\\', ignore);
-				RemoveDirectoryW(unicode);
+				RemoveDirectoryW(pathToLongPath(std::wstring(unicode)).c_str());
 			}
 		}
 	}
