@@ -1,0 +1,99 @@
+:root {
+	--min-vw: 150px;
+	--min-vh: 300px;
+	--html-margin: 0%;
+	--html-leftover: 1;
+}
+
+html {
+	font-family: Verdana;
+	
+	margin-top: var(--html-margin);
+	margin-bottom: var(--html-margin);
+	margin-left: var(--html-margin);
+	margin-right: var(--html-margin);
+
+	min-width: calc(var(--html-leftover) * var(--min-vw));
+	min-height: calc(var(--html-leftover) * var(--min-vh));
+}
+
+body {
+	background-color: #312450;
+	color: white;
+
+	position: relative;
+
+	margin: 0;
+	width: 100%;
+	height: 100%;
+
+	min-width: calc(var(--html-leftover) * var(--min-vw));
+	min-height: calc(var(--html-leftover) * var(--min-vh));
+}
+
+#navigation-bar {
+	width: 100%;
+	height: 10%;
+
+	display: block;
+}
+
+#navigator {
+	width: 100%;
+	height: 90%;
+	background-color: #312450;
+
+	display: flex;
+	flex-flow: row nowrap;
+}
+
+#navigator > div {
+	width: calc(100% / 3);
+	height: 100%;
+
+	display: flex;
+}
+
+#navigator > div:not(.nav-selected) {
+	cursor: pointer;
+}
+
+#navigator > div > div {
+	margin: auto;
+
+	font-size: 15.75px;
+}
+
+@media (min-height: 300px) {
+	#navigator > div > div {
+		font-size: calc(1.25vh + 12px);
+	}
+}
+
+@media (min-height: 700px) {
+	#navigator > div > div {
+		font-size: 20.75px;
+	}
+}
+
+#navigator > div:not(.nav-selected):hover {
+	background-color: #5f4f87;
+}
+
+.nav-selected {
+	background-color: #a072ff;
+}
+
+#divider {
+	width: 100%;
+	height: 10%;
+	background-color: #a072ff;
+}
+
+#main {
+	width: 100%;
+	height: 90%;
+
+	overflow: hidden;
+	position: relative;
+}
