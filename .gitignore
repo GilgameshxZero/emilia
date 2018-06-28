@@ -4,7 +4,9 @@ Development/Development/Dynamic
 Development/Staging
 Development/Production
 Development/Production-Remote
-Staging
+Staging/Auxiliary
+Staging/Code
+Staging/Dynamic
 Production
 
 *.vs
