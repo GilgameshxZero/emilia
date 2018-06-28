@@ -1,0 +1,130 @@
+<h1 id="mitconfessionsbot">MIT Confessions Bot</h1>
+
+<p>Jun. 27, 2018</p>
+
+<p>There are few things more human than language. Inspired by Karpathy's famous <a href="http://karpathy.github.io/2015/05/21/rnn-effectiveness/">RNN Post</a> and my recent acquisition of a high-end GPU, I decided that it would be a good time to gain some hands-on RNN experience myself.</p>
+
+<h1 id="data">Data</h1>
+
+<h2 id="sources">Sources</h2>
+
+<p>Any ML projects begins with data acquisition. For this project, I chose the MIT Confessions Facebook pages as my source. Namely, there are three such pages:</p>
+
+<ul>
+<li><a href="https://www.facebook.com/beaverconfessions/">MIT Confessions</a></li>
+
+<li><a href="https://www.facebook.com/timelybeaverconfessions/">MIT Timely Confessions</a></li>
+
+<li><a href="https://www.facebook.com/MITSummerConfessions/">MIT Summer Confessions</a></li>
+</ul>
+
+<p>At one point in time, I did consider using confessions pages from other colleges - however, while this would allow us more data points, the increased diversity would surely make training the model more difficult. Moreover, I would lose anything which made MIT Confessions unique.</p>
+
+<p>A brief look at our sources nets us some important observations:</p>
+
+<ul>
+<li>MIT
+
+
+<ul>
+<li>Most posts overall</li>
+
+<li>Not active</li>
+
+<li>Moderate amount of non-confessions announcements mixed in</li></ul>
+</li>
+
+<li>Timely
+
+
+<ul>
+<li>Moderate number of posts</li>
+
+<li>Very active before summer</li>
+
+<li>Very few announcements</li></ul>
+</li>
+
+<li>Summer
+
+
+<ul>
+<li>Very small number of posts</li>
+
+<li>Currently very active</li>
+
+<li>No announcements</li></ul>
+</li>
+</ul>
+
+<h2 id="acquisition">Acquisition</h2>
+
+<p>I am not familiar with Facebook's Graph API, and my latest interactions with it have proven difficult. As data acquisition will not be a common process, using Selenium here was likely a good choice.</p>
+
+<p>Selenium offers the benefits of a very low learning curve as well as constant visualization. However, I still encountered a few problems at this step, which I solved over a few iterations:</p>
+
+<ul>
+<li>Infinite scroll: Facebook pages don't load all their posts at one time. I made several observations before I could look through all the posts while ensuring that I did not cause a tremendous slowdown by loading too many posts, or otherwise manually delay for longer than necessary to load posts.</li>
+
+<li>Expanding posts: Moderately long posts are initially collapsed. Many attempts to scrape posts using various attributes resulted in <code>...</code> appearing at the point Facebook decided to initially cut off the post. It took a while to realize that I had to manually expand the posts as well as find the right attribute to scrape.
+
+
+<ul>
+<li>Very long posts: As the frequency of these posts is low, I decided to forego the effort to scrape these.</li></ul>
+</li>
+
+<li>Non-text posts: Since we're working with RNNs here, simply discarding these posts was fine.</li>
+</ul>
+
+<p>As a side, I also scraped the time at which posts were made. You can find the raw scraped data, in JSON, <a href="tech-blog/assets/mit-confessions-bot/fetch.zip">here</a>.</p>
+
+<h2 id="cleaningpreparation">Cleaning &amp; Preparation</h2>
+
+<p>In preparation for training, I made a few design choices:</p>
+
+<ul>
+<li>Confession numbers not removed
+
+
+<ul>
+<li>Maximum Likelihood Language Model: Confession numbers were removed for this model</li></ul>
+</li>
+
+<li>Uppercase letters converted to lowercase</li>
+
+<li>Charset restricted to this regex: <code>[^a-z \n\'\.,?!0-9@#&lt;&gt;/:;\-\"()]</code></li>
+</ul>
+
+<p>You can find the parsed data as JSON <a href="tech-blog/assets/mit-confessions-bot/parsed.zip">here</a>. There are three versions of the text for each post:</p>
+
+<ul>
+<li><code>orig-text</code>: Unmodified post text.</li>
+
+<li><code>text</code>: Post text with the modifications above applied, but with the confession number still intact.</li>
+
+<li><code>nr-text</code>: Same as <code>text</code> but without the confession number.</li>
+</ul>
+
+<p>Before training, I also randomly concatenated the post texts together, separated by a special <code>NULL</code> character. <a href="tech-blog/assets/mit-confessions-bot/data-mit-all-full.txt">This</a> is the concatenated file of posts with the confession number, and <a href="tech-blog/assets/mit-confessions-bot/data-mit-all-nr.txt">this</a> is without.</p>
+
+<h1 id="charrnn">Char-RNN</h1>
+
+<h2 id="research">Research</h2>
+
+<h2 id="firstmodel256256lstm">First Model: 256-256 LSTM</h2>
+
+<h2 id="secondmodel512lstm">Second Model: 512 LSTM</h2>
+
+<h2 id="thirdmodel512512gru">Third Model: 512-512 GRU</h2>
+
+<h2 id="temperature">Temperature</h2>
+
+<h2 id="samples">Samples</h2>
+
+<h1 id="maximumlikelihoodlanugagemodel">Maximum Likelihood Lanugage Model</h1>
+
+<h1 id="deployment">Deployment</h1>
+
+<p>The page is live at <a href="https://www.facebook.com/mitconfessionssimulator/">MIT Confessions Simulator</a>.</p>
+
+<h1 id="finalthoughts">Final Thoughts</h1>
