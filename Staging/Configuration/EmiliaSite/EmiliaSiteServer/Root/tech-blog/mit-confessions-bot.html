@@ -4,18 +4,24 @@
 
 <p>There are few things more human than language. Inspired by Karpathy's famous <a href="http://karpathy.github.io/2015/05/21/rnn-effectiveness/">RNN Post</a> and my recent acquisition of a high-end GPU, I decided that it would be a good time to gain some hands-on RNN experience myself.</p>
 
+<h1 id="overview">Overview</h1>
+
+<p>In this project, we will be training predictive languages model following the MIT Confessions Facebook pages. The model should be able to generate unlimited confessions posts given an initial seed sequence of text. In addition to a character-level RNN model (<code>char-RNN</code>), I also trained a char-based n-gram model (henceforth referred to as <code>char-n-gram</code>) which I will also contrast with the <code>char-RNN</code>.</p>
+
+<p>In this post, I will focus on practical technicalities regarding the models rather than the mathematical background. There exist numerous resources which cover the latter.</p>
+
 <h1 id="data">Data</h1>
 
 <h2 id="sources">Sources</h2>
 
-<p>Any ML projects begins with data acquisition. For this project, I chose the MIT Confessions Facebook pages as my source. Namely, there are three such pages:</p>
+<p>Any ML project begins with data acquisition. Namely, there are three such pages:</p>
 
 <ul>
-<li><a href="https://www.facebook.com/beaverconfessions/">MIT Confessions</a></li>
+<li><a href="https://www.facebook.com/beaverconfessions/">MIT Confessions</a> (henceforth referred to as <code>mit</code>)</li>
 
-<li><a href="https://www.facebook.com/timelybeaverconfessions/">MIT Timely Confessions</a></li>
+<li><a href="https://www.facebook.com/timelybeaverconfessions/">MIT Timely Confessions</a> (henceforth referred to as <code>timely</code>)</li>
 
-<li><a href="https://www.facebook.com/MITSummerConfessions/">MIT Summer Confessions</a></li>
+<li><a href="https://www.facebook.com/MITSummerConfessions/">MIT Summer Confessions</a> (henceforth referred to as <code>summer</code>)</li>
 </ul>
 
 <p>At one point in time, I did consider using confessions pages from other colleges - however, while this would allow us more data points, the increased diversity would surely make training the model more difficult. Moreover, I would lose anything which made MIT Confessions unique.</p>
@@ -23,93 +29,73 @@
 <p>A brief look at our sources nets us some important observations:</p>
 
 <ul>
-<li>MIT
+<li><code>mit</code> has the most posts, then <code>timely</code>, then <code>summer</code>.</li>
 
+<li>Each has differing levels of current activity.</li>
 
-<ul>
-<li>Most posts overall</li>
-
-<li>Not active</li>
-
-<li>Moderate amount of non-confessions announcements mixed in</li></ul>
-</li>
-
-<li>Timely
-
-
-<ul>
-<li>Moderate number of posts</li>
-
-<li>Very active before summer</li>
-
-<li>Very few announcements</li></ul>
-</li>
-
-<li>Summer
-
-
-<ul>
-<li>Very small number of posts</li>
-
-<li>Currently very active</li>
-
-<li>No announcements</li></ul>
-</li>
+<li>There are varying amounts of non-confession announcements mixed in on each page.</li>
 </ul>
 
-<h2 id="acquisition">Acquisition</h2>
+<h2 id="acquisitionscraping">Acquisition (Scraping)</h2>
 
-<p>I am not familiar with Facebook's Graph API, and my latest interactions with it have proven difficult. As data acquisition will not be a common process, using Selenium here was likely a good choice.</p>
-
-<p>Selenium offers the benefits of a very low learning curve as well as constant visualization. However, I still encountered a few problems at this step, which I solved over a few iterations:</p>
+<p>I am not familiar with Facebook's Graph API, and my latest interactions with it have proven difficult. As data acquisition will not be a common process, using Selenium here was likely a good choice. Selenium offers the benefits of a very low learning curve, as well as visualization of the scraping process. However, I still encountered a few problems at this step, which I solved over a few iterations:</p>
 
 <ul>
-<li>Infinite scroll: Facebook pages don't load all their posts at one time. I made several observations before I could look through all the posts while ensuring that I did not cause a tremendous slowdown by loading too many posts, or otherwise manually delay for longer than necessary to load posts.</li>
-
-<li>Expanding posts: Moderately long posts are initially collapsed. Many attempts to scrape posts using various attributes resulted in <code>...</code> appearing at the point Facebook decided to initially cut off the post. It took a while to realize that I had to manually expand the posts as well as find the right attribute to scrape.
+<li><strong>Infinite scroll</strong>: Facebook pages don't load all their posts at one time, but rather (mostly) chronologically. In order to reach the oldest posts, one must scroll down pretty far. Selenium doesn't have an easily accesible "wait for scroll to load" function, while a constant sleep duration would crash if there were connectivity hiccups and cause the process to be unnecessarily slow otherwise. Here's what I did:
 
 
 <ul>
-<li>Very long posts: As the frequency of these posts is low, I decided to forego the effort to scrape these.</li></ul>
+<li>Scrape posts as I scroll the page, and delete the post element once scraped: This prevents Chrome slowdowns from a very large DOM in memory.</li>
+
+<li>The DOM id <code>www_pages_reaction_see_more_unitwww_pages_posts</code> only appears when there's more posts to load. So, scroll down while this id exists.</li></ul>
 </li>
 
-<li>Non-text posts: Since we're working with RNNs here, simply discarding these posts was fine.</li>
+<li><strong>Long posts</strong>: Moderately long posts are initially collapsed under a <code>See More</code> link. There are many attributes to each post which contain the post text, but most of them insert a <code>...</code> at the place of the <code>See More</code> link into the raw post text. The trick here is to first click the <code>See More</code> link (css selector <code>a.see_more_link</code>) and then scrape the <code>outerText</code> attribute of all <code>p</code> children of the post element, which avoids the <code>...</code> problem.</li>
+
+<li><strong>Extremely long posts</strong>: These posts don't have a <code>See More</code> link but rather a <code>Continue Reading</code> link, which would open a new tab with the full post. I decided to disregard these posts, since they were few and far inbetween.</li>
+
+<li><strong>Non-text posts</strong>: Since we're working with characters here, simply discarding these posts was fine.</li>
 </ul>
 
-<p>As a side, I also scraped the time at which posts were made. You can find the raw scraped data, in JSON, <a href="tech-blog/assets/mit-confessions-bot/fetch.zip">here</a>.</p>
+<p>As a side, I also scraped the time at which posts were made from the css selector <code>abbr._5ptz</code>. You can find the raw scraped data, in JSON, <a href="tech-blog/assets/mit-confessions-bot/fetch.zip">here</a>.</p>
 
 <h2 id="cleaningpreparation">Cleaning &amp; Preparation</h2>
 
 <p>In preparation for training, I made a few design choices:</p>
 
 <ul>
-<li>Confession numbers not removed
+<li><strong>Confession numbers not removed</strong>: Not too impactful in the long run; perhaps even beneficial to RNN training, considering that strings like <code>#1000</code> are strong indicators of a post beginning (beyond the special character to be added at post ends).
 
 
 <ul>
-<li>Maximum Likelihood Language Model: Confession numbers were removed for this model</li></ul>
+<li><strong>char-n-gram</strong>: Confession numbers were removed for this model, as they would most definitely make the model less robust.</li></ul>
 </li>
 
-<li>Uppercase letters converted to lowercase</li>
+<li><strong>Uppercase letters converted to lowercase</strong>: I'm fairly certain this makes both the <code>char-RNN</code> and the <code>char-n-gram</code> easier to train, since it reduces the alphabet size. However, on the flip side, capitals are usually strongly favored after periods, so the char-RNN might learn</li>
 
-<li>Charset restricted to this regex: <code>[^a-z \n\'\.,?!0-9@#&lt;&gt;/:;\-\"()]</code></li>
+<li><strong>Charset restricted to this regex</strong>: <code>[a-z \n\'\.,?!0-9@#&lt;&gt;/:;\-\"()]</code>. Again, this restricts the alphabet and would make the models easier to train.</li>
 </ul>
 
-<p>You can find the parsed data as JSON <a href="tech-blog/assets/mit-confessions-bot/parsed.zip">here</a>. There are three versions of the text for each post:</p>
+<p>The flipside of the latter two design choices above is that they restrict the alphabet of generated samples. In my case, this wasn't top priority to capture the intricacies of MIT Confessions language.</p>
 
-<ul>
-<li><code>orig-text</code>: Unmodified post text.</li>
-
-<li><code>text</code>: Post text with the modifications above applied, but with the confession number still intact.</li>
-
-<li><code>nr-text</code>: Same as <code>text</code> but without the confession number.</li>
-</ul>
-
-<p>Before training, I also randomly concatenated the post texts together, separated by a special <code>NULL</code> character. <a href="tech-blog/assets/mit-confessions-bot/data-mit-all-full.txt">This</a> is the concatenated file of posts with the confession number, and <a href="tech-blog/assets/mit-confessions-bot/data-mit-all-nr.txt">this</a> is without.</p>
+<p>In order to have the model be able to write new posts, it is necessary for the model to be able to recognize post ends. Thus, I concatenated all cleaned posts into one large string to serve as the training data, each post being separated by a <code>\0</code> (NULL) character. Post order was randomized. <a href="tech-blog/assets/mit-confessions-bot/data-mit-all-full.txt">This</a> is the concatenated file of posts with the confession number, and <a href="tech-blog/assets/mit-confessions-bot/data-mit-all-nr.txt">this</a> is without. These strings served as training and validation data for both the <code>char-RNN</code> and the <code>char-n-gram</code>.</p>
 
 <h1 id="charrnn">Char-RNN</h1>
 
-<h2 id="research">Research</h2>
+<h2 id="basics">Basics</h2>
+
+<ul>
+<li><strong>Hardware</strong>:
+
+
+<ul>
+<li>CPU: Intel Core i7-7600U</li>
+
+<li>GPU: Nvidia GeForce GTX 1080 Ti (external; Akitio Node TB3)</li></ul>
+</li>
+
+<li><strong>Framework</strong>: Keras</li>
+</ul>
 
 <h2 id="firstmodel256256lstm">First Model: 256-256 LSTM</h2>
 

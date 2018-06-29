@@ -3,58 +3,54 @@ Jun. 27, 2018
 
 There are few things more human than language. Inspired by Karpathy's famous [RNN Post](http://karpathy.github.io/2015/05/21/rnn-effectiveness/) and my recent acquisition of a high-end GPU, I decided that it would be a good time to gain some hands-on RNN experience myself.
 
+# Overview
+In this project, we will be training predictive languages model following the MIT Confessions Facebook pages. The model should be able to generate unlimited confessions posts given an initial seed sequence of text. In addition to a character-level RNN model (`char-RNN`), I also trained a char-based n-gram model (henceforth referred to as `char-n-gram`) which I will also contrast with the `char-RNN`.
+
+In this post, I will focus on practical technicalities regarding the models rather than the mathematical background. There exist numerous resources which cover the latter.
+
 # Data
-
 ## Sources
-Any ML projects begins with data acquisition. For this project, I chose the MIT Confessions Facebook pages as my source. Namely, there are three such pages:
+Any ML project begins with data acquisition. Namely, there are three such pages:
 
-* [MIT Confessions](https://www.facebook.com/beaverconfessions/)
-* [MIT Timely Confessions](https://www.facebook.com/timelybeaverconfessions/)
-* [MIT Summer Confessions](https://www.facebook.com/MITSummerConfessions/)
+* [MIT Confessions](https://www.facebook.com/beaverconfessions/) (henceforth referred to as `mit`)
+* [MIT Timely Confessions](https://www.facebook.com/timelybeaverconfessions/) (henceforth referred to as `timely`)
+* [MIT Summer Confessions](https://www.facebook.com/MITSummerConfessions/) (henceforth referred to as `summer`)
 
 At one point in time, I did consider using confessions pages from other colleges - however, while this would allow us more data points, the increased diversity would surely make training the model more difficult. Moreover, I would lose anything which made MIT Confessions unique.
 
 A brief look at our sources nets us some important observations:
-* MIT
-	* Most posts overall
-	* Not active
-	* Moderate amount of non-confessions announcements mixed in
-* Timely
-	* Moderate number of posts
-	* Very active before summer
-	* Very few announcements
-* Summer
-	* Very small number of posts
-	* Currently very active
-	* No announcements
+* `mit` has the most posts, then `timely`, then `summer`.
+* Each has differing levels of current activity.
+* There are varying amounts of non-confession announcements mixed in on each page.
 
-## Acquisition
-I am not familiar with Facebook's Graph API, and my latest interactions with it have proven difficult. As data acquisition will not be a common process, using Selenium here was likely a good choice.
+## Acquisition (Scraping)
+I am not familiar with Facebook's Graph API, and my latest interactions with it have proven difficult. As data acquisition will not be a common process, using Selenium here was likely a good choice. Selenium offers the benefits of a very low learning curve, as well as visualization of the scraping process. However, I still encountered a few problems at this step, which I solved over a few iterations:
+* **Infinite scroll**: Facebook pages don't load all their posts at one time, but rather (mostly) chronologically. In order to reach the oldest posts, one must scroll down pretty far. Selenium doesn't have an easily accesible "wait for scroll to load" function, while a constant sleep duration would crash if there were connectivity hiccups and cause the process to be unnecessarily slow otherwise. Here's what I did:
+	* Scrape posts as I scroll the page, and delete the post element once scraped: This prevents Chrome slowdowns from a very large DOM in memory.
+	* The DOM id `www_pages_reaction_see_more_unitwww_pages_posts` only appears when there's more posts to load. So, scroll down while this id exists.
+* **Long posts**: Moderately long posts are initially collapsed under a `See More` link. There are many attributes to each post which contain the post text, but most of them insert a `...` at the place of the `See More` link into the raw post text. The trick here is to first click the `See More` link (css selector `a.see_more_link`) and then scrape the `outerText` attribute of all `p` children of the post element, which avoids the `...` problem.
+* **Extremely long posts**: These posts don't have a `See More` link but rather a `Continue Reading` link, which would open a new tab with the full post. I decided to disregard these posts, since they were few and far inbetween.
+* **Non-text posts**: Since we're working with characters here, simply discarding these posts was fine.
 
-Selenium offers the benefits of a very low learning curve as well as constant visualization. However, I still encountered a few problems at this step, which I solved over a few iterations:
-* Infinite scroll: Facebook pages don't load all their posts at one time. I made several observations before I could look through all the posts while ensuring that I did not cause a tremendous slowdown by loading too many posts, or otherwise manually delay for longer than necessary to load posts.
-* Expanding posts: Moderately long posts are initially collapsed. Many attempts to scrape posts using various attributes resulted in `...` appearing at the point Facebook decided to initially cut off the post. It took a while to realize that I had to manually expand the posts as well as find the right attribute to scrape.
-	* Very long posts: As the frequency of these posts is low, I decided to forego the effort to scrape these.
-* Non-text posts: Since we're working with RNNs here, simply discarding these posts was fine.
-
-As a side, I also scraped the time at which posts were made. You can find the raw scraped data, in JSON, [here](tech-blog/assets/mit-confessions-bot/fetch.zip).
+As a side, I also scraped the time at which posts were made from the css selector `abbr._5ptz`. You can find the raw scraped data, in JSON, [here](tech-blog/assets/mit-confessions-bot/fetch.zip).
 
 ## Cleaning & Preparation
 In preparation for training, I made a few design choices:
-* Confession numbers not removed
-	* Maximum Likelihood Language Model: Confession numbers were removed for this model
-* Uppercase letters converted to lowercase
-* Charset restricted to this regex: `[^a-z \n\'\.,?!0-9@#<>/:;\-\"()]`
+* **Confession numbers not removed**: Not too impactful in the long run; perhaps even beneficial to RNN training, considering that strings like `#1000` are strong indicators of a post beginning (beyond the special character to be added at post ends).
+	* **char-n-gram**: Confession numbers were removed for this model, as they would most definitely make the model less robust.
+* **Uppercase letters converted to lowercase**: I'm fairly certain this makes both the `char-RNN` and the `char-n-gram` easier to train, since it reduces the alphabet size. However, on the flip side, capitals are usually strongly favored after periods, so the char-RNN might learn
+* **Charset restricted to this regex**: `[a-z \n\'\.,?!0-9@#<>/:;\-\"()]`. Again, this restricts the alphabet and would make the models easier to train.
 
-You can find the parsed data as JSON [here](tech-blog/assets/mit-confessions-bot/parsed.zip). There are three versions of the text for each post:
-* `orig-text`: Unmodified post text.
-* `text`: Post text with the modifications above applied, but with the confession number still intact.
-* `nr-text`: Same as `text` but without the confession number.
+The flipside of the latter two design choices above is that they restrict the alphabet of generated samples. In my case, this wasn't top priority to capture the intricacies of MIT Confessions language.
 
-Before training, I also randomly concatenated the post texts together, separated by a special `NULL` character. [This](tech-blog/assets/mit-confessions-bot/data-mit-all-full.txt) is the concatenated file of posts with the confession number, and [this](tech-blog/assets/mit-confessions-bot/data-mit-all-nr.txt) is without.
+In order to have the model be able to write new posts, it is necessary for the model to be able to recognize post ends. Thus, I concatenated all cleaned posts into one large string to serve as the training data, each post being separated by a `\0` (NULL) character. Post order was randomized. [This](tech-blog/assets/mit-confessions-bot/data-mit-all-full.txt) is the concatenated file of posts with the confession number, and [this](tech-blog/assets/mit-confessions-bot/data-mit-all-nr.txt) is without. These strings served as training and validation data for both the `char-RNN` and the `char-n-gram`.
 
 # Char-RNN
-## Research
+## Basics
+* **Hardware**:
+	* CPU: Intel Core i7-7600U
+	* GPU: Nvidia GeForce GTX 1080 Ti (external; Akitio Node TB3)
+* **Framework**: Keras
 
 ## First Model: 256-256 LSTM
 
