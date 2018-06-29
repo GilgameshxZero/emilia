@@ -49,10 +49,14 @@
 	width: calc(100% - 20px);
 	height: 123px;
 
-	padding: 1px 10px;
+	padding: 0px 10px;
 
 	display: flex;
 	flex-flow: column nowrap;
+}
+
+.tech-selector-panel > div > p {
+	margin: 0;
 }
 
 .tech-selector-panel:hover:not(.tech-selector-panel-selected) {

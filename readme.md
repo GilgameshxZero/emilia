@@ -17,7 +17,9 @@ Emilia-tan conforms to RFC protocol as much as possible, but not completely, as 
 * 3.1.1
 	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (4.0.3, 2.0.4, 1.0.5, 1.0.3, 1.0.5)
 	* Added Staging/Configuration to VC.
-	* Continued to work on the tech post.
+	* Finished mit-confessions-bot tech blog post.
+	* Updated .txt to have text content-type.
+	* Some styling changes to the website.
 * 3.1.0
 	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (4.0.3, 2.0.4, 1.0.5, 1.0.3, 1.0.5)
 * 3.0.0
