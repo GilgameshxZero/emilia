@@ -14,6 +14,9 @@ Emilia-tan conforms to RFC protocol as much as possible, but not completely, as 
 ## Changelog
 
 ### Emilia-tan
+* 3.1.3
+	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (4.0.3, 2.0.4, 1.0.5, 1.0.3, 1.0.5)
+	* URL fragment hotfixes.
 * 3.1.2
 	* (EmiliaSiteServer, EmiliaMailServer, EmiliaUpdateClient, EmiliaUpdateCRHelper, EmiliaUpdateServer) = (4.0.3, 2.0.4, 1.0.5, 1.0.3, 1.0.5)
 	* Fixes to `mit-confessions-bot`.

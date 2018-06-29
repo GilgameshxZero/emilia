@@ -13,7 +13,7 @@ function onLoad() {
 
 	var fragment = window.location.hash.substr(1);
 	var fSplit = fragment.split("&", 2);
-	if (fSplit.length >= 2)
+	if (fSplit.length >= 2 == "mailing-list")
 		fragment = fSplit[1];
 	else
 		fragment = "";
@@ -23,8 +23,6 @@ function onLoad() {
 	for (var a = 0;a < mListSelector.children.length;a++) {
 		mListSelector.children[a].addEventListener("click", onSelectorClick, false);
 	}
-
-	onMListSelectorResize();
 }
 onLoad();
 
@@ -42,6 +40,8 @@ function setSelector(id) {
 
 		onMListSelectorResize();
 		onMListViewerResize();
+		setTimeout(onMListSelectorResize, 100);
+		setTimeout(onMListViewerResize, 100);
     }).catch(function (error) {
         console.warn(error);
     });

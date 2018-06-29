@@ -13,7 +13,7 @@ function onLoad() {
 
 	var fragment = window.location.hash.substr(1);
 	var fSplit = fragment.split("&", 2);
-	if (fSplit.length >= 2)
+	if (fSplit.length >= 2 && fSplit[0] == "tech-blog")
 		fragment = fSplit[1];
 	else
 		fragment = "";
@@ -23,8 +23,6 @@ function onLoad() {
 	for (var a = 0;a < techSelector.children.length;a++) {
 		techSelector.children[a].addEventListener("click", onSelectorClick, false);
 	}
-
-	onTechSelectorResize();
 }
 onLoad();
 
@@ -42,6 +40,8 @@ function setSelector(id) {
 
 		onTechSelectorResize();
 		onTechViewerResize();
+		setTimeout(onTechSelectorResize, 100);
+		setTimeout(onTechViewerResize, 100);
     }).catch(function (error) {
         console.warn(error);
     });
