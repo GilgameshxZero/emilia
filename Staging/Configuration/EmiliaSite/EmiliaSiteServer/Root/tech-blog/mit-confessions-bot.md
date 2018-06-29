@@ -47,22 +47,82 @@ In order to have the model be able to write new posts, it is necessary for the m
 
 # Char-RNN
 ## Basics
-* **Hardware**:
+* **Hardware**
 	* CPU: Intel Core i7-7600U
 	* GPU: Nvidia GeForce GTX 1080 Ti (external; Akitio Node TB3)
-* **Framework**: Keras
+* **Framework**: Keras, Sequential Model
 
-## First Model: 256-256 LSTM
+## First Model: 2x256 LSTM
+### Layers
+1. LSTM: 256
+2. Dropout: 0.2
+3. LSTM: 256
+4. Dropout: 0.2
+5. Softmax
 
-## Second Model: 512 LSTM
+### Other Specs
+* **Optimizer**: `adam` (`lr` = 0.001)
+* **Loss**: `categorical_crossentropy`
+* **Input sequence length**: 50
+* **Batch size**: 64
 
-## Third Model: 512-512 GRU
+### Final Model
+* **Weights**: [.hdf5]()
+* **Loss**: ~1.530
+* **Epochs**: 43 out of 50 planned
+
+### Sampling
+* Did not incorporate temperature (by default, temperature = 1).
+* Using `argmax` instead of choosing from output distribution caused repetitive patterns in samples.
+
+### Thoughts
+* Small batch sizes slowed down training.
+* Loss declines plateaued after epoch 40.
+
+## Second Model: 1x512 LSTM
+### Layers
+1. LSTM: 512
+2. Dropout: 0.4
+3. Softmax
+
+### Other Specs
+* **Optimizer**: `adam` (`lr` = 0.001, `lr`=0.00001 after epoch 18)
+* **Loss**: `categorical_crossentropy`
+* **Input sequence length**: 150
+* **Batch size**: 256
+
+### Final Model
+* **Weights**: [.hdf5]()
+* **Loss**: ~1.681
+* **Epochs**: 22 out of 100 planned
+
+## Third Model: 2x512 GRU
+### Layers
+1. GRU: 512
+2. BatchNorm
+3. Dropout: 0.4
+1. GRU: 512
+2. BatchNorm
+3. Dropout: 0.4
+4. Softmax
+
+### Other Specs
+* **Optimizer**: `adam` (`lr` = 0.0003 (Karpathy constant))
+* **Loss**: `categorical_crossentropy`
+* **Input sequence length**: 100
+* **Batch size**: 256
+
+### Final Model
+* **Weights**: [.hdf5]()
+* **Loss**: ~1.412
+* **Epochs**: 46 out of 100 planned
 
 ## Temperature
+Temperature is a layer added before the final `softmax` layer during sampling, which condenses or expands the distribution of pre-softmax activations. In Keras, I used a `Lambda` layer. Lower temperatures lead to more consistent, less creative samples, and higher temperatures lead to a more confident model and more experimental samples.
 
 ## Samples
 
-# Maximum Likelihood Lanugage Model
+# Char-N-Gram
 
 # Deployment
 The page is live at [MIT Confessions Simulator](https://www.facebook.com/mitconfessionssimulator/).
