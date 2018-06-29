@@ -85,7 +85,7 @@
 <h2 id="basics">Basics</h2>
 
 <ul>
-<li><strong>Hardware</strong>:
+<li><strong>Hardware</strong>
 
 
 <ul>
@@ -94,20 +94,146 @@
 <li>GPU: Nvidia GeForce GTX 1080 Ti (external; Akitio Node TB3)</li></ul>
 </li>
 
-<li><strong>Framework</strong>: Keras</li>
+<li><strong>Framework</strong>: Keras, Sequential Model</li>
 </ul>
 
-<h2 id="firstmodel256256lstm">First Model: 256-256 LSTM</h2>
+<h2 id="firstmodel2x256lstm">First Model: 2x256 LSTM</h2>
 
-<h2 id="secondmodel512lstm">Second Model: 512 LSTM</h2>
+<h3 id="layers">Layers</h3>
 
-<h2 id="thirdmodel512512gru">Third Model: 512-512 GRU</h2>
+<ol>
+<li>LSTM: 256</li>
+
+<li>Dropout: 0.2</li>
+
+<li>LSTM: 256</li>
+
+<li>Dropout: 0.2</li>
+
+<li>Softmax</li>
+</ol>
+
+<h3 id="otherspecs">Other Specs</h3>
+
+<ul>
+<li><strong>Optimizer</strong>: <code>adam</code> (<code>lr</code> = 0.001)</li>
+
+<li><strong>Loss</strong>: <code>categorical_crossentropy</code></li>
+
+<li><strong>Input sequence length</strong>: 50</li>
+
+<li><strong>Batch size</strong>: 64</li>
+</ul>
+
+<h3 id="finalmodel">Final Model</h3>
+
+<ul>
+<li><strong>Weights</strong>: <a href="">.hdf5</a></li>
+
+<li><strong>Loss</strong>: ~1.530</li>
+
+<li><strong>Epochs</strong>: 43 out of 50 planned</li>
+</ul>
+
+<h3 id="sampling">Sampling</h3>
+
+<ul>
+<li>Did not incorporate temperature (by default, temperature = 1).</li>
+
+<li>Using <code>argmax</code> instead of choosing from output distribution caused repetitive patterns in samples.</li>
+</ul>
+
+<h3 id="thoughts">Thoughts</h3>
+
+<ul>
+<li>Small batch sizes slowed down training.</li>
+
+<li>Loss declines plateaued after epoch 40.</li>
+</ul>
+
+<h2 id="secondmodel1x512lstm">Second Model: 1x512 LSTM</h2>
+
+<h3 id="layers-1">Layers</h3>
+
+<ol>
+<li>LSTM: 512</li>
+
+<li>Dropout: 0.4</li>
+
+<li>Softmax</li>
+</ol>
+
+<h3 id="otherspecs-1">Other Specs</h3>
+
+<ul>
+<li><strong>Optimizer</strong>: <code>adam</code> (<code>lr</code> = 0.001, <code>lr</code>=0.00001 after epoch 18)</li>
+
+<li><strong>Loss</strong>: <code>categorical_crossentropy</code></li>
+
+<li><strong>Input sequence length</strong>: 150</li>
+
+<li><strong>Batch size</strong>: 256</li>
+</ul>
+
+<h3 id="finalmodel-1">Final Model</h3>
+
+<ul>
+<li><strong>Weights</strong>: <a href="">.hdf5</a></li>
+
+<li><strong>Loss</strong>: ~1.681</li>
+
+<li><strong>Epochs</strong>: 22 out of 100 planned</li>
+</ul>
+
+<h2 id="thirdmodel2x512gru">Third Model: 2x512 GRU</h2>
+
+<h3 id="layers-2">Layers</h3>
+
+<ol>
+<li>GRU: 512</li>
+
+<li>BatchNorm</li>
+
+<li>Dropout: 0.4</li>
+
+<li>GRU: 512</li>
+
+<li>BatchNorm</li>
+
+<li>Dropout: 0.4</li>
+
+<li>Softmax</li>
+</ol>
+
+<h3 id="otherspecs-2">Other Specs</h3>
+
+<ul>
+<li><strong>Optimizer</strong>: <code>adam</code> (<code>lr</code> = 0.0003 (Karpathy constant))</li>
+
+<li><strong>Loss</strong>: <code>categorical_crossentropy</code></li>
+
+<li><strong>Input sequence length</strong>: 100</li>
+
+<li><strong>Batch size</strong>: 256</li>
+</ul>
+
+<h3 id="finalmodel-2">Final Model</h3>
+
+<ul>
+<li><strong>Weights</strong>: <a href="">.hdf5</a></li>
+
+<li><strong>Loss</strong>: ~1.412</li>
+
+<li><strong>Epochs</strong>: 46 out of 100 planned</li>
+</ul>
 
 <h2 id="temperature">Temperature</h2>
 
+<p>Temperature is a layer added before the final <code>softmax</code> layer during sampling, which condenses or expands the distribution of pre-softmax activations. In Keras, I used a <code>Lambda</code> layer. Lower temperatures lead to more consistent, less creative samples, and higher temperatures lead to a more confident model and more experimental samples.</p>
+
 <h2 id="samples">Samples</h2>
 
-<h1 id="maximumlikelihoodlanugagemodel">Maximum Likelihood Lanugage Model</h1>
+<h1 id="charngram">Char-N-Gram</h1>
 
 <h1 id="deployment">Deployment</h1>
 
