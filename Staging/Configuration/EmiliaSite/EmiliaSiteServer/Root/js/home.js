@@ -1,4 +1,4 @@
-var minSocialPanelWidth = 250;
+var minSocialPanelWidth = 100;
 
 var html;
 var homeMainInner;
@@ -9,18 +9,23 @@ function onLoad() {
 	homeMainInner = document.getElementById("home-main-inner");
 	homeSocial = document.getElementById("home-social");
 
-	new ResizeObserver(onHomeResize).observe(homeMainInner);
-	new ResizeObserver(onHomeSocialResize).observe(homeSocial);
+	onHomeMainResize();
+	setTimeout(function() {
+		onHomeMainResize();
+	}, 100);
+	
+	onSocialResize();
+	window.addEventListener("resize", function() {
+		onSocialResize();
+	});
 }
 onLoad();
 
-function onHomeResize() {
+function onHomeMainResize() {
 	var scrollWidth = homeMainInner.offsetWidth - homeMainInner.clientWidth;
-
-	console.log(homeMainInner.offsetWidth, homeMainInner.clientWidth);
 	homeMainInner.style.width = "calc(100% + " + scrollWidth + "px";
 }
 
-function onHomeSocialResize() {
-	html.style.setProperty("--social-panel-cols", Math.min(4, Math.ceil(html.clientWidth / minSocialPanelWidth)));
+function onSocialResize() {
+	html.style.setProperty("--social-panel-cols", Math.min(4, Math.ceil(homeSocial.clientWidth / minSocialPanelWidth)));
 }
