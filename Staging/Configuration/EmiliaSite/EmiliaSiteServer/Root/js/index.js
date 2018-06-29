@@ -1,4 +1,3 @@
-let mainPostfix = "-main";
 let navSelected = "nav-selected";
 let defaultNav = "home";
 
@@ -22,7 +21,9 @@ window.onload = function() {
 }
 
 function fetchText(url) {
-    return fetch(url).then((response) => (response.text()));
+    return fetch(url).then(function(response) {
+		return response.text();
+	});
 }
 
 function loadJS(url, implementationCode, location){
@@ -37,13 +38,13 @@ function loadJS(url, implementationCode, location){
 
 function setNavBar(id) {
 	//update main content
-	fetchText(id + ".html").then((html) => {
+	fetchText(id + ".html").then(function(html) {
 		mainDiv.innerHTML = html;
 		
 		loadJS("js/" + id + ".js", function() {
 			//do nothing
 		}, document.body);
-    }).catch((error) => {
+    }).catch(function (error) {
         console.warn(error);
     });
 

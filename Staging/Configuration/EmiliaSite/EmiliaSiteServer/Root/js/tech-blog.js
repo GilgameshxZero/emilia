@@ -24,21 +24,25 @@ function onLoad() {
 		techSelector.children[a].addEventListener("click", onSelectorClick, false);
 	}
 
-	new ResizeObserver(onTechViewerResize).observe(techViewer);
-	new ResizeObserver(onTechSelectorResize).observe(techSelector);
+	onTechSelectorResize();
 }
 onLoad();
 
 function fetchText(url) {
-    return fetch(url).then((response) => (response.text()));
+    return fetch(url).then(function(response) {
+		return response.text();
+	});
 }
 
 function setSelector(id) {
 	//update viewer content
-	fetchText("tech-blog/" + id + ".html").then((html) => {
+	fetchText("tech-blog/" + id + ".html").then(function(html) {
 		techViewer.scrollTop = 0;
 		techViewer.innerHTML = html;
-    }).catch((error) => {
+
+		onTechSelectorResize();
+		onTechViewerResize();
+    }).catch(function (error) {
         console.warn(error);
     });
 
@@ -58,18 +62,12 @@ function onSelectorClick() {
 function onTechViewerResize() {
 	var scrollWidth = techViewer.offsetWidth - techViewer.clientWidth;
 
-	//necessary to prevent flickering
-	scrollWidth = scrollWidth + scrollWidth % 2;
-
 	techViewer.style.right = "calc(0% - " + scrollWidth + "px)";
 	techViewer.style.paddingRight = "calc(20px + " + scrollWidth + "px)";
 }
 
 function onTechSelectorResize() {
 	var scrollWidth = techSelector.offsetWidth - techSelector.clientWidth;
-
-	//necessary to prevent flickering
-	scrollWidth = scrollWidth + scrollWidth % 2;
 
 	techSelector.style.width = "calc(100% + " + scrollWidth + "px)";
 	techSelector.style.paddingRight = scrollWidth + "px";

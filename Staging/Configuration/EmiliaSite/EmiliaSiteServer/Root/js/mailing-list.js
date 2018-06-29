@@ -24,21 +24,25 @@ function onLoad() {
 		mListSelector.children[a].addEventListener("click", onSelectorClick, false);
 	}
 
-	new ResizeObserver(onMListViewerResize).observe(mListViewer);
-	new ResizeObserver(onMListSelectorResize).observe(mListSelector);
+	onMListSelectorResize();
 }
 onLoad();
 
 function fetchText(url) {
-    return fetch(url).then((response) => (response.text()));
+    return fetch(url).then(function(response) {
+		return response.text();
+	});
 }
 
 function setSelector(id) {
 	//update viewer content
-	fetchText("mailing-list/" + id + ".html").then((html) => {
+	fetchText("mailing-list/" + id + ".html").then(function(html) {
 		mListViewer.scrollTop = 0;
 		mListViewer.innerHTML = html;
-    }).catch((error) => {
+
+		onMListSelectorResize();
+		onMListViewerResize();
+    }).catch(function (error) {
         console.warn(error);
     });
 
@@ -58,18 +62,12 @@ function onSelectorClick() {
 function onMListViewerResize() {
 	var scrollWidth = mListViewer.offsetWidth - mListViewer.clientWidth;
 
-	//necessary to prevent flickering
-	scrollWidth = scrollWidth + scrollWidth % 2;
-
 	mListViewer.style.right = "calc(0% - " + scrollWidth + "px)";
 	mListViewer.style.paddingRight = "calc(20px + " + scrollWidth + "px)";
 }
 
 function onMListSelectorResize() {
 	var scrollWidth = mListSelector.offsetWidth - mListSelector.clientWidth;
-
-	//necessary to prevent flickering
-	scrollWidth = scrollWidth + scrollWidth % 2;
 
 	mListSelector.style.width = "calc(100% + " + scrollWidth + "px)";
 	mListSelector.style.paddingRight = scrollWidth + "px";

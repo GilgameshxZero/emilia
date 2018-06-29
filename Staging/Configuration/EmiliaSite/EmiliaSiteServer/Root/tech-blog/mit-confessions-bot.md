@@ -30,7 +30,7 @@ I am not familiar with Facebook's Graph API, and my latest interactions with it 
 	* The DOM id `www_pages_reaction_see_more_unitwww_pages_posts` only appears when there's more posts to load. So, scroll down while this id exists.
 * **Long posts**: Moderately long posts are initially collapsed under a `See More` link. There are many attributes to each post which contain the post text, but most of them insert a `...` at the place of the `See More` link into the raw post text. The trick here is to first click the `See More` link (css selector `a.see_more_link`) and then scrape the `outerText` attribute of all `p` children of the post element, which avoids the `...` problem.
 * **Extremely long posts**: These posts don't have a `See More` link but rather a `Continue Reading` link, which would open a new tab with the full post. I decided to disregard these posts, since they were few and far in-between.
-![](tech-blog/assets/mit-confessions-bot/long-post.png)
+![](tech-blog/assets/mit-confessions-bot/long-post.png)\
 What a pain (to scrape).
 
 * **Non-text posts**: Since we're working with characters here, simply discarding these posts was fine.
