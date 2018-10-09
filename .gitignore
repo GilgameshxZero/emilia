@@ -1,15 +1,7 @@
-emilia-tan.com
-Development/Development/Auxiliary
-Development/Development/Dynamic
-Development/Staging
-Development/Production
-Development/Production-Remote
-Staging/Auxiliary
-Staging/Code
-Staging/Dynamic
-Production
+/.vscode
+/emilia-tan.com
+/prod
 
-*.vs
-*.confidential*
-*.log
-*.exe
+/bin
+/data
+/root
