@@ -1,4 +1,5 @@
 #pragma once
+#pragma comment(lib,"user32.lib") 
 
 #include "rain-aeternum/rain-libraries.h"
 

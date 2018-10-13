@@ -1,19 +1,17 @@
 #include "main.h"
 
-namespace Emilia {
-	int main(int argc, char *argv[]) {
-		int error = start(argc, argv);
-		if (error != 0) {
-			std::cout << "start returned error code " << error << ".\nExiting in 3 seconds...";
-			fflush(stdout);
-			Sleep(3000);
-		}
-		return error;
+int main(int argc, char *argv[]) {
+	int error = Emilia::start(argc, argv);
+	if (error != 0) {
+		std::cout << "start returned error code " << error << ".\nExiting in 3 seconds...";
+		fflush(stdout);
+		Sleep(3000);
 	}
-	int start(int argc, char* argv[]) {
-		std::cout << "Hello world!";
-		return 0;
+	return error;
+}
 
+namespace Emilia {
+	int start(int argc, char* argv[]) {
 		//parameters
 		std::map<std::string, std::string> config;
 
@@ -90,9 +88,8 @@ namespace Emilia {
 
 		logger.setStdHandleSrc(STD_OUTPUT_HANDLE, false);
 
-		Rain::tsCout("The program has terminated. Exiting in 3 seconds...\r\n");
+		Rain::tsCout("The program has terminated.\r\n");
 		fflush(stdout);
-		Sleep(3000);
 		return 0;
 	}
 }
