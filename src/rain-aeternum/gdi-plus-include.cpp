@@ -1,1 +1,1 @@
-#include "GdiplusInclude.h"
+#include "gdi-plus-include.h"

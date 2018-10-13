@@ -9,6 +9,7 @@ Windows-specific.
 */
 
 #pragma once
+#pragma comment(lib,"user32.lib") 
 
 #include "windows-lam-include.h"
 #include "utility-libraries.h"
