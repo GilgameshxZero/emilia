@@ -5,7 +5,8 @@
 #include "command-handlers.h"
 #include "connection-handlers.h"
 
+int main(int argc, char *argv[]);
+
 namespace Emilia {
-	int main(int argc, char *argv[]);
 	int start(int argc, char* argv[]);
 }
