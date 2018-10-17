@@ -1,12 +1,18 @@
 call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
 cd src
 call ".\build-id-inc.bat"
+call rc /Fo".\..\obj\rc.res" rc.rc
 call cl ^
 /EHsc ^
 /Fo".\..\obj\\" ^
 /Fe".\..\bin\emilia.exe" ^
 /O2 ^
+/Ot ^
 /Ox ^
+/MT ^
+/MP ^
+/incremental ^
+.\..\obj\rc.res ^
 .\main.cpp ^
 .\connection-handlers.cpp ^
 .\command-handlers.cpp ^
