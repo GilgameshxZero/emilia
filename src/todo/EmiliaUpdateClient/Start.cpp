@@ -14,12 +14,12 @@ namespace Monochrome3 {
 			Rain::concatMap(config, Rain::readParameterFile(authenticationFile));
 
 			//debugging & logging
-			Rain::createDirRec(config["aux-path"]);
-			Rain::redirectCerrFile(config["aux-path"] + config["aux-error"], true);
-			HANDLE hFMemLeak = Rain::logMemoryLeaks(config["aux-path"] + config["aux-memory"]);
+			Rain::createDirRec(config["log-path"]);
+			Rain::redirectCerrFile(config["log-path"] + config["log-error"], true);
+			HANDLE hFMemLeak = Rain::logMemoryLeaks(config["log-path"] + config["log-memory"]);
 
 			Rain::LogStream logger;
-			logger.setFileDst(config["aux-path"] + config["aux-log"], true);
+			logger.setFileDst(config["log-path"] + config["log-log"], true);
 			logger.setStdHandleSrc(STD_OUTPUT_HANDLE, true);
 
 			//output parameters
