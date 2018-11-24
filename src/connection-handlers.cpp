@@ -210,7 +210,11 @@ namespace Emilia {
 		static bool notFound404Parsed = false;
 		static std::string notFound404HTML;
 		if (!notFound404Parsed) {
-			Rain::readFileToStr(config["config-path"] + config["config-404"], notFound404HTML);
+			if (Rain::fileExists(config["config-path"] + config["config-404"])) {
+				Rain::readFileToStr(config["config-path"] + config["config-404"], notFound404HTML);
+			} else {
+				notFound404HTML = "";
+			}
 			notFound404Parsed = true;
 		}
 
