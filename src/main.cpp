@@ -15,9 +15,7 @@ namespace Emilia {
 		//parameters
 		std::map<std::string, std::string> config;
 
-		std::string configLocFile = "config-loc.ini";
-		Rain::concatMap(config, Rain::readParameterFile(configLocFile));
-		std::string configFile = config["config-path"] + config["config-file"];
+		std::string configFile = "../config/config.ini";
 		Rain::concatMap(config, Rain::readParameterFile(configFile));
 
 		//debugging
