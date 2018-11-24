@@ -327,3 +327,2347 @@ Info: Client connected from 127.0.0.1. Total: 5.
 Info: Client connected from 127.0.0.1. Total: 6.
 
 
+11/24/18.14:15:39-0500 53
+Info: Client disconnected from 127.0.0.1. Total: 5.
+
+
+11/24/18.14:15:39-0500 53
+Info: Client disconnected from 127.0.0.1. Total: 4.
+
+
+11/24/18.14:21:49-0500 53
+Info: Client disconnected from 127.0.0.1. Total: 3.
+
+
+11/24/18.14:21:49-0500 159
+Info: Client disconnected from 127.0.0.1. Total: 2.
+Info: Client disconnected from 127.0.0.1. Total: 1.
+Info: Client disconnected from 127.0.0.1. Total: 0.
+
+
+11/24/18.14:22:00-0500 15
+Command: exit
+
+
+11/24/18.14:24:10-0500 612
+Starting...
+16 configuration options:
+	config-path: ..\config\
+	data-path: ..\data\
+	http-404: http-404.html
+	http-cgi-scripts: http-cgi.ini
+	http-cgi-timeout: 0
+	http-content-type: http-content-type.ini
+	http-custom-headers: http-headers.ini
+	http-default-ctype: application/octet-stream
+	http-default-index: index.html
+	http-server-root: ..\root\
+	http-transfer-buffer: 65536
+	log-error: errors.log
+	log-log: log.log
+	log-memory: memory-leaks.log
+	log-path: ..\logs\
+	update-server-port: 50368
+
+Command line arguments: 1
+
+emilia.exe
+
+Server listening on port 80.
+Accepting commands...
+
+
+11/24/18.14:24:16-0500 50
+Info: Client connected from 127.0.0.1. Total: 1.
+
+
+11/24/18.14:24:16-0500 386
+GET /img/wechat.jpg HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:24:16-0500 32
+127.0.0.1: GET /img/wechat.jpg
+
+
+11/24/18.14:24:17-0500 50
+Info: Client connected from 127.0.0.1. Total: 2.
+
+
+11/24/18.14:24:17-0500 446
+GET / HTTP/1.1
+Host: localhost
+Connection: keep-alive
+Cache-Control: max-age=0
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:24:17-0500 18
+127.0.0.1: GET /
+
+
+11/24/18.14:24:17-0500 365
+GET /css/common.css HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: text/css,*/*;q=0.1
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:24:17-0500 32
+127.0.0.1: GET /css/common.css
+
+
+11/24/18.14:24:17-0500 364
+GET /css/index.css HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: text/css,*/*;q=0.1
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:24:17-0500 347
+GET /js/index.js HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: */*
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:24:17-0500 60
+127.0.0.1: GET /css/index.css
+127.0.0.1: GET /js/index.js
+
+
+11/24/18.14:24:18-0500 345
+GET /home.html HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: */*
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:24:18-0500 27
+127.0.0.1: GET /home.html
+
+
+11/24/18.14:24:18-0500 389
+GET /img/gmail-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:24:18-0500 35
+127.0.0.1: GET /img/gmail-fav.ico
+
+
+11/24/18.14:24:18-0500 391
+GET /img/profile-pic.jpg HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:24:18-0500 363
+GET /css/home.css HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: text/css,*/*;q=0.1
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:24:18-0500 386
+GET /img/fb-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:24:18-0500 390
+GET /img/wechat-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:24:18-0500 135
+127.0.0.1: GET /img/profile-pic.jpg
+127.0.0.1: GET /css/home.css
+127.0.0.1: GET /img/fb-fav.ico
+127.0.0.1: GET /img/wechat-fav.ico
+
+
+11/24/18.14:24:18-0500 392
+GET /img/linkedin-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:24:18-0500 386
+GET /img/cf-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:24:18-0500 70
+127.0.0.1: GET /img/linkedin-fav.ico
+127.0.0.1: GET /img/cf-fav.ico
+
+
+11/24/18.14:24:18-0500 390
+GET /img/github-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:24:18-0500 387
+GET /img/mal-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:24:18-0500 69
+127.0.0.1: GET /img/github-fav.ico
+127.0.0.1: GET /img/mal-fav.ico
+
+
+11/24/18.14:24:18-0500 389
+GET /img/quora-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:24:18-0500 346
+GET /js/home.js HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: */*
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:24:18-0500 63
+127.0.0.1: GET /img/quora-fav.ico
+127.0.0.1: GET /js/home.js
+
+
+11/24/18.14:24:18-0500 50
+Info: Client connected from 127.0.0.1. Total: 3.
+
+
+11/24/18.14:24:18-0500 100
+Info: Client connected from 127.0.0.1. Total: 4.
+Info: Client connected from 127.0.0.1. Total: 5.
+
+
+11/24/18.14:24:18-0500 50
+Info: Client connected from 127.0.0.1. Total: 6.
+
+
+11/24/18.14:26:44-0500 53
+Info: Client disconnected from 127.0.0.1. Total: 3.
+
+
+11/24/18.14:26:44-0500 159
+Info: Client disconnected from 127.0.0.1. Total: 3.
+Info: Client disconnected from 127.0.0.1. Total: 3.
+Info: Client disconnected from 127.0.0.1. Total: 2.
+
+
+11/24/18.14:30:55-0500 53
+Info: Client disconnected from 127.0.0.1. Total: 0.
+
+
+11/24/18.14:30:55-0500 53
+Info: Client disconnected from 127.0.0.1. Total: 0.
+
+
+11/24/18.14:31:06-0500 50
+Info: Client connected from 127.0.0.1. Total: 1.
+
+
+11/24/18.14:31:06-0500 446
+GET / HTTP/1.1
+Host: localhost
+Connection: keep-alive
+Cache-Control: max-age=0
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:31:06-0500 18
+127.0.0.1: GET /
+
+
+11/24/18.14:31:06-0500 365
+GET /css/common.css HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: text/css,*/*;q=0.1
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:31:06-0500 32
+127.0.0.1: GET /css/common.css
+
+
+11/24/18.14:31:06-0500 364
+GET /css/index.css HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: text/css,*/*;q=0.1
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:31:06-0500 31
+127.0.0.1: GET /css/index.css
+
+
+11/24/18.14:31:06-0500 347
+GET /js/index.js HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: */*
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:31:06-0500 29
+127.0.0.1: GET /js/index.js
+
+
+11/24/18.14:31:06-0500 50
+Info: Client connected from 127.0.0.1. Total: 2.
+
+
+11/24/18.14:31:07-0500 50
+Info: Client connected from 127.0.0.1. Total: 3.
+
+
+11/24/18.14:31:07-0500 50
+Info: Client connected from 127.0.0.1. Total: 4.
+
+
+11/24/18.14:31:07-0500 345
+GET /home.html HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: */*
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:31:07-0500 27
+127.0.0.1: GET /home.html
+
+
+11/24/18.14:31:07-0500 430
+GET /img/favicon.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+Pragma: no-cache
+Cache-Control: no-cache
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:31:07-0500 33
+127.0.0.1: GET /img/favicon.ico
+
+
+11/24/18.14:31:07-0500 389
+GET /img/gmail-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:31:07-0500 35
+127.0.0.1: GET /img/gmail-fav.ico
+
+
+11/24/18.14:31:07-0500 386
+GET /img/fb-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:31:07-0500 391
+GET /img/profile-pic.jpg HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:31:07-0500 69
+127.0.0.1: GET /img/fb-fav.ico
+127.0.0.1: GET /img/profile-pic.jpg
+
+
+11/24/18.14:31:07-0500 363
+GET /css/home.css HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: text/css,*/*;q=0.1
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:31:07-0500 30
+127.0.0.1: GET /css/home.css
+
+
+11/24/18.14:31:07-0500 390
+GET /img/wechat-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:31:07-0500 36
+127.0.0.1: GET /img/wechat-fav.ico
+
+
+11/24/18.14:31:07-0500 392
+GET /img/linkedin-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:31:07-0500 38
+127.0.0.1: GET /img/linkedin-fav.ico
+
+
+11/24/18.14:31:07-0500 386
+GET /img/cf-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:31:07-0500 390
+GET /img/github-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:31:07-0500 387
+GET /img/mal-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:31:07-0500 389
+GET /img/quora-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:31:07-0500 136
+127.0.0.1: GET /img/cf-fav.ico
+127.0.0.1: GET /img/github-fav.ico
+127.0.0.1: GET /img/mal-fav.ico
+127.0.0.1: GET /img/quora-fav.ico
+
+
+11/24/18.14:31:07-0500 346
+GET /js/home.js HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: */*
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:31:07-0500 28
+127.0.0.1: GET /js/home.js
+
+
+11/24/18.14:31:07-0500 50
+Info: Client connected from 127.0.0.1. Total: 5.
+
+
+11/24/18.14:31:07-0500 50
+Info: Client connected from 127.0.0.1. Total: 6.
+
+
+11/24/18.14:31:14-0500 53
+Info: Client disconnected from 127.0.0.1. Total: 5.
+
+
+11/24/18.14:31:14-0500 265
+Info: Client disconnected from 127.0.0.1. Total: 4.
+Info: Client disconnected from 127.0.0.1. Total: 3.
+Info: Client disconnected from 127.0.0.1. Total: 2.
+Info: Client disconnected from 127.0.0.1. Total: 1.
+Info: Client disconnected from 127.0.0.1. Total: 0.
+
+
+11/24/18.14:40:18-0500 15
+Command: exit
+
+
+11/24/18.14:41:24-0500 808
+Starting...
+21 configuration options:
+	config-path: ..\config\
+	data-path: ..\data\
+	emilia-auth-pass: 2JRx8LW4beuEEgUw
+	http-404: http-404.html
+	http-cgi-scripts: http-cgi.ini
+	http-cgi-timeout: 0
+	http-content-type: http-content-type.ini
+	http-custom-headers: http-headers.ini
+	http-default-ctype: application/octet-stream
+	http-default-index: index.html
+	http-server-root: ..\root\
+	http-transfer-buffer: 65536
+	log-error: errors.log
+	log-log: log.log
+	log-memory: memory-leaks.log
+	log-path: ..\logs\
+	smtp-connect-timeout: 30000
+	smtp-domain: emilia-tan.com
+	smtp-transfer-buffer: 65536
+	smtp-users: mail-users.ini
+	update-server-port: 50368
+
+Command line arguments: 1
+
+emilia.exe
+
+HTTP server listening on port 80.
+SMTP server listening on port 80.
+Accepting commands...
+
+
+11/24/18.14:41:36-0500 15
+Command: exit
+
+
+11/24/18.14:41:52-0500 808
+Starting...
+21 configuration options:
+	config-path: ..\config\
+	data-path: ..\data\
+	emilia-auth-pass: 2JRx8LW4beuEEgUw
+	http-404: http-404.html
+	http-cgi-scripts: http-cgi.ini
+	http-cgi-timeout: 0
+	http-content-type: http-content-type.ini
+	http-custom-headers: http-headers.ini
+	http-default-ctype: application/octet-stream
+	http-default-index: index.html
+	http-server-root: ..\root\
+	http-transfer-buffer: 65536
+	log-error: errors.log
+	log-log: log.log
+	log-memory: memory-leaks.log
+	log-path: ..\logs\
+	smtp-connect-timeout: 30000
+	smtp-domain: emilia-tan.com
+	smtp-transfer-buffer: 65536
+	smtp-users: mail-users.ini
+	update-server-port: 50368
+
+Command line arguments: 1
+
+emilia.exe
+
+HTTP server listening on port 80.
+SMTP server listening on port 25.
+Accepting commands...
+
+
+11/24/18.14:42:02-0500 50
+Info: Client connected from 127.0.0.1. Total: 1.
+
+
+11/24/18.14:42:02-0500 420
+GET / HTTP/1.1
+Host: localhost
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:42:02-0500 18
+127.0.0.1: GET /
+
+
+11/24/18.14:42:02-0500 365
+GET /css/common.css HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: text/css,*/*;q=0.1
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:42:02-0500 32
+127.0.0.1: GET /css/common.css
+
+
+11/24/18.14:42:02-0500 364
+GET /css/index.css HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: text/css,*/*;q=0.1
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:42:02-0500 347
+GET /js/index.js HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: */*
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:42:02-0500 60
+127.0.0.1: GET /css/index.css
+127.0.0.1: GET /js/index.js
+
+
+11/24/18.14:42:02-0500 50
+Info: Client connected from 127.0.0.1. Total: 2.
+
+
+11/24/18.14:42:02-0500 50
+Info: Client connected from 127.0.0.1. Total: 3.
+
+
+11/24/18.14:42:03-0500 345
+GET /home.html HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: */*
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:42:03-0500 27
+127.0.0.1: GET /home.html
+
+
+11/24/18.14:42:03-0500 363
+GET /css/home.css HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: text/css,*/*;q=0.1
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:42:03-0500 30
+127.0.0.1: GET /css/home.css
+
+
+11/24/18.14:42:03-0500 346
+GET /js/home.js HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: */*
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:42:03-0500 391
+GET /img/profile-pic.jpg HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:42:03-0500 65
+127.0.0.1: GET /js/home.js
+127.0.0.1: GET /img/profile-pic.jpg
+
+
+11/24/18.14:42:03-0500 389
+GET /img/gmail-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:42:03-0500 35
+127.0.0.1: GET /img/gmail-fav.ico
+
+
+11/24/18.14:42:03-0500 386
+GET /img/fb-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:42:03-0500 32
+127.0.0.1: GET /img/fb-fav.ico
+
+
+11/24/18.14:42:03-0500 390
+GET /img/wechat-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:42:03-0500 392
+GET /img/linkedin-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:42:03-0500 386
+GET /img/cf-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:42:03-0500 106
+127.0.0.1: GET /img/wechat-fav.ico
+127.0.0.1: GET /img/linkedin-fav.ico
+127.0.0.1: GET /img/cf-fav.ico
+
+
+11/24/18.14:42:03-0500 390
+GET /img/github-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:42:03-0500 36
+127.0.0.1: GET /img/github-fav.ico
+
+
+11/24/18.14:42:03-0500 387
+GET /img/mal-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:42:03-0500 389
+GET /img/quora-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:42:03-0500 68
+127.0.0.1: GET /img/mal-fav.ico
+127.0.0.1: GET /img/quora-fav.ico
+
+
+11/24/18.14:42:03-0500 50
+Info: Client connected from 127.0.0.1. Total: 4.
+
+
+11/24/18.14:42:03-0500 50
+Info: Client connected from 127.0.0.1. Total: 5.
+
+
+11/24/18.14:42:03-0500 50
+Info: Client connected from 127.0.0.1. Total: 6.
+
+
+11/24/18.14:42:43-0500 53
+Info: Client disconnected from 127.0.0.1. Total: 5.
+
+
+11/24/18.14:42:43-0500 106
+Info: Client disconnected from 127.0.0.1. Total: 4.
+Info: Client disconnected from 127.0.0.1. Total: 3.
+
+
+11/24/18.14:43:11-0500 808
+Starting...
+21 configuration options:
+	config-path: ..\config\
+	data-path: ..\data\
+	emilia-auth-pass: 2JRx8LW4beuEEgUw
+	http-404: http-404.html
+	http-cgi-scripts: http-cgi.ini
+	http-cgi-timeout: 0
+	http-content-type: http-content-type.ini
+	http-custom-headers: http-headers.ini
+	http-default-ctype: application/octet-stream
+	http-default-index: index.html
+	http-server-root: ..\root\
+	http-transfer-buffer: 65536
+	log-error: errors.log
+	log-log: log.log
+	log-memory: memory-leaks.log
+	log-path: ..\logs\
+	smtp-connect-timeout: 30000
+	smtp-domain: emilia-tan.com
+	smtp-transfer-buffer: 65536
+	smtp-users: mail-users.ini
+	update-server-port: 50368
+
+Command line arguments: 1
+
+emilia.exe
+
+HTTP server listening on port 80.
+SMTP server listening on port 25.
+Accepting commands...
+
+
+11/24/18.14:43:16-0500 50
+Info: Client connected from 127.0.0.1. Total: 1.
+
+
+11/24/18.14:43:26-0500 53
+Info: Client disconnected from 127.0.0.1. Total: 0.
+
+
+11/24/18.14:45:29-0500 808
+Starting...
+21 configuration options:
+	config-path: ..\config\
+	data-path: ..\data\
+	emilia-auth-pass: 2JRx8LW4beuEEgUw
+	http-404: http-404.html
+	http-cgi-scripts: http-cgi.ini
+	http-cgi-timeout: 0
+	http-content-type: http-content-type.ini
+	http-custom-headers: http-headers.ini
+	http-default-ctype: application/octet-stream
+	http-default-index: index.html
+	http-server-root: ..\root\
+	http-transfer-buffer: 65536
+	log-error: errors.log
+	log-log: log.log
+	log-memory: memory-leaks.log
+	log-path: ..\logs\
+	smtp-connect-timeout: 30000
+	smtp-domain: emilia-tan.com
+	smtp-transfer-buffer: 65536
+	smtp-users: mail-users.ini
+	update-server-port: 50368
+
+Command line arguments: 1
+
+emilia.exe
+
+HTTP server listening on port 80.
+SMTP server listening on port 25.
+Accepting commands...
+
+
+11/24/18.14:45:35-0500 50
+Info: Client connected from 127.0.0.1. Total: 1.
+
+
+11/24/18.14:45:35-0500 420
+GET / HTTP/1.1
+Host: localhost
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:45:35-0500 18
+127.0.0.1: GET /
+
+
+11/24/18.14:45:35-0500 365
+GET /css/common.css HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: text/css,*/*;q=0.1
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:45:35-0500 32
+127.0.0.1: GET /css/common.css
+
+
+11/24/18.14:45:35-0500 364
+GET /css/index.css HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: text/css,*/*;q=0.1
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:45:35-0500 347
+GET /js/index.js HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: */*
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:45:35-0500 60
+127.0.0.1: GET /css/index.css
+127.0.0.1: GET /js/index.js
+
+
+11/24/18.14:45:36-0500 50
+Info: Client connected from 127.0.0.1. Total: 2.
+
+
+11/24/18.14:45:36-0500 50
+Info: Client connected from 127.0.0.1. Total: 3.
+
+
+11/24/18.14:45:36-0500 50
+Info: Client connected from 127.0.0.1. Total: 4.
+
+
+11/24/18.14:45:36-0500 345
+GET /home.html HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: */*
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:45:36-0500 27
+127.0.0.1: GET /home.html
+
+
+11/24/18.14:45:37-0500 363
+GET /css/home.css HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: text/css,*/*;q=0.1
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:45:37-0500 346
+GET /js/home.js HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: */*
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:45:37-0500 391
+GET /img/profile-pic.jpg HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:45:37-0500 389
+GET /img/gmail-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:45:37-0500 386
+GET /img/fb-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:45:37-0500 390
+GET /img/wechat-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:45:37-0500 198
+127.0.0.1: GET /css/home.css
+127.0.0.1: GET /js/home.js
+127.0.0.1: GET /img/profile-pic.jpg
+127.0.0.1: GET /img/gmail-fav.ico
+127.0.0.1: GET /img/fb-fav.ico
+127.0.0.1: GET /img/wechat-fav.ico
+
+
+11/24/18.14:45:37-0500 392
+GET /img/linkedin-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:45:37-0500 38
+127.0.0.1: GET /img/linkedin-fav.ico
+
+
+11/24/18.14:45:37-0500 386
+GET /img/cf-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:45:37-0500 390
+GET /img/github-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:45:37-0500 387
+GET /img/mal-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:45:37-0500 389
+GET /img/quora-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:45:37-0500 136
+127.0.0.1: GET /img/cf-fav.ico
+127.0.0.1: GET /img/github-fav.ico
+127.0.0.1: GET /img/mal-fav.ico
+127.0.0.1: GET /img/quora-fav.ico
+
+
+11/24/18.14:45:37-0500 50
+Info: Client connected from 127.0.0.1. Total: 5.
+
+
+11/24/18.14:45:37-0500 50
+Info: Client connected from 127.0.0.1. Total: 6.
+
+
+11/24/18.14:47:46-0500 808
+Starting...
+21 configuration options:
+	config-path: ..\config\
+	data-path: ..\data\
+	emilia-auth-pass: 2JRx8LW4beuEEgUw
+	http-404: http-404.html
+	http-cgi-scripts: http-cgi.ini
+	http-cgi-timeout: 0
+	http-content-type: http-content-type.ini
+	http-custom-headers: http-headers.ini
+	http-default-ctype: application/octet-stream
+	http-default-index: index.html
+	http-server-root: ..\root\
+	http-transfer-buffer: 65536
+	log-error: errors.log
+	log-log: log.log
+	log-memory: memory-leaks.log
+	log-path: ..\logs\
+	smtp-connect-timeout: 30000
+	smtp-domain: emilia-tan.com
+	smtp-transfer-buffer: 65536
+	smtp-users: mail-users.ini
+	update-server-port: 50368
+
+Command line arguments: 1
+
+emilia.exe
+
+HTTP server listening on port 80.
+SMTP server listening on port 25.
+Accepting commands...
+
+
+11/24/18.14:47:49-0500 50
+Info: Client connected from 127.0.0.1. Total: 1.
+
+
+11/24/18.14:47:49-0500 446
+GET / HTTP/1.1
+Host: localhost
+Connection: keep-alive
+Cache-Control: max-age=0
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:49-0500 365
+GET /css/common.css HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: text/css,*/*;q=0.1
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:49-0500 364
+GET /css/index.css HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: text/css,*/*;q=0.1
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:49-0500 347
+GET /js/index.js HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: */*
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:49-0500 110
+127.0.0.1: GET /
+127.0.0.1: GET /css/common.css
+127.0.0.1: GET /css/index.css
+127.0.0.1: GET /js/index.js
+
+
+11/24/18.14:47:49-0500 50
+Info: Client connected from 127.0.0.1. Total: 2.
+
+
+11/24/18.14:47:49-0500 50
+Info: Client connected from 127.0.0.1. Total: 3.
+
+
+11/24/18.14:47:49-0500 50
+Info: Client connected from 127.0.0.1. Total: 4.
+
+
+11/24/18.14:47:49-0500 345
+GET /home.html HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: */*
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:49-0500 27
+127.0.0.1: GET /home.html
+
+
+11/24/18.14:47:49-0500 389
+GET /img/gmail-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:49-0500 35
+127.0.0.1: GET /img/gmail-fav.ico
+
+
+11/24/18.14:47:49-0500 391
+GET /img/profile-pic.jpg HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:49-0500 386
+GET /img/fb-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:49-0500 390
+GET /img/wechat-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:49-0500 363
+GET /css/home.css HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: text/css,*/*;q=0.1
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:49-0500 386
+GET /img/cf-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:49-0500 392
+GET /img/linkedin-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:49-0500 390
+GET /img/github-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:49-0500 387
+GET /img/mal-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:49-0500 389
+GET /img/quora-fav.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:49-0500 346
+GET /js/home.js HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: */*
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:49-0500 337
+127.0.0.1: GET /img/profile-pic.jpg
+127.0.0.1: GET /img/fb-fav.ico
+127.0.0.1: GET /img/wechat-fav.ico
+127.0.0.1: GET /css/home.css
+127.0.0.1: GET /img/cf-fav.ico
+127.0.0.1: GET /img/linkedin-fav.ico
+127.0.0.1: GET /img/github-fav.ico
+127.0.0.1: GET /img/mal-fav.ico
+127.0.0.1: GET /img/quora-fav.ico
+127.0.0.1: GET /js/home.js
+
+
+11/24/18.14:47:49-0500 430
+GET /img/favicon.ico HTTP/1.1
+Host: localhost
+Connection: keep-alive
+Pragma: no-cache
+Cache-Control: no-cache
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:49-0500 33
+127.0.0.1: GET /img/favicon.ico
+
+
+11/24/18.14:47:50-0500 50
+Info: Client connected from 127.0.0.1. Total: 5.
+
+
+11/24/18.14:47:50-0500 50
+Info: Client connected from 127.0.0.1. Total: 6.
+
+
+11/24/18.14:47:50-0500 350
+GET /tech-blog.html HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: */*
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:50-0500 32
+127.0.0.1: GET /tech-blog.html
+
+
+11/24/18.14:47:50-0500 368
+GET /css/tech-blog.css HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: text/css,*/*;q=0.1
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:50-0500 351
+GET /js/tech-blog.js HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: */*
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:50-0500 68
+127.0.0.1: GET /css/tech-blog.css
+127.0.0.1: GET /js/tech-blog.js
+
+
+11/24/18.14:47:50-0500 370
+GET /tech-blog/mit-confessions-bot.html HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: */*
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:50-0500 52
+127.0.0.1: GET /tech-blog/mit-confessions-bot.html
+
+
+11/24/18.14:47:50-0500 422
+GET /tech-blog/assets/mit-confessions-bot/long-post.png HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:50-0500 68
+127.0.0.1: GET /tech-blog/assets/mit-confessions-bot/long-post.png
+
+
+11/24/18.14:47:50-0500 426
+GET /tech-blog/assets/mit-confessions-bot/kevin-comment.png HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:50-0500 416
+GET /tech-blog/assets/mit-confessions-bot/psa.png HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:50-0500 421
+GET /tech-blog/assets/mit-confessions-bot/course-6.png HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:50-0500 418
+GET /tech-blog/assets/mit-confessions-bot/seals.png HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:50-0500 427
+GET /tech-blog/assets/mit-confessions-bot/model-training.png HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:50-0500 338
+127.0.0.1: GET /tech-blog/assets/mit-confessions-bot/kevin-comment.png
+127.0.0.1: GET /tech-blog/assets/mit-confessions-bot/psa.png
+127.0.0.1: GET /tech-blog/assets/mit-confessions-bot/course-6.png
+127.0.0.1: GET /tech-blog/assets/mit-confessions-bot/seals.png
+127.0.0.1: GET /tech-blog/assets/mit-confessions-bot/model-training.png
+
+
+11/24/18.14:47:50-0500 424
+GET /tech-blog/assets/mit-confessions-bot/loss-epochs.png HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:50-0500 70
+127.0.0.1: GET /tech-blog/assets/mit-confessions-bot/loss-epochs.png
+
+
+11/24/18.14:47:50-0500 424
+GET /tech-blog/assets/mit-confessions-bot/paul-graham.png HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:50-0500 428
+GET /tech-blog/assets/mit-confessions-bot/selenium-python.png HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:50-0500 423
+GET /tech-blog/assets/mit-confessions-bot/trung-post.png HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:50-0500 213
+127.0.0.1: GET /tech-blog/assets/mit-confessions-bot/paul-graham.png
+127.0.0.1: GET /tech-blog/assets/mit-confessions-bot/selenium-python.png
+127.0.0.1: GET /tech-blog/assets/mit-confessions-bot/trung-post.png
+
+
+11/24/18.14:47:52-0500 353
+GET /mailing-list.html HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: */*
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:52-0500 35
+127.0.0.1: GET /mailing-list.html
+
+
+11/24/18.14:47:52-0500 371
+GET /css/mailing-list.css HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: text/css,*/*;q=0.1
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:52-0500 38
+127.0.0.1: GET /css/mailing-list.css
+
+
+11/24/18.14:47:52-0500 354
+GET /js/mailing-list.js HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: */*
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:52-0500 36
+127.0.0.1: GET /js/mailing-list.js
+
+
+11/24/18.14:47:52-0500 364
+GET /mailing-list/mar-4-2018.html HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: */*
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:52-0500 46
+127.0.0.1: GET /mailing-list/mar-4-2018.html
+
+
+11/24/18.14:47:52-0500 405
+GET /mailing-list/img/mar-4-2018-2.jpg HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:52-0500 405
+GET /mailing-list/img/mar-4-2018-1.jpg HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:52-0500 51
+127.0.0.1: GET /mailing-list/img/mar-4-2018-2.jpg
+
+
+11/24/18.14:47:52-0500 405
+GET /mailing-list/img/mar-4-2018-4.jpg HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:52-0500 405
+GET /mailing-list/img/mar-4-2018-3.jpg HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:52-0500 153
+127.0.0.1: GET /mailing-list/img/mar-4-2018-1.jpg
+127.0.0.1: GET /mailing-list/img/mar-4-2018-4.jpg
+127.0.0.1: GET /mailing-list/img/mar-4-2018-3.jpg
+
+
+11/24/18.14:47:52-0500 364
+GET /mailing-list/jan-9-2017.html HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: */*
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:52-0500 46
+127.0.0.1: GET /mailing-list/jan-9-2017.html
+
+
+11/24/18.14:47:52-0500 405
+GET /mailing-list/img/jan-9-2017-1.jpg HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: image/webp,image/apng,image/*,*/*;q=0.8
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:52-0500 51
+127.0.0.1: GET /mailing-list/img/jan-9-2017-1.jpg
+
+
+11/24/18.14:47:53-0500 364
+GET /mailing-list/mar-4-2018.html HTTP/1.1
+Host: localhost
+Connection: keep-alive
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36
+DNT: 1
+Accept: */*
+Referer: http://localhost/
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
+
+
+
+11/24/18.14:47:53-0500 46
+127.0.0.1: GET /mailing-list/mar-4-2018.html
+
+
+11/24/18.14:50:07-0500 808
+Starting...
+21 configuration options:
+	config-path: ..\config\
+	data-path: ..\data\
+	emilia-auth-pass: 2JRx8LW4beuEEgUw
+	http-404: http-404.html
+	http-cgi-scripts: http-cgi.ini
+	http-cgi-timeout: 0
+	http-content-type: http-content-type.ini
+	http-custom-headers: http-headers.ini
+	http-default-ctype: application/octet-stream
+	http-default-index: index.html
+	http-server-root: ..\root\
+	http-transfer-buffer: 65536
+	log-error: errors.log
+	log-log: log.log
+	log-memory: memory-leaks.log
+	log-path: ..\logs\
+	smtp-connect-timeout: 30000
+	smtp-domain: emilia-tan.com
+	smtp-transfer-buffer: 65536
+	smtp-users: mail-users.ini
+	update-server-port: 50368
+
+Command line arguments: 1
+
+emilia.exe
+
+HTTP server listening on port 80.
+SMTP server listening on port 25.
+Accepting commands...
+
+
+11/24/18.14:56:12-0500 808
+Starting...
+21 configuration options:
+	config-path: ..\config\
+	data-path: ..\data\
+	emilia-auth-pass: 2JRx8LW4beuEEgUw
+	http-404: http-404.html
+	http-cgi-scripts: http-cgi.ini
+	http-cgi-timeout: 0
+	http-content-type: http-content-type.ini
+	http-custom-headers: http-headers.ini
+	http-default-ctype: application/octet-stream
+	http-default-index: index.html
+	http-server-root: ..\root\
+	http-transfer-buffer: 65536
+	log-error: errors.log
+	log-log: log.log
+	log-memory: memory-leaks.log
+	log-path: ..\logs\
+	smtp-connect-timeout: 30000
+	smtp-domain: emilia-tan.com
+	smtp-transfer-buffer: 65536
+	smtp-users: mail-users.ini
+	update-server-port: 50368
+
+Command line arguments: 1
+
+emilia.exe
+
+HTTP server listening on port 80.
+SMTP server listening on port 25.
+Accepting commands...
+
+
+11/24/18.14:56:27-0500 808
+Starting...
+21 configuration options:
+	config-path: ..\config\
+	data-path: ..\data\
+	emilia-auth-pass: 2JRx8LW4beuEEgUw
+	http-404: http-404.html
+	http-cgi-scripts: http-cgi.ini
+	http-cgi-timeout: 0
+	http-content-type: http-content-type.ini
+	http-custom-headers: http-headers.ini
+	http-default-ctype: application/octet-stream
+	http-default-index: index.html
+	http-server-root: ..\root\
+	http-transfer-buffer: 65536
+	log-error: errors.log
+	log-log: log.log
+	log-memory: memory-leaks.log
+	log-path: ..\logs\
+	smtp-connect-timeout: 30000
+	smtp-domain: emilia-tan.com
+	smtp-transfer-buffer: 65536
+	smtp-users: mail-users.ini
+	update-server-port: 50368
+
+Command line arguments: 1
+
+emilia.exe
+
+HTTP server listening on port 80.
+SMTP server listening on port 25.
+Accepting commands...
+
+
+11/24/18.14:59:00-0500 808
+Starting...
+21 configuration options:
+	config-path: ..\config\
+	data-path: ..\data\
+	emilia-auth-pass: 2JRx8LW4beuEEgUw
+	http-404: http-404.html
+	http-cgi-scripts: http-cgi.ini
+	http-cgi-timeout: 0
+	http-content-type: http-content-type.ini
+	http-custom-headers: http-headers.ini
+	http-default-ctype: application/octet-stream
+	http-default-index: index.html
+	http-server-root: ..\root\
+	http-transfer-buffer: 65536
+	log-error: errors.log
+	log-log: log.log
+	log-memory: memory-leaks.log
+	log-path: ..\logs\
+	smtp-connect-timeout: 30000
+	smtp-domain: emilia-tan.com
+	smtp-transfer-buffer: 65536
+	smtp-users: mail-users.ini
+	update-server-port: 50368
+
+Command line arguments: 1
+
+emilia.exe
+
+HTTP server listening on port 80.
+SMTP server listening on port 25.
+Accepting commands...
+
+
+11/24/18.14:59:03-0500 15
+Command: help
+
+
+11/24/18.14:59:03-0500 55
+Available commands: exit, help
+Accepting commands...
+
+
+11/24/18.14:59:34-0500 808
+Starting...
+21 configuration options:
+	config-path: ..\config\
+	data-path: ..\data\
+	emilia-auth-pass: 2JRx8LW4beuEEgUw
+	http-404: http-404.html
+	http-cgi-scripts: http-cgi.ini
+	http-cgi-timeout: 0
+	http-content-type: http-content-type.ini
+	http-custom-headers: http-headers.ini
+	http-default-ctype: application/octet-stream
+	http-default-index: index.html
+	http-server-root: ..\root\
+	http-transfer-buffer: 65536
+	log-error: errors.log
+	log-log: log.log
+	log-memory: memory-leaks.log
+	log-path: ..\logs\
+	smtp-connect-timeout: 30000
+	smtp-domain: emilia-tan.com
+	smtp-transfer-buffer: 65536
+	smtp-users: mail-users.ini
+	update-server-port: 50368
+
+Command line arguments: 1
+
+emilia.exe
+
+HTTP server listening on port 80.
+SMTP server listening on port 25.
+Accepting commands...
+
+
+11/24/18.15:00:09-0500 808
+Starting...
+21 configuration options:
+	config-path: ..\config\
+	data-path: ..\data\
+	emilia-auth-pass: 2JRx8LW4beuEEgUw
+	http-404: http-404.html
+	http-cgi-scripts: http-cgi.ini
+	http-cgi-timeout: 0
+	http-content-type: http-content-type.ini
+	http-custom-headers: http-headers.ini
+	http-default-ctype: application/octet-stream
+	http-default-index: index.html
+	http-server-root: ..\root\
+	http-transfer-buffer: 65536
+	log-error: errors.log
+	log-log: log.log
+	log-memory: memory-leaks.log
+	log-path: ..\logs\
+	smtp-connect-timeout: 30000
+	smtp-domain: emilia-tan.com
+	smtp-transfer-buffer: 65536
+	smtp-users: mail-users.ini
+	update-server-port: 50368
+
+Command line arguments: 1
+
+emilia.exe
+
+HTTP server listening on port 80.
+SMTP server listening on port 25.
+Accepting commands...
+
+
+11/24/18.15:00:15-0500 808
+Starting...
+21 configuration options:
+	config-path: ..\config\
+	data-path: ..\data\
+	emilia-auth-pass: 2JRx8LW4beuEEgUw
+	http-404: http-404.html
+	http-cgi-scripts: http-cgi.ini
+	http-cgi-timeout: 0
+	http-content-type: http-content-type.ini
+	http-custom-headers: http-headers.ini
+	http-default-ctype: application/octet-stream
+	http-default-index: index.html
+	http-server-root: ..\root\
+	http-transfer-buffer: 65536
+	log-error: errors.log
+	log-log: log.log
+	log-memory: memory-leaks.log
+	log-path: ..\logs\
+	smtp-connect-timeout: 30000
+	smtp-domain: emilia-tan.com
+	smtp-transfer-buffer: 65536
+	smtp-users: mail-users.ini
+	update-server-port: 50368
+
+Command line arguments: 1
+
+emilia.exe
+
+HTTP server listening on port 80.
+SMTP server listening on port 25.
+Accepting commands...
+
+

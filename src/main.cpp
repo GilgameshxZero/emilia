@@ -1,7 +1,19 @@
 #include "main.h"
 
 int main(int argc, char* argv[]) {
-    int error = Emilia::start(argc, argv);
+    int error;
+
+    //if there's an exception, just restart the servers
+    while (true) {
+        try {
+            error = Emilia::start(argc, argv);
+            break;
+        } catch (const std::exception& e) {
+            std::cout << e.what() << std::endl;
+            std::cout << "Retrying..." << std::endl;
+        }
+    }
+
     std::cout << "start returned error code " << error << ".\r\n";
     fflush(stdout);
     return error;
@@ -36,25 +48,17 @@ int start(int argc, char* argv[]) {
     }
     Rain::tsCout("\r\n");
 
-    //server setups
-    /*DWORD updateServerPort = Rain::strToT<DWORD>(config["update-server-port"]);
-
-		std::map<DWORD, std::pair<ConnectionCallerParam, Rain::ServerManager>> servers;
-		servers.insert(std::make_pair(80, std::make_pair(ConnectionCallerParam(), Rain::ServerManager())));
-		servers.insert(std::make_pair(25, std::make_pair(ConnectionCallerParam(), Rain::ServerManager())));
-		servers.insert(std::make_pair(updateServerPort, std::make_pair(ConnectionCallerParam(), Rain::ServerManager())));*/
-
     //http server setup
-    HTTPServer::ConnectionCallerParam ccParam;
-    ccParam.config = &config;
-    ccParam.logger = &logger;
-    ccParam.connectedClients = 0;
+    HTTPServer::ConnectionCallerParam httpCCP;
+    httpCCP.config = &config;
+    httpCCP.logger = &logger;
+    httpCCP.connectedClients = 0;
 
-    Rain::ServerManager sm;
-    sm.setEventHandlers(HTTPServer::onConnect, HTTPServer::onMessage, HTTPServer::onDisconnect, &ccParam);
-    sm.setRecvBufLen(Rain::strToT<std::size_t>(config["http-transfer-buffer"]));
-    if (!sm.setServerListen(80, 80)) {
-        Rain::tsCout("Server listening on port ", sm.getListeningPort(), ".\r\n");
+    Rain::ServerManager httpSM;
+    httpSM.setEventHandlers(HTTPServer::onConnect, HTTPServer::onMessage, HTTPServer::onDisconnect, &httpCCP);
+    httpSM.setRecvBufLen(Rain::strToT<std::size_t>(config["http-transfer-buffer"]));
+    if (!httpSM.setServerListen(80, 80)) {
+        Rain::tsCout("HTTP server listening on port ", httpSM.getListeningPort(), ".\r\n");
     } else {
         Rain::tsCout("Fatal error: could not setup HTTP server listening.\r\n");
         fflush(stdout);
@@ -65,6 +69,31 @@ int start(int argc, char* argv[]) {
             CloseHandle(hFMemLeak);
         return error;
     }
+
+    //smtp server setup
+    HTTPServer::ConnectionCallerParam smtpCCP;
+    smtpCCP.config = &config;
+    smtpCCP.logger = &logger;
+    smtpCCP.connectedClients = 0;
+
+    Rain::ServerManager smtpSM;
+    smtpSM.setEventHandlers(SMTPServer::onConnect, SMTPServer::onMessage, SMTPServer::onDisconnect, &smtpCCP);
+    smtpSM.setRecvBufLen(Rain::strToT<std::size_t>(config["smtp-transfer-buffer"]));
+    if (!smtpSM.setServerListen(25, 25)) {
+        Rain::tsCout("SMTP server listening on port ", smtpSM.getListeningPort(), ".\r\n");
+    } else {
+        Rain::tsCout("Fatal error: could not setup SMTP server listening.\r\n");
+        fflush(stdout);
+        DWORD error = GetLastError();
+        Rain::reportError(error, "Fatal error: could not setup SMTP server listening.");
+        WSACleanup();
+        if (hFMemLeak != NULL)
+            CloseHandle(hFMemLeak);
+        return error;
+    }
+
+    //update server setup
+    DWORD updateServerPort = Rain::strToT<DWORD>(config["update-server-port"]);
 
     //process commands
     static std::map<std::string, CommandMethodHandler> commandHandlers{
