@@ -15,6 +15,7 @@ Implements class ClientSocketManager, which maintains a socket connection to an 
 
 #include "utility-logging.h"
 
+#include <algorithm>
 #include <string>
 #include <queue>
 #include <vector>

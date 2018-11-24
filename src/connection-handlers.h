@@ -1,10 +1,11 @@
 #pragma once
-#pragma comment(lib,"user32.lib") 
+#pragma comment(lib, "user32.lib") 
 
 #include "rain-aeternum/rain-libraries.h"
 
 #include "build-id.h"
 
+#include <algorithm>
 #include <map>
 #include <set>
 

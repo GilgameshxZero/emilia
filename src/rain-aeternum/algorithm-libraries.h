@@ -4,6 +4,7 @@ Standard
 
 #pragma once
 
+#include <algorithm>
 #include <string>
 
 namespace Rain {
