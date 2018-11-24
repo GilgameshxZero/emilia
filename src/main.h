@@ -4,6 +4,7 @@
 
 #include "command-handlers.h"
 #include "http-server.h"
+#include "smtp-server.h"
 
 int main(int argc, char *argv[]);
 

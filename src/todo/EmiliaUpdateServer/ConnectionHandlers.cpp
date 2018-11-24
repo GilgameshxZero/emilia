@@ -114,7 +114,7 @@ namespace Monochrome3 {
 				Rain::sendBlockMessage(*ssmdhParam.ssm, "authenticate auth-done");
 				Rain::tsCout("Info: Authenticated already.\r\n");
 				fflush(stdout);
-			} else if (ccParam.config->at("client-auth-pass") != cdParam.request) {
+			} else if (ccParam.config->at("emilia-auth-pass") != cdParam.request) {
 				Rain::sendBlockMessage(*ssmdhParam.ssm, "authenticate fail");
 				Rain::tsCout("Failure: Authenticate fail.\r\n");
 				fflush(stdout);

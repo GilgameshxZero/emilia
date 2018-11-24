@@ -306,7 +306,7 @@ namespace Monochrome3 {
 				chParam.waitingRequests = 1;
 				ResetEvent(chParam.doneWaitingEvent);
 				chParam.lastSuccess = -1;
-				Rain::sendBlockMessage(csm, "authenticate " + (*cmhParam.config)["client-auth-pass"]);
+				Rain::sendBlockMessage(csm, "authenticate " + (*cmhParam.config)["emilia-auth-pass"]);
 				WaitForSingleObject(chParam.doneWaitingEvent, 10000);
 				if (chParam.lastSuccess) {
 					if (csm.getConnectedPort() == highPort) {
