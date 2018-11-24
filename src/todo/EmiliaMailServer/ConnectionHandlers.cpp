@@ -112,7 +112,7 @@ namespace Monochrome3 {
 				fflush(stdout);
 
 				//refresh userdata
-				std::map<std::string, std::string> users = Rain::readParameterFile((*ccParam.config)["dyn-path"] + (*ccParam.config)["dyn-users"]);
+				std::map<std::string, std::string> users = Rain::readParameterFile((*ccParam.config)["data-path"] + (*ccParam.config)["dyn-users"]);
 				for (auto it : users) {
 					ccParam.b64Users[Rain::strEncodeB64(it.first)] = Rain::strEncodeB64(it.second);
 				}
@@ -301,7 +301,7 @@ namespace Monochrome3 {
 			Rain::strTrimWhite(&cdParam.request);
 
 			//refresh userdata
-			std::map<std::string, std::string> users = Rain::readParameterFile((*ccParam.config)["dyn-path"] + (*ccParam.config)["dyn-users"]);
+			std::map<std::string, std::string> users = Rain::readParameterFile((*ccParam.config)["data-path"] + (*ccParam.config)["dyn-users"]);
 			for (auto it : users) {
 				ccParam.b64Users[Rain::strEncodeB64(it.first)] = Rain::strEncodeB64(it.second);
 			}
