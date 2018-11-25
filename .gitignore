@@ -9,3 +9,6 @@
 /logs
 
 rc/rc.aps
+
+project/.vs
+project/emilia.vcxproj.user
