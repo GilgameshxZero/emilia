@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{28028940-EC89-47C0-A4B5-956F1FEE006F}</ProjectGuid>
+    <RootNamespace>emilia</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\build-id.h" />
+    <ClInclude Include="..\src\command-handlers.h" />
+    <ClInclude Include="..\src\http-server.h" />
+    <ClInclude Include="..\src\main.h" />
+    <ClInclude Include="..\src\rain-aeternum\algorithm-libraries.h" />
+    <ClInclude Include="..\src\rain-aeternum\gdi-plus-include.h" />
+    <ClInclude Include="..\src\rain-aeternum\network-base.h" />
+    <ClInclude Include="..\src\rain-aeternum\network-client-manager.h" />
+    <ClInclude Include="..\src\rain-aeternum\network-libraries.h" />
+    <ClInclude Include="..\src\rain-aeternum\network-recv-thread.h" />
+    <ClInclude Include="..\src\rain-aeternum\network-server-manager.h" />
+    <ClInclude Include="..\src\rain-aeternum\network-smtp.h" />
+    <ClInclude Include="..\src\rain-aeternum\network-socket-manager.h" />
+    <ClInclude Include="..\src\rain-aeternum\network-utility.h" />
+    <ClInclude Include="..\src\rain-aeternum\network-wsa-include.h" />
+    <ClInclude Include="..\src\rain-aeternum\rain-libraries.h" />
+    <ClInclude Include="..\src\rain-aeternum\rain-window.h" />
+    <ClInclude Include="..\src\rain-aeternum\utility-error.h" />
+    <ClInclude Include="..\src\rain-aeternum\utility-filesystem.h" />
+    <ClInclude Include="..\src\rain-aeternum\utility-libraries.h" />
+    <ClInclude Include="..\src\rain-aeternum\utility-logging.h" />
+    <ClInclude Include="..\src\rain-aeternum\utility-string.h" />
+    <ClInclude Include="..\src\rain-aeternum\utility-time.h" />
+    <ClInclude Include="..\src\rain-aeternum\windows-lam-include.h" />
+    <ClInclude Include="..\src\smtp-external.h" />
+    <ClInclude Include="..\src\smtp-internal.h" />
+    <ClInclude Include="..\src\smtp-server.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\command-handlers.cpp" />
+    <ClCompile Include="..\src\http-server.cpp" />
+    <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\rain-aeternum\algorithm-libraries.cpp" />
+    <ClCompile Include="..\src\rain-aeternum\gdi-plus-include.cpp" />
+    <ClCompile Include="..\src\rain-aeternum\network-base.cpp" />
+    <ClCompile Include="..\src\rain-aeternum\network-client-manager.cpp" />
+    <ClCompile Include="..\src\rain-aeternum\network-libraries.cpp" />
+    <ClCompile Include="..\src\rain-aeternum\network-recv-thread.cpp" />
+    <ClCompile Include="..\src\rain-aeternum\network-server-manager.cpp" />
+    <ClCompile Include="..\src\rain-aeternum\network-smtp.cpp" />
+    <ClCompile Include="..\src\rain-aeternum\network-socket-manager.cpp" />
+    <ClCompile Include="..\src\rain-aeternum\network-utility.cpp" />
+    <ClCompile Include="..\src\rain-aeternum\network-wsa-include.cpp" />
+    <ClCompile Include="..\src\rain-aeternum\rain-libraries.cpp" />
+    <ClCompile Include="..\src\rain-aeternum\rain-window.cpp" />
+    <ClCompile Include="..\src\rain-aeternum\utility-error.cpp" />
+    <ClCompile Include="..\src\rain-aeternum\utility-filesystem.cpp" />
+    <ClCompile Include="..\src\rain-aeternum\utility-libraries.cpp" />
+    <ClCompile Include="..\src\rain-aeternum\utility-logging.cpp" />
+    <ClCompile Include="..\src\rain-aeternum\utility-string.cpp" />
+    <ClCompile Include="..\src\rain-aeternum\utility-time.cpp" />
+    <ClCompile Include="..\src\rain-aeternum\windows-lam-include.cpp" />
+    <ClCompile Include="..\src\smtp-external.cpp" />
+    <ClCompile Include="..\src\smtp-internal.cpp" />
+    <ClCompile Include="..\src\smtp-server.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\build\build-debug.bat" />
+    <None Include="..\build\build-id-inc.bat" />
+    <None Include="..\build\build.bat" />
+    <None Include="..\build\make.bat" />
+    <None Include="..\build\setup-env.bat" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\rc\icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\rc\rc.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
