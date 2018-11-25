@@ -5,7 +5,7 @@ namespace Rain {
 		static wchar_t *buffer;
 		static int bytes;
 		static std::wstring ret;
-		
+
 		buffer = new wchar_t[s.length()];
 		bytes = MultiByteToWideChar(CP_UTF8, 0, s.c_str(), static_cast<int>(s.length()), buffer, static_cast<int>(s.length()));
 		ret = std::wstring(buffer, bytes);

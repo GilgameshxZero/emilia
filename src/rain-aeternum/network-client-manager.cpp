@@ -162,7 +162,7 @@ namespace Rain {
 		csm.portAddrs.resize(csm.highPort - csm.lowPort + 1, NULL);
 
 		Rain::createSocket(csm.socket);
-		
+
 		while (csm.socketStatus == csm.STATUS_CONNECTING) {
 			Sleep(csm.msReconnectWait);
 			if (csm.msReconnectWait < csm.msReconnectWaitMax)
@@ -233,7 +233,7 @@ namespace Rain {
 	}
 	int ClientSocketManager::onConnect(void *param) {
 		Rain::ClientSocketManager &csm = *reinterpret_cast<Rain::ClientSocketManager *>(param);
-		
+
 		//reset an event for listeners of the end of onDisconnect
 		ResetEvent(csm.recvExitComplete);
 
