@@ -13,6 +13,18 @@
     <Filter Include="rain-aeternum">
       <UniqueIdentifier>{b30b134a-d98e-4e14-8747-ffb825b87052}</UniqueIdentifier>
     </Filter>
+    <Filter Include="config">
+      <UniqueIdentifier>{ab1b3081-c7c7-44a1-8d9f-767075bd48ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="logs">
+      <UniqueIdentifier>{b7abf1b1-d54b-4abe-8613-659d043d8d40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="prod">
+      <UniqueIdentifier>{c51ff2e9-c1a2-42d5-bb27-941a06f871f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="prod\config">
+      <UniqueIdentifier>{cf5513b5-5592-484a-8044-05f22d4d748b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\smtp-server.h">
@@ -96,6 +108,9 @@
     <ClInclude Include="..\src\rain-aeternum\windows-lam-include.h">
       <Filter>rain-aeternum</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\update-server.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\command-handlers.cpp">
@@ -176,6 +191,9 @@
     <ClCompile Include="..\src\rain-aeternum\windows-lam-include.cpp">
       <Filter>rain-aeternum</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\update-server.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\build\build.bat">
@@ -193,6 +211,42 @@
     <None Include="..\build\setup-env.bat">
       <Filter>build</Filter>
     </None>
+    <None Include="..\config\config.ini">
+      <Filter>config</Filter>
+    </None>
+    <None Include="..\config\http-404.html">
+      <Filter>config</Filter>
+    </None>
+    <None Include="..\config\http-cgi.ini">
+      <Filter>config</Filter>
+    </None>
+    <None Include="..\config\http-content-type.ini">
+      <Filter>config</Filter>
+    </None>
+    <None Include="..\config\http-headers.ini">
+      <Filter>config</Filter>
+    </None>
+    <None Include="..\config\update-config.ini">
+      <Filter>config</Filter>
+    </None>
+    <None Include="..\config\update-server-config.ini">
+      <Filter>config</Filter>
+    </None>
+    <None Include="..\prod\config\config.ini">
+      <Filter>prod\config</Filter>
+    </None>
+    <None Include="..\prod\config\http-404.html">
+      <Filter>prod\config</Filter>
+    </None>
+    <None Include="..\prod\config\http-cgi.ini">
+      <Filter>prod\config</Filter>
+    </None>
+    <None Include="..\prod\config\http-content-type.ini">
+      <Filter>prod\config</Filter>
+    </None>
+    <None Include="..\prod\config\http-headers.ini">
+      <Filter>prod\config</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\rc\icon.ico">
@@ -203,5 +257,16 @@
     <ResourceCompile Include="..\rc\rc.rc">
       <Filter>rc</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\logs\errors.log">
+      <Filter>logs</Filter>
+    </Text>
+    <Text Include="..\logs\log.log">
+      <Filter>logs</Filter>
+    </Text>
+    <Text Include="..\logs\memory-leaks.log">
+      <Filter>logs</Filter>
+    </Text>
   </ItemGroup>
 </Project>

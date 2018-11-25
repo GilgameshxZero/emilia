@@ -7,7 +7,7 @@ namespace Rain {
 			stlCLRF = message->rfind("\r\n", lastCLRF - 1);
 		if (lastCLRF == std::string::npos)
 			return -1;
-		std::string lastLine = message->substr((stlCLRF == std::string::npos ? 0 : stlCLRF) , lastCLRF);
+		std::string lastLine = message->substr((stlCLRF == std::string::npos ? 0 : stlCLRF), lastCLRF);
 
 		//status code is anything up to the first space
 		std::size_t firstSpace = lastLine.find(" ");

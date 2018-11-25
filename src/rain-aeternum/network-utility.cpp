@@ -21,7 +21,7 @@ namespace Rain {
 
 		return std::string(clhname);
 	}
-	
+
 	void sendBlockMessage(Rain::SocketManager &manager, std::string message) {
 		Rain::sendBlockMessage(manager, &message);
 	}

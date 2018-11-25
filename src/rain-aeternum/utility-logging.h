@@ -88,7 +88,7 @@ namespace Rain {
 		//terminates when rd_pipe is closed
 		static DWORD WINAPI stdSrcRedirectThread(LPVOID lpParameter);
 	};
-	
+
 	//returns a shared mutex which locks cout for functions later
 	std::mutex &getCoutMutex();
 

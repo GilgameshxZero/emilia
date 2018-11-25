@@ -42,9 +42,9 @@ namespace Rain {
 
 		//ServerSocketManager must be initialized with a ServerManager parent and default event handlers set by the ServerManager's setEventHandlers
 		ServerSocketManager(SOCKET *cSocket,
-							RecvHandlerParam::EventHandler onConnect, 
-							RecvHandlerParam::EventHandler onMessage, 
-							RecvHandlerParam::EventHandler onDisconnect, 
+							RecvHandlerParam::EventHandler onConnect,
+							RecvHandlerParam::EventHandler onMessage,
+							RecvHandlerParam::EventHandler onDisconnect,
 							void *funcParam);
 		~ServerSocketManager();
 
