@@ -57,7 +57,7 @@ namespace Rain {
 
 		//set sendRawMessage as blocking or non-blocking
 		bool setSendRawMessageBlocking(bool blocking);
-		
+
 		//-1: socket is disconnected; 0: socket is connected; 1: socket is trying to connect but currently unavailable
 		int getSocketStatus();
 
@@ -78,8 +78,8 @@ namespace Rain {
 
 		//set event handlers in addition to those of class
 		//pass NULL to any parameter to remove the custom handler
-		void setEventHandlers(RecvHandlerParam::EventHandler onConnect, 
-							  RecvHandlerParam::EventHandler onMessage, 
+		void setEventHandlers(RecvHandlerParam::EventHandler onConnect,
+							  RecvHandlerParam::EventHandler onMessage,
 							  RecvHandlerParam::EventHandler onDisconnect,
 							  void *funcParam);
 

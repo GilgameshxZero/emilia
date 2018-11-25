@@ -87,7 +87,7 @@ namespace Rain {
 				_dup2(itMap->second->oshRepPipeWr, _fileno(stdout));
 			}
 		}
-		for (std::string file: this->fileDst) {
+		for (std::string file : this->fileDst) {
 			Rain::printToFile(file, &header, true);
 			Rain::printToFile(file, s, true);
 			Rain::printToFile(file, "\r\n\r\n", true);

@@ -4,7 +4,7 @@ namespace Rain {
 	unsigned long long fastModExp(unsigned long long base, unsigned long long exp, unsigned long long mod) {
 		if (exp == 0)
 			return 1;
-		
+
 		unsigned long long halfExp = fastModExp(base, exp / 2, mod);
 		return (((halfExp * halfExp) % mod) * (exp % 2 ? base : 1)) % mod;
 	}

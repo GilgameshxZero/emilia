@@ -66,7 +66,7 @@ namespace Rain {
 
 	//transform b16 integer to b10 integer
 	int b16ToB10(char hex);
-	
+
 	//convert two hex digits to a char and back
 	char hexToChr(std::pair<char, char> hex);
 	std::pair<char, char> chrToHex(char c);

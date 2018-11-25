@@ -1,12 +1,13 @@
 #pragma once
-#include "../../Common/RainAeternum/RainLibraries.h"
+
+#include "rain-aeternum/rain-libraries.h"
 
 #include <map>
 #include <set>
 #include <shellapi.h>
 
-namespace Monochrome3 {
-	namespace EmiliaUpdateServer {
+namespace Emilia {
+	namespace UpdateServer {
 		typedef int(*RequestMethodHandler)(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &);
 
 		struct ServerStatus {

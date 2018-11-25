@@ -1,7 +1,7 @@
-#include "ConnectionHandlers.h"
+#include "update-server.h"
 
-namespace Monochrome3 {
-	namespace EmiliaUpdateServer {
+namespace Emilia {
+	namespace UpdateServer {
 		static const std::string headerDelim = "\r\n\r\n";
 
 		int onConnect(void *funcParam) {
@@ -172,7 +172,7 @@ namespace Monochrome3 {
 				std::string crhelperAbspath = Rain::pathToAbsolute((*ccParam.config)["crhelper"]),
 					crhWorkingDir = Rain::getPathDir(crhelperAbspath),
 					//"source" "destination" "additional commands to pass to restart"
-					crhCmdLine = "\"" + thisPath + (*ccParam.config)["upload-tmp-app"] +
+					crhCmdLine = "\"" + thisPath + (*ccParam.config)["update-tmp-ext"] +
 					"\" \"" + thisPath + "\" " +
 					"prod-upload-success";
 				crhWorkingDir = crhWorkingDir.substr(0, crhWorkingDir.length() - 1);
@@ -250,7 +250,7 @@ namespace Monochrome3 {
 								Rain::printToFile(filePath,
 												  reqAcc.substr(0, curFileReqBlock), true);
 							} else {
-								Rain::printToFile(filePath + (*ccParam.config)["upload-tmp-app"],
+								Rain::printToFile(filePath + (*ccParam.config)["update-tmp-ext"],
 												  reqAcc.substr(0, curFileReqBlock), true);
 								delayExeWrite = true;
 							}

@@ -231,6 +231,7 @@
     <ClInclude Include="..\src\smtp-external.h" />
     <ClInclude Include="..\src\smtp-internal.h" />
     <ClInclude Include="..\src\smtp-server.h" />
+    <ClInclude Include="..\src\update-server.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\command-handlers.cpp" />
@@ -259,6 +260,7 @@
     <ClCompile Include="..\src\smtp-external.cpp" />
     <ClCompile Include="..\src\smtp-internal.cpp" />
     <ClCompile Include="..\src\smtp-server.cpp" />
+    <ClCompile Include="..\src\update-server.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\build\build-debug.bat" />
@@ -266,12 +268,29 @@
     <None Include="..\build\build.bat" />
     <None Include="..\build\make.bat" />
     <None Include="..\build\setup-env.bat" />
+    <None Include="..\config\config.ini" />
+    <None Include="..\config\http-404.html" />
+    <None Include="..\config\http-cgi.ini" />
+    <None Include="..\config\http-content-type.ini" />
+    <None Include="..\config\http-headers.ini" />
+    <None Include="..\config\update-config.ini" />
+    <None Include="..\config\update-server-config.ini" />
+    <None Include="..\prod\config\config.ini" />
+    <None Include="..\prod\config\http-404.html" />
+    <None Include="..\prod\config\http-cgi.ini" />
+    <None Include="..\prod\config\http-content-type.ini" />
+    <None Include="..\prod\config\http-headers.ini" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\rc\icon.ico" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\rc\rc.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\logs\errors.log" />
+    <Text Include="..\logs\log.log" />
+    <Text Include="..\logs\memory-leaks.log" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

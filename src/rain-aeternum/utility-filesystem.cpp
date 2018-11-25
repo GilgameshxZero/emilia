@@ -200,12 +200,12 @@ namespace Rain {
 
 	BY_HANDLE_FILE_INFORMATION getFileInformation(std::string path) {
 		HANDLE handle = CreateFileW(pathToLongPath(pathToAbsolute(path)).c_str(),
-								   0,
-								   FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-								   NULL,
-								   OPEN_EXISTING,
-								   FILE_ATTRIBUTE_NORMAL,
-								   NULL);
+									0,
+									FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+									NULL,
+									OPEN_EXISTING,
+									FILE_ATTRIBUTE_NORMAL,
+									NULL);
 		BY_HANDLE_FILE_INFORMATION info;
 		GetFileInformationByHandle(handle, &info);
 		return info;

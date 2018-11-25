@@ -44,7 +44,7 @@ namespace Monochrome3 {
 					Rain::tsCout("IMPORTANT: 'prod-upload' CRH operation completed successfully.\r\n");
 
 					//remove tmp file of the prod-upload operation
-					std::string filePath = Rain::pathToAbsolute(Rain::getExePath() + config["upload-tmp-app"]);
+					std::string filePath = Rain::pathToAbsolute(Rain::getExePath() + config["update-tmp-ext"]);
 					DeleteFile(filePath.c_str());
 					Rain::tsCout("Temporary file for 'prod-upload' deleted.\r\n\r\n");
 				}

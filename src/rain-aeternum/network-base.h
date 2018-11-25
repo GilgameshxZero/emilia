@@ -21,7 +21,7 @@ namespace Rain {
 
 	//target returned needs to be freed
 	//if no error, returns 0
-	int getTargetAddr(struct addrinfo **target,  std::string host, std::string port,
+	int getTargetAddr(struct addrinfo **target, std::string host, std::string port,
 					  int family = AF_UNSPEC, int sockType = SOCK_STREAM, int type = IPPROTO_TCP);
 
 	//same thing as getTargetAddr, but with different default arguments, to be used for servers trying to listen on a port
