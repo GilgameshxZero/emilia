@@ -71,7 +71,7 @@ int start(int argc, char* argv[]) {
     }
 
     //smtp server setup
-    HTTPServer::ConnectionCallerParam smtpCCP;
+    SMTPServer::ConnectionCallerParam smtpCCP;
     smtpCCP.config = &config;
     smtpCCP.logger = &logger;
     smtpCCP.connectedClients = 0;
