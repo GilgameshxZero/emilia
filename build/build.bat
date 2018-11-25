@@ -1,6 +1,7 @@
-cd src
 call "build-id-inc.bat"
+cd ../rc
 call rc /Fo"..\obj\rc.res" rc.rc
+cd ../src
 call cl ^
 /EHsc ^
 /Fo"..\obj\\" ^
@@ -11,11 +12,8 @@ call cl ^
 /Ox ^
 /MT ^
 /MP ^
-/Zi ^
-/Z7 ^
-/Zl ^
 /incremental ^
 ..\obj\rc.res ^
 .\*.cpp ^
 .\rain-aeternum\*.cpp
-cd ..
+cd ../build
