@@ -2671,3 +2671,207 @@ SMTP server listening on port 25.
 Accepting commands...
 
 
+11/24/18.20:54:29-0500 808
+Starting...
+21 configuration options:
+	config-path: ..\config\
+	data-path: ..\data\
+	emilia-auth-pass: 2JRx8LW4beuEEgUw
+	http-404: http-404.html
+	http-cgi-scripts: http-cgi.ini
+	http-cgi-timeout: 0
+	http-content-type: http-content-type.ini
+	http-custom-headers: http-headers.ini
+	http-default-ctype: application/octet-stream
+	http-default-index: index.html
+	http-server-root: ..\root\
+	http-transfer-buffer: 65536
+	log-error: errors.log
+	log-log: log.log
+	log-memory: memory-leaks.log
+	log-path: ..\logs\
+	smtp-connect-timeout: 30000
+	smtp-domain: emilia-tan.com
+	smtp-transfer-buffer: 65536
+	smtp-users: mail-users.ini
+	update-server-port: 50368
+
+Command line arguments: 1
+
+emilia.exe
+
+HTTP server listening on port 80.
+SMTP server listening on port 25.
+Accepting commands...
+
+
+11/24/18.20:55:24-0500 808
+Starting...
+21 configuration options:
+	config-path: ..\config\
+	data-path: ..\data\
+	emilia-auth-pass: 2JRx8LW4beuEEgUw
+	http-404: http-404.html
+	http-cgi-scripts: http-cgi.ini
+	http-cgi-timeout: 0
+	http-content-type: http-content-type.ini
+	http-custom-headers: http-headers.ini
+	http-default-ctype: application/octet-stream
+	http-default-index: index.html
+	http-server-root: ..\root\
+	http-transfer-buffer: 65536
+	log-error: errors.log
+	log-log: log.log
+	log-memory: memory-leaks.log
+	log-path: ..\logs\
+	smtp-connect-timeout: 30000
+	smtp-domain: emilia-tan.com
+	smtp-transfer-buffer: 65536
+	smtp-users: mail-users.ini
+	update-server-port: 50368
+
+Command line arguments: 1
+
+emilia.exe
+
+HTTP server listening on port 80.
+SMTP server listening on port 25.
+Accepting commands...
+
+
+11/24/18.20:57:47-0500 808
+Starting...
+21 configuration options:
+	config-path: ..\config\
+	data-path: ..\data\
+	emilia-auth-pass: 2JRx8LW4beuEEgUw
+	http-404: http-404.html
+	http-cgi-scripts: http-cgi.ini
+	http-cgi-timeout: 0
+	http-content-type: http-content-type.ini
+	http-custom-headers: http-headers.ini
+	http-default-ctype: application/octet-stream
+	http-default-index: index.html
+	http-server-root: ..\root\
+	http-transfer-buffer: 65536
+	log-error: errors.log
+	log-log: log.log
+	log-memory: memory-leaks.log
+	log-path: ..\logs\
+	smtp-connect-timeout: 30000
+	smtp-domain: emilia-tan.com
+	smtp-transfer-buffer: 65536
+	smtp-users: mail-users.ini
+	update-server-port: 50368
+
+Command line arguments: 1
+
+emilia.exe
+
+HTTP server listening on port 80.
+SMTP server listening on port 25.
+Accepting commands...
+
+
+11/24/18.20:58:31-0500 808
+Starting...
+21 configuration options:
+	config-path: ..\config\
+	data-path: ..\data\
+	emilia-auth-pass: 2JRx8LW4beuEEgUw
+	http-404: http-404.html
+	http-cgi-scripts: http-cgi.ini
+	http-cgi-timeout: 0
+	http-content-type: http-content-type.ini
+	http-custom-headers: http-headers.ini
+	http-default-ctype: application/octet-stream
+	http-default-index: index.html
+	http-server-root: ..\root\
+	http-transfer-buffer: 65536
+	log-error: errors.log
+	log-log: log.log
+	log-memory: memory-leaks.log
+	log-path: ..\logs\
+	smtp-connect-timeout: 30000
+	smtp-domain: emilia-tan.com
+	smtp-transfer-buffer: 65536
+	smtp-users: mail-users.ini
+	update-server-port: 50368
+
+Command line arguments: 1
+
+emilia.exe
+
+HTTP server listening on port 80.
+SMTP server listening on port 25.
+Accepting commands...
+
+
+11/24/18.21:28:34-0500 808
+Starting...
+21 configuration options:
+	config-path: ..\config\
+	data-path: ..\data\
+	emilia-auth-pass: 2JRx8LW4beuEEgUw
+	http-404: http-404.html
+	http-cgi-scripts: http-cgi.ini
+	http-cgi-timeout: 0
+	http-content-type: http-content-type.ini
+	http-custom-headers: http-headers.ini
+	http-default-ctype: application/octet-stream
+	http-default-index: index.html
+	http-server-root: ..\root\
+	http-transfer-buffer: 65536
+	log-error: errors.log
+	log-log: log.log
+	log-memory: memory-leaks.log
+	log-path: ..\logs\
+	smtp-connect-timeout: 30000
+	smtp-domain: emilia-tan.com
+	smtp-transfer-buffer: 65536
+	smtp-users: mail-users.ini
+	update-server-port: 50368
+
+Command line arguments: 1
+
+emilia.exe
+
+HTTP server listening on port 80.
+SMTP server listening on port 25.
+Accepting commands...
+
+
+11/24/18.21:35:19-0500 808
+Starting...
+21 configuration options:
+	config-path: ..\config\
+	data-path: ..\data\
+	emilia-auth-pass: 2JRx8LW4beuEEgUw
+	http-404: http-404.html
+	http-cgi-scripts: http-cgi.ini
+	http-cgi-timeout: 0
+	http-content-type: http-content-type.ini
+	http-custom-headers: http-headers.ini
+	http-default-ctype: application/octet-stream
+	http-default-index: index.html
+	http-server-root: ..\root\
+	http-transfer-buffer: 65536
+	log-error: errors.log
+	log-log: log.log
+	log-memory: memory-leaks.log
+	log-path: ..\logs\
+	smtp-connect-timeout: 30000
+	smtp-domain: emilia-tan.com
+	smtp-transfer-buffer: 65536
+	smtp-users: mail-users.ini
+	update-server-port: 50368
+
+Command line arguments: 1
+
+emilia.exe
+
+HTTP server listening on port 80.
+SMTP server listening on port 25.
+Accepting commands...
+
+
