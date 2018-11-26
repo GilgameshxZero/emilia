@@ -1,11 +1,12 @@
 #pragma once
-#include "../../Common/RainAeternum/RainLibraries.h"
+
+#include "rain-aeternum/rain-libraries.h"
 
 #include <map>
 #include <set>
 
-namespace Monochrome3 {
-	namespace EmiliaUpdateClient {
+namespace Emilia {
+	namespace UpdateClient {
 		typedef int(*RequestMethodHandler)(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &);
 
 		struct ConnectionHandlerParam {
