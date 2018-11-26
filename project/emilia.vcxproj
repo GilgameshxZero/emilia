@@ -283,6 +283,8 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\rc\icon.ico" />
+    <Image Include="..\rc\icon.png" />
+    <Image Include="..\rc\orig.png" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\rc\rc.rc" />

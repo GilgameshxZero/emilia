@@ -117,7 +117,7 @@ namespace Emilia {
 		updSM.setEventHandlers(UpdateServer::onConnect, UpdateServer::onMessage, UpdateServer::onDisconnect, &updCCP);
 		updSM.setRecvBufLen(Rain::strToT<std::size_t>(config["update-transfer-buffer"]));
 		if (!updSM.setServerListen(updateServerPort, updateServerPort)) {
-			Rain::tsCout("Update erver listening on port ", updSM.getListeningPort(), ".\r\n");
+			Rain::tsCout("Update server listening on port ", updSM.getListeningPort(), ".\r\n");
 		} else {
 			Rain::tsCout("Fatal error: could not setup update server listening.\r\n");
 			DWORD error = GetLastError();
