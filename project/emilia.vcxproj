@@ -231,6 +231,7 @@
     <ClInclude Include="..\src\smtp-external.h" />
     <ClInclude Include="..\src\smtp-internal.h" />
     <ClInclude Include="..\src\smtp-server.h" />
+    <ClInclude Include="..\src\update-client.h" />
     <ClInclude Include="..\src\update-server.h" />
   </ItemGroup>
   <ItemGroup>
@@ -260,6 +261,7 @@
     <ClCompile Include="..\src\smtp-external.cpp" />
     <ClCompile Include="..\src\smtp-internal.cpp" />
     <ClCompile Include="..\src\smtp-server.cpp" />
+    <ClCompile Include="..\src\update-client.cpp" />
     <ClCompile Include="..\src\update-server.cpp" />
   </ItemGroup>
   <ItemGroup>
