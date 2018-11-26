@@ -232,12 +232,6 @@
     <None Include="..\config\http-headers.ini">
       <Filter>config</Filter>
     </None>
-    <None Include="..\config\update-config.ini">
-      <Filter>config</Filter>
-    </None>
-    <None Include="..\config\update-server-config.ini">
-      <Filter>config</Filter>
-    </None>
     <None Include="..\prod\config\config.ini">
       <Filter>prod\config</Filter>
     </None>
