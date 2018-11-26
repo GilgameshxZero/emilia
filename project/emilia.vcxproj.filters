@@ -111,6 +111,9 @@
     <ClInclude Include="..\src\update-server.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\update-client.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\command-handlers.cpp">
@@ -192,6 +195,9 @@
       <Filter>rain-aeternum</Filter>
     </ClCompile>
     <ClCompile Include="..\src\update-server.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\update-client.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

@@ -44,6 +44,23 @@ namespace Emilia {
 		}
 		Rain::tsCout("\r\n");
 
+		//setup command handlers
+		static std::map<std::string, CommandMethodHandler> commandHandlers{
+			{"exit", CHExit},
+			{"help", CHHelp},
+			{"stage-dev", CHStageDev},
+			{"deploy-staging", CHDeployStaging},
+			{"prod-download", CHProdDownload},
+			{"stage-prod", CHStageProd},
+			{"prod-stop", CHProdStop},
+			{"prod-start", CHProdStart},
+			{"sync-stop", CHSyncStop},
+			{"sync-start", CHSyncStart},
+		};
+		CommandHandlerParam cmhParam;
+		cmhParam.config = &config;
+		cmhParam.logger = &logger;
+
 		//check command line for notifications
 		if (argc >= 2) {
 			std::string arg1 = argv[1];
@@ -57,7 +74,38 @@ namespace Emilia {
 				Rain::tsCout("Temporary file for 'prod-upload' deleted.\r\n\r\n");
 			} else if (arg1 == "crash-restart") {
 				Rain::tsCout("IMPORTANT: Server recovering from crash.\r\n");
+			} else if (arg1 == "stage-dev-crh-success")
+				Rain::tsCout("IMPORTANT: 'stage-dev' CRH completed successfully.\r\n");
+			else if (arg1 == "stage-prod-crh-success")
+				Rain::tsCout("IMPORTANT: 'stage-prod' CRH completed successfully.\r\n");
+			else if (arg1 == "deploy-staging-crh-success") {
+				Rain::tsCout("IMPORTANT: 'deploy-staging' CRH completed successfully.\r\n");
+				CHProdStart(cmhParam);
 			}
+		}
+
+		//update server setup
+		DWORD updateServerPort = Rain::strToT<DWORD>(config["update-server-port"]);
+
+		UpdateServer::ConnectionCallerParam updCCP;
+		updCCP.config = &config;
+		updCCP.hInputExitEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+		updCCP.serverStatus.resize(0); //separate servers deprecated for now
+		updCCP.clientConnected = false;
+
+		Rain::ServerManager updSM;
+		updSM.setEventHandlers(UpdateServer::onConnect, UpdateServer::onMessage, UpdateServer::onDisconnect, &updCCP);
+		updSM.setRecvBufLen(Rain::strToT<std::size_t>(config["update-transfer-buffer"]));
+		if (!updSM.setServerListen(updateServerPort, updateServerPort)) {
+			Rain::tsCout("Update server listening on port ", updSM.getListeningPort(), ".\r\n");
+		} else {
+			Rain::tsCout("Fatal error: could not setup update server listening.\r\n");
+			DWORD error = GetLastError();
+			Rain::reportError(error, "Fatal error: could not setup update server listening.");
+			WSACleanup();
+			if (hFMemLeak != NULL)
+				CloseHandle(hFMemLeak);
+			return error;
 		}
 
 		//http server setup
@@ -104,38 +152,7 @@ namespace Emilia {
 			return error;
 		}
 
-		//update server setup
-		DWORD updateServerPort = Rain::strToT<DWORD>(config["update-server-port"]);
-
-		UpdateServer::ConnectionCallerParam updCCP;
-		updCCP.config = &config;
-		updCCP.hInputExitEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-		updCCP.serverStatus.resize(0); //separate servers deprecated for now
-		updCCP.clientConnected = false;
-
-		Rain::ServerManager updSM;
-		updSM.setEventHandlers(UpdateServer::onConnect, UpdateServer::onMessage, UpdateServer::onDisconnect, &updCCP);
-		updSM.setRecvBufLen(Rain::strToT<std::size_t>(config["update-transfer-buffer"]));
-		if (!updSM.setServerListen(updateServerPort, updateServerPort)) {
-			Rain::tsCout("Update server listening on port ", updSM.getListeningPort(), ".\r\n");
-		} else {
-			Rain::tsCout("Fatal error: could not setup update server listening.\r\n");
-			DWORD error = GetLastError();
-			Rain::reportError(error, "Fatal error: could not setup update server listening.");
-			WSACleanup();
-			if (hFMemLeak != NULL)
-				CloseHandle(hFMemLeak);
-			return error;
-		}
-
 		//process commands
-		static std::map<std::string, CommandMethodHandler> commandHandlers{
-			{"exit", CHExit},
-			{"help", CHHelp},
-		};
-		CommandHandlerParam cmhParam;
-		cmhParam.config = &config;
-		cmhParam.logger = &logger;
 		while (true) {
 			static std::string command, tmp;
 			Rain::tsCout("Accepting commands...\r\n");

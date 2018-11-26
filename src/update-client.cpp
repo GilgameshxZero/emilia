@@ -1,7 +1,7 @@
-#include "ConnectionHandlers.h"
+#include "update-client.h"
 
-namespace Monochrome3 {
-	namespace EmiliaUpdateClient {
+namespace Emilia {
+	namespace UpdateClient {
 		static const std::string headerDelim = "\r\n\r\n";
 
 		int onConnect(void *funcParam) {
