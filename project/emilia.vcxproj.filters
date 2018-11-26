@@ -252,6 +252,12 @@
     <Image Include="..\rc\icon.ico">
       <Filter>rc</Filter>
     </Image>
+    <Image Include="..\rc\icon.png">
+      <Filter>rc</Filter>
+    </Image>
+    <Image Include="..\rc\orig.png">
+      <Filter>rc</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\rc\rc.rc">
