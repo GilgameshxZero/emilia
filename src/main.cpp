@@ -1,12 +1,14 @@
 #include "main.h"
 
+const std::string LINE_END = "\r\n";
+
 int main(int argc, char* argv[]) {
 	//restart the application if it didn't finish successfully
 	RegisterApplicationRestart(Rain::mbStrToWStr("crash-restart").c_str(), 0);
 
 	int error;
 	error = Emilia::start(argc, argv);
-	std::cout << "start returned error code " << error << ".\r\n";
+	std::cout << "start returned error code " << error << "." << LINE_END;
 
 	//finished successfully, so don't restart it
 	UnregisterApplicationRestart();
@@ -66,20 +68,20 @@ namespace Emilia {
 			std::string arg1 = argv[1];
 			Rain::strTrimWhite(&arg1);
 			if (arg1 == "prod-upload-success") {
-				Rain::tsCout("IMPORTANT: 'prod-upload' CRH operation completed successfully.\r\n");
+				Rain::tsCout("Important: 'prod-upload' CRH operation completed successfully.\r\n");
 
 				//remove tmp file of the prod-upload operation
 				std::string filePath = Rain::pathToAbsolute(Rain::getExePath() + config["update-tmp-ext"]);
 				DeleteFile(filePath.c_str());
 				Rain::tsCout("Temporary file for 'prod-upload' deleted.\r\n\r\n");
 			} else if (arg1 == "crash-restart") {
-				Rain::tsCout("IMPORTANT: Server recovering from crash.\r\n");
+				Rain::tsCout("Important: Server recovering from crash.\r\n");
 			} else if (arg1 == "stage-dev-crh-success")
-				Rain::tsCout("IMPORTANT: 'stage-dev' CRH completed successfully.\r\n");
+				Rain::tsCout("Important: 'stage-dev' CRH completed successfully.\r\n");
 			else if (arg1 == "stage-prod-crh-success")
-				Rain::tsCout("IMPORTANT: 'stage-prod' CRH completed successfully.\r\n");
+				Rain::tsCout("Important: 'stage-prod' CRH completed successfully.\r\n");
 			else if (arg1 == "deploy-staging-crh-success") {
-				Rain::tsCout("IMPORTANT: 'deploy-staging' CRH completed successfully.\r\n");
+				Rain::tsCout("Important: 'deploy-staging' CRH completed successfully.\r\n");
 				CHProdStart(cmhParam);
 			}
 		}
