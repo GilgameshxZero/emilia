@@ -108,6 +108,9 @@
     <ClInclude Include="..\src\update-client.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\command-handler-param.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\command-handlers.cpp">
@@ -192,6 +195,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\update-client.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\command-handler-param.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

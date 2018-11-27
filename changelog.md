@@ -1,5 +1,13 @@
 # Changelog
 
+## 5.0.4
+
+* Implemented remote `start`, `stop`, and `restart` commands.
+* Updated authentication process to disconnect fully on fail.
+* Updated `CommandHandlerParam` to its own file.
+* Cleaned up logging around connections.
+* Bugfix: ServerManager's `listenThread` had race conditions when restarted multiple times in fast succession; fixed by moving mutex locks around.
+
 ## 5.0.3
 
 * Implemented local `start`, `stop`, `restart` commands.

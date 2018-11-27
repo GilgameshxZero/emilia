@@ -16,6 +16,7 @@ namespace Emilia {
 		int onDisconnect(void *funcParam) {
 			Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam = *reinterpret_cast<Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam *>(funcParam);
 			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
+
 			return 0;
 		}
 		int onMessage(void *funcParam) {
@@ -51,12 +52,18 @@ namespace Emilia {
 					break;
 			}
 
-			return 0;
+			return ret;
 		}
 
 		int HandleRequest(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam) {
 			static const std::map<std::string, RequestMethodHandler> methodHandlerMap{
-				{"authenticate", HRAuthenticate} //validates a socket connection session
+				{"authenticate", HRAuthenticate}, //validates a socket connection session
+				{ "push", HRPush},
+				{"push-exclusive", HRPushExclusive},
+				{"pull", HRPull},
+				{"sync", HRSync},
+				{"start", HRStart},
+				{"stop", HRStop}
 			};
 			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
 
@@ -86,23 +93,55 @@ namespace Emilia {
 
 		int HRAuthenticate(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam) {
 			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
+			chParam.waitingRequests--;
+			chParam.lastSuccess = 0;
 			if (chParam.request == "success") {
-				chParam.lastSuccess = 0;
 				Rain::tsCout("Info: Authentication with update server successful.\r\n");
 			} else if (chParam.request == "auth-done") {
-				chParam.lastSuccess = 0;
 				Rain::tsCout("Info: Already authenticated with update server.\r\n");
 			} else if (chParam.request == "fail") {
-				chParam.lastSuccess = 1;
-				Rain::tsCout("Error: Failed to authenticate with update server.\r\n");
-				return 1;
-			} else {
+				Rain::tsCout("Error: Failed to authenticate with update server; disconnecting...\r\n");
 				chParam.lastSuccess = -1;
-				Rain::tsCout("Error: Unrecognized message from update server.\r\n");
-				return 1;
+				fflush(stdout);
+				return -1;
+			} else {
+				Rain::tsCout("Error: Unrecognized message from update server; disconnecting...\r\n");
+				chParam.lastSuccess = -1;
+				fflush(stdout);
+				return -1;
 			}
 			fflush(stdout);
-			chParam.waitingRequests--;
+			return 0;
+		}
+		int HRPush(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam) {
+			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
+			return 0;
+		}
+		int HRPushExclusive(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam) {
+			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
+			return 0;
+		}
+		int HRPull(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam) {
+			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
+			return 0;
+		}
+		int HRSync(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam) {
+			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
+			return 0;
+		}
+		int HRStart(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam) {
+			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
+
+			Rain::tsCout("Remote: ", chParam.request);
+			fflush(stdout);
+
+			return 0;
+		}
+		int HRStop(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam) {
+			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
+
+			//nothing reaches here
+
 			return 0;
 		}
 		//int HRProdUpload(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam) {
@@ -231,34 +270,6 @@ namespace Emilia {
 		//		}
 		//	}
 
-		//	return 0;
-		//}
-		//int HRProdStop(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam) {
-		//	ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
-		//	if (chParam.request == "success")
-		//		chParam.lastSuccess = 0;
-		//	else if (chParam.request == "fail" || chParam.request == "auth-error")
-		//		chParam.lastSuccess = 1;
-		//	else
-		//		chParam.lastSuccess = -1;
-		//	chParam.waitingRequests--;
-		//	return 0;
-		//}
-		//int HRProdStart(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam) {
-		//	ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
-		//	if (chParam.request == "success")
-		//		chParam.lastSuccess = 0;
-		//	else if (chParam.request == "fail" || chParam.request == "auth-error")
-		//		chParam.lastSuccess = 1;
-		//	else
-		//		chParam.lastSuccess = -1;
-		//	chParam.waitingRequests--;
-		//	return 0;
-		//}
-		//int HRSyncStop(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam) {
-		//	return 0;
-		//}
-		//int HRSyncStart(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam) {
 		//	return 0;
 		//}
 	}
