@@ -8,9 +8,13 @@ namespace Rain {
 		std::cerr << "Error code: " << code << std::endl;
 		return code;
 	}
+	int errorAndCout(int code, std::string desc, std::string endl) {
+		tsCout(desc, endl);
+		reportError(code, desc);
+	}
 
 	std::streambuf *redirectCerrFile(std::string filename, bool append) {
-		static std::ofstream cerrfile;
+		std::ofstream cerrfile;
 		cerrfile.open(filename, std::ios_base::out |
 					  std::ios_base::binary |
 					  (append ? std::ios_base::app : 1));
