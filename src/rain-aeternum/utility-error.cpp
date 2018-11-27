@@ -3,7 +3,7 @@
 namespace Rain {
 	int reportError(int code, std::string desc) {
 		if (desc != "")
-			std::cerr << desc << "\n";
+			std::cerr << desc << std::endl;
 
 		std::cerr << "Error code: " << code << std::endl;
 		return code;

@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.0.5
+
+* Updated `getFilesRec` and `getDirsRec` to be able to specify files to want as well as files to ignore.
+* Implemented Rain with a CRC32 algorithm.
+* Implemented part of the `push` command handshake, with the actual data transfer to go.
+
 ## 5.0.4
 
 * Implemented remote `start`, `stop`, and `restart` commands.
