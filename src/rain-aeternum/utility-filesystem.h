@@ -62,8 +62,9 @@ namespace Rain {
 	//gets all files and directories under a directory, recursively
 	//works with unicode/multibyte UTF8
 	//use absolute paths in ignore
-	std::vector<std::string> getFilesRec(std::string directory, std::string format = "*", std::set<std::string> *ignore = NULL);
-	std::vector<std::string> getDirsRec(std::string directory, std::string format = "*", std::set<std::string> *ignore = NULL);
+	//can specify only directories or files that we want; overwritten by ignore
+	std::vector<std::string> getFilesRec(std::string directory, std::string format = "*", std::set<std::string> *ignore = NULL, std::set<std::string> *want = NULL);
+	std::vector<std::string> getDirsRec(std::string directory, std::string format = "*", std::set<std::string> *ignore = NULL, std::set<std::string> *want = NULL);
 
 	//creates parent directories until specified directory created
 	void createDirRec(std::string dir);
