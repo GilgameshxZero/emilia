@@ -13,16 +13,16 @@
     <Filter Include="rain-aeternum">
       <UniqueIdentifier>{b30b134a-d98e-4e14-8747-ffb825b87052}</UniqueIdentifier>
     </Filter>
-    <Filter Include="config">
-      <UniqueIdentifier>{ab1b3081-c7c7-44a1-8d9f-767075bd48ff}</UniqueIdentifier>
-    </Filter>
     <Filter Include="logs">
       <UniqueIdentifier>{b7abf1b1-d54b-4abe-8613-659d043d8d40}</UniqueIdentifier>
     </Filter>
-    <Filter Include="prod">
+    <Filter Include="config">
+      <UniqueIdentifier>{ab1b3081-c7c7-44a1-8d9f-767075bd48ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="remote">
       <UniqueIdentifier>{c51ff2e9-c1a2-42d5-bb27-941a06f871f6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="prod\config">
+    <Filter Include="remote\config">
       <UniqueIdentifier>{cf5513b5-5592-484a-8044-05f22d4d748b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -232,20 +232,24 @@
     <None Include="..\config\http-headers.ini">
       <Filter>config</Filter>
     </None>
-    <None Include="..\prod\config\config.ini">
-      <Filter>prod\config</Filter>
+    <None Include="..\.gitignore" />
+    <None Include="..\changelog.md" />
+    <None Include="..\readme.md" />
+    <None Include="..\todo.md" />
+    <None Include="..\remote\config\config.ini">
+      <Filter>remote\config</Filter>
     </None>
-    <None Include="..\prod\config\http-404.html">
-      <Filter>prod\config</Filter>
+    <None Include="..\remote\config\http-404.html">
+      <Filter>remote\config</Filter>
     </None>
-    <None Include="..\prod\config\http-cgi.ini">
-      <Filter>prod\config</Filter>
+    <None Include="..\remote\config\http-cgi.ini">
+      <Filter>remote\config</Filter>
     </None>
-    <None Include="..\prod\config\http-content-type.ini">
-      <Filter>prod\config</Filter>
+    <None Include="..\remote\config\http-content-type.ini">
+      <Filter>remote\config</Filter>
     </None>
-    <None Include="..\prod\config\http-headers.ini">
-      <Filter>prod\config</Filter>
+    <None Include="..\remote\config\http-headers.ini">
+      <Filter>remote\config</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
