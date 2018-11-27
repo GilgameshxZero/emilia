@@ -234,19 +234,23 @@ namespace Rain {
 		}
 
 		//wait on all spawned and active recvThreads to exit
+		llMutex.lock();
 		while (llHead.next != &llTail) {
 			//close client socket to force blocking WSA2 calls to finish
-			llMutex.lock();
 			Rain::shutdownSocketSend(llHead.next->ssm->getSocket());
 			closesocket(llHead.next->ssm->getSocket());
 			//in case thread gets shutdown while some operations are happening with its handle
 			HANDLE curRecvThread = llHead.next->hRecvThread;
+
 			llMutex.unlock();
 
 			//join the recvThread
 			CancelSynchronousIo(curRecvThread);
 			WaitForSingleObject(curRecvThread, 0);
+
+			llMutex.lock();
 		}
+		llMutex.unlock();
 
 		//set an event to notify listeners that the thread is exiting
 		SetEvent(sm.ltEvent);

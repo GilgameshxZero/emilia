@@ -25,48 +25,61 @@ namespace Emilia {
 
 		//prompt for more information
 		std::string remoteAddr, passResponse, pass;
-		Rain::tsCout("Remote address: ");
+		Rain::tsCout("Prompt: Remote address: ");
 		std::cin >> remoteAddr;
-		Rain::tsCout("Use configuration authentication? (y/n): ");
+		Rain::tsCout("Prompt: Use configuration authentication? (y/n): ");
 		std::cin >> passResponse;
 		if (passResponse == "y") {
 			pass = (*cmhParam.config)["emilia-auth-pass"];
 		} else {
-			Rain::tsCout("Password for remote: ");
+			Rain::tsCout("Prompt: Password for remote: ");
 			std::cin >> pass;
 			Rain::strTrimWhite(&pass);
 		}
 
 		//attempt to connect to remote
-		Rain::tsCout("Attempting to connect...", LINE_END);
+		Rain::tsCout("Info: Attempting to connect...", LINE_END);
 		DWORD updateServerPort = Rain::strToT<DWORD>((*cmhParam.config)["update-server-port"]);
 		cmhParam.remoteCSM = new Rain::ClientSocketManager();
 		cmhParam.chParam = new UpdateClient::ConnectionHandlerParam();
 		cmhParam.chParam->config = cmhParam.config;
 		cmhParam.remoteCSM->setEventHandlers(UpdateClient::onConnect, UpdateClient::onMessage, UpdateClient::onDisconnect, cmhParam.chParam);
-		cmhParam.logger->setSocketSrc(cmhParam.remoteCSM, true);
 		cmhParam.remoteCSM->setClientTarget(remoteAddr, updateServerPort, updateServerPort);
 		cmhParam.remoteCSM->blockForConnect(10000);
 
 		int status = cmhParam.remoteCSM->getSocketStatus();
 		if (status == 0) {
-			Rain::tsCout("Connected successfully!", LINE_END);
+			Rain::tsCout("Info: Connected successfully!", LINE_END);
 		} else if (status == 1) {
 			Rain::tsCout("Error: Connection timeout.", LINE_END);
 			delete cmhParam.remoteCSM;
 			cmhParam.remoteCSM = NULL;
+			return 0;
 		} else {
 			Rain::tsCout("Error: Disconnected.", LINE_END);
 			delete cmhParam.remoteCSM;
 			cmhParam.remoteCSM = NULL;
+			return 0;
 		}
 
 		//authenticate
 		Rain::tsCout("Info: Authenticating with update server...", LINE_END);
 		cmhParam.chParam->waitingRequests++;
+		ResetEvent(cmhParam.chParam->doneWaitingEvent);
 		Rain::sendBlockMessage(*cmhParam.remoteCSM, "authenticate " + pass);
 
-		cmhParam.logger->setSocketSrc(cmhParam.remoteCSM, false);
+		//wait for response, then see if we are still connected
+		WaitForSingleObject(cmhParam.chParam->doneWaitingEvent, 30000);
+		if (cmhParam.chParam->lastSuccess != 0) {
+			cmhParam.remoteCSM->setEventHandlers(NULL, NULL, NULL, NULL);
+			cmhParam.remoteCSM->setClientTarget("", 0, 0);
+			cmhParam.remoteCSM->blockForConnect();
+			delete cmhParam.remoteCSM;
+			cmhParam.remoteCSM = NULL;
+			Rain::tsCout("Info: Update client is disconnected.", LINE_END);
+			return 0;
+		}
+
 		return 0;
 	}
 	int CHDisconnect(CommandHandlerParam &cmhParam) {
@@ -82,15 +95,35 @@ namespace Emilia {
 		return 0;
 	}
 	int CHPush(CommandHandlerParam &cmhParam) {
+		if (cmhParam.remoteCSM == NULL) {
+			//not yet connected
+			Rain::tsCout("Cannot execute this comment when not connected with remote.", LINE_END);
+			return 0;
+		}
 		return 0;
 	}
 	int CHPushExclusive(CommandHandlerParam &cmhParam) {
+		if (cmhParam.remoteCSM == NULL) {
+			//not yet connected
+			Rain::tsCout("Cannot execute this comment when not connected with remote.", LINE_END);
+			return 0;
+		}
 		return 0;
 	}
 	int CHPull(CommandHandlerParam &cmhParam) {
+		if (cmhParam.remoteCSM == NULL) {
+			//not yet connected
+			Rain::tsCout("Cannot execute this comment when not connected with remote.", LINE_END);
+			return 0;
+		}
 		return 0;
 	}
 	int CHSync(CommandHandlerParam &cmhParam) {
+		if (cmhParam.remoteCSM == NULL) {
+			//not yet connected
+			Rain::tsCout("Cannot execute this comment when not connected with remote.", LINE_END);
+			return 0;
+		}
 		return 0;
 	}
 	int CHStart(CommandHandlerParam &cmhParam) {
@@ -99,21 +132,26 @@ namespace Emilia {
 				Rain::tsCout("HTTP server listening on port ", cmhParam.httpSM->getListeningPort(), ".", LINE_END);
 			} else {
 				DWORD error = GetLastError();
-				Rain::errorAndCout(error, "Fatal: could not setup HTTP server listening.");
+				Rain::errorAndCout(error, "Error: could not setup HTTP server listening.");
 			}
 			if (!cmhParam.smtpSM->setServerListen(25, 25)) {
 				Rain::tsCout("SMTP server listening on port ", cmhParam.smtpSM->getListeningPort(), ".", LINE_END);
 			} else {
 				DWORD error = GetLastError();
-				Rain::errorAndCout(error, "Fatal: could not setup SMTP server listening.");
+				Rain::errorAndCout(error, "Error: could not setup SMTP server listening.");
 			}
 		} else {
+			Rain::sendBlockMessage(*cmhParam.remoteCSM, "start");
 		}
 		return 0;
 	}
 	int CHStop(CommandHandlerParam &cmhParam) {
-		cmhParam.httpSM->setServerListen(0, 0);
-		cmhParam.smtpSM->setServerListen(0, 0);
+		if (cmhParam.remoteCSM == NULL) {
+			cmhParam.httpSM->setServerListen(0, 0);
+			cmhParam.smtpSM->setServerListen(0, 0);
+		} else {
+			Rain::sendBlockMessage(*cmhParam.remoteCSM, "stop");
+		}
 		return 0;
 	}
 	int CHRestart(CommandHandlerParam &cmhParam) {
