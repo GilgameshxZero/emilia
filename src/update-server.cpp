@@ -59,7 +59,7 @@ namespace Emilia {
 					break;
 			}
 
-			return 0;
+			return ret;
 		}
 		int onDisconnect(void *funcParam) {
 			Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam = *reinterpret_cast<Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam *>(funcParam);
@@ -102,7 +102,7 @@ namespace Emilia {
 				Rain::tsCout("Info: Received request from update client: ", cdParam.requestMethod, ".\r\n");
 				handlerRet = handler->second(ssmdhParam);
 			} else {
-				Rain::tsCout("Failure: Received unknown method from update client: ", cdParam.requestMethod, ".\r\n");
+				Rain::tsCout("Error: Received unknown method from update client: ", cdParam.requestMethod, ".\r\n");
 			}
 
 			//clear request on exit
@@ -114,21 +114,22 @@ namespace Emilia {
 		int HRAuthenticate(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
+
 			if (cdParam.authenticated) {
 				Rain::sendBlockMessage(*ssmdhParam.ssm, "authenticate auth-done");
 				Rain::tsCout("Info: Update client authenticated already.\r\n");
-				fflush(stdout);
 			} else if (ccParam.config->at("emilia-auth-pass") != cdParam.request) {
 				Rain::sendBlockMessage(*ssmdhParam.ssm, "authenticate fail");
 				Rain::tsCout("Error: Update client authenticate fail.\r\n");
 				fflush(stdout);
+				return -1;
 			} else {
 				Rain::sendBlockMessage(*ssmdhParam.ssm, "authenticate success");
 				cdParam.authenticated = true;
 				Rain::tsCout("Info: Update client authenticate success.\r\n");
-				fflush(stdout);
 			}
 
+			fflush(stdout);
 			return 0;
 		}
 		int HRPush(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
@@ -158,12 +159,40 @@ namespace Emilia {
 		int HRStart(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
+			CommandHandlerParam &cmhParam = *reinterpret_cast<CommandHandlerParam *>(ccParam.cmhParam);
+
+			//send the command line back as it is over the socket, which should get printed by the client
+			std::string response;
+
+			if (!cmhParam.httpSM->setServerListen(80, 80)) {
+				response = "Info: HTTP server listening on port " + Rain::tToStr(cmhParam.httpSM->getListeningPort()) + "." + "\r\n";
+				Rain::tsCout("Info: HTTP server listening on port ", cmhParam.httpSM->getListeningPort(), ".", "\r\n");
+			} else {
+				DWORD error = GetLastError();
+				response = "Error: could not setup HTTP server listening.\r\n";
+				Rain::errorAndCout(error, "Error: could not setup HTTP server listening.");
+			}
+			Rain::sendBlockMessage(*ssmdhParam.ssm, "start " + response);
+
+			if (!cmhParam.smtpSM->setServerListen(25, 25)) {
+				response = "Info: SMTP server listening on port " + Rain::tToStr(cmhParam.smtpSM->getListeningPort()) + "." + "\r\n";
+				Rain::tsCout("Info: SMTP server listening on port ", cmhParam.smtpSM->getListeningPort(), ".", "\r\n");
+			} else {
+				DWORD error = GetLastError();
+				response = "Error: could not setup SMTP server listening.\r\n";
+				Rain::errorAndCout(error, "Error: could not setup SMTP server listening.");
+			}
+			Rain::sendBlockMessage(*ssmdhParam.ssm, "start " + response);
 
 			return 0;
 		}
 		int HRStop(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
+			CommandHandlerParam &cmhParam = *reinterpret_cast<CommandHandlerParam *>(ccParam.cmhParam);
+
+			cmhParam.httpSM->setServerListen(0, 0);
+			cmhParam.smtpSM->setServerListen(0, 0);
 
 			return 0;
 		}

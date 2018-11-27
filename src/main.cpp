@@ -62,28 +62,6 @@ namespace Emilia {
 			}
 		}
 
-		//update server setup
-		DWORD updateServerPort = Rain::strToT<DWORD>(config["update-server-port"]);
-
-		UpdateServer::ConnectionCallerParam updCCP;
-		updCCP.config = &config;
-		updCCP.hInputExitEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-		updCCP.clientConnected = false;
-
-		Rain::ServerManager updSM;
-		updSM.setEventHandlers(UpdateServer::onConnect, UpdateServer::onMessage, UpdateServer::onDisconnect, &updCCP);
-		updSM.setRecvBufLen(Rain::strToT<std::size_t>(config["update-transfer-buffer"]));
-		if (!updSM.setServerListen(updateServerPort, updateServerPort)) {
-			Rain::tsCout("Update server listening on port ", updSM.getListeningPort(), ".\r\n");
-		} else {
-			DWORD error = GetLastError();
-			Rain::errorAndCout(error, "Fatal: could not setup update server listening.");
-			WSACleanup();
-			if (hFMemLeak != NULL)
-				CloseHandle(hFMemLeak);
-			return error;
-		}
-
 		//http server setup
 		HTTPServer::ConnectionCallerParam httpCCP;
 		httpCCP.config = &config;
@@ -124,12 +102,35 @@ namespace Emilia {
 		cmhParam.httpSM = &httpSM;
 		cmhParam.smtpSM = &smtpSM;
 
+		//update server setup
+		DWORD updateServerPort = Rain::strToT<DWORD>(config["update-server-port"]);
+
+		UpdateServer::ConnectionCallerParam updCCP;
+		updCCP.config = &config;
+		updCCP.hInputExitEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+		updCCP.clientConnected = false;
+		updCCP.cmhParam = &cmhParam;
+
+		Rain::ServerManager updSM;
+		updSM.setEventHandlers(UpdateServer::onConnect, UpdateServer::onMessage, UpdateServer::onDisconnect, &updCCP);
+		updSM.setRecvBufLen(Rain::strToT<std::size_t>(config["update-transfer-buffer"]));
+		if (!updSM.setServerListen(updateServerPort, updateServerPort)) {
+			Rain::tsCout("Update server listening on port ", updSM.getListeningPort(), ".\r\n");
+		} else {
+			DWORD error = GetLastError();
+			Rain::errorAndCout(error, "Fatal: could not setup update server listening.");
+			WSACleanup();
+			if (hFMemLeak != NULL)
+				CloseHandle(hFMemLeak);
+			return error;
+		}
+
 		//process commands
 		while (true) {
 			static std::string command, tmp;
 			Rain::tsCout("Accepting commands...\r\n");
+			fflush(stdout);
 			std::cin >> command;
-			Rain::tsCout("Command: " + command + "\r\n");
 			std::getline(std::cin, tmp);
 
 			auto handler = commandHandlers.find(command);

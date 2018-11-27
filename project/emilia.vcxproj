@@ -205,6 +205,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\src\build-id.h" />
+    <ClInclude Include="..\src\command-handler-param.h" />
     <ClInclude Include="..\src\command-handlers.h" />
     <ClInclude Include="..\src\http-server.h" />
     <ClInclude Include="..\src\main.h" />
@@ -235,6 +236,7 @@
     <ClInclude Include="..\src\update-server.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\command-handler-param.cpp" />
     <ClCompile Include="..\src\command-handlers.cpp" />
     <ClCompile Include="..\src\http-server.cpp" />
     <ClCompile Include="..\src\main.cpp" />
