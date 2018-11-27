@@ -12,7 +12,12 @@ Emilia consists of three components: an HTTP server, a SMTP server, and an updat
 
 ## Deployment Overview
 
-There are two types of files: local and remote. 
+There are two types of files in this project: `shared` and `exclusive`.
+
+* `shared`: The same file should exist between all distributions of this project.
+* `exclusive`: A separate version of this file should exist on each distribution of the project.
+
+File types are specified in the config file of a server. Pushing overwrites `shared` files based on the local config. Pulling overwrites files based on the remote config. Sync is only available when file type configurations are the same on local and remote.
 
 ## Commands
 
@@ -22,9 +27,10 @@ exit | Exits the process, or, if connected to a remote update server, the remote
 help | Lists all available commands.
 connect | Connect to remote update server. Not available if already connected to a remote server.
 disconnect | Disconnect from a remote connection.
-push | Replaces all files on remote server with local files, substituting those in the local 'remote' directory to the remote root directory in the process.
-pull | Replaces local files with those on the remote server, ignoring the files in the root with the same paths as those in the local 'remote' directory and replacing those in the 'remote' directory instead.
-sync | 
+push | Overwrite the remote `shared` files with the local ones.
+push-exclusive | Overwrite the remote `shared` files with the local ones, and the remote `exclusive` files with the local ones as well.
+pull | Overwrite the local `shared` files with the remote ones, and create/update a copy of the local `exclusive` files from the remote, but not overwrite the local `exclusive` files.
+sync | Update both sides with the most recently modified copies of the `shared` files, and update copies of the `exclusive` files on each end.
 start | Starts the HTTP and SMTP servers.
 stop | Stops the HTTP and SMTP servers.
 restart | Restarts the HTTP and SMTP servers.
