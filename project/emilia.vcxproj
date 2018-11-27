@@ -265,21 +265,25 @@
     <ClCompile Include="..\src\update-server.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\.gitignore" />
     <None Include="..\build\build-debug.bat" />
     <None Include="..\build\build-id-inc.bat" />
     <None Include="..\build\build.bat" />
     <None Include="..\build\make.bat" />
     <None Include="..\build\setup-env.bat" />
+    <None Include="..\changelog.md" />
     <None Include="..\config\config.ini" />
     <None Include="..\config\http-404.html" />
     <None Include="..\config\http-cgi.ini" />
     <None Include="..\config\http-content-type.ini" />
     <None Include="..\config\http-headers.ini" />
-    <None Include="..\prod\config\config.ini" />
-    <None Include="..\prod\config\http-404.html" />
-    <None Include="..\prod\config\http-cgi.ini" />
-    <None Include="..\prod\config\http-content-type.ini" />
-    <None Include="..\prod\config\http-headers.ini" />
+    <None Include="..\readme.md" />
+    <None Include="..\remote\config\config.ini" />
+    <None Include="..\remote\config\http-404.html" />
+    <None Include="..\remote\config\http-cgi.ini" />
+    <None Include="..\remote\config\http-content-type.ini" />
+    <None Include="..\remote\config\http-headers.ini" />
+    <None Include="..\todo.md" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\rc\icon.ico" />

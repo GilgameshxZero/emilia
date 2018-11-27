@@ -5,7 +5,7 @@ namespace Rain {
 		return Rain::mbStrToWStr("\\\\?\\" + path);
 	}
 	std::wstring pathToLongPath(std::wstring path) {
-		static std::wstring prefix = Rain::mbStrToWStr("\\\\?\\");
+		static const std::wstring prefix = Rain::mbStrToWStr("\\\\?\\");
 		return prefix + path;
 	}
 
@@ -47,8 +47,8 @@ namespace Rain {
 	}
 
 	std::string getExePath() {
-		static char multibyte[32767];
-		static wchar_t buffer[32767];
+		char multibyte[32767];
+		wchar_t buffer[32767];
 
 		GetModuleFileNameW(NULL, buffer, 32767);
 		WideCharToMultiByte(CP_UTF8, 0, buffer, -1, multibyte, 32767, NULL, NULL);
@@ -63,8 +63,8 @@ namespace Rain {
 	}
 
 	std::vector<std::string> getFiles(std::string directory, std::string format) {
-		static char search_path[32767], multibyte[32767];
-		static wchar_t unicodesp[32767];
+		char search_path[32767], multibyte[32767];
+		wchar_t unicodesp[32767];
 		sprintf_s(search_path, ("%s" + format).c_str(), directory.c_str());
 		WIN32_FIND_DATAW fd;
 
@@ -85,8 +85,8 @@ namespace Rain {
 		return ret;
 	}
 	std::vector<std::string> getDirs(std::string directory, std::string format) {
-		static char search_path[32767], multibyte[32767];
-		static wchar_t unicodesp[32767];
+		char search_path[32767], multibyte[32767];
+		wchar_t unicodesp[32767];
 		sprintf_s(search_path, ("%s" + format).c_str(), directory.c_str());
 		WIN32_FIND_DATAW fd;
 
@@ -193,7 +193,7 @@ namespace Rain {
 	}
 
 	std::string pathToAbsolute(std::string path) {
-		static WCHAR tcFullPath[32767];
+		WCHAR tcFullPath[32767];
 		GetFullPathNameW(mbStrToWStr(path).c_str(), 32767, tcFullPath, NULL);
 		return wStrToMBStr(tcFullPath);
 	}
@@ -267,14 +267,14 @@ namespace Rain {
 	}
 
 	std::vector<std::string> readMultilineFile(std::string filePath) {
-		static std::ifstream fileIn;
+		std::ifstream fileIn;
 		std::vector<std::string> ret;
 
 		fileIn.open(filePath, std::ios::binary);
 		std::stringstream ss;
 		ss << fileIn.rdbuf();
 
-		static std::string value = "";
+		std::string value = "";
 		std::getline(ss, value);
 
 		while (value.length() != 0) {
@@ -288,7 +288,7 @@ namespace Rain {
 	}
 
 	std::map<std::string, std::string> readParameterStream(std::stringstream &paramStream) {
-		static std::string key = "", value;
+		std::string key = "", value;
 		std::map<std::string, std::string> params;
 		std::getline(paramStream, key, ':');
 
@@ -308,7 +308,7 @@ namespace Rain {
 		return readParameterStream(ss);
 	}
 	std::map<std::string, std::string> readParameterFile(std::string filePath) {
-		static std::ifstream fileIn;
+		std::ifstream fileIn;
 
 		fileIn.open(filePath, std::ios::binary);
 		std::stringstream ss;

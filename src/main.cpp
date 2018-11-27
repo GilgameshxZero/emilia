@@ -2,13 +2,14 @@
 
 const std::string LINE_END = "\r\n";
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
 	//restart the application if it didn't finish successfully
-	RegisterApplicationRestart(Rain::mbStrToWStr("crash-restart").c_str(), 0);
+	if (FAILED(RegisterApplicationRestart(Rain::mbStrToWStr("crash-restart").c_str(), 0))) {
+		std::cout << "RegisterApplicationRestart failed." << LINE_END;
+	}
 
-	int error;
-	error = Emilia::start(argc, argv);
-	std::cout << "start returned error code " << error << "." << LINE_END;
+	int error = Emilia::start(argc, argv);
+	std::cout << "Start returned error code " << error << "." << LINE_END;
 
 	//finished successfully, so don't restart it
 	UnregisterApplicationRestart();
@@ -18,7 +19,7 @@ int main(int argc, char* argv[]) {
 }
 
 namespace Emilia {
-	int start(int argc, char* argv[]) {
+	int start(int argc, char *argv[]) {
 		//parameters
 		std::map<std::string, std::string> config;
 
@@ -35,12 +36,12 @@ namespace Emilia {
 		logger.setStdHandleSrc(STD_OUTPUT_HANDLE, true);
 
 		//print parameters & command line
-		Rain::tsCout("Starting...\r\n" + Rain::tToStr(config.size()) + " configuration options:\r\n");
+		Rain::tsCout("Starting...\r\n" + Rain::tToStr(config.size()), " configuration options:", LINE_END);
 		for (std::map<std::string, std::string>::iterator it = config.begin(); it != config.end(); it++) {
 			Rain::tsCout("\t" + it->first + ": " + it->second + "\r\n");
 		}
 
-		Rain::tsCout("\r\nCommand line arguments: " + Rain::tToStr(argc) + "\r\n\r\n");
+		Rain::tsCout("\r\nCommand line arguments: ", Rain::tToStr(argc), LINE_END);
 		for (int a = 0; a < argc; a++) {
 			Rain::tsCout(std::string(argv[a]) + "\r\n");
 		}
@@ -73,9 +74,8 @@ namespace Emilia {
 				//remove tmp file of the prod-upload operation
 				std::string filePath = Rain::pathToAbsolute(Rain::getExePath() + config["update-tmp-ext"]);
 				DeleteFile(filePath.c_str());
-				Rain::tsCout("Temporary file for 'prod-upload' deleted.\r\n\r\n");
 			} else if (arg1 == "crash-restart") {
-				Rain::tsCout("Important: Server recovering from crash.\r\n");
+				Rain::tsCout("Important: Successfully recovering from crash.", LINE_END);
 			} else if (arg1 == "stage-dev-crh-success")
 				Rain::tsCout("Important: 'stage-dev' CRH completed successfully.\r\n");
 			else if (arg1 == "stage-prod-crh-success")
@@ -101,9 +101,8 @@ namespace Emilia {
 		if (!updSM.setServerListen(updateServerPort, updateServerPort)) {
 			Rain::tsCout("Update server listening on port ", updSM.getListeningPort(), ".\r\n");
 		} else {
-			Rain::tsCout("Fatal error: could not setup update server listening.\r\n");
 			DWORD error = GetLastError();
-			Rain::reportError(error, "Fatal error: could not setup update server listening.");
+			Rain::errorAndCout(error, "Fatal: could not setup update server listening.");
 			WSACleanup();
 			if (hFMemLeak != NULL)
 				CloseHandle(hFMemLeak);
@@ -122,10 +121,8 @@ namespace Emilia {
 		if (!httpSM.setServerListen(80, 80)) {
 			Rain::tsCout("HTTP server listening on port ", httpSM.getListeningPort(), ".\r\n");
 		} else {
-			Rain::tsCout("Fatal error: could not setup HTTP server listening.\r\n");
-			fflush(stdout);
 			DWORD error = GetLastError();
-			Rain::reportError(error, "Fatal error: could not setup HTTP server listening.");
+			Rain::errorAndCout(error, "Fatal: could not setup HTTP server listening.");
 			WSACleanup();
 			if (hFMemLeak != NULL)
 				CloseHandle(hFMemLeak);
@@ -144,10 +141,8 @@ namespace Emilia {
 		if (!smtpSM.setServerListen(25, 25)) {
 			Rain::tsCout("SMTP server listening on port ", smtpSM.getListeningPort(), ".\r\n");
 		} else {
-			Rain::tsCout("Fatal error: could not setup SMTP server listening.\r\n");
-			fflush(stdout);
 			DWORD error = GetLastError();
-			Rain::reportError(error, "Fatal error: could not setup SMTP server listening.");
+			Rain::errorAndCout(error, "Fatal: could not setup SMTP server listening.");
 			WSACleanup();
 			if (hFMemLeak != NULL)
 				CloseHandle(hFMemLeak);
@@ -164,18 +159,18 @@ namespace Emilia {
 
 			auto handler = commandHandlers.find(command);
 			if (handler != commandHandlers.end()) {
-				if (handler->second(cmhParam) != 0)
+				if (handler->second(cmhParam) != 0) {
 					break;
+				}
 			} else {
 				Rain::tsCout("Command not recognized.\r\n");
 			}
 		}
 
-		Rain::tsCout("The program has terminated.\r\n");
+		Rain::tsCout("The program has terminated.", LINE_END);
 		fflush(stdout);
 
 		logger.setStdHandleSrc(STD_OUTPUT_HANDLE, false);
-
 		return 0;
 	}
 }  // namespace Emilia
