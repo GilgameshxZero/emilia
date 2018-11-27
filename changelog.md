@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.0.2
+
+* Designed and summarized commands in readme.
+
 ## 5.0.1
 
 * Error reporting with less lines.
