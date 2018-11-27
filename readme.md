@@ -17,7 +17,7 @@ There are two types of files in this project: `shared` and `exclusive`.
 * `shared`: The same file should exist between all distributions of this project.
 * `exclusive`: A separate version of this file should exist on each distribution of the project.
 
-File types are specified in the config file of a server. Pushing overwrites `shared` files based on the local config. Pulling overwrites files based on the remote config. Sync is only available when file type configurations are the same on local and remote.
+File types are specified in the config file of a server. `shared` files are those not marked `exclusive`. Pushing overwrites `shared` files based on the local config. Pulling overwrites files based on the remote config. Sync is only available when file type configurations are the same on local and remote.
 
 ## Commands
 

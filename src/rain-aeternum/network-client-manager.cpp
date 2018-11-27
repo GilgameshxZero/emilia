@@ -82,6 +82,9 @@ namespace Rain {
 	DWORD ClientSocketManager::getConnectedPort() {
 		return this->connectedPort;
 	}
+	std::string ClientSocketManager::getTargetIP() {
+		return this->ipAddress;
+	}
 	SOCKET &ClientSocketManager::getSocket() {
 		return this->socket;
 	}

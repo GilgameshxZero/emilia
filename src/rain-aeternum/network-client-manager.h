@@ -68,6 +68,9 @@ namespace Rain {
 		//returns value of connected port, or -1 if not connected
 		DWORD getConnectedPort();
 
+		//returns domain name or IP, whichever was set in setClientTarget, or "" if not connected
+		std::string getTargetIP();
+
 		//returns current socket immediately
 		SOCKET &getSocket();
 

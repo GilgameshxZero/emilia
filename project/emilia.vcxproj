@@ -280,6 +280,8 @@
     <None Include="..\config\http-content-type.ini" />
     <None Include="..\config\http-headers.ini" />
     <None Include="..\config\update-exclusives.ini" />
+    <None Include="..\config\update-ignores.ini" />
+    <None Include="..\data\mail-users.ini" />
     <None Include="..\readme.md" />
     <None Include="..\todo.md" />
   </ItemGroup>

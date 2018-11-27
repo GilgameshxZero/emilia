@@ -107,29 +107,37 @@ namespace Rain {
 		return ret;
 	}
 
-	std::vector<std::string> getFilesRec(std::string directory, std::string format, std::set<std::string> *ignore) {
+	std::vector<std::string> getFilesRec(std::string directory, std::string format, std::set<std::string> *ignore, std::set<std::string> *want) {
 		std::vector<std::string> dirs, files;
 		directory = Rain::pathToAbsolute(directory);
 		dirs = Rain::getDirs(directory, "*");
 		files = Rain::getFiles(directory, format);
 
 		std::vector<std::string> relpath;
-		for (std::size_t a = 0; a < files.size(); a++)
-			if (ignore == NULL || ignore->find(pathToAbsolute(files[a])) == ignore->end())
-				relpath.push_back(files[a]);
+		for (std::size_t a = 0; a < files.size(); a++) {
+			if (ignore == NULL || ignore->find(pathToAbsolute(files[a])) == ignore->end()) {
+				if (want == NULL || want->find(pathToAbsolute(files[a])) != want->end()) {
+					relpath.push_back(files[a]);
+				}
+			}
+		}
 
 		for (std::size_t a = 2; a < dirs.size(); a++) {
 			if (ignore != NULL && ignore->find(pathToAbsolute(directory + dirs[a] + "\\")) != ignore->end())
 				continue;
+
 			std::vector<std::string> subrel;
-			subrel = getFilesRec(directory + dirs[a] + "\\", format, ignore);
+			if (want == NULL || want->find(pathToAbsolute(directory + dirs[a] + "\\")) != want->end()) {
+				//drop the want variable, since everything in this directory is wanted
+				subrel = getFilesRec(directory + dirs[a] + "\\", format, ignore);
+			}
 
 			for (std::size_t b = 0; b < subrel.size(); b++)
 				relpath.push_back(dirs[a] + "\\" + subrel[b]);
 		}
 		return relpath;
 	}
-	std::vector<std::string> getDirsRec(std::string directory, std::string format, std::set<std::string> *ignore) {
+	std::vector<std::string> getDirsRec(std::string directory, std::string format, std::set<std::string> *ignore, std::set<std::string> *want) {
 		std::vector<std::string> dirs;
 		directory = Rain::pathToAbsolute(directory);
 		dirs = Rain::getDirs(directory, "*");
@@ -138,10 +146,13 @@ namespace Rain {
 		for (size_t a = 2; a < dirs.size(); a++) {
 			if (ignore == NULL || ignore->find(pathToAbsolute(directory + dirs[a] + "\\")) != ignore->end())
 				continue;
-			relpath.push_back(dirs[a] + "\\");
 
 			std::vector<std::string> subrel;
-			subrel = getDirsRec(directory + dirs[a] + "\\", format, ignore);
+
+			if (want == NULL || want->find(pathToAbsolute(directory + dirs[a] + "\\")) != want->end()) {
+				relpath.push_back(dirs[a] + "\\");
+				subrel = getDirsRec(directory + dirs[a] + "\\", format, ignore, want);
+			}
 
 			for (size_t b = 0; b < subrel.size(); b++)
 				relpath.push_back(dirs[a] + "\\" + subrel[b]);

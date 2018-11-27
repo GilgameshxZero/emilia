@@ -19,6 +19,9 @@
     <Filter Include="config">
       <UniqueIdentifier>{ab1b3081-c7c7-44a1-8d9f-767075bd48ff}</UniqueIdentifier>
     </Filter>
+    <Filter Include="data">
+      <UniqueIdentifier>{b417e276-a129-4a7a-b08d-b6f7dabbf367}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\smtp-server.h">
@@ -237,6 +240,12 @@
     <None Include="..\readme.md" />
     <None Include="..\todo.md" />
     <None Include="..\config\update-exclusives.ini">
+      <Filter>config</Filter>
+    </None>
+    <None Include="..\data\mail-users.ini">
+      <Filter>data</Filter>
+    </None>
+    <None Include="..\config\update-ignores.ini">
       <Filter>config</Filter>
     </None>
   </ItemGroup>

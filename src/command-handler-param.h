@@ -17,5 +17,9 @@ namespace Emilia {
 		Rain::ClientSocketManager *remoteCSM = NULL;
 
 		UpdateClient::ConnectionHandlerParam *chParam;
+
+		//types of files
+		std::set<std::string> excAbsSet, ignAbsSet, notSharedAbsSet;
+		std::vector<std::string> excVec, ignVec;
 	};
 }

@@ -102,6 +102,20 @@ namespace Emilia {
 		cmhParam.httpSM = &httpSM;
 		cmhParam.smtpSM = &smtpSM;
 
+		cmhParam.excVec = Rain::readMultilineFile(config["config-path"] + config["update-exclusive-files"]);
+		cmhParam.excVec.push_back(config["update-exclusive-dir"]);
+		cmhParam.ignVec = Rain::readMultilineFile(config["config-path"] + config["update-ignore-files"]);
+		
+		//format exclusives into absolute paths
+		for (int a = 0; a < cmhParam.excVec.size(); a++) {
+			cmhParam.excAbsSet.insert(Rain::pathToAbsolute(config["update-root"] + cmhParam.excVec[a]));
+		}
+		for (int a = 0; a < cmhParam.ignVec.size(); a++) {
+			cmhParam.ignAbsSet.insert(Rain::pathToAbsolute(config["update-root"] + cmhParam.ignVec[a]));
+		}
+		cmhParam.notSharedAbsSet = cmhParam.excAbsSet;
+		cmhParam.notSharedAbsSet.insert(cmhParam.ignAbsSet.begin(), cmhParam.ignAbsSet.end());
+
 		//update server setup
 		DWORD updateServerPort = Rain::strToT<DWORD>(config["update-server-port"]);
 
