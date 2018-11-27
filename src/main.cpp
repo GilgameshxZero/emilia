@@ -47,23 +47,6 @@ namespace Emilia {
 		}
 		Rain::tsCout("\r\n");
 
-		//setup command handlers
-		static std::map<std::string, CommandMethodHandler> commandHandlers{
-			{"exit", CHExit},
-			{"help", CHHelp},
-			{"stage-dev", CHStageDev},
-			{"deploy-staging", CHDeployStaging},
-			{"prod-download", CHProdDownload},
-			{"stage-prod", CHStageProd},
-			{"prod-stop", CHProdStop},
-			{"prod-start", CHProdStart},
-			{"sync-stop", CHSyncStop},
-			{"sync-start", CHSyncStart},
-		};
-		CommandHandlerParam cmhParam;
-		cmhParam.config = &config;
-		cmhParam.logger = &logger;
-
 		//check command line for notifications
 		if (argc >= 2) {
 			std::string arg1 = argv[1];
@@ -76,13 +59,6 @@ namespace Emilia {
 				DeleteFile(filePath.c_str());
 			} else if (arg1 == "crash-restart") {
 				Rain::tsCout("Important: Successfully recovering from crash.", LINE_END);
-			} else if (arg1 == "stage-dev-crh-success")
-				Rain::tsCout("Important: 'stage-dev' CRH completed successfully.\r\n");
-			else if (arg1 == "stage-prod-crh-success")
-				Rain::tsCout("Important: 'stage-prod' CRH completed successfully.\r\n");
-			else if (arg1 == "deploy-staging-crh-success") {
-				Rain::tsCout("Important: 'deploy-staging' CRH completed successfully.\r\n");
-				CHProdStart(cmhParam);
 			}
 		}
 
@@ -92,7 +68,6 @@ namespace Emilia {
 		UpdateServer::ConnectionCallerParam updCCP;
 		updCCP.config = &config;
 		updCCP.hInputExitEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-		updCCP.serverStatus.resize(0); //separate servers deprecated for now
 		updCCP.clientConnected = false;
 
 		Rain::ServerManager updSM;
@@ -118,16 +93,6 @@ namespace Emilia {
 		Rain::ServerManager httpSM;
 		httpSM.setEventHandlers(HTTPServer::onConnect, HTTPServer::onMessage, HTTPServer::onDisconnect, &httpCCP);
 		httpSM.setRecvBufLen(Rain::strToT<std::size_t>(config["http-transfer-buffer"]));
-		if (!httpSM.setServerListen(80, 80)) {
-			Rain::tsCout("HTTP server listening on port ", httpSM.getListeningPort(), ".\r\n");
-		} else {
-			DWORD error = GetLastError();
-			Rain::errorAndCout(error, "Fatal: could not setup HTTP server listening.");
-			WSACleanup();
-			if (hFMemLeak != NULL)
-				CloseHandle(hFMemLeak);
-			return error;
-		}
 
 		//smtp server setup
 		SMTPServer::ConnectionCallerParam smtpCCP;
@@ -138,16 +103,26 @@ namespace Emilia {
 		Rain::ServerManager smtpSM;
 		smtpSM.setEventHandlers(SMTPServer::onConnect, SMTPServer::onMessage, SMTPServer::onDisconnect, &smtpCCP);
 		smtpSM.setRecvBufLen(Rain::strToT<std::size_t>(config["smtp-transfer-buffer"]));
-		if (!smtpSM.setServerListen(25, 25)) {
-			Rain::tsCout("SMTP server listening on port ", smtpSM.getListeningPort(), ".\r\n");
-		} else {
-			DWORD error = GetLastError();
-			Rain::errorAndCout(error, "Fatal: could not setup SMTP server listening.");
-			WSACleanup();
-			if (hFMemLeak != NULL)
-				CloseHandle(hFMemLeak);
-			return error;
-		}
+
+		//setup command handlers
+		static std::map<std::string, CommandMethodHandler> commandHandlers{
+			{"exit", CHExit},
+			{"help", CHHelp},
+			{"connect", CHConnect},
+			{"disconnect", CHDisconnect},
+			{"push", CHPush},
+			{"push-exclusive", CHPushExclusive},
+			{"pull", CHPull},
+			{"sync", CHSync},
+			{"start", CHStart},
+			{"stop", CHStop},
+			{"restart", CHRestart},
+		};
+		CommandHandlerParam cmhParam;
+		cmhParam.config = &config;
+		cmhParam.logger = &logger;
+		cmhParam.httpSM = &httpSM;
+		cmhParam.smtpSM = &smtpSM;
 
 		//process commands
 		while (true) {
