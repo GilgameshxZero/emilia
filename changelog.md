@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.0.3
+
+* Implemented local `start`, `stop`, `restart` commands.
+* Implemented `connect` and `disconnect` commands.
+* Implemented authentication process with update servers.
+* Bugfix: ServerManager `disconnectSocket` now works properly.
+
 ## 5.0.2
 
 * Designed and summarized commands in readme.

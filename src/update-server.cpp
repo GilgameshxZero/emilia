@@ -8,11 +8,14 @@ namespace Emilia {
 			Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam = *reinterpret_cast<Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam *>(funcParam);
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 
-			if (ccParam.clientConnected)
+			if (ccParam.clientConnected) {
+				Rain::tsCout("Info: Update client connection request refused; client already connected.\r\n");
+				fflush(stdout);
 				return 1; //immediately terminate
+			}
 
 			ccParam.clientConnected = true;
-			Rain::tsCout("Info: client connected.\r\n");
+			Rain::tsCout("Info: Update client connected.\r\n");
 			fflush(stdout);
 
 			//create the delegate parameter for the first time
@@ -20,9 +23,6 @@ namespace Emilia {
 			ssmdhParam.delegateParam = reinterpret_cast<void *>(cdParam);
 
 			//initialize cdParam here
-			cdParam->request = "";
-			cdParam->requestLength = 0;
-
 			cdParam->authenticated = false;
 			return 0;
 		}
@@ -66,23 +66,23 @@ namespace Emilia {
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 
 			ccParam.clientConnected = false;
-			Rain::tsCout("Info: client disconnected.\r\n");
+			Rain::tsCout("Info: Update client disconnected.\r\n");
 			fflush(stdout);
 
 			//free the delegate parameter
 			delete ssmdhParam.delegateParam;
 			return 0;
 		}
-
+		
 		int HandleRequest(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
 			static const std::map<std::string, RequestMethodHandler> methodHandlerMap{
 				{"authenticate", HRAuthenticate}, //validates a socket connection session
-			{"prod-upload", HRProdUpload}, //updates server-side production files with client files
-			{"prod-download", HRProdDownload}, //request for current production files to client
-			{"prod-stop", HRProdStop}, //stop all server services
-			{"prod-start", HRProdStart}, //start all server services
-			{"sync-stop", HRSyncStop}, //stops constant updates and enables other commands
-			{"sync-start", HRSyncStart}, //request constant updates for changed production files; disables other commands except sync-stop
+				{"push", HRPush},
+				{"push-exclusive", HRPushExclusive},
+				{"pull", HRPull},
+				{"sync", HRSync},
+				{"start", HRStart},
+				{"stop", HRStop}
 			};
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
@@ -98,35 +98,77 @@ namespace Emilia {
 
 			auto handler = methodHandlerMap.find(cdParam.requestMethod);
 			int handlerRet = 0;
-			if (handler != methodHandlerMap.end())
+			if (handler != methodHandlerMap.end()) {
+				Rain::tsCout("Info: Received request from update client: ", cdParam.requestMethod, ".\r\n");
 				handlerRet = handler->second(ssmdhParam);
+			} else {
+				Rain::tsCout("Failure: Received unknown method from update client: ", cdParam.requestMethod, ".\r\n");
+			}
 
 			//clear request on exit
 			cdParam.request = "";
 
 			return handlerRet;
 		}
-
+		
 		int HRAuthenticate(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 			if (cdParam.authenticated) {
 				Rain::sendBlockMessage(*ssmdhParam.ssm, "authenticate auth-done");
-				Rain::tsCout("Info: Authenticated already.\r\n");
+				Rain::tsCout("Info: Update client authenticated already.\r\n");
 				fflush(stdout);
 			} else if (ccParam.config->at("emilia-auth-pass") != cdParam.request) {
 				Rain::sendBlockMessage(*ssmdhParam.ssm, "authenticate fail");
-				Rain::tsCout("Failure: Authenticate fail.\r\n");
+				Rain::tsCout("Error: Update client authenticate fail.\r\n");
 				fflush(stdout);
 			} else {
 				Rain::sendBlockMessage(*ssmdhParam.ssm, "authenticate success");
 				cdParam.authenticated = true;
-				Rain::tsCout("Success: Authenticate success.\r\n");
+				Rain::tsCout("Info: Update client authenticate success.\r\n");
 				fflush(stdout);
 			}
 
 			return 0;
 		}
+		int HRPush(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
+
+			return 0;
+		}
+		int HRPushExclusive(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
+
+			return 0;
+		}
+		int HRPull(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
+
+			return 0;
+		}
+		int HRSync(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
+
+			return 0;
+		}
+		int HRStart(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
+
+			return 0;
+		}
+		int HRStop(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
+
+			return 0;
+		}
+
+		/*
 		int HRProdUpload(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
@@ -486,6 +528,6 @@ namespace Emilia {
 		}
 		int HRSyncStart(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
 			return 0;
-		}
+		}*/
 	}
 }

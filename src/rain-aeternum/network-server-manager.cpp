@@ -254,7 +254,7 @@ namespace Rain {
 		return 0;
 	}
 	void ServerManager::disconnectSocket() {
-		if (this->socket == NULL) {
+		if (this->socket != NULL) {
 			Rain::shutdownSocketSend(this->socket);
 			closesocket(this->socket);
 		}
