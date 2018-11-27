@@ -230,6 +230,9 @@
     <None Include="..\changelog.md" />
     <None Include="..\readme.md" />
     <None Include="..\todo.md" />
+    <None Include="..\config\update-exclusives.ini">
+      <Filter>config</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\rc\icon.ico">

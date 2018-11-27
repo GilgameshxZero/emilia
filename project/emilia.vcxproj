@@ -277,6 +277,7 @@
     <None Include="..\config\http-cgi.ini" />
     <None Include="..\config\http-content-type.ini" />
     <None Include="..\config\http-headers.ini" />
+    <None Include="..\config\update-exclusives.ini" />
     <None Include="..\readme.md" />
     <None Include="..\todo.md" />
   </ItemGroup>

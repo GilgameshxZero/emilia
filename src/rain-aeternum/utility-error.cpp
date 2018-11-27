@@ -10,7 +10,7 @@ namespace Rain {
 	}
 	int errorAndCout(int code, std::string desc, std::string endl) {
 		tsCout(desc, endl);
-		reportError(code, desc);
+		return reportError(code, desc);
 	}
 
 	std::streambuf *redirectCerrFile(std::string filename, bool append) {
