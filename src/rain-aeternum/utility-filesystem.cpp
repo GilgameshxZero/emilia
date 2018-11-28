@@ -328,4 +328,14 @@ namespace Rain {
 		fileIn.close();
 		return ret;
 	}
+
+	bool isFileWritable(std::string file) {
+		FILE *fp;
+		fopen_s(&fp, file.c_str(), "w");
+		if (fp == NULL) {
+			return false;
+		}
+		fclose(fp);
+		return true;
+	}
 }

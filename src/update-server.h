@@ -23,6 +23,8 @@ namespace Emilia {
 			bool clientConnected;
 
 			Emilia::CommandHandlerParam *cmhParam;
+
+			std::string hrPushState;
 		};
 
 		struct ConnectionDelegateParam {

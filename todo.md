@@ -2,4 +2,4 @@
 
 * Separate logs into separate streams to separate destinations.
 * Capture all exceptions in main thread and deal with them there.
-* `reportError` sometimes crashes.
+* Speed up compilation with regards to changing build-ids.

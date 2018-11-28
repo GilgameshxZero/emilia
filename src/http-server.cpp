@@ -202,7 +202,7 @@ namespace Emilia {
 				customHeaders = Rain::readParameterFile(config["config-path"] + config["http-custom-headers"]);
 
 				//add server versioning info to "server" header
-				customHeaders["server"] = customHeaders["server"] + " (ver. " + Rain::tToStr(VERSION_MAJOR) + "." + Rain::tToStr(VERSION_MINOR) + "." + Rain::tToStr(VERSION_REVISION) + "." + Rain::tToStr(VERSION_BUILD) + ")";
+				customHeaders["server"] = customHeaders["server"] + " (version " + getVersionStr() + ")";
 
 				customHeadersParsed = true;
 			}

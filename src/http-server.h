@@ -3,7 +3,7 @@
 
 #include "rain-aeternum/rain-libraries.h"
 
-#include "build-id.h"
+#include "build-id-helpers.h"
 
 #include <algorithm>
 #include <map>
