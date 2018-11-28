@@ -117,39 +117,45 @@ namespace Emilia {
 			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
 			std::map<std::string, std::string> &config = *chParam.config;
 
-			static std::string state = "waiting-request";
-
 			static int cfiles;
 			static std::vector<std::string> requested;
 
-			if (state == "waiting-request") { //send over all file lengths
-				std::stringstream ss;
-				ss << chParam.request;
+			//HRPush handles a request which lists all the files which the server requests
+			std::stringstream ss;
+			ss << chParam.request;
 
-				ss >> cfiles;
-				std::string tmp;
-				std::getline(ss, tmp);
-				requested.clear();
-				for (int a = 0; a < cfiles; a++) {
-					requested.push_back("");
-					std::getline(ss, requested.back());
-					Rain::strTrimWhite(&requested.back());
-				}
-
-				std::string root = Rain::pathToAbsolute(config["update-root"]);
-				std::string response = "push \n";
-				for (int a = 0; a < requested.size(); a++) {
-					response += Rain::tToStr(Rain::getFileSize(root + requested[a])) + "\n";
-				}
-				Rain::sendBlockMessage(*csmdhParam.csm, &response);
-
-				Rain::tsCout("Info: Received requested files in response to 'push' command from remote. Sending filedata...\r\n");
-				fflush(stdout);
-
-				//move on to send buffered chunks of data from the files, in the same order as the requested files
-
-				state = "wait-confirm";
+			ss >> cfiles;
+			std::string tmp;
+			std::getline(ss, tmp);
+			requested.clear();
+			for (int a = 0; a < cfiles; a++) {
+				requested.push_back("");
+				std::getline(ss, requested.back());
+				Rain::strTrimWhite(&requested.back());
 			}
+
+			std::string root = Rain::pathToAbsolute(config["update-root"]);
+			std::string response = "push \n";
+			for (int a = 0; a < requested.size(); a++) {
+				response += Rain::tToStr(Rain::getFileSize(root + requested[a])) + "\n";
+			}
+			Rain::sendBlockMessage(*csmdhParam.csm, &response);
+
+			Rain::tsCout("Info: Received requested files in response to 'push' command from remote. Sending filedata...\r\n");
+			fflush(stdout);
+
+			//move on to send buffered chunks of data from the files, in the same order as the requested files
+			int bufferSize = Rain::strToT<int>(config["update-transfer-buffer"]);
+			char *buffer = new char[bufferSize];
+			for (int a = 0; a < requested.size(); a++) {
+				std::ifstream in(root + requested[a], std::ios::binary);
+				while (in) {
+					in.read(buffer, bufferSize);
+					Rain::sendBlockMessage(*csmdhParam.csm, (std::string)(buffer));
+				}
+				in.close();
+			}
+			delete[] buffer;
 
 			return 0;
 		}

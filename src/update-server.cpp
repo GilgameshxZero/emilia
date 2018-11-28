@@ -144,6 +144,10 @@ namespace Emilia {
 			static int cfiles;
 			static std::vector<std::string> requested;
 			static std::vector<std::size_t> fileLen;
+			static int curFile = 0;
+			static std::string accFile = "";
+
+			std::string root = Rain::pathToAbsolute(config["update-root"]);
 
 			if (state == "start") { //receiving filelist
 				std::stringstream ss;
@@ -161,7 +165,6 @@ namespace Emilia {
 				fflush(stdout);
 
 				//compare filelist with local checksums and see which ones need to be updated/deleted
-				std::string root = Rain::pathToAbsolute(config["update-root"]);
 				requested.clear();
 				Rain::tsCout(std::hex);
 				for (int a = 0; a < files.size(); a++) {
@@ -186,7 +189,7 @@ namespace Emilia {
 
 				state = "wait-filelengths";
 			} else if (state == "wait-filelengths") {
-				Rain::tsCout("Info: Received filelengths from update client.\r\n");
+				Rain::tsCout("Info: Received filelengths from update client. Receiving filedata...\r\n");
 				fflush(stdout);
 
 				std::stringstream ss;
@@ -196,9 +199,17 @@ namespace Emilia {
 					ss >> fileLen.back();
 				}
 
+				//remove all shared files
+				Rain::rmDirRec(root, &cmhParam.notSharedAbsSet);
+
 				state = "wait-data";
 			} else if (state == "wait-data") {
 				//data is a block of everything in the same order as request, buffered
+				accFile += cdParam.request;
+				
+				if (accFile.length() > fileLen[curFile]) {
+
+				}
 			}
 
 			return 0;
@@ -247,6 +258,7 @@ namespace Emilia {
 				response = "Error: could not setup SMTP server listening.\r\n";
 				Rain::errorAndCout(error, "Error: could not setup SMTP server listening.");
 			}
+			fflush(stdout);
 			Rain::sendBlockMessage(*ssmdhParam.ssm, "start " + response);
 
 			return 0;
