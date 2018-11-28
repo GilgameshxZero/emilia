@@ -140,6 +140,9 @@ namespace Rain {
 		//event which will be set when there have been as many calls to onDisconnect as there have been to onConnect
 		HANDLE recvExitComplete;
 
+		//lock this when modifying message queue
+		std::mutex queueMutex;
+
 		//disconnects socket immediately, regardless of state
 		//sets state as -1
 		void disconnectSocket();

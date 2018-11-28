@@ -1,5 +1,15 @@
 # Changelog
 
+## 5.1.0
+
+* Implemented `push` command which works most of the time between remote and local.
+  * Wrote `update-script.bat` which wait until a file is writable then replaces it.
+* Moved the build-ID helper function to a separate file, but this does not speed up compile.
+* Implemented `isFileWritable` to test just that.
+* Updated main to not crash if update server cannot be run.
+* Bugfix: `redirectCerrFile` no longer deletes stream buffer and causes error on use of `cerr`.
+* Bugfix: `NetworkClientManager` would sometimes crash when its message queue was modified concurrently.
+
 ## 5.0.5
 
 * Updated `getFilesRec` and `getDirsRec` to be able to specify files to want as well as files to ignore.

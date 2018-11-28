@@ -45,7 +45,9 @@ namespace Rain {
 	}
 	void ClientSocketManager::sendRawMessage(std::string *request) {
 		//uses copy constructor
+		this->queueMutex.lock();
 		this->messageQueue.push(*request);
+		this->queueMutex.unlock();
 
 		//if we are logging socket communications, do that here for outgoing communications
 		if (this->logger != NULL)
@@ -216,6 +218,7 @@ namespace Rain {
 		csm.msSendMessageWait = 1;
 
 		//attempt to send messages until csm.messageQueue is empty, at which point set the messageDoneEvent
+		csm.queueMutex.lock();
 		while (!csm.messageQueue.empty()) {
 			csm.blockForConnect(csm.msSendMessageWait);
 
@@ -224,10 +227,14 @@ namespace Rain {
 				csm.msSendMessageWait < csm.msSendWaitMax)
 				csm.msSendMessageWait = min(csm.msSendMessageWait * 2, csm.msSendWaitMax);
 			else if (csm.socketStatus == csm.STATUS_CONNECTED) {
+				//attempt to send messages until csm.messageQueue is empty, at which point set the messageDoneEvent
 				Rain::sendRawMessage(csm.socket, &csm.messageQueue.front());
 				csm.messageQueue.pop();
 			}
+			csm.queueMutex.unlock();
+			csm.queueMutex.lock();
 		}
+		csm.queueMutex.unlock();
 
 		CloseHandle(csm.hSendThread);
 

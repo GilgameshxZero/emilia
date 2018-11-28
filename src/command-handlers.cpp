@@ -119,6 +119,8 @@ namespace Emilia {
 		Rain::tsCout(std::dec);
 
 		//send over list of files and checksums
+		Rain::tsCout("Sending over 'push' request with checksums...", LINE_END);
+		fflush(stdout);
 		std::string message = "push " + Rain::tToStr(shared.size()) + "\n";
 		for (int a = 0; a < shared.size(); a++) {
 			message += Rain::tToStr(crc32[a]) + " " + shared[a] + "\n";
