@@ -22,6 +22,9 @@
     <Filter Include="data">
       <UniqueIdentifier>{b417e276-a129-4a7a-b08d-b6f7dabbf367}</UniqueIdentifier>
     </Filter>
+    <Filter Include="bin">
+      <UniqueIdentifier>{1da75a11-4f7c-458a-b83e-9692b48b681a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\smtp-server.h">
@@ -114,6 +117,9 @@
     <ClInclude Include="..\src\command-handler-param.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\build-id-helpers.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\command-handlers.cpp">
@@ -200,7 +206,7 @@
     <ClCompile Include="..\src\update-client.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\command-handler-param.cpp">
+    <ClCompile Include="..\src\build-id-helpers.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -247,6 +253,12 @@
     </None>
     <None Include="..\config\update-ignores.ini">
       <Filter>config</Filter>
+    </None>
+    <None Include="..\src\update-script.bat">
+      <Filter>src</Filter>
+    </None>
+    <None Include="..\bin\update-script.bat">
+      <Filter>bin</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

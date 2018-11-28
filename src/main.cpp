@@ -28,7 +28,7 @@ namespace Emilia {
 
 		//logging
 		Rain::createDirRec(config["log-path"]);
-		Rain::redirectCerrFile(config["log-path"] + config["log-error"], true);
+		std::pair<std::streambuf *, std::ofstream *> cerrRedirect = Rain::redirectCerrFile(config["log-path"] + config["log-error"], true);
 		HANDLE hFMemLeak = Rain::logMemoryLeaks(config["log-path"] + config["log-memory"]);
 
 		Rain::LogStream logger;
@@ -51,12 +51,8 @@ namespace Emilia {
 		if (argc >= 2) {
 			std::string arg1 = argv[1];
 			Rain::strTrimWhite(&arg1);
-			if (arg1 == "prod-upload-success") {
-				Rain::tsCout("Important: 'prod-upload' CRH operation completed successfully.\r\n");
-
-				//remove tmp file of the prod-upload operation
-				std::string filePath = Rain::pathToAbsolute(Rain::getExePath() + config["update-tmp-ext"]);
-				DeleteFile(filePath.c_str());
+			if (arg1 == "update-restart") {
+				Rain::tsCout("Important: Successfully restarted server after replacing from .tmp file from update operation.", LINE_END);
 			} else if (arg1 == "crash-restart") {
 				Rain::tsCout("Important: Successfully recovering from crash.", LINE_END);
 			}
@@ -132,11 +128,7 @@ namespace Emilia {
 			Rain::tsCout("Update server listening on port ", updSM.getListeningPort(), ".\r\n");
 		} else {
 			DWORD error = GetLastError();
-			Rain::errorAndCout(error, "Fatal: could not setup update server listening.");
-			WSACleanup();
-			if (hFMemLeak != NULL)
-				CloseHandle(hFMemLeak);
-			return error;
+			Rain::errorAndCout(error, "Error: could not setup update server listening.");
 		}
 
 		//process commands
@@ -161,6 +153,8 @@ namespace Emilia {
 		fflush(stdout);
 
 		logger.setStdHandleSrc(STD_OUTPUT_HANDLE, false);
+		std::cerr.rdbuf(cerrRedirect.first);
+		delete cerrRedirect.second;
 		return 0;
 	}
 }  // namespace Emilia
