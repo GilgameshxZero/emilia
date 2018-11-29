@@ -1,11 +1,17 @@
 # Changelog
 
+## 5.1.4
+
+* Fixed SMTP server config authentication error.
+* Renamed SMTP files to represent client better.
+
 ## 5.1.3
 
 * Merged common code between `push` and `push-exclusive`.
 * Requires authentication for high-level commands.
 * Automatically re-authenticates on reconnect.
 * Client shows requested filelist on `push`, and `push-exclusive`.
+* HTTP & SMTP servers automatically start on startup.
 
 ## 5.1.2
 

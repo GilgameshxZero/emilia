@@ -3,8 +3,8 @@
 
 #include "rain-aeternum/rain-libraries.h"
 
-#include "smtp-external.h"
-#include "smtp-internal.h"
+#include "smtp-external-client.h"
+#include "smtp-internal-client.h"
 
 #include <map>
 #include <WinDNS.h>
