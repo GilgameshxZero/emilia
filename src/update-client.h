@@ -3,6 +3,7 @@
 #include "rain-aeternum/rain-libraries.h"
 
 #include "update-client-param.h"
+#include "update-helper.h"
 
 namespace Emilia {
 	namespace UpdateClient {
