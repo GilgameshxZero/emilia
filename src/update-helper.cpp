@@ -224,7 +224,7 @@ namespace Emilia {
 						totalBytes += currentBytes;
 						response += Rain::tToStr(currentBytes) + "\n";
 
-						Rain::tsCout(std::setprecision(2), currentBytes / 1e6, " MB ", requested[a], "\r\n");
+						Rain::tsCout(std::setw(8), std::setprecision(2), currentBytes / 1e6, " MB ", requested[a], "\r\n");
 					}
 					Rain::sendBlockMessage(*csmdhParam.csm, &response);
 
