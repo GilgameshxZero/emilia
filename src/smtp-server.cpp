@@ -151,7 +151,7 @@ namespace Emilia {
 					vCSM.back()->setClientTarget("localhost", 25, 25);
 
 					//authentication
-					Rain::sendBlockMessage(*vCSM.back(), (*ccParam.config)["client-auth"]);
+					Rain::sendBlockMessage(*vCSM.back(), (*ccParam.config)["emilia-auth-pass"]);
 
 					//from address
 					Rain::sendBlockMessage(*vCSM.back(), "server@emilia-tan.com");
@@ -375,7 +375,7 @@ namespace Emilia {
 
 			//all requests to the client come here
 
-			if (cdParam.request != (*ccParam.config)["client-auth"]) {
+			if (cdParam.request != (*ccParam.config)["emilia-auth-pass"]) {
 				Rain::tsCout("Failure: Authentication to client failed.\r\n");
 				fflush(stdout);
 				ssmdhParam.ssm->sendRawMessage("-1");
