@@ -32,6 +32,9 @@ namespace Emilia {
 			//the success of the last request, as a code
 			//nonzero for error
 			int lastSuccess;
+
+			//password for authentication on reconnect
+			std::string authPass;
 		};
 	}
 }

@@ -151,7 +151,7 @@ namespace Emilia {
 						std::string message = "Error: Could not write to " + requested[*it] + ".";
 						if (Rain::pathToAbsolute(root + requested[*it]) == Rain::pathToAbsolute(Rain::getExePath())) {
 							//the current file is part of the unwritable files
-							message += " Restarting to write to executable...";
+							message += " Restarting to write to executable. Please disconnect and reconnect.";
 							shouldRestart = true;
 						}
 						message += "\r\n";

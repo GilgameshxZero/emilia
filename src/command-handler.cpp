@@ -43,6 +43,9 @@ namespace Emilia {
 		cmhParam.remoteCSM = new Rain::ClientSocketManager();
 		cmhParam.chParam = new UpdateClient::ConnectionHandlerParam();
 		cmhParam.chParam->config = cmhParam.config;
+		cmhParam.chParam->authPass = pass;
+		cmhParam.chParam->doneWaitingEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+		ResetEvent(cmhParam.chParam->doneWaitingEvent);
 		cmhParam.remoteCSM->setEventHandlers(UpdateClient::onConnect, UpdateClient::onMessage, UpdateClient::onDisconnect, cmhParam.chParam);
 		cmhParam.remoteCSM->setClientTarget(remoteAddr, updateServerPort, updateServerPort);
 		cmhParam.remoteCSM->blockForConnect(10000);
@@ -61,12 +64,6 @@ namespace Emilia {
 			cmhParam.remoteCSM = NULL;
 			return 0;
 		}
-
-		//authenticate
-		Rain::tsCout("Info: Authenticating with update server...", LINE_END);
-		cmhParam.chParam->waitingRequests++;
-		ResetEvent(cmhParam.chParam->doneWaitingEvent);
-		Rain::sendBlockMessage(*cmhParam.remoteCSM, "authenticate " + pass);
 
 		//wait for response, then see if we are still connected
 		WaitForSingleObject(cmhParam.chParam->doneWaitingEvent, 30000);

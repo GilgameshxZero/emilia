@@ -2,7 +2,7 @@
 
 #include "rain-aeternum/rain-libraries.h"
 
-#include "update-client.h"
+#include "update-client-param.h"
 
 namespace Emilia {
 	struct CommandHandlerParam {

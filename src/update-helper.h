@@ -5,9 +5,11 @@
 #include "update-server-param.h"
 #include "update-client-param.h"
 
+#include <ShellAPI.h>
+
 namespace Emilia {
-	namespace UpdateHelpers {
-		int ServerPushProc(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
-		int ClientPushProc(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam);
+	namespace UpdateHelper {
+		int ServerPushProc(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam, std::string method);
+		int ClientPushProc(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam, std::string method);
 	}
 }

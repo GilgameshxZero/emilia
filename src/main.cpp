@@ -131,6 +131,9 @@ namespace Emilia {
 			Rain::errorAndCout(error, "Error: could not setup update server listening.");
 		}
 
+		//auto-start servers
+		CHStart(cmhParam);
+
 		//process commands
 		while (true) {
 			static std::string command, tmp;
