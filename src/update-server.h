@@ -3,6 +3,7 @@
 #include "rain-aeternum/rain-libraries.h"
 
 #include "update-server-param.h"
+#include "update-helper.h"
 
 #include <ShellAPI.h>
 

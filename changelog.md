@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.1.3
+
+* Merged common code between `push` and `push-exclusive`.
+* Requires authentication for high-level commands.
+* Automatically re-authenticates on reconnect.
+* Client shows requested filelist on `push`, and `push-exclusive`.
+
 ## 5.1.2
 
 * New build versioning makes compiles faster.
