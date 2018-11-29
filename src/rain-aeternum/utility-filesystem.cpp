@@ -169,7 +169,7 @@ namespace Rain {
 		} while (pos != std::string::npos);
 	}
 
-	void rmDirRec(std::string dir, std::set<std::string> *ignore) {
+	void rmDirRec(std::string dir, std::set<std::string> *ignore, std::set<std::string> *want) {
 		wchar_t unicode[32767];
 		std::vector<std::string> ldir, lfile;
 
@@ -178,15 +178,22 @@ namespace Rain {
 
 		for (std::size_t a = 0; a < lfile.size(); a++) {
 			MultiByteToWideChar(CP_UTF8, 0, pathToAbsolute(dir + lfile[a]).c_str(), -1, unicode, 32767);
-			if (ignore == NULL || ignore->find(pathToAbsolute(dir + lfile[a])) == ignore->end())
-				DeleteFileW(pathToLongPath(std::wstring(unicode)).c_str());
+			if (ignore == NULL || ignore->find(pathToAbsolute(dir + lfile[a])) == ignore->end()) {
+				if (want == NULL || want->find(pathToAbsolute(dir + lfile[a])) != want->end()) {
+					DeleteFileW(pathToLongPath(std::wstring(unicode)).c_str());
+				}
+			}
 		}
 		for (std::size_t a = 2; a < ldir.size(); a++) //skip . and ..
 		{
 			MultiByteToWideChar(CP_UTF8, 0, pathToAbsolute(dir + ldir[a] + '\\').c_str(), -1, unicode, 32767);
 			if (ignore == NULL || ignore->find(pathToAbsolute(dir + ldir[a] + '\\')) == ignore->end()) {
-				rmDirRec(dir + ldir[a] + '\\', ignore);
-				RemoveDirectoryW(pathToLongPath(std::wstring(unicode)).c_str());
+				if (want == NULL || want->find(pathToAbsolute(dir + ldir[a] + '\\')) != want->end()) {
+					//want everything under this directory, so don't pass any argument forward
+					rmDirRec(dir + ldir[a] + '\\', ignore, NULL);
+
+					RemoveDirectoryW(pathToLongPath(std::wstring(unicode)).c_str());
+				}
 			}
 		}
 	}

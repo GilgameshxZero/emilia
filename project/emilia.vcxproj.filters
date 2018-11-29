@@ -25,6 +25,18 @@
     <Filter Include="bin">
       <UniqueIdentifier>{1da75a11-4f7c-458a-b83e-9692b48b681a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="exclusive">
+      <UniqueIdentifier>{8e8f8bf7-6602-460b-b3b9-83ea8842e64e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="exclusive\emilia-tan.com">
+      <UniqueIdentifier>{7de07f48-d714-42c6-8f0f-bd95699d7204}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="exclusive\emilia-tan.com\config">
+      <UniqueIdentifier>{ce0340ff-1bb5-48a7-a7ae-0eaf41965328}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="exclusive\emilia-tan.com\logs">
+      <UniqueIdentifier>{b26c3850-321b-41eb-8987-29a5f4efde43}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\smtp-server.h">
@@ -260,6 +272,27 @@
     <None Include="..\bin\update-script.bat">
       <Filter>bin</Filter>
     </None>
+    <None Include="..\exclusive\emilia-tan.com\config\update-ignores.ini">
+      <Filter>exclusive\emilia-tan.com\config</Filter>
+    </None>
+    <None Include="..\exclusive\emilia-tan.com\config\config.ini">
+      <Filter>exclusive\emilia-tan.com\config</Filter>
+    </None>
+    <None Include="..\exclusive\emilia-tan.com\config\http-404.html">
+      <Filter>exclusive\emilia-tan.com\config</Filter>
+    </None>
+    <None Include="..\exclusive\emilia-tan.com\config\http-cgi.ini">
+      <Filter>exclusive\emilia-tan.com\config</Filter>
+    </None>
+    <None Include="..\exclusive\emilia-tan.com\config\http-content-type.ini">
+      <Filter>exclusive\emilia-tan.com\config</Filter>
+    </None>
+    <None Include="..\exclusive\emilia-tan.com\config\http-headers.ini">
+      <Filter>exclusive\emilia-tan.com\config</Filter>
+    </None>
+    <None Include="..\exclusive\emilia-tan.com\config\update-exclusives.ini">
+      <Filter>exclusive\emilia-tan.com\config</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\rc\icon.ico">
@@ -286,6 +319,15 @@
     </Text>
     <Text Include="..\logs\memory-leaks.log">
       <Filter>logs</Filter>
+    </Text>
+    <Text Include="..\exclusive\emilia-tan.com\logs\errors.log">
+      <Filter>exclusive\emilia-tan.com\logs</Filter>
+    </Text>
+    <Text Include="..\exclusive\emilia-tan.com\logs\log.log">
+      <Filter>exclusive\emilia-tan.com\logs</Filter>
+    </Text>
+    <Text Include="..\exclusive\emilia-tan.com\logs\memory-leaks.log">
+      <Filter>exclusive\emilia-tan.com\logs</Filter>
     </Text>
   </ItemGroup>
 </Project>

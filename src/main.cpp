@@ -99,8 +99,8 @@ namespace Emilia {
 		cmhParam.smtpSM = &smtpSM;
 
 		cmhParam.excVec = Rain::readMultilineFile(config["config-path"] + config["update-exclusive-files"]);
-		cmhParam.excVec.push_back(config["update-exclusive-dir"]);
 		cmhParam.ignVec = Rain::readMultilineFile(config["config-path"] + config["update-ignore-files"]);
+		cmhParam.ignVec.push_back(config["update-exclusive-dir"]);
 		
 		//format exclusives into absolute paths
 		for (int a = 0; a < cmhParam.excVec.size(); a++) {

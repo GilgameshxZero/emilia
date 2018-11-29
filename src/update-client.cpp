@@ -121,6 +121,7 @@ namespace Emilia {
 
 			static int cfiles;
 			static std::vector<std::string> requested;
+			std::string root = Rain::pathToAbsolute(config["update-root"]);
 
 			if (state == "wait-request") {
 				//HRPush handles a request which lists all the files which the server requests
@@ -142,7 +143,6 @@ namespace Emilia {
 						Rain::strTrimWhite(&requested.back());
 					}
 
-					std::string root = Rain::pathToAbsolute(config["update-root"]);
 					std::string response = "push \n";
 					std::size_t totalBytes = 0, currentBytes;
 					for (int a = 0; a < requested.size(); a++) {
@@ -152,7 +152,7 @@ namespace Emilia {
 					}
 					Rain::sendBlockMessage(*csmdhParam.csm, &response);
 
-					Rain::tsCout("Info: Received requested files in response to 'push' command from remote. Sending filedata (", totalBytes / 1e6, " MB)...\r\n");
+					Rain::tsCout("Info: Received ", cfiles, " requested files in response to 'push' command from remote. Sending filedata (", totalBytes / 1e6, " MB)...\r\n");
 					fflush(stdout);
 
 					//move on to send buffered chunks of data from the files, in the same order as the requested files
@@ -193,6 +193,80 @@ namespace Emilia {
 		}
 		int HRPushExclusive(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam) {
 			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
+			std::map<std::string, std::string> &config = *chParam.config;
+
+			static std::string state = "wait-request";
+
+			static int cfiles;
+			static std::vector<std::string> requested;
+			std::string root = Rain::pathToAbsolute(config["update-root"]) + config["update-exclusive-dir"] + csmdhParam.csm->getTargetIP() + "\\";
+
+			if (state == "wait-request") {
+				//HRPush handles a request which lists all the files which the server requests
+				std::stringstream ss;
+				ss << chParam.request;
+
+				ss >> cfiles;
+
+				if (cfiles == 0) {
+					Rain::tsCout("Remote is up-to-date. No 'push-exclusive' necessary.\r\n");
+					fflush(stdout);
+				} else {
+					std::string tmp;
+					std::getline(ss, tmp);
+					requested.clear();
+					for (int a = 0; a < cfiles; a++) {
+						requested.push_back("");
+						std::getline(ss, requested.back());
+						Rain::strTrimWhite(&requested.back());
+					}
+
+					std::string response = "push-exclusive \n";
+					std::size_t totalBytes = 0, currentBytes;
+					for (int a = 0; a < requested.size(); a++) {
+						currentBytes = Rain::getFileSize(root + requested[a]);
+						totalBytes += currentBytes;
+						response += Rain::tToStr(currentBytes) + "\n";
+					}
+					Rain::sendBlockMessage(*csmdhParam.csm, &response);
+
+					Rain::tsCout("Info: Received ", cfiles, " requested files in response to 'push-exclusive' command from remote. Sending filedata (", totalBytes / 1e6, " MB)...\r\n");
+					fflush(stdout);
+
+					//move on to send buffered chunks of data from the files, in the same order as the requested files
+					int bufferSize = Rain::strToT<int>(config["update-transfer-buffer"]);
+					char *buffer = new char[bufferSize];
+					std::size_t completedBytes = 0;
+					std::string message;
+					Rain::tsCout(std::fixed);
+					for (int a = 0; a < requested.size(); a++) {
+						std::ifstream in(root + requested[a], std::ios::binary);
+						while (in) {
+							in.read(buffer, bufferSize);
+							message = "push-exclusive ";
+							message += std::string(buffer, std::size_t(in.gcount()));
+							Rain::sendBlockMessage(*csmdhParam.csm, &message);
+							completedBytes += in.gcount();
+							Rain::tsCout("Sending filedata: ", std::setw(6), 100.0 * completedBytes / totalBytes, "%\r");
+							fflush(stdout);
+						}
+						in.close();
+					}
+					delete[] buffer;
+					Rain::tsCout("\nDone. Waiting for server response...\r\n");
+					fflush(stdout);
+
+					state = "wait-complete";
+				}
+			} else if (state == "wait-complete") {
+				//everything in response is to be printed to cout and logs
+				Rain::tsCout(chParam.request);
+				fflush(stdout);
+
+				state = "wait-request";
+				requested.clear();
+			}
+
 			return 0;
 		}
 		int HRPull(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam) {

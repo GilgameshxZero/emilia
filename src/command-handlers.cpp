@@ -153,11 +153,20 @@ namespace Emilia {
 		std::vector<unsigned int> crc32(exclusive.size());
 		Rain::tsCout(std::hex);
 		for (int a = 0; a < exclusive.size(); a++) {
-			crc32[a] = Rain::checksumFileCRC32(root + exclusive[a]);
+			crc32[a] = Rain::checksumFileCRC32(excRoot + exclusive[a]);
 			Rain::tsCout(std::setw(8), crc32[a], " ", exclusive[a], LINE_END);
 			fflush(stdout);
 		}
 		Rain::tsCout(std::dec);
+
+		//send over the exclusive files as part of the push command (piggyback off of the command)
+		Rain::tsCout("Sending over 'push-exclusive' request with checksums...", LINE_END);
+		fflush(stdout);
+		std::string message = "push-exclusive " + Rain::tToStr(exclusive.size()) + "\n";
+		for (int a = 0; a < exclusive.size(); a++) {
+			message += Rain::tToStr(crc32[a]) + " " + exclusive[a] + "\n";
+		}
+		Rain::sendBlockMessage(*cmhParam.remoteCSM, &message);
 
 		return 0;
 	}
