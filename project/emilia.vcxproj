@@ -118,10 +118,10 @@
       <AdditionalLibraryDirectories>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\lib\x64</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>cd "$(SolutionDir)..\build\" &amp;&amp; call "build-id-inc.bat" &amp;&amp; copy "..\src\update-script.bat" "..\bin\update-script.bat"</Command>
+      <Command>cd "$(SolutionDir)..\build\" &amp;&amp; call "build-inc.bat" &amp;&amp; copy "..\src\update-script.bat" "..\bin\update-script.bat"</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>incrementing build id file &amp; copying update script</Message>
+      <Message>incrementing build file &amp; copying update script</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
@@ -141,10 +141,10 @@
       <AdditionalLibraryDirectories>C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\lib\x64</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>cd "$(SolutionDir)..\build\" &amp;&amp; call "build-id-inc.bat" &amp;&amp; copy "..\src\update-script.bat" "..\bin\update-script.bat"</Command>
+      <Command>cd "$(SolutionDir)..\build\" &amp;&amp; call "build-inc.bat" &amp;&amp; copy "..\src\update-script.bat" "..\bin\update-script.bat"</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>incrementing build id file &amp; copying update script</Message>
+      <Message>incrementing build file &amp; copying update script</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
@@ -169,10 +169,10 @@
       </Message>
     </CustomBuildStep>
     <PreBuildEvent>
-      <Command>cd "$(SolutionDir)..\build\" &amp;&amp; call "build-id-inc.bat" &amp;&amp; copy "..\src\update-script.bat" "..\bin\update-script.bat"</Command>
+      <Command>cd "$(SolutionDir)..\build\" &amp;&amp; call "build-inc.bat" &amp;&amp; copy "..\src\update-script.bat" "..\bin\update-script.bat"</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>incrementing build id file &amp; copying update script</Message>
+      <Message>incrementing build file &amp; copying update script</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
@@ -197,17 +197,26 @@
       </Message>
     </CustomBuildStep>
     <PreBuildEvent>
-      <Command>cd "$(SolutionDir)..\build\" &amp;&amp; call "build-id-inc.bat" &amp;&amp; copy "..\src\update-script.bat" "..\bin\update-script.bat"</Command>
+      <Command>cd "$(SolutionDir)..\build\" &amp;&amp; call "build-inc.bat" &amp;&amp; copy "..\src\update-script.bat" "..\bin\update-script.bat"</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>incrementing build id file &amp; copying update script</Message>
+      <Message>incrementing build file &amp; copying update script</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\build-id-helpers.h" />
-    <ClInclude Include="..\src\build-id.h" />
+    <ClInclude Include="..\rc\build.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|x64'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
+      </ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\src\build-helper.h" />
     <ClInclude Include="..\src\command-handler-param.h" />
-    <ClInclude Include="..\src\command-handlers.h" />
+    <ClInclude Include="..\src\command-handler.h" />
     <ClInclude Include="..\src\http-server.h" />
     <ClInclude Include="..\src\main.h" />
     <ClInclude Include="..\src\rain-aeternum\algorithm-libraries.h" />
@@ -233,12 +242,15 @@
     <ClInclude Include="..\src\smtp-external.h" />
     <ClInclude Include="..\src\smtp-internal.h" />
     <ClInclude Include="..\src\smtp-server.h" />
+    <ClInclude Include="..\src\update-client-param.h" />
     <ClInclude Include="..\src\update-client.h" />
+    <ClInclude Include="..\src\update-helper.h" />
+    <ClInclude Include="..\src\update-server-param.h" />
     <ClInclude Include="..\src\update-server.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\build-id-helpers.cpp" />
-    <ClCompile Include="..\src\command-handlers.cpp" />
+    <ClCompile Include="..\src\build-helper.cpp" />
+    <ClCompile Include="..\src\command-handler.cpp" />
     <ClCompile Include="..\src\http-server.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\rain-aeternum\algorithm-libraries.cpp" />
@@ -265,13 +277,14 @@
     <ClCompile Include="..\src\smtp-internal.cpp" />
     <ClCompile Include="..\src\smtp-server.cpp" />
     <ClCompile Include="..\src\update-client.cpp" />
+    <ClCompile Include="..\src\update-helper.cpp" />
     <ClCompile Include="..\src\update-server.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
     <None Include="..\bin\update-script.bat" />
     <None Include="..\build\build-debug.bat" />
-    <None Include="..\build\build-id-inc.bat" />
+    <None Include="..\build\build-inc.bat" />
     <None Include="..\build\build.bat" />
     <None Include="..\build\make.bat" />
     <None Include="..\build\setup-env.bat" />
