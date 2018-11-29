@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.1.2
+
+* New build versioning makes compiles faster.
+* Moved some params to external header files.
+
 ## 5.1.1
 
 * Implemented `push-exclusive`, and fixed most crashes with `push`.

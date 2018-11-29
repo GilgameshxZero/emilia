@@ -42,12 +42,6 @@
     <ClInclude Include="..\src\smtp-server.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\build-id.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\command-handlers.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\http-server.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -129,14 +123,26 @@
     <ClInclude Include="..\src\command-handler-param.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\build-id-helpers.h">
+    <ClInclude Include="..\src\command-handler.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\update-client-param.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\update-helper.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\update-server-param.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\build-helper.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rc\build.h">
+      <Filter>rc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\command-handlers.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\http-server.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -218,7 +224,13 @@
     <ClCompile Include="..\src\update-client.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\build-id-helpers.cpp">
+    <ClCompile Include="..\src\command-handler.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\update-helper.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\build-helper.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -227,9 +239,6 @@
       <Filter>build</Filter>
     </None>
     <None Include="..\build\build-debug.bat">
-      <Filter>build</Filter>
-    </None>
-    <None Include="..\build\build-id-inc.bat">
       <Filter>build</Filter>
     </None>
     <None Include="..\build\make.bat">
@@ -292,6 +301,9 @@
     </None>
     <None Include="..\exclusive\emilia-tan.com\config\update-exclusives.ini">
       <Filter>exclusive\emilia-tan.com\config</Filter>
+    </None>
+    <None Include="..\build\build-inc.bat">
+      <Filter>build</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
