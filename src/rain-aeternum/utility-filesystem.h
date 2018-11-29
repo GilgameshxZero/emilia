@@ -73,7 +73,7 @@ namespace Rain {
 	//works with unicode/multibyte UTF8
 	//second argument specifies files/directories to not remove; use \ end to specify dir
 	//use absolute paths in ignore
-	void rmDirRec(std::string dir, std::set<std::string> *ignore = NULL);
+	void rmDirRec(std::string dir, std::set<std::string> *ignore = NULL, std::set<std::string> *want = NULL);
 
 	//copies directory structure over, replacing any files in the destination, but not deleting any unrelated files
 	void cpyDirRec(std::string src, std::string dst, std::set<std::string> *ignore = NULL);
