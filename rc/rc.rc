@@ -1,4 +1,4 @@
-#include "../src/build-id.h"
+#include "build.h"
 
 1 ICON "icon.ico"
 

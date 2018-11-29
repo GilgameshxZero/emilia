@@ -2,7 +2,7 @@
 
 #include "rain-aeternum/rain-libraries.h"
 
-#include "command-handlers.h"
+#include "command-handler.h"
 
 #include "http-server.h"
 #include "smtp-server.h"
