@@ -1,5 +1,15 @@
 # Changelog
 
+## 5.1.1
+
+* Implemented `push-exclusive`, and fixed most crashes with `push`.
+* Fixed a missing newline log in `push` on the server.
+* Moved \exclusive to the ignore set.
+* Updated `rmDirRec` to have a optional `want` parameter.
+* Updated behavior when no files are requested.
+* Update script is now copied to `bin` on build.
+* Bugfix: `NetworkClientManager` would crash if `messageDoneEvent` was accessed concurrently, which has now been solved with mutexes.
+
 ## 5.1.0
 
 * Implemented `push` command which works most of the time between remote and local.

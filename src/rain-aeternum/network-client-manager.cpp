@@ -47,7 +47,6 @@ namespace Rain {
 		//uses copy constructor
 		this->queueMutex.lock();
 		this->messageQueue.push(*request);
-		this->queueMutex.unlock();
 
 		//if we are logging socket communications, do that here for outgoing communications
 		if (this->logger != NULL)
@@ -60,6 +59,7 @@ namespace Rain {
 			//start thread to send messages
 			this->hSendThread = Rain::simpleCreateThread(ClientSocketManager::attemptSendMessageThread, this);
 		}
+		this->queueMutex.unlock();
 
 		if (this->blockSendRawMessage)
 			this->blockForMessageQueue(0);
