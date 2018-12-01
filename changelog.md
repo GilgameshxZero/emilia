@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.1.5
+
+* Flush stdout more often with `push` on server end.
+* Server closes connection on authentication fail.
+* Internal SMTP server is now gone; all mail is directly forwarded/sent.
+
 ## 5.1.4
 
 * Fixed SMTP server config authentication error.

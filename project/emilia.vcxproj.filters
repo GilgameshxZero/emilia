@@ -135,9 +135,6 @@
     <ClInclude Include="..\rc\build.h">
       <Filter>rc</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\smtp-internal-client.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\smtp-external-client.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -225,9 +222,6 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\build-helper.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\smtp-internal-client.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\smtp-external-client.cpp">

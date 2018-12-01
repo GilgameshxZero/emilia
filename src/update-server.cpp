@@ -54,6 +54,8 @@ namespace Emilia {
 					int hrReturn = HandleRequest(ssmdhParam);
 					if (hrReturn < 0 || (hrReturn > 0 && ret >= 0))
 						ret = hrReturn;
+					if (ret < 0)
+						return ret;
 
 					cdParam.request = fragment;
 					cdParam.requestLength = 0;

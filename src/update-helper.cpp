@@ -59,8 +59,8 @@ namespace Emilia {
 						noRemove.insert(root + files[a].second);
 					}
 					Rain::tsCout("\r\n");
+					fflush(stdout);
 				}
-				fflush(stdout);
 
 				if (requested.size() == 0) {
 					//if we don't need any files, don't send the request.
