@@ -9,12 +9,14 @@ namespace Emilia {
 			ccParam.logger->setSocketSrc(ssmdhParam.ssm, true);
 
 			ssmdhParam.delegateParam = new ConnectionDelegateParam();
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 			Rain::tsCout("Info: Client ", Rain::getClientNumIP(*ssmdhParam.cSocket), " connected. Total: ", ++ccParam.connectedClients, ".\r\n");
 			fflush(stdout);
 
 			//in either request type, send a 220
 			//in send requests, the 220 will be ignored, but that's fine
 			ssmdhParam.ssm->sendRawMessage("220 Emilia is ready\r\n");
+			cdParam.rcd.reqHandler = HRREhlo;
 
 			return 0;
 		}
@@ -25,73 +27,23 @@ namespace Emilia {
 
 			cdParam.request += *ssmdhParam.message;
 
-			if (cdParam.cType == "") {
-				std::size_t firstSpace = cdParam.request.find(' ');
-				if (firstSpace != std::string::npos) {
-					std::string method = cdParam.request.substr(0, firstSpace);
-					if (method == "EHLO" || method == "HELO") {
-						cdParam.cType = "recv";
-						cdParam.rcd.reqHandler = HRREhlo;
-					} else {
-						cdParam.cType = "send";
-						cdParam.scd.reqHandler = HRSAuth;
-
-						//start off as fail
-						cdParam.scd.status = -1;
-					}
-				}
-			}
-
 			int ret = 0;
-			if (cdParam.cType == "recv") {
-				//test if message is done receiving
-				if (cdParam.rcd.reqHandler != HRRData) {
-					//message terminated by CRLF
-					if (cdParam.request.substr(cdParam.request.length() - 2, 2) == "\r\n") {
-						//message complete, send to handler
-						ret = cdParam.rcd.reqHandler(ssmdhParam);
-					}
-				} else {
-					//message terminated by \r\n.\r\n
-					if (cdParam.request.substr(cdParam.request.length() - 5, 5) == "\r\n.\r\n") {
-						//message complete, send to handler
-						ret = cdParam.rcd.reqHandler(ssmdhParam);
-					}
+			if (cdParam.rcd.reqHandler != HRRData) {
+				//message terminated by CRLF
+				if (cdParam.request.substr(cdParam.request.length() - 2, 2) == "\r\n") {
+					//message complete, send to handler
+					ret = cdParam.rcd.reqHandler(ssmdhParam);
+					cdParam.request.clear();
 				}
-			} else if (cdParam.cType == "send") {
-				//message is done if its length is correct; care for multiple message mushed together
-				while (true) {
-					if (cdParam.scd.requestLength == 0) {
-						std::size_t firstSpace = cdParam.request.find(' ');
-						if (firstSpace != std::string::npos) {
-							cdParam.scd.requestLength = Rain::strToT<std::size_t>(cdParam.request.substr(0, firstSpace));
-
-							//care: requestLength may be invalid
-
-							cdParam.request = cdParam.request.substr(firstSpace + 1, cdParam.request.length());
-						} else
-							break;
-					}
-					if (cdParam.scd.requestLength != 0 &&
-						cdParam.scd.requestLength <= cdParam.request.length()) {
-						std::string fragment = cdParam.request.substr(cdParam.scd.requestLength, cdParam.request.length());
-						cdParam.request = cdParam.request.substr(0, cdParam.scd.requestLength);
-
-						//cdParam.request may be invalid at this point
-						//shouldn't be NULL, but just in case
-						if (cdParam.scd.reqHandler == NULL)
-							ret = -1;
-						else
-							ret = cdParam.scd.reqHandler(ssmdhParam);
-
-						cdParam.request = fragment;
-						cdParam.scd.requestLength = 0;
-					} else
-						break;
+			} else {
+				//message terminated by \r\n.\r\n
+				if (cdParam.request.substr(cdParam.request.length() - 5, 5) == "\r\n.\r\n") {
+					//message complete, send to handler
+					ret = cdParam.rcd.reqHandler(ssmdhParam);
+					cdParam.request.clear();
 				}
 			}
 
-			cdParam.request.clear();
 			return ret;
 		}
 		int onDisconnect(void *param) {
@@ -105,8 +57,7 @@ namespace Emilia {
 			fflush(stdout);
 
 			//if receiving mail, process it now if possible
-			if (cdParam.cType == "recv" &&
-				cdParam.rcd.mailData.length() > 0) {
+			if (cdParam.rcd.mailData.length() > 0) {
 				Rain::tsCout("Success: Parsed receive mail request from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ".\r\n");
 				Rain::tsCout("Info: Forwarding receive mail request to respective recipients.\r\n");
 				fflush(stdout);
@@ -116,10 +67,6 @@ namespace Emilia {
 				for (auto it : users) {
 					ccParam.b64Users[Rain::strEncodeB64(it.first)] = Rain::strEncodeB64(it.second);
 				}
-
-				//different csm's used to send requests to internal client
-				std::vector<Rain::ClientSocketManager *> vCSM;
-				std::vector<InternalConnectionParam *> vICParam;
 
 				//break down the receive request into one for each rcpt to
 				for (auto rcpt : cdParam.rcd.rcptTo) {
@@ -140,48 +87,73 @@ namespace Emilia {
 						}
 					}
 
-					//create a CSM to send a request to EmiliaMailServer's same port to send this email to the right location
-					vCSM.push_back(new Rain::ClientSocketManager());
-					vICParam.push_back(new InternalConnectionParam());
-					vICParam.back()->hFinish = CreateEvent(NULL, TRUE, FALSE, NULL);
-					vICParam.back()->toAddress = trueTo;
+					//get DNS information
+					std::string emailHostDomain = Rain::getEmailDomain(trueTo);
+					std::vector<std::string> smtpServers;
+					DNS_RECORD *dnsRecord;
+					if (!DnsQuery(emailHostDomain.c_str(), DNS_TYPE_MX, DNS_QUERY_STANDARD, NULL, &dnsRecord, NULL)) {
+						DNS_RECORD *curDNSR = dnsRecord;
+						while (curDNSR != NULL) {
+							smtpServers.push_back(curDNSR->Data.MX.pNameExchange);
+							curDNSR = curDNSR->pNext;
+						}
+						DnsRecordListFree(dnsRecord, DnsFreeRecordList);
+						Rain::tsCout("Success: Successfully queried ", smtpServers.size(), " MX DNS record(s) for domain ", emailHostDomain, ". Connecting to SMTP server...\r\n");
+						fflush(stdout);
+					} else {
+						Rain::tsCout("Failure: Failed query for MX DNS record for domain ", emailHostDomain, ". Client will discard email and terminate...\r\n");
+						fflush(stdout);
+						ssmdhParam.ssm->sendRawMessage("-2");
+						return 1;
+					}
 
-					//don't need to verify; just send the information and exit
-					vCSM.back()->setEventHandlers(onInternalConnect, onInternalMessage, onInternalDisconnect, vICParam.back());
-					vCSM.back()->setClientTarget("localhost", 25, 25);
+					//use CSM to send the mail and block for results
+					Rain::ClientSocketManager csm;
+					ExternalConnectionParam ecParam;
 
-					//authentication
-					Rain::sendBlockMessage(*vCSM.back(), (*ccParam.config)["emilia-auth-pass"]);
+					ccParam.logger->setSocketSrc(&csm, true);
 
-					//from address
-					Rain::sendBlockMessage(*vCSM.back(), "server@emilia-tan.com");
+					ecParam.hFinish = CreateEvent(NULL, TRUE, FALSE, NULL);
+					ecParam.reqHandler = EHREhlo;
+					ecParam.to = &trueTo;
+					ecParam.from = &cdParam.rcd.mailFrom;
+					ecParam.data = &cdParam.rcd.mailData;
 
-					//to address
-					Rain::sendBlockMessage(*vCSM.back(), trueTo);
+					csm.setEventHandlers(onExternalConnect, onExternalMessage, onExternalDisconnect, &ecParam);
 
-					//entire email body, including end
-					Rain::sendBlockMessage(*vCSM.back(), cdParam.rcd.mailData);
-				}
+					//attempt to connect to each of the MX records in order, each with a timeout, until all of them fail or one of them succeeds
+					bool connected = false;
+					for (std::string server : smtpServers) {
+						csm.setClientTarget(server, 25, 25);
 
-				//wait on all CSMs to return with a code (and, thus report their success to the console)
-				while (vICParam.size() > 0) {
-					WaitForSingleObject(vICParam.back()->hFinish, INFINITE);
-					CloseHandle(vICParam.back()->hFinish);
-					delete vICParam.back();
-					vICParam.pop_back();
-					delete vCSM.back();
-					vCSM.pop_back();
+						//only allow connecting to client for a timeout before discarding email
+						csm.blockForConnect(Rain::strToT<DWORD>((*ccParam.config)["smtp-connect-timeout"]));
+						if (csm.getSocketStatus() != csm.STATUS_CONNECTED) {
+							Rain::tsCout("Failure: Could not connect to SMTP server ", server, ". Client will try next MX SMTP server if available...\r\n");
+							fflush(stdout);
+						} else {
+							Rain::tsCout("Success: Connected to SMTP server ", server, ". Sending email...\r\n");
+							fflush(stdout);
+							connected = true;
+							break;
+						}
+					}
+
+					if (!connected) {
+						Rain::tsCout("Failure: All MX record SMTP servers failed to connect. Client will discard email and terminate.\r\n");
+						fflush(stdout);
+						ssmdhParam.ssm->sendRawMessage("-3");
+						return 1;
+					}
+
+					//block for communications, which the event handlers will send
+					WaitForSingleObject(ecParam.hFinish, INFINITE);
+					CloseHandle(ecParam.hFinish);
+
+					ccParam.logger->setSocketSrc(&csm, false);
 				}
 
 				Rain::tsCout("Info: Finished processing receive mail request from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ".\r\n");
-			} else if (cdParam.cType == "send") {
-				if (cdParam.scd.status == 0) {
-					Rain::tsCout("Success: Processed 'send' mail request from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ".\r\n");
-				} else {
-					Rain::tsCout("Failure: Invalid 'send' mail request from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ".\r\n");
-				}
-			} else if (cdParam.cType == "recv") {
-				Rain::tsCout("Failure: Invalid 'recv' mail request from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ".\r\n");
 			} else {
 				Rain::tsCout("Failure: Invalid mail request from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ".\r\n");
 			}
@@ -252,7 +224,8 @@ namespace Emilia {
 				isAtDomain = allAtDomain;
 			}
 
-			if (isAtDomain) {
+			//we are willing to send email to and from anybody
+			if (true || isAtDomain) {
 				ssmdhParam.ssm->sendRawMessage("250 OK\r\n");
 			} else {
 				ssmdhParam.ssm->sendRawMessage("510 Emilia doesn't like talking for strangers (one of either 'RCPT TO' or 'MAIL FROM' must be at the local domain\r\n");
@@ -367,120 +340,6 @@ namespace Emilia {
 
 			ssmdhParam.ssm->sendRawMessage("250 OK\r\n");
 			return 0;
-		}
-
-		int HRSAuth(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
-			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
-			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
-
-			//all requests to the client come here
-
-			if (cdParam.request != (*ccParam.config)["emilia-auth-pass"]) {
-				Rain::tsCout("Failure: Authentication to client failed.\r\n");
-				fflush(stdout);
-				ssmdhParam.ssm->sendRawMessage("-1");
-				return 1;
-			}
-
-			cdParam.scd.reqHandler = HRSFrom;
-			return 0;
-		}
-		int HRSFrom(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
-			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
-			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
-
-			cdParam.scd.from = cdParam.request;
-			cdParam.scd.reqHandler = HRSTo;
-			return 0;
-		}
-		int HRSTo(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
-			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
-			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
-
-			cdParam.scd.to = cdParam.request;
-			cdParam.scd.reqHandler = HRSBody;
-			return 0;
-		}
-		int HRSBody(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam) {
-			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
-			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
-
-			cdParam.scd.data = cdParam.request;
-			cdParam.scd.reqHandler = NULL;
-
-			//get DNS information
-			std::string emailHostDomain = Rain::getEmailDomain(cdParam.scd.to);
-			std::vector<std::string> smtpServers;
-			DNS_RECORD *dnsRecord;
-			if (!DnsQuery(emailHostDomain.c_str(), DNS_TYPE_MX, DNS_QUERY_STANDARD, NULL, &dnsRecord, NULL)) {
-				DNS_RECORD *curDNSR = dnsRecord;
-				while (curDNSR != NULL) {
-					smtpServers.push_back(curDNSR->Data.MX.pNameExchange);
-					curDNSR = curDNSR->pNext;
-				}
-				DnsRecordListFree(dnsRecord, DnsFreeRecordList);
-				Rain::tsCout("Success: Successfully queried ", smtpServers.size(), " MX DNS record(s) for domain ", emailHostDomain, ". Connecting to SMTP server...\r\n");
-				fflush(stdout);
-			} else {
-				Rain::tsCout("Failure: Failed query for MX DNS record for domain ", emailHostDomain, ". Client will discard email and terminate...\r\n");
-				fflush(stdout);
-				ssmdhParam.ssm->sendRawMessage("-2");
-				return 1;
-			}
-
-			//use CSM to send the mail and block for results
-			Rain::ClientSocketManager csm;
-			ExternalConnectionParam ecParam;
-
-			ccParam.logger->setSocketSrc(&csm, true);
-
-			ecParam.hFinish = CreateEvent(NULL, TRUE, FALSE, NULL);
-			ecParam.reqHandler = EHREhlo;
-			ecParam.to = &cdParam.scd.to;
-			ecParam.from = &cdParam.scd.from;
-			ecParam.data = &cdParam.scd.data;
-
-			csm.setEventHandlers(onExternalConnect, onExternalMessage, onExternalDisconnect, &ecParam);
-
-			//attempt to connect to each of the MX records in order, each with a timeout, until all of them fail or one of them succeeds
-			bool connected = false;
-			for (std::string server : smtpServers) {
-				csm.setClientTarget(server, 25, 25);
-
-				//only allow connecting to client for a timeout before discarding email
-				csm.blockForConnect(Rain::strToT<DWORD>((*ccParam.config)["smtp-connect-timeout"]));
-				if (csm.getSocketStatus() != csm.STATUS_CONNECTED) {
-					Rain::tsCout("Failure: Could not connect to SMTP server ", server, ". Client will try next MX SMTP server if available...\r\n");
-					fflush(stdout);
-				} else {
-					Rain::tsCout("Success: Connected to SMTP server ", server, ". Sending email...\r\n");
-					fflush(stdout);
-					connected = true;
-					break;
-				}
-			}
-
-			if (!connected) {
-				Rain::tsCout("Failure: All MX record SMTP servers failed to connect. Client will discard email and terminate.\r\n");
-				fflush(stdout);
-				ssmdhParam.ssm->sendRawMessage("-3");
-				return 1;
-			}
-
-			//block for communications, which the event handlers will send
-			WaitForSingleObject(ecParam.hFinish, INFINITE);
-			CloseHandle(ecParam.hFinish);
-
-			ccParam.logger->setSocketSrc(&csm, false);
-
-			//output a status code and terminate the connection
-			//0 is success
-			ssmdhParam.ssm->sendRawMessage(Rain::tToStr(ecParam.status));
-
-			//also mark locally the return code
-			cdParam.scd.status = ecParam.status;
-
-			return 1;
 		}
 	}  // namespace SMTPServer
 }  // namespace Emilia

@@ -240,7 +240,6 @@
     <ClInclude Include="..\src\rain-aeternum\utility-time.h" />
     <ClInclude Include="..\src\rain-aeternum\windows-lam-include.h" />
     <ClInclude Include="..\src\smtp-external-client.h" />
-    <ClInclude Include="..\src\smtp-internal-client.h" />
     <ClInclude Include="..\src\smtp-server.h" />
     <ClInclude Include="..\src\update-client-param.h" />
     <ClInclude Include="..\src\update-client.h" />
@@ -274,7 +273,6 @@
     <ClCompile Include="..\src\rain-aeternum\utility-time.cpp" />
     <ClCompile Include="..\src\rain-aeternum\windows-lam-include.cpp" />
     <ClCompile Include="..\src\smtp-external-client.cpp" />
-    <ClCompile Include="..\src\smtp-internal-client.cpp" />
     <ClCompile Include="..\src\smtp-server.cpp" />
     <ClCompile Include="..\src\update-client.cpp" />
     <ClCompile Include="..\src\update-helper.cpp" />
