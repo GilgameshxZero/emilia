@@ -195,6 +195,15 @@ namespace Emilia {
 				cgiScriptsParsed = true;
 			}
 
+			//we are a cgi script if the current requestFilePathAbs has any of the cgiScript strings as a substring
+			bool isCgiScript = false;
+			for (auto it = cgiScripts.begin(); it != cgiScripts.end(); it++) {
+				if (requestFilePathAbs.substr(0, it->length()) == *it) {
+					isCgiScript = true;
+					break;
+				}
+			}
+
 			//make sure custom response headers are parsed
 			static bool customHeadersParsed = false;
 			static std::map<std::string, std::string> customHeaders;
@@ -242,7 +251,7 @@ namespace Emilia {
 					Rain::reportError(GetLastError(), "error while sending response to client; response: " + response);
 					return -7;
 				}
-			} else if (cgiScripts.find(requestFilePathAbs) != cgiScripts.end()) {
+			} else if (isCgiScript) {
 				//branch if the file is a cgi script
 				//run the file at FilePath as a cgi script, and respond with its content
 				//set the current environment block as well as additional environment parameters for the script
@@ -354,12 +363,6 @@ namespace Emilia {
 
 				//compose response
 				//get buffered output from the script, and send it over the socket buffered
-				responseStatus = "HTTP/1.1 200 OK";
-				if (!Rain::sendRawMessage(cSocket, &responseStatus)) {
-					Rain::reportError(GetLastError(), "error while sending response to client; responseStatus: " + responseStatus);
-					return -7;
-				}
-
 				static std::size_t cgiOutPipeBufLen = Rain::strToT<std::size_t>(config["http-transfer-buffer"]);
 				CHAR *chBuf = new CHAR[cgiOutPipeBufLen];
 				for (;;) {

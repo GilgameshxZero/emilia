@@ -1,5 +1,15 @@
 # Changelog
 
+## 5.1.6
+
+* Created HTTP accessible script to forward requests to internal SMTP server, so that it is accessible through JS.
+* Created simple POST and GET scripts to print back requests.
+* Refined build pipelines for scripts and main program.
+* Coded `getQueryToMap` in `network-utility` which transforms a GET query to a string:string map.
+* Opened `server@emilia-tan.com` to the outside world without authentication.
+* CGI script specification can now include paths.
+* Bugfix: SMTP server not longer ignores requests if they are sent in the same block.
+
 ## 5.1.5
 
 * Flush stdout more often with `push` on server end.
