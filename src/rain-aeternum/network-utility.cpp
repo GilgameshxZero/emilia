@@ -49,4 +49,26 @@ namespace Rain {
 
 		return rw;
 	}
+
+	std::map<std::string, std::string> getQueryToMap(std::string query) {
+		std::size_t start, end;
+		std::vector<std::string> lines;
+
+		start = 0;
+		end = query.find('&');
+		while (end != std::string::npos) {
+			lines.push_back(query.substr(start, end - start));
+			start = end + 1;
+			end = query.find('&', start);
+		}
+		lines.push_back(query.substr(start, end));
+
+		std::map<std::string, std::string> rt;
+		for (std::size_t a = 0; a < lines.size(); a++) {
+			std::size_t equals = lines[a].find('=');
+			rt.insert(std::make_pair(lines[a].substr(0, equals), lines[a].substr(equals + 1, lines[a].length())));
+		}
+
+		return rt;
+	}
 }

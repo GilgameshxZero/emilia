@@ -28,19 +28,31 @@ namespace Emilia {
 			cdParam.request += *ssmdhParam.message;
 
 			int ret = 0;
-			if (cdParam.rcd.reqHandler != HRRData) {
-				//message terminated by CRLF
-				if (cdParam.request.substr(cdParam.request.length() - 2, 2) == "\r\n") {
-					//message complete, send to handler
-					ret = cdParam.rcd.reqHandler(ssmdhParam);
-					cdParam.request.clear();
-				}
-			} else {
-				//message terminated by \r\n.\r\n
-				if (cdParam.request.substr(cdParam.request.length() - 5, 5) == "\r\n.\r\n") {
-					//message complete, send to handler
-					ret = cdParam.rcd.reqHandler(ssmdhParam);
-					cdParam.request.clear();
+			while (true) {
+				if (cdParam.rcd.reqHandler != HRRData) {
+					//message terminated by CRLF
+					std::size_t end = cdParam.request.find("\r\n");
+					if (end != std::string::npos) {
+						//message complete, send to handler
+						std::string fragment = cdParam.request.substr(end + 2, cdParam.request.length());
+						cdParam.request = cdParam.request.substr(0, end + 2);
+						ret = cdParam.rcd.reqHandler(ssmdhParam);
+						cdParam.request = fragment;
+					} else {
+						break;
+					}
+				} else {
+					//message terminated by \r\n.\r\n
+					std::size_t end = cdParam.request.find("\r\n.\r\n");
+					if (end != std::string::npos) {
+						//message complete, send to handler
+						std::string fragment = cdParam.request.substr(end + 5, cdParam.request.length());
+						cdParam.request = cdParam.request.substr(0, end + 5);
+						ret = cdParam.rcd.reqHandler(ssmdhParam);
+						cdParam.request = fragment;
+					} else {
+						break;
+					}
 				}
 			}
 
@@ -93,7 +105,7 @@ namespace Emilia {
 					DNS_RECORD *dnsRecord;
 					if (!DnsQuery(emailHostDomain.c_str(), DNS_TYPE_MX, DNS_QUERY_STANDARD, NULL, &dnsRecord, NULL)) {
 						DNS_RECORD *curDNSR = dnsRecord;
-						while (curDNSR != NULL) {
+						while (curDNSR != NULL && curDNSR->wType == DNS_TYPE_MX) {
 							smtpServers.push_back(curDNSR->Data.MX.pNameExchange);
 							curDNSR = curDNSR->pNext;
 						}
@@ -103,7 +115,7 @@ namespace Emilia {
 					} else {
 						Rain::tsCout("Failure: Failed query for MX DNS record for domain ", emailHostDomain, ". Client will discard email and terminate...\r\n");
 						fflush(stdout);
-						ssmdhParam.ssm->sendRawMessage("-2");
+						ssmdhParam.ssm->sendRawMessage("Failure: Failed query for MX DNS record for domain " + emailHostDomain + ". Client will discard email and terminate...\r\n");
 						return 1;
 					}
 
@@ -311,9 +323,9 @@ namespace Emilia {
 			}
 			cdParam.rcd.mailFrom = Rain::strTrimWhite(afterColon.substr(b1 + 1, b2 - b1 - 1));
 
-			//if sending from current domain, need to be authenticated
+			//if sending from current domain, need to be authenticated, unless it's from server@emilia-tan.com, which is publicly accessible without password
 			if (Rain::getEmailDomain(cdParam.rcd.mailFrom) == (*ccParam.config)["smtp-domain"] &&
-				cdParam.rcd.b64User.length() == 0) {
+				cdParam.rcd.b64User.length() == 0 && cdParam.rcd.mailFrom != "server@emilia-tan.com") {
 				ssmdhParam.ssm->sendRawMessage("502 Emilia hasn't authenticated you to do that (sending from a managed domain requires authentication)\r\n");
 			} else
 				ssmdhParam.ssm->sendRawMessage("250 OK\r\n");

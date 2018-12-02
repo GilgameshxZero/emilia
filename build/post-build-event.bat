@@ -1,0 +1,1 @@
+copy ..\src\update-script.bat ..\bin\update-script.bat
