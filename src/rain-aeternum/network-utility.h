@@ -28,4 +28,7 @@ namespace Rain {
 	//create a message queue/window which will respond to messages sent to it
 	//RainWindow * which is returned must be freed
 	RainWindow *createSendHandler(std::unordered_map<UINT, RainWindow::MSGFC> *msgm);
+
+	//converts a GET query string into a map
+	std::map<std::string, std::string> getQueryToMap(std::string query);
 }
