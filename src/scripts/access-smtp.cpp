@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
 	response = request.str() + "\r\n" + csmp.response;
 
     std::cout << "HTTP/1.1 200 OK\r\n"
-              << "content-type:text/plain\r\n"
+              << "content-type:text/html\r\n"
               << "\r\n"
               << response;
 

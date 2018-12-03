@@ -273,6 +273,10 @@ namespace Emilia {
 					envBlock += "HTTP_HOST=" + iterator->second;
 					envBlock.push_back('\0');
 				}
+				
+				//also, store some other useful information as environment variables
+				envBlock += "CLIENT_IP=" + Rain::getClientNumIP(cSocket);
+				envBlock.push_back('\0');
 
 				//append current environment block
 				LPCH curEnvBlock = GetEnvironmentStrings();
