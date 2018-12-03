@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
 	delete[] buffer;
 
     std::cout << "HTTP/1.1 200 OK\r\n"
-              << "content-type:text/plain\r\n"
+              << "content-type:text/html\r\n"
               << "\r\n"
               << response;
 

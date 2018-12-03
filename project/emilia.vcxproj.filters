@@ -239,6 +239,12 @@
     <ClCompile Include="..\src\scripts\print-post.cpp">
       <Filter>scripts</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\scripts\track-mac-ip.cpp">
+      <Filter>scripts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\scripts\print-ip.cpp">
+      <Filter>scripts</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\build\build.bat">
@@ -302,13 +308,19 @@
     <None Include="..\build\build-inc.bat">
       <Filter>build</Filter>
     </None>
-    <None Include="..\build\build-script.bat">
-      <Filter>build</Filter>
-    </None>
     <None Include="..\build\pre-build-event.bat">
       <Filter>build</Filter>
     </None>
     <None Include="..\build\setup-env.bat">
+      <Filter>build</Filter>
+    </None>
+    <None Include="..\data\mac-ip.ini">
+      <Filter>data</Filter>
+    </None>
+    <None Include="..\build\build-scripts.bat">
+      <Filter>build</Filter>
+    </None>
+    <None Include="..\build\post-build-event.bat">
       <Filter>build</Filter>
     </None>
   </ItemGroup>

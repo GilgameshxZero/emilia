@@ -335,6 +335,15 @@ namespace Rain {
 		fileIn.close();
 		return ret;
 	}
+	void writeParameterFile(std::string filePath, std::map<std::string, std::string> params) {
+		std::ofstream fileOut(filePath, std::ios::binary);
+
+		for (auto it = params.begin(); it != params.end(); it++) {
+			fileOut << it->first << ": " << it->second << "\r\n";
+		}
+
+		fileOut.close();
+	}
 
 	bool isFileWritable(std::string file) {
 		FILE *fp;
