@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.1.7
+
+* Added script to track IPs.
+* Changed all scripts to output in HTML content-type.
+
 ## 5.1.6
 
 * Created HTTP accessible script to forward requests to internal SMTP server, so that it is accessible through JS.

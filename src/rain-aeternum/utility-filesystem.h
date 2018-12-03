@@ -107,6 +107,7 @@ namespace Rain {
 	std::map<std::string, std::string> readParameterStream(std::stringstream &paramStream);
 	std::map<std::string, std::string> readParameterString(std::string paramString);
 	std::map<std::string, std::string> readParameterFile(std::string filePath);
+	void writeParameterFile(std::string filePath, std::map<std::string, std::string> params);
 
 	bool isFileWritable(std::string file);
 }

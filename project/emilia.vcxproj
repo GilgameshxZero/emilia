@@ -308,7 +308,19 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\src\scripts\print-ip.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\src\scripts\print-post.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\src\scripts\track-mac-ip.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|x64'">true</ExcludedFromBuild>
@@ -324,8 +336,9 @@
     <None Include="..\.gitignore" />
     <None Include="..\bin\update-script.bat" />
     <None Include="..\build\build-inc.bat" />
-    <None Include="..\build\build-script.bat" />
+    <None Include="..\build\build-scripts.bat" />
     <None Include="..\build\build.bat" />
+    <None Include="..\build\post-build-event.bat" />
     <None Include="..\build\pre-build-event.bat" />
     <None Include="..\build\setup-env.bat" />
     <None Include="..\changelog.md" />
@@ -336,6 +349,7 @@
     <None Include="..\config\http-headers.ini" />
     <None Include="..\config\update-exclusives.ini" />
     <None Include="..\config\update-ignores.ini" />
+    <None Include="..\data\mac-ip.ini" />
     <None Include="..\data\mail-users.ini" />
     <None Include="..\exclusive\emilia-tan.com\config\config.ini" />
     <None Include="..\exclusive\emilia-tan.com\config\http-404.html" />
