@@ -17,17 +17,17 @@ Windows-specific.
 
 #pragma once
 
-#include "windows-lam-include.h"
 #include "utility-string.h"
+#include "windows-lam-include.h"
 
 #include <cstdlib>
 #include <fstream>
-#include <string>
-#include <sys/stat.h>
-#include <vector>
 #include <map>
 #include <set>
 #include <sstream>
+#include <string>
+#include <sys/stat.h>
+#include <vector>
 
 namespace Rain {
 	//turn a string into LPCWSTR with a "\\?\" prefix, for use in long paths unicode functions
