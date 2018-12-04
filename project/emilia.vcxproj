@@ -256,6 +256,7 @@
     <ClInclude Include="..\src\rain-aeternum\network-wsa-include.h" />
     <ClInclude Include="..\src\rain-aeternum\rain-libraries.h" />
     <ClInclude Include="..\src\rain-aeternum\rain-window.h" />
+    <ClInclude Include="..\src\rain-aeternum\network-recv-handler-param.h" />
     <ClInclude Include="..\src\rain-aeternum\utility-error.h" />
     <ClInclude Include="..\src\rain-aeternum\utility-filesystem.h" />
     <ClInclude Include="..\src\rain-aeternum\utility-libraries.h" />
@@ -277,17 +278,12 @@
     <ClCompile Include="..\src\http-server.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\rain-aeternum\algorithm-libraries.cpp" />
-    <ClCompile Include="..\src\rain-aeternum\gdi-plus-include.cpp" />
     <ClCompile Include="..\src\rain-aeternum\network-base.cpp" />
     <ClCompile Include="..\src\rain-aeternum\network-client-manager.cpp" />
-    <ClCompile Include="..\src\rain-aeternum\network-libraries.cpp" />
     <ClCompile Include="..\src\rain-aeternum\network-recv-thread.cpp" />
     <ClCompile Include="..\src\rain-aeternum\network-server-manager.cpp" />
     <ClCompile Include="..\src\rain-aeternum\network-smtp.cpp" />
-    <ClCompile Include="..\src\rain-aeternum\network-socket-manager.cpp" />
     <ClCompile Include="..\src\rain-aeternum\network-utility.cpp" />
-    <ClCompile Include="..\src\rain-aeternum\network-wsa-include.cpp" />
-    <ClCompile Include="..\src\rain-aeternum\rain-libraries.cpp" />
     <ClCompile Include="..\src\rain-aeternum\rain-window.cpp" />
     <ClCompile Include="..\src\rain-aeternum\utility-error.cpp" />
     <ClCompile Include="..\src\rain-aeternum\utility-filesystem.cpp" />
@@ -295,7 +291,6 @@
     <ClCompile Include="..\src\rain-aeternum\utility-logging.cpp" />
     <ClCompile Include="..\src\rain-aeternum\utility-string.cpp" />
     <ClCompile Include="..\src\rain-aeternum\utility-time.cpp" />
-    <ClCompile Include="..\src\rain-aeternum\windows-lam-include.cpp" />
     <ClCompile Include="..\src\scripts\access-smtp.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">true</ExcludedFromBuild>

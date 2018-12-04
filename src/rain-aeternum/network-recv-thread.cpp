@@ -51,7 +51,7 @@ namespace Rain {
 		SOCKET *connection,
 		std::string *message, //where the message is stored each time onMessage is called
 		int buflen, //the buffer size of the receive function
-		void *funcparam, //additional parameter to pass to the functions onMessage and onDisconnect
+		void *funcParam, //additional parameter to pass to the functions onMessage and onDisconnect
 		RecvHandlerParam::EventHandler onConnect, //called when thread starts
 		RecvHandlerParam::EventHandler onMessage,
 		RecvHandlerParam::EventHandler onDisconnect, //called when the other side shuts down send
@@ -60,7 +60,7 @@ namespace Rain {
 		LPDWORD lpThreadId,
 		LPSECURITY_ATTRIBUTES lpThreadAttributes) {
 		if (recvparam == NULL)
-			recvparam = new RecvHandlerParam(connection, message, buflen, funcparam, onConnect, onMessage, onDisconnect);
+			recvparam = new RecvHandlerParam(connection, message, buflen, funcParam, onConnect, onMessage, onDisconnect);
 
 		return CreateThread(lpThreadAttributes, dwStackSize, recvThread, reinterpret_cast<LPVOID>(recvparam), dwCreationFlags, lpThreadId);
 	}

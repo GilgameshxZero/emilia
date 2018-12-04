@@ -12,7 +12,6 @@ Implements class ClientSocketManager, which maintains a socket connection to an 
 #include "network-recv-thread.h"
 #include "network-socket-manager.h"
 #include "network-utility.h"
-
 #include "utility-logging.h"
 
 #include <algorithm>

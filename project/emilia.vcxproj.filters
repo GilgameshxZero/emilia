@@ -141,6 +141,9 @@
     <ClInclude Include="..\src\smtp-external-client.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\rain-aeternum\network-recv-handler-param.h">
+      <Filter>rain-aeternum</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\http-server.cpp">
@@ -155,16 +158,10 @@
     <ClCompile Include="..\src\rain-aeternum\algorithm-libraries.cpp">
       <Filter>rain-aeternum</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\rain-aeternum\gdi-plus-include.cpp">
-      <Filter>rain-aeternum</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\rain-aeternum\network-base.cpp">
       <Filter>rain-aeternum</Filter>
     </ClCompile>
     <ClCompile Include="..\src\rain-aeternum\network-client-manager.cpp">
-      <Filter>rain-aeternum</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\rain-aeternum\network-libraries.cpp">
       <Filter>rain-aeternum</Filter>
     </ClCompile>
     <ClCompile Include="..\src\rain-aeternum\network-recv-thread.cpp">
@@ -176,16 +173,7 @@
     <ClCompile Include="..\src\rain-aeternum\network-smtp.cpp">
       <Filter>rain-aeternum</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\rain-aeternum\network-socket-manager.cpp">
-      <Filter>rain-aeternum</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\rain-aeternum\network-utility.cpp">
-      <Filter>rain-aeternum</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\rain-aeternum\network-wsa-include.cpp">
-      <Filter>rain-aeternum</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\rain-aeternum\rain-libraries.cpp">
       <Filter>rain-aeternum</Filter>
     </ClCompile>
     <ClCompile Include="..\src\rain-aeternum\rain-window.cpp">
@@ -207,9 +195,6 @@
       <Filter>rain-aeternum</Filter>
     </ClCompile>
     <ClCompile Include="..\src\rain-aeternum\utility-time.cpp">
-      <Filter>rain-aeternum</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\rain-aeternum\windows-lam-include.cpp">
       <Filter>rain-aeternum</Filter>
     </ClCompile>
     <ClCompile Include="..\src\update-server.cpp">
