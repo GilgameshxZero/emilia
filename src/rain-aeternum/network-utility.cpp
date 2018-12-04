@@ -10,13 +10,13 @@ namespace Rain {
 		return true;
 	}
 
-	std::string getClientNumIP(SOCKET &clientsock) {
+	std::string getClientNumIP(SOCKET &clientSock) {
 		static struct sockaddr clname;
 		static int clnamesize;
 		static TCHAR clhname[32];
 
 		clnamesize = sizeof(clname);
-		getpeername(clientsock, &clname, &clnamesize);
+		getpeername(clientSock, &clname, &clnamesize);
 		getnameinfo(&clname, clnamesize, clhname, 32, NULL, NULL, NI_NUMERICHOST);
 
 		return std::string(clhname);
@@ -70,5 +70,23 @@ namespace Rain {
 		}
 
 		return rt;
+	}
+
+	RecvHandlerParam::EventHandler onHeadedConnect(RecvHandlerParam::EventHandler delegate) {
+		return delegate;
+	}
+	RecvHandlerParam::EventHandler onHeadedMessage(RecvHandlerParam::EventHandler delegate) {
+		return [](void *param) {
+			return 0;
+		};
+	}
+	RecvHandlerParam::EventHandler onHeadedDisconnect(RecvHandlerParam::EventHandler delegate) {
+		return delegate;
+	}
+	void sendHeadedMessage(Rain::SocketManager &manager, std::string message) {
+
+	}
+	void sendHeadedMessage(Rain::SocketManager &manager, std::string *message) {
+
 	}
 }

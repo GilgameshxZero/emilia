@@ -9,6 +9,7 @@ Higher-level, optional functions are in NetworkUtility.
 */
 
 #pragma once
+
 #include "network-wsa-include.h"
 #include "rain-window.h"
 

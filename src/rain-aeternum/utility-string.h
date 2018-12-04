@@ -10,11 +10,11 @@ Compatiable with all OS.
 
 #include "windows-lam-include.h"
 
-#include <iomanip> //encodeURL and decodeURL
-#include <sstream>
-#include <string>
 #include <algorithm> 
 #include <cctype>
+#include <iomanip>
+#include <sstream>
+#include <string>
 #include <vector>
 
 namespace Rain {

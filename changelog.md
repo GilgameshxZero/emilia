@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.2.0
+
+* Added todos.
+* Cleaned `Rain` headers.
+* Started ideating and implementing `headed` socket messages, which have a predefined length like `blocked` messages but are more concise.
+
 ## 5.1.7
 
 * Added script to track IPs.
