@@ -8,7 +8,7 @@ Manages CSM to external SMTP servers; used by the internal client.
 
 namespace Emilia {
 	namespace SMTPServer {
-		typedef int(*ExternalRequestMethodHandler)(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &);
+		typedef int(*ExternalRequestMethodHandler)(Rain::ClientSocketManager::DelegateHandlerParam &);
 
 		struct ExternalConnectionParam {
 			//event is set when communications are finished
@@ -32,11 +32,11 @@ namespace Emilia {
 		int onExternalMessage(void *param);
 		int onExternalDisconnect(void *param);
 
-		int EHREhlo(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam);
-		int EHRMailFrom(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam);
-		int EHRRcptTo(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam);
-		int EHRPreData(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam);
-		int EHRData(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam);
-		int EHRQuit(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam);
+		int EHREhlo(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam);
+		int EHRMailFrom(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam);
+		int EHRRcptTo(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam);
+		int EHRPreData(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam);
+		int EHRData(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam);
+		int EHRQuit(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam);
 	}  // namespace SMTPServer
 }  // namespace Emilia

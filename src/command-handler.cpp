@@ -40,7 +40,7 @@ namespace Emilia {
 		//attempt to connect to remote
 		Rain::tsCout("Info: Attempting to connect...", LINE_END);
 		DWORD updateServerPort = Rain::strToT<DWORD>((*cmhParam.config)["update-server-port"]);
-		cmhParam.remoteCSM = new Rain::ClientSocketManager();
+		cmhParam.remoteCSM = new Rain::HeadedClientSocketManager();
 		cmhParam.chParam = new UpdateClient::ConnectionHandlerParam();
 		cmhParam.chParam->config = cmhParam.config;
 		cmhParam.chParam->authPass = pass;
@@ -122,7 +122,7 @@ namespace Emilia {
 		for (int a = 0; a < shared.size(); a++) {
 			message += Rain::tToStr(crc32[a]) + " " + shared[a] + "\n";
 		}
-		Rain::sendBlockMessage(*cmhParam.remoteCSM, &message);
+		Rain::sendHeadedMessage(*cmhParam.remoteCSM, &message);
 
 		return 0;
 	}
@@ -163,7 +163,7 @@ namespace Emilia {
 		for (int a = 0; a < exclusive.size(); a++) {
 			message += Rain::tToStr(crc32[a]) + " " + exclusive[a] + "\n";
 		}
-		Rain::sendBlockMessage(*cmhParam.remoteCSM, &message);
+		Rain::sendHeadedMessage(*cmhParam.remoteCSM, &message);
 
 		return 0;
 	}
@@ -201,7 +201,7 @@ namespace Emilia {
 				Rain::errorAndCout(error, "Error: could not setup SMTP server listening.");
 			}
 		} else {
-			Rain::sendBlockMessage(*cmhParam.remoteCSM, "start");
+			Rain::sendHeadedMessage(*cmhParam.remoteCSM, "start");
 		}
 		return 0;
 	}
@@ -210,7 +210,7 @@ namespace Emilia {
 			cmhParam.httpSM->setServerListen(0, 0);
 			cmhParam.smtpSM->setServerListen(0, 0);
 		} else {
-			Rain::sendBlockMessage(*cmhParam.remoteCSM, "stop");
+			Rain::sendHeadedMessage(*cmhParam.remoteCSM, "stop");
 		}
 		return 0;
 	}

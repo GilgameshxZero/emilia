@@ -9,7 +9,7 @@
 
 namespace Emilia {
 	namespace UpdateHelper {
-		int ServerPushProc(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam, std::string method);
-		int ClientPushProc(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam, std::string method);
+		int ServerPushProc(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam, std::string method);
+		int ClientPushProc(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam, std::string method);
 	}
 }

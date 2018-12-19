@@ -141,7 +141,10 @@
     <ClInclude Include="..\src\smtp-external-client.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\rain-aeternum\network-recv-handler-param.h">
+    <ClInclude Include="..\src\rain-aeternum\network-recv-param.h">
+      <Filter>rain-aeternum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\rain-aeternum\network-headed-managers.h">
       <Filter>rain-aeternum</Filter>
     </ClInclude>
   </ItemGroup>
@@ -229,6 +232,9 @@
     </ClCompile>
     <ClCompile Include="..\src\scripts\print-ip.cpp">
       <Filter>scripts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\rain-aeternum\network-headed-managers.cpp">
+      <Filter>rain-aeternum</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

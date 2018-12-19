@@ -76,27 +76,27 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
     <OutDir>$(SolutionDir)..\bin\</OutDir>
     <TargetName>$(ProjectName)-$(Platform)-$(Configuration)</TargetName>
-    <IntDir>$(SolutionDir)..\obj\</IntDir>
+    <IntDir>$(SolutionDir)..\obj\$(Platform)\$(Configuration)\</IntDir>
     <CustomBuildBeforeTargets />
     <CustomBuildAfterTargets />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
     <OutDir>$(SolutionDir)..\bin\</OutDir>
     <TargetName>$(ProjectName)-$(Platform)-$(Configuration)</TargetName>
-    <IntDir>$(SolutionDir)..\obj\</IntDir>
+    <IntDir>$(SolutionDir)..\obj\$(Platform)\$(Configuration)\</IntDir>
     <CustomBuildBeforeTargets />
     <CustomBuildAfterTargets />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">
     <OutDir>$(SolutionDir)..\bin\</OutDir>
-    <IntDir>$(SolutionDir)..\obj\</IntDir>
+    <IntDir>$(SolutionDir)..\obj\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)-$(Platform)-$(Configuration)</TargetName>
     <CustomBuildBeforeTargets />
     <CustomBuildAfterTargets />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
     <OutDir>$(SolutionDir)..\bin\</OutDir>
-    <IntDir>$(SolutionDir)..\obj\</IntDir>
+    <IntDir>$(SolutionDir)..\obj\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)-$(Platform)-$(Configuration)</TargetName>
     <CustomBuildBeforeTargets />
     <CustomBuildAfterTargets />
@@ -247,6 +247,7 @@
     <ClInclude Include="..\src\rain-aeternum\gdi-plus-include.h" />
     <ClInclude Include="..\src\rain-aeternum\network-base.h" />
     <ClInclude Include="..\src\rain-aeternum\network-client-manager.h" />
+    <ClInclude Include="..\src\rain-aeternum\network-headed-managers.h" />
     <ClInclude Include="..\src\rain-aeternum\network-libraries.h" />
     <ClInclude Include="..\src\rain-aeternum\network-recv-thread.h" />
     <ClInclude Include="..\src\rain-aeternum\network-server-manager.h" />
@@ -256,7 +257,7 @@
     <ClInclude Include="..\src\rain-aeternum\network-wsa-include.h" />
     <ClInclude Include="..\src\rain-aeternum\rain-libraries.h" />
     <ClInclude Include="..\src\rain-aeternum\rain-window.h" />
-    <ClInclude Include="..\src\rain-aeternum\network-recv-handler-param.h" />
+    <ClInclude Include="..\src\rain-aeternum\network-recv-param.h" />
     <ClInclude Include="..\src\rain-aeternum\utility-error.h" />
     <ClInclude Include="..\src\rain-aeternum\utility-filesystem.h" />
     <ClInclude Include="..\src\rain-aeternum\utility-libraries.h" />
@@ -280,6 +281,7 @@
     <ClCompile Include="..\src\rain-aeternum\algorithm-libraries.cpp" />
     <ClCompile Include="..\src\rain-aeternum\network-base.cpp" />
     <ClCompile Include="..\src\rain-aeternum\network-client-manager.cpp" />
+    <ClCompile Include="..\src\rain-aeternum\network-headed-managers.cpp" />
     <ClCompile Include="..\src\rain-aeternum\network-recv-thread.cpp" />
     <ClCompile Include="..\src\rain-aeternum\network-server-manager.cpp" />
     <ClCompile Include="..\src\rain-aeternum\network-smtp.cpp" />
