@@ -15,15 +15,15 @@ namespace Emilia {
 		int onDisconnect(void *funcParam);
 
 		//general method which takes request and distributes it to appropriate method handler
-		int HandleRequest(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
+		int HandleRequest(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam);
 
 		//specific handlers for different messages
-		int HRAuthenticate(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
-		int HRPush(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
-		int HRPushExclusive(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
-		int HRPull(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
-		int HRSync(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
-		int HRStart(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
-		int HRStop(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
+		int HRAuthenticate(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam);
+		int HRPush(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam);
+		int HRPushExclusive(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam);
+		int HRPull(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam);
+		int HRSync(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam);
+		int HRStart(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam);
+		int HRStop(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam);
 	}
 }

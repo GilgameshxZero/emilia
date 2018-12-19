@@ -10,7 +10,7 @@
 
 namespace Emilia {
 	namespace SMTPServer {
-		typedef int(*RequestMethodHandler)(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &);
+		typedef int(*RequestMethodHandler)(Rain::ServerSocketManager::DelegateHandlerParam &);
 
 		struct RecvConnectionDelegateParam {
 			//the current request handler
@@ -54,15 +54,15 @@ namespace Emilia {
 		int onDisconnect(void *param);
 
 		//Ehlo manages both EHLO and HELO requests
-		int HRREhlo(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
+		int HRREhlo(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam);
 
-		int HRRPreData(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
-		int HRRData(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
+		int HRRPreData(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam);
+		int HRRData(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam);
 
-		int HRRAuthLogin(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
-		int HRRAuthLoginUsername(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
-		int HRRAuthLoginPassword(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
-		int HRRMailFrom(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
-		int HRRRcptTo(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam);
+		int HRRAuthLogin(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam);
+		int HRRAuthLoginUsername(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam);
+		int HRRAuthLoginPassword(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam);
+		int HRRMailFrom(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam);
+		int HRRRcptTo(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam);
 	}  // namespace SMTPServer
 }  // namespace Emilia

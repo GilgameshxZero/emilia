@@ -72,21 +72,26 @@ namespace Rain {
 		return rt;
 	}
 
-	RecvHandlerParam::EventHandler onHeadedConnect(RecvHandlerParam::EventHandler delegate) {
-		return delegate;
-	}
-	RecvHandlerParam::EventHandler onHeadedMessage(RecvHandlerParam::EventHandler delegate) {
-		return [](void *param) {
-			return 0;
-		};
-	}
-	RecvHandlerParam::EventHandler onHeadedDisconnect(RecvHandlerParam::EventHandler delegate) {
-		return delegate;
-	}
 	void sendHeadedMessage(Rain::SocketManager &manager, std::string message) {
-
+		sendHeadedMessage(manager, &message);
 	}
 	void sendHeadedMessage(Rain::SocketManager &manager, std::string *message) {
+		std::size_t len = message->length();
+		std::string header;
+		if (len < 256 * 256) {
+			//only need 2-byte header
+			header.push_back((len >> 8) & 0xff);
+			header.push_back(len & 0xff);
+		} else {
+			header.push_back('\0');
+			header.push_back('\0');
+			header.push_back((len >> 24) & 0xff);
+			header.push_back((len >> 16) & 0xff);
+			header.push_back((len >> 8) & 0xff);
+			header.push_back(len & 0xff);
+		}
 
+		manager.sendRawMessage(&header);
+		manager.sendRawMessage(message);
 	}
 }

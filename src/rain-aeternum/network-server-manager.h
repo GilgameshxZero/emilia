@@ -23,7 +23,7 @@ namespace Rain {
 	class ServerSocketManager : public SocketManager {
 		public:
 		//parameter passed to delegate handlers
-		struct ServerSocketManagerDelegateHandlerParam {
+		struct DelegateHandlerParam {
 			//this object
 			ServerSocketManager *ssm;
 
@@ -73,7 +73,7 @@ namespace Rain {
 		LogStream *logger;
 
 		//parameter to be passed to delegates
-		ServerSocketManagerDelegateHandlerParam ssmdhParam;
+		DelegateHandlerParam ssmdhParam;
 
 		//recvThread parameter associated with the current recvThread
 		RecvHandlerParam::EventHandler onConnectDelegate, onMessageDelegate, onDisconnectDelegate;
@@ -93,12 +93,12 @@ namespace Rain {
 
 		//passed to SM's event handlers
 		//also used as linked list node for all spawned ServerSocketManagers
-		struct ServerManagerRecvThreadParam {
+		struct RecvThreadParam {
 			//used to call the event handler delegates in the SSM
 			ServerSocketManager *ssm;
 
 			//wraps SSM in a linked list node
-			ServerManagerRecvThreadParam *prev, *next;
+			RecvThreadParam *prev, *next;
 
 			//locked when changing linked list
 			std::mutex *llMutex;
@@ -140,6 +140,12 @@ namespace Rain {
 		//sets buffer length of spawned recvThreads
 		std::size_t setRecvBufLen(std::size_t newLen);
 
+		protected:
+		//default handlers and params which ServerSocketManager should use
+		//protected so that 'headed' server manager can change these
+		RecvHandlerParam::EventHandler onConnectDelegate, onMessageDelegate, onDisconnectDelegate;
+		void *funcParam;
+
 		private:
 		SOCKET socket;
 		DWORD listeningPort;
@@ -147,10 +153,6 @@ namespace Rain {
 		NewClientFunc newClientCall;
 		std::size_t recvBufLen;
 		HANDLE ltEvent;
-
-		//default handlers and params which ServerSocketManager should use
-		RecvHandlerParam::EventHandler onConnectDelegate, onMessageDelegate, onDisconnectDelegate;
-		void *funcParam;
 
 		void disconnectSocket();
 

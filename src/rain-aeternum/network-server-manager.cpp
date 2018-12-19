@@ -52,7 +52,7 @@ namespace Rain {
 		return std::make_tuple(this->onConnect, this->onMessage, this->onDisconnect);
 	}
 	int ServerSocketManager::onConnect(void *param) {
-		ServerManager::ServerManagerRecvThreadParam &smrtParam = *reinterpret_cast<ServerManager::ServerManagerRecvThreadParam *>(param);
+		ServerManager::RecvThreadParam &smrtParam = *reinterpret_cast<ServerManager::RecvThreadParam *>(param);
 
 		//depending on which delegate handlers are defined, call the right one
 		smrtParam.ssm->ssmdhParam.message = &smrtParam.message;
@@ -60,7 +60,7 @@ namespace Rain {
 	}
 	int ServerSocketManager::onMessage(void *param) {
 		//call delegate handler
-		ServerManager::ServerManagerRecvThreadParam &smrtParam = *reinterpret_cast<ServerManager::ServerManagerRecvThreadParam *>(param);
+		ServerManager::RecvThreadParam &smrtParam = *reinterpret_cast<ServerManager::RecvThreadParam *>(param);
 
 		//if we are logging socket communications, do that here for incoming communications
 		if (smrtParam.ssm->logger != NULL)
@@ -70,7 +70,7 @@ namespace Rain {
 		return smrtParam.ssm->onMessageDelegate == NULL ? 0 : smrtParam.ssm->onMessageDelegate(&smrtParam.ssm->ssmdhParam);
 	}
 	int ServerSocketManager::onDisconnect(void *param) {
-		ServerManager::ServerManagerRecvThreadParam &smrtParam = *reinterpret_cast<ServerManager::ServerManagerRecvThreadParam *>(param);
+		ServerManager::RecvThreadParam &smrtParam = *reinterpret_cast<ServerManager::RecvThreadParam *>(param);
 
 		//depending on which delegate handlers are defined, call the right one
 		int delRtrn = smrtParam.ssm->onDisconnectDelegate == NULL ? 0 : smrtParam.ssm->onDisconnectDelegate(&smrtParam.ssm->ssmdhParam);
@@ -172,7 +172,7 @@ namespace Rain {
 		ServerManager &sm = *reinterpret_cast<ServerManager *>(lpParameter); //specific to the listen thread
 
 		//keep track of all WSA2ListenThreadRecvFuncParam spawned so that we can use them to end all recvThreads when thread needs to exit
-		ServerManagerRecvThreadParam llHead, llTail;
+		RecvThreadParam llHead, llTail;
 		llHead.prev = NULL;
 		llHead.next = &llTail;
 		llTail.prev = &llHead;
@@ -203,7 +203,7 @@ namespace Rain {
 			if (sm.newClientCall != NULL)
 				sm.newClientCall(ssm);
 
-			ServerManagerRecvThreadParam *smrtParam = new ServerManagerRecvThreadParam();
+			RecvThreadParam *smrtParam = new RecvThreadParam();
 			smrtParam->llMutex = &llMutex;
 			smrtParam->ssm = ssm;
 

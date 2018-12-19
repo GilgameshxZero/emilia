@@ -9,7 +9,7 @@
 
 namespace Emilia {
 	namespace UpdateServer {
-		typedef int(*RequestMethodHandler)(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &);
+		typedef int(*RequestMethodHandler)(Rain::ServerSocketManager::DelegateHandlerParam &);
 
 		struct ConnectionCallerParam {
 			//global config options
@@ -27,12 +27,6 @@ namespace Emilia {
 		};
 
 		struct ConnectionDelegateParam {
-			//accumulated request from messages
-			std::string request;
-
-			//length of the request
-			std::size_t requestLength;
-
 			//parsed first section of the request
 			std::string requestMethod;
 

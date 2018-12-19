@@ -121,7 +121,7 @@ namespace Emilia {
 		updCCP.clientConnected = false;
 		updCCP.cmhParam = &cmhParam;
 
-		Rain::ServerManager updSM;
+		Rain::HeadedServerManager updSM;
 		updSM.setEventHandlers(UpdateServer::onConnect, UpdateServer::onMessage, UpdateServer::onDisconnect, &updCCP);
 		updSM.setRecvBufLen(Rain::strToT<std::size_t>(config["update-transfer-buffer"]));
 		if (!updSM.setServerListen(updateServerPort, updateServerPort)) {

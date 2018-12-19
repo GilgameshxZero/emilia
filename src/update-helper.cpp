@@ -2,11 +2,12 @@
 
 namespace Emilia {
 	namespace UpdateHelper {
-		int ServerPushProc(Rain::ServerSocketManager::ServerSocketManagerDelegateHandlerParam &ssmdhParam, std::string method) {
+		int ServerPushProc(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam, std::string method) {
 			UpdateServer::ConnectionCallerParam &ccParam = *reinterpret_cast<UpdateServer::ConnectionCallerParam *>(ssmdhParam.callerParam);
 			UpdateServer::ConnectionDelegateParam &cdParam = *reinterpret_cast<UpdateServer::ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 			CommandHandlerParam &cmhParam = *ccParam.cmhParam;
 			std::map<std::string, std::string> &config = *cmhParam.config;
+			std::string &request = *ssmdhParam.message;
 
 			//parse message based on state of the request
 			static int cfiles;
@@ -33,7 +34,7 @@ namespace Emilia {
 				}
 
 				std::stringstream ss;
-				ss << cdParam.request;
+				ss << request;
 
 				ss >> cfiles;
 				std::vector<std::pair<unsigned int, std::string>> files;
@@ -50,15 +51,16 @@ namespace Emilia {
 				Rain::tsCout(std::hex);
 				for (int a = 0; a < files.size(); a++) {
 					unsigned int crc32 = Rain::checksumFileCRC32(root + files[a].second);
-					Rain::tsCout(std::setw(8), crc32, " ", std::setw(8), files[a].first, " ", files[a].second, " ");
+					Rain::tsCout(std::setw(8), crc32, " ", std::setw(8), files[a].first, " ");
 					if (files[a].first != crc32) {
 						requested.push_back(files[a].second);
-						Rain::tsCout("DIFF");
+						Rain::tsCout("! ");
 					} else {
 						//CRC32s match, so add this file to the list of ignored files when we remove files
 						noRemove.insert(root + files[a].second);
+						Rain::tsCout("  ");
 					}
-					Rain::tsCout("\r\n");
+					Rain::tsCout(files[a].second, "\r\n");
 					fflush(stdout);
 				}
 
@@ -67,11 +69,11 @@ namespace Emilia {
 					ccParam.hrPushState = "start";
 					Rain::tsCout("Local is up-to-date. '", method, "' from client is unnecessary.\r\n");
 					fflush(stdout);
-					Rain::sendBlockMessage(*ssmdhParam.ssm, method + " 0");
+					Rain::sendHeadedMessage(*ssmdhParam.ssm, method + " 0");
 				} else {
 					cfiles = static_cast<int>(requested.size());
 					Rain::tsCout(std::dec);
-					Rain::tsCout("Info: Requesting ", requested.size(), " files in total from client.\r\n");
+					Rain::tsCout("Info: Requesting ", requested.size(), " files in total from client...\r\n");
 					fflush(stdout);
 
 					//send back a list of requested files.
@@ -79,24 +81,20 @@ namespace Emilia {
 					for (int a = 0; a < requested.size(); a++) {
 						response += requested[a] + "\n";
 					}
-					Rain::sendBlockMessage(*ssmdhParam.ssm, &response);
+					Rain::sendHeadedMessage(*ssmdhParam.ssm, &response);
 
 					ccParam.hrPushState = "wait-filelengths";
 					fileLen.clear();
 				}
 			} else if (ccParam.hrPushState == "wait-filelengths") {
-				Rain::tsCout("Info: Received filelengths from update client. Receiving file lengths...\r\n");
-				fflush(stdout);
-
 				std::stringstream ss;
-				ss << cdParam.request;
+				ss << request;
 				totalBytes = currentBytes = 0;
 				for (int a = 0; a < cfiles; a++) {
 					fileLen.push_back(0);
 					ss >> fileLen.back();
 					totalBytes += fileLen.back();
 				}
-				Rain::tsCout("Info: Receiving filedata (", totalBytes / 1e6, " MB)...\r\n");
 
 				//remove all exclusive files except for those matched by CRC32
 				if (method == "push") {
@@ -109,7 +107,11 @@ namespace Emilia {
 				curFile = 0;
 				curFileLenLeft = -1;
 
-				Rain::tsCout(std::fixed);
+				Rain::tsCout(std::fixed, "Info: Received file lengths from update client. Receiving filedata (", std::setprecision(2), totalBytes / 1e6, " MB)...\r\n");
+				for (int a = 0; a < cfiles; a++) {
+					Rain::tsCout(std::setw(8), fileLen[a] / 1e6, " MB ", requested[a], "\r\n");
+				}
+				fflush(stdout);
 			} else if (ccParam.hrPushState == "wait-data") {
 				//data is a block of everything in the same order as request, buffered
 				if (curFileLenLeft == -1) {
@@ -123,14 +125,14 @@ namespace Emilia {
 				}
 
 				if (unwritable.find(curFile) == unwritable.end()) {
-					Rain::printToFile(root + requested[curFile], &cdParam.request, true);
+					Rain::printToFile(root + requested[curFile], &request, true);
 				} else {
-					Rain::printToFile(root + requested[curFile] + config["update-tmp-ext"], &cdParam.request, true);
+					Rain::printToFile(root + requested[curFile] + config["update-tmp-ext"], &request, true);
 				}
-				currentBytes += cdParam.request.length();
-				Rain::tsCout("Receiving filedata: ", std::setw(6), 100.0 * currentBytes / totalBytes, "%\r");
+				currentBytes += request.length();
+				Rain::tsCout("Receiving filedata: ", 100.0 * currentBytes / totalBytes, "%\r");
 				fflush(stdout);
-				curFileLenLeft -= cdParam.request.length();
+				curFileLenLeft -= request.length();
 
 				if (curFileLenLeft == 0) {
 					curFile++;
@@ -160,7 +162,7 @@ namespace Emilia {
 					}
 					fflush(stdout);
 
-					Rain::sendBlockMessage(*ssmdhParam.ssm, &response);
+					Rain::sendHeadedMessage(*ssmdhParam.ssm, &response);
 				}
 			}
 
@@ -178,9 +180,10 @@ namespace Emilia {
 
 			return 0;
 		}
-		int ClientPushProc(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam, std::string method) {
+		int ClientPushProc(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam, std::string method) {
 			UpdateClient::ConnectionHandlerParam &chParam = *reinterpret_cast<UpdateClient::ConnectionHandlerParam *>(csmdhParam.delegateParam);
 			std::map<std::string, std::string> &config = *chParam.config;
+			std::string &request = *csmdhParam.message;
 
 			static std::string state = "wait-request";
 
@@ -196,7 +199,7 @@ namespace Emilia {
 			if (state == "wait-request") {
 				//HRPush handles a request which lists all the files which the server requests
 				std::stringstream ss;
-				ss << chParam.request;
+				ss << request;
 
 				ss >> cfiles;
 
@@ -218,15 +221,15 @@ namespace Emilia {
 
 					std::string response = method + " \n";
 					std::size_t totalBytes = 0, currentBytes;
-					Rain::tsCout(std::fixed);
+					Rain::tsCout(std::fixed, std::setprecision(2));
 					for (int a = 0; a < requested.size(); a++) {
 						currentBytes = Rain::getFileSize(root + requested[a]);
 						totalBytes += currentBytes;
 						response += Rain::tToStr(currentBytes) + "\n";
 
-						Rain::tsCout(std::setw(8), std::setprecision(2), currentBytes / 1e6, " MB ", requested[a], "\r\n");
+						Rain::tsCout(std::setw(8), currentBytes / 1e6, " MB ", requested[a], "\r\n");
 					}
-					Rain::sendBlockMessage(*csmdhParam.csm, &response);
+					Rain::sendHeadedMessage(*csmdhParam.csm, &response);
 
 					Rain::tsCout("Info: Sending filedata (", totalBytes / 1e6, " MB)...\r\n");
 					fflush(stdout);
@@ -243,9 +246,9 @@ namespace Emilia {
 							in.read(buffer, bufferSize);
 							message = method + " ";
 							message += std::string(buffer, std::size_t(in.gcount()));
-							Rain::sendBlockMessage(*csmdhParam.csm, &message);
+							Rain::sendHeadedMessage(*csmdhParam.csm, &message);
 							completedBytes += in.gcount();
-							Rain::tsCout("Sending filedata: ", std::setw(6), 100.0 * completedBytes / totalBytes, "%\r");
+							Rain::tsCout("Sending filedata: ", 100.0 * completedBytes / totalBytes, "%\r");
 							fflush(stdout);
 						}
 						in.close();
@@ -258,7 +261,7 @@ namespace Emilia {
 				}
 			} else if (state == "wait-complete") {
 				//everything in response is to be printed to cout and logs
-				Rain::tsCout(chParam.request);
+				Rain::tsCout("Remote: ", request);
 				fflush(stdout);
 
 				state = "wait-request";
