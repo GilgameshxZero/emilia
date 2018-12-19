@@ -3,7 +3,7 @@
 namespace Emilia {
 	namespace SMTPServer {
 		int onExternalConnect(void *param) {
-			Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam = *reinterpret_cast<Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam *>(param);
+			Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam = *reinterpret_cast<Rain::ClientSocketManager::DelegateHandlerParam *>(param);
 			ExternalConnectionParam &ecParam = *reinterpret_cast<ExternalConnectionParam *>(csmdhParam.delegateParam);
 
 			//unsuccessful at the beginning
@@ -12,7 +12,7 @@ namespace Emilia {
 			return 0;
 		}
 		int onExternalMessage(void *param) {
-			Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam = *reinterpret_cast<Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam *>(param);
+			Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam = *reinterpret_cast<Rain::ClientSocketManager::DelegateHandlerParam *>(param);
 			ExternalConnectionParam &ecParam = *reinterpret_cast<ExternalConnectionParam *>(csmdhParam.delegateParam);
 
 			int ret = 0;
@@ -50,7 +50,7 @@ namespace Emilia {
 			return ret;
 		}
 		int onExternalDisconnect(void *param) {
-			Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam = *reinterpret_cast<Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam *>(param);
+			Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam = *reinterpret_cast<Rain::ClientSocketManager::DelegateHandlerParam *>(param);
 			ExternalConnectionParam &ecParam = *reinterpret_cast<ExternalConnectionParam *>(csmdhParam.delegateParam);
 
 			//mark the event as finished for listeners
@@ -59,7 +59,7 @@ namespace Emilia {
 			return 0;
 		}
 
-		int EHREhlo(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam) {
+		int EHREhlo(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam) {
 			ExternalConnectionParam &ecParam = *reinterpret_cast<ExternalConnectionParam *>(csmdhParam.delegateParam);
 			if (Rain::getSMTPStatus(ecParam.request) != 220)
 				return 1;
@@ -68,7 +68,7 @@ namespace Emilia {
 			ecParam.reqHandler = EHRMailFrom;
 			return 0;
 		}
-		int EHRMailFrom(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam) {
+		int EHRMailFrom(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam) {
 			ExternalConnectionParam &ecParam = *reinterpret_cast<ExternalConnectionParam *>(csmdhParam.delegateParam);
 			if (Rain::getSMTPStatus(ecParam.request) != 250)
 				return 1;
@@ -79,7 +79,7 @@ namespace Emilia {
 			ecParam.reqHandler = EHRRcptTo;
 			return 0;
 		}
-		int EHRRcptTo(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam) {
+		int EHRRcptTo(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam) {
 			ExternalConnectionParam &ecParam = *reinterpret_cast<ExternalConnectionParam *>(csmdhParam.delegateParam);
 			if (Rain::getSMTPStatus(ecParam.request) != 250)
 				return 1;
@@ -90,7 +90,7 @@ namespace Emilia {
 			ecParam.reqHandler = EHRPreData;
 			return 0;
 		}
-		int EHRPreData(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam) {
+		int EHRPreData(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam) {
 			ExternalConnectionParam &ecParam = *reinterpret_cast<ExternalConnectionParam *>(csmdhParam.delegateParam);
 			if (Rain::getSMTPStatus(ecParam.request) != 250)
 				return 1;
@@ -99,7 +99,7 @@ namespace Emilia {
 			ecParam.reqHandler = EHRData;
 			return 0;
 		}
-		int EHRData(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam) {
+		int EHRData(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam) {
 			ExternalConnectionParam &ecParam = *reinterpret_cast<ExternalConnectionParam *>(csmdhParam.delegateParam);
 			if (Rain::getSMTPStatus(ecParam.request) != 354)
 				return 1;
@@ -108,7 +108,7 @@ namespace Emilia {
 			ecParam.reqHandler = EHRQuit;
 			return 0;
 		}
-		int EHRQuit(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhParam) {
+		int EHRQuit(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam) {
 			ExternalConnectionParam &ecParam = *reinterpret_cast<ExternalConnectionParam *>(csmdhParam.delegateParam);
 			if (Rain::getSMTPStatus(ecParam.request) != 250)
 				return 1;

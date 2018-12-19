@@ -12,19 +12,19 @@ struct CSMParam {
 };
 
 int onConnect(void *param) {
-	Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhp = *reinterpret_cast<Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam *>(param);
+	Rain::ClientSocketManager::DelegateHandlerParam &csmdhp = *reinterpret_cast<Rain::ClientSocketManager::DelegateHandlerParam *>(param);
 	CSMParam &csmp = *reinterpret_cast<CSMParam *>(csmdhp.delegateParam);
 	ResetEvent(csmp.dcEvent);
 	return 0;
 }
 int onMessage(void *param) {
-	Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhp = *reinterpret_cast<Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam *>(param);
+	Rain::ClientSocketManager::DelegateHandlerParam &csmdhp = *reinterpret_cast<Rain::ClientSocketManager::DelegateHandlerParam *>(param);
 	CSMParam &csmp = *reinterpret_cast<CSMParam *>(csmdhp.delegateParam);
 	csmp.response += *csmdhp.message;
 	return 0;
 }
 int onDisconnect(void *param) {
-	Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &csmdhp = *reinterpret_cast<Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam *>(param);
+	Rain::ClientSocketManager::DelegateHandlerParam &csmdhp = *reinterpret_cast<Rain::ClientSocketManager::DelegateHandlerParam *>(param);
 	CSMParam &csmp = *reinterpret_cast<CSMParam *>(csmdhp.delegateParam);
 	SetEvent(csmp.dcEvent);
 	return 0;

@@ -1,5 +1,13 @@
 # Changelog
 
+## 5.2.1
+
+* Finished integrating `headed` servers and clients with the update process.
+* Built in `headed` process with `Rain`.
+* Standardized some network-related naming in `Rain`.
+* Standardized line endings in markdown files.
+* Better console formatting during `push` commands.
+
 ## 5.2.0
 
 * Added todos.

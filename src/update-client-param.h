@@ -7,17 +7,11 @@
 
 namespace Emilia {
 	namespace UpdateClient {
-		typedef int(*RequestMethodHandler)(Rain::ClientSocketManager::ClientSocketManagerDelegateHandlerParam &);
+		typedef int(*RequestMethodHandler)(Rain::ClientSocketManager::DelegateHandlerParam &);
 
 		struct ConnectionHandlerParam {
 			//global config
 			std::map<std::string, std::string> *config;
-
-			//accumulated request
-			std::string request;
-
-			//length of the request
-			std::size_t requestLength;
 
 			//parsed first section of the request
 			std::string requestMethod;

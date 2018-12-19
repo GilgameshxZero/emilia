@@ -14,7 +14,7 @@ namespace Emilia {
 		Rain::ServerManager *httpSM = NULL, *smtpSM = NULL;
 
 		//NULL, or a valid socket to a remote server after connect is issued
-		Rain::ClientSocketManager *remoteCSM = NULL;
+		Rain::HeadedClientSocketManager *remoteCSM = NULL;
 
 		UpdateClient::ConnectionHandlerParam *chParam;
 
