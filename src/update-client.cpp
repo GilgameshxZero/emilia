@@ -12,6 +12,7 @@ namespace Emilia {
 
 			//authenticate automatically
 			Rain::tsCout("Info: Authenticating with update server...\r\n");
+			fflush(stdout);
 			chParam.waitingRequests++;
 			ResetEvent(chParam.doneWaitingEvent);
 			Rain::sendHeadedMessage(*csmdhParam.csm, "authenticate " + chParam.authPass);
@@ -21,6 +22,9 @@ namespace Emilia {
 		int onDisconnect(void *funcParam) {
 			Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam = *reinterpret_cast<Rain::ClientSocketManager::DelegateHandlerParam *>(funcParam);
 			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
+
+			Rain::tsCout("Info: Update server disconnected.\r\n");
+			fflush(stdout);
 
 			return 0;
 		}

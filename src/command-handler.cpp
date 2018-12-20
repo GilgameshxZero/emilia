@@ -48,6 +48,7 @@ namespace Emilia {
 		DWORD updateServerPort = Rain::strToT<DWORD>((*cmhParam.config)["update-server-port"]);
 		cmhParam.remoteCSM = new Rain::HeadedClientSocketManager();
 		cmhParam.chParam = new UpdateClient::ConnectionHandlerParam();
+		cmhParam.chParam->cmhParam = &cmhParam;
 		cmhParam.chParam->config = cmhParam.config;
 		cmhParam.chParam->authPass = pass;
 		cmhParam.chParam->doneWaitingEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
@@ -116,6 +117,8 @@ namespace Emilia {
 		Rain::tsCout("Sending over 'push' request with checksums...", LINE_END);
 		fflush(stdout);
 
+		cmhParam.canAcceptCommand = false;
+
 		return 0;
 	}
 	int CHPushExclusive(CommandHandlerParam &cmhParam) {
@@ -142,6 +145,8 @@ namespace Emilia {
 		Rain::sendHeadedMessage(*cmhParam.remoteCSM, "push-exclusive" + CHHPushGenerateRequest(excRoot, exclusive));
 		Rain::tsCout("Sending over 'push-exclusive' request with checksums...", LINE_END);
 		fflush(stdout);
+
+		cmhParam.canAcceptCommand = false;
 
 		return 0;
 	}

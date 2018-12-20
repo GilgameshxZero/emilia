@@ -2,14 +2,20 @@
 
 #include "rain-aeternum/rain-libraries.h"
 
+#include "command-handler-param.h"
+
 #include <map>
 #include <set>
 
 namespace Emilia {
+	struct CommandHandlerParam;
+
 	namespace UpdateClient {
 		typedef int(*RequestMethodHandler)(Rain::ClientSocketManager::DelegateHandlerParam &);
 
 		struct ConnectionHandlerParam {
+			Emilia::CommandHandlerParam *cmhParam;
+
 			//global config
 			std::map<std::string, std::string> *config;
 

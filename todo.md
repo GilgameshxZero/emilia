@@ -2,7 +2,9 @@
 
 * Separate logs into separate streams to separate destinations.
 * Check scripts/HTTP server to make sure that GET requests deal with URI conversion properly.
-* Cleanup restart/exit routine.
+* Consider removing circular struct references.
+* Pause command stream on more commands.
+* Exit routine still uses `exit(0)`; what is wrong?
 * `Rain` optimizations.
   * Separate structs and params into their own files in `Rain`.
   * Define a '\r\n' line ending in `Rain`.

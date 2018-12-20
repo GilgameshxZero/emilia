@@ -5,6 +5,10 @@
 #include "update-client-param.h"
 
 namespace Emilia {
+	namespace UpdateClient {
+		struct ConnectionHandlerParam;
+	}
+
 	struct CommandHandlerParam {
 		std::map<std::string, std::string> *config = NULL;
 
@@ -21,5 +25,15 @@ namespace Emilia {
 		//types of files
 		std::set<std::string> excAbsSet, ignAbsSet, notSharedAbsSet;
 		std::vector<std::string> excVec, ignVec;
+
+		//alternate command input stream
+		std::istream *cmdInput;
+
+		//when input stream is crashed, this specifies whether we should quit application or not
+		bool shouldExitApp;
+		
+		//lock if we don't want to accept any commands just yet (e.g. when we're switching command input buffer)
+		bool canAcceptCommand;
+		std::condition_variable canAcceptCommandCV;
 	};
 }
