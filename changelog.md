@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.2.3
+
+* Console output now fills hexes with 0s and others with spaces.
+
 ## 5.2.2
 
 * During `push` commands, file diffing now uses last modified time instead of CRC32 hashes, which is faster.

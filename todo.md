@@ -10,3 +10,4 @@
 * Change all threads in `Rain` to C++11 threads.
 * Failed authentication crashes the application.
 * Console output in fixed-width hex should fill empty spaces with 0.
+* `push` request state should not be local to the helper functions, but to socket connection parameters.
