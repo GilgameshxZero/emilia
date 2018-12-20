@@ -195,7 +195,7 @@ namespace Emilia {
 	std::string CHHPushGenerateRequest(std::string root, std::vector<std::string> &files) {
 		//generate hashes (using last write time instead of crc32)
 		std::vector<FILETIME> hash(files.size());
-		Rain::tsCout(std::hex);
+		Rain::tsCout(std::hex, std::setfill('0'));
 		for (int a = 0; a < files.size(); a++) {
 			HANDLE hFile;
 			hFile = CreateFile((root + files[a]).c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
