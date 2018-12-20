@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.2.6
+
+* `push` and `push-exclusive` parameters are stored in delegate parameters instead of as statics of helper functions, making the commands more resistant to failure.
+
 ## 5.2.5
 
 * Authentication now uses exclusive configuration-specific passwords instead of general configuration password is `yes` selected.

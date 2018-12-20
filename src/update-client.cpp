@@ -8,6 +8,8 @@ namespace Emilia {
 			Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam = *reinterpret_cast<Rain::ClientSocketManager::DelegateHandlerParam *>(funcParam);
 			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
 
+			chParam.state = "wait-request";
+
 			//authenticate automatically
 			Rain::tsCout("Info: Authenticating with update server...\r\n");
 			chParam.waitingRequests++;
