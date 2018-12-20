@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.2.7
+
+* Small console output change to server side of `push`.
+* Only one instance of the application can run at the same time from the same .exe.
+* `push-exclusive` now restarts application with update script when there are unwritable locked files.
+* Sending 0 bytes no longer displays as `nan-ind%`.
+
 ## 5.2.6
 
 * `push` and `push-exclusive` parameters are stored in delegate parameters instead of as statics of helper functions, making the commands more resistant to failure.

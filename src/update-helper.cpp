@@ -49,7 +49,7 @@ namespace Emilia {
 					hFile = CreateFile((root + files[a].second).c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_ALWAYS, 0, NULL);
 					GetFileTime(hFile, NULL, NULL, &lastWrite);
 					CloseHandle(hFile);
-					Rain::tsCout(std::setw(8), lastWrite.dwHighDateTime, std::setw(8), lastWrite.dwLowDateTime, " | ",
+					Rain::tsCout(std::setw(8), lastWrite.dwHighDateTime, std::setw(8), lastWrite.dwLowDateTime, " ",
 						std::setw(8), files[a].first.dwHighDateTime, std::setw(8), files[a].first.dwLowDateTime, " ");
 					if (files[a].first.dwHighDateTime != lastWrite.dwHighDateTime ||
 						files[a].first.dwLowDateTime != lastWrite.dwLowDateTime) {
@@ -131,8 +131,10 @@ namespace Emilia {
 					Rain::printToFile(root + cdParam.requested[cdParam.curFile] + config["update-tmp-ext"], &request, true);
 				}
 				cdParam.currentBytes += request.length();
-				Rain::tsCout("Receiving filedata: ", 100.0 * cdParam.currentBytes / cdParam.totalBytes, "%\r");
-				fflush(stdout);
+				if (cdParam.totalBytes > 0) {
+					Rain::tsCout("Receiving filedata: ", 100.0 * cdParam.currentBytes / cdParam.totalBytes, "%\r");
+					fflush(stdout);
+				}
 				cdParam.curFileLenLeft -= request.length();
 
 				//done with current file?
@@ -160,35 +162,41 @@ namespace Emilia {
 
 					Rain::tsCout("\n");
 
-					//if we have unwritable files, note them; if that includes this executable, restart this executable
+					//if we have unwritable files, note them and start the update script on them; restart the current executable again afterwards
 					std::string response;
 					response = method + " '" + method + "' completed.\r\n";
 					Rain::tsCout("'", method, "' completed.\r\n");
+
+					//setup update script params
+					std::string updateScript = Rain::pathToAbsolute(root + config["update-script"]),
+						serverPath = "\"" + Rain::pathToAbsolute(Rain::getExePath()) + "\"";
+
+					//open a script for every unwritable file; these will attempt to start the server multiple times, but only one will succeed
 					for (auto it = cdParam.unwritable.begin(); it != cdParam.unwritable.end(); it++) {
-						std::string message = "Error: Could not write to " + cdParam.requested[*it] + ".";
-						if (Rain::pathToAbsolute(root + cdParam.requested[*it]) == Rain::pathToAbsolute(Rain::getExePath())) {
-							//the current file is part of the unwritable files
-							message += " Restarting to write to executable...";
-							shouldRestart = true;
-						}
-						message += "\r\n";
+						std::string message = "Error: Could not write to " + cdParam.requested[*it] + ".\r\n",
+							dest = root + cdParam.requested[*it];
+						shouldRestart = true;
+						ShellExecute(NULL, "open", updateScript.c_str(), 
+							(serverPath + " \"" + dest + config["update-tmp-ext"] + "\" \"" + dest + "\"").c_str(),
+							Rain::getPathDir(updateScript).c_str(), SW_SHOWDEFAULT);
 						response += message;
 						Rain::tsCout(message);
 					}
-					fflush(stdout);
 
+					if (shouldRestart) {
+						std::string message = "Restarting server to write to locked files...\r\n";
+						response += message;
+						Rain::tsCout(message);
+					}
+
+					fflush(stdout);
 					Rain::sendHeadedMessage(*ssmdhParam.ssm, &response);
 				}
 			}
 
 			if (shouldRestart) {
-				//need to restart current executable after replacing it with the tmp file
-				std::string updateScript = Rain::pathToAbsolute(root + config["update-script"]),
-					cmdLine = "\"" + Rain::pathToAbsolute(Rain::getExePath()) + "\" \"" + Rain::pathToAbsolute(Rain::getExePath() + config["update-tmp-ext"]) + "\"";
-				ShellExecute(NULL, "open", updateScript.c_str(), cmdLine.c_str(), Rain::getPathDir(updateScript).c_str(), SW_SHOWDEFAULT);
-
+				//restart the application here
 				//todo: make this cleaner
-				Sleep(1000);
 				exit(0);
 				return 1;
 			}
@@ -260,7 +268,9 @@ namespace Emilia {
 							message += std::string(buffer, std::size_t(in.gcount()));
 							Rain::sendHeadedMessage(*csmdhParam.csm, &message);
 							completedBytes += in.gcount();
-							Rain::tsCout("Sending filedata: ", 100.0 * completedBytes / totalBytes, "%\r");
+							if (totalBytes > 0) {
+								Rain::tsCout("Sending filedata: ", 100.0 * completedBytes / totalBytes, "%\r");
+							}
 							fflush(stdout);
 						}
 						in.close();
