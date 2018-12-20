@@ -93,25 +93,12 @@ namespace Emilia {
 		smtpSM.setRecvBufLen(Rain::strToT<std::size_t>(config["smtp-transfer-buffer"]));
 
 		//setup command handlers
-		static std::map<std::string, CommandMethodHandler> commandHandlers{
-			{"exit", CHExit},
-			{"help", CHHelp},
-			{"connect", CHConnect},
-			{"disconnect", CHDisconnect},
-			{"push", CHPush},
-			{"push-exclusive", CHPushExclusive},
-			{"pull", CHPull},
-			{"sync", CHSync},
-			{"start", CHStart},
-			{"stop", CHStop},
-			{"restart", CHRestart},
-		};
 		CommandHandlerParam cmhParam;
 		cmhParam.config = &config;
 		cmhParam.logger = &logger;
 		cmhParam.httpSM = &httpSM;
 		cmhParam.smtpSM = &smtpSM;
-
+		 
 		cmhParam.excVec = Rain::readMultilineFile(config["config-path"] + config["update-exclusive-files"]);
 		cmhParam.ignVec = Rain::readMultilineFile(config["config-path"] + config["update-ignore-files"]);
 		cmhParam.ignVec.push_back(config["update-exclusive-dir"]);
@@ -148,13 +135,42 @@ namespace Emilia {
 		//auto-start servers
 		CHStart(cmhParam);
 
-		//process commands
+		//replace read from an istream, and replace its buffer with cin; when program needs to die, we'll replace the buffer with a buffer of our own
+		std::map<std::string, CommandMethodHandler> commandHandlers{
+			{"exit", CHExit},
+			{"help", CHHelp},
+			{"connect", CHConnect},
+			{"disconnect", CHDisconnect},
+			{"push", CHPush},
+			{"push-exclusive", CHPushExclusive},
+			{"pull", CHPull},
+			{"sync", CHSync},
+			{"start", CHStart},
+			{"stop", CHStop},
+			{"restart", CHRestart}
+		};
+
+		std::mutex mtx;
+		std::unique_lock<std::mutex> lc(mtx);
+		cmhParam.canAcceptCommand = true;
+		cmhParam.shouldExitApp = false;
+		cmhParam.cmdInput = new std::istream(std::cin.rdbuf());
+
 		while (true) {
-			static std::string command, tmp;
+			std::string command, tmp;
+			while (!cmhParam.canAcceptCommand) {
+				cmhParam.canAcceptCommandCV.wait(lc);
+			}
 			Rain::tsCout("Accepting commands...\r\n");
 			fflush(stdout);
-			std::cin >> command;
-			std::getline(std::cin, tmp);
+
+			*cmhParam.cmdInput >> command;
+			Rain::strTrimWhite(command);
+			std::getline(*cmhParam.cmdInput, tmp);
+
+			if (cmhParam.shouldExitApp) {
+				command = "exit";
+			}
 
 			auto handler = commandHandlers.find(command);
 			if (handler != commandHandlers.end()) {
@@ -164,6 +180,10 @@ namespace Emilia {
 			} else {
 				Rain::tsCout("Command not recognized.\r\n");
 			}
+		}
+
+		if (cmhParam.cmdInput != NULL) {
+			delete cmhParam.cmdInput;
 		}
 
 		Rain::tsCout("The program has terminated.", LINE_END);

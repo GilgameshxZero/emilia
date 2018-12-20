@@ -38,7 +38,7 @@ namespace Emilia {
 					std::getline(ss, files.back().second);
 					Rain::strTrimWhite(&files.back().second);
 				}
-				Rain::tsCout("Info: Received ", method, " request with header with ", cdParam.cfiles, " files. Comparing with local files...\r\n");
+				Rain::tsCout("Info: Received ", method, " request with header with ", std::dec, cdParam.cfiles, " files. Comparing with local files...\r\n");
 				fflush(stdout);
 
 				//compare filelist with local hashes (last write time; not crc32) and see which ones need to be updated/deleted
@@ -176,7 +176,7 @@ namespace Emilia {
 						std::string message = "Error: Could not write to " + cdParam.requested[*it] + ".\r\n",
 							dest = root + cdParam.requested[*it];
 						shouldRestart = true;
-						ShellExecute(NULL, "open", updateScript.c_str(), 
+						ShellExecute(NULL, "open", updateScript.c_str(),
 							(serverPath + " \"" + dest + config["update-tmp-ext"] + "\" \"" + dest + "\"").c_str(),
 							Rain::getPathDir(updateScript).c_str(), SW_SHOWDEFAULT);
 						response += message;
@@ -195,16 +195,27 @@ namespace Emilia {
 			}
 
 			if (shouldRestart) {
-				//restart the application here
-				//todo: make this cleaner
+				//todo: fix this
 				exit(0);
-				return 1;
+				return 0;
+
+				//restart the application here
+				cmhParam.shouldExitApp = true;
+
+				//crash the command stream
+				cmhParam.cmdInput->putback('\n');
+				cmhParam.cmdInput->putback('a');
+				cmhParam.cmdInput->sync();
+
+				Rain::tsCout("Exit flag set and input stream crashed...\r\n");
+				fflush(stdout);
 			}
 
 			return 0;
 		}
 		int ClientPushProc(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam, std::string method) {
 			UpdateClient::ConnectionHandlerParam &chParam = *reinterpret_cast<UpdateClient::ConnectionHandlerParam *>(csmdhParam.delegateParam);
+			CommandHandlerParam &cmhParam = *chParam.cmhParam;
 			std::map<std::string, std::string> &config = *chParam.config;
 			std::string &request = *csmdhParam.message;
 
@@ -226,6 +237,9 @@ namespace Emilia {
 				if (chParam.cfiles == 0) {
 					Rain::tsCout("Remote is up-to-date. No '", method, "' necessary.\r\n");
 					fflush(stdout);
+
+					cmhParam.canAcceptCommand = true;
+					cmhParam.canAcceptCommandCV.notify_one();
 				} else {
 					Rain::tsCout("Info: Received ", chParam.cfiles, " requested files in response to '", method, "' command from remote. Sending file lengths...\r\n");
 					fflush(stdout);
@@ -288,6 +302,9 @@ namespace Emilia {
 
 				chParam.state = "wait-request";
 				chParam.requested.clear();
+
+				cmhParam.canAcceptCommand = true;
+				cmhParam.canAcceptCommandCV.notify_one();
 			}
 
 			return 0;
