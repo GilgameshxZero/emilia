@@ -8,3 +8,5 @@
 * Define a '\r\n' line ending in `Rain`.
 * Implement a true message system in `Rain` without `RainWindow`.
 * Change all threads in `Rain` to C++11 threads.
+* Failed authentication crashes the application.
+* Console output in fixed-width hex should fill empty spaces with 0.
