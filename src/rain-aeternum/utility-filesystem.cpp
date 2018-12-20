@@ -115,8 +115,8 @@ namespace Rain {
 
 		std::vector<std::string> relpath;
 		for (std::size_t a = 0; a < files.size(); a++) {
-			if (ignore == NULL || ignore->find(pathToAbsolute(files[a])) == ignore->end()) {
-				if (want == NULL || want->find(pathToAbsolute(files[a])) != want->end()) {
+			if (ignore == NULL || ignore->find(pathToAbsolute(directory + files[a])) == ignore->end()) {
+				if (want == NULL || want->find(pathToAbsolute(directory + files[a])) != want->end()) {
 					relpath.push_back(files[a]);
 				}
 			}

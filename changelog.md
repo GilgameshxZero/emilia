@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.2.8
+
+* Command stream is paused during some commands.
+* Add more directories to ignore file during `push`.
+
 ## 5.2.7
 
 * Small console output change to server side of `push`.
