@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.2.5
+
+* Authentication now uses exclusive configuration-specific passwords instead of general configuration password is `yes` selected.
+
 ## 5.2.4
 
 * Failed authentication no longer crashes application.
