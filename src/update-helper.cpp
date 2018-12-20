@@ -50,7 +50,7 @@ namespace Emilia {
 				fflush(stdout);
 
 				//compare filelist with local hashes (last write time; not crc32) and see which ones need to be updated/deleted
-				Rain::tsCout(std::hex);
+				Rain::tsCout(std::hex, std::setfill('0'));
 				for (int a = 0; a < files.size(); a++) {
 					FILETIME lastWrite;
 					HANDLE hFile;
@@ -116,7 +116,7 @@ namespace Emilia {
 				curFile = 0;
 				curFileLenLeft = -1;
 
-				Rain::tsCout(std::fixed, "Info: Received file lengths from update client. Receiving filedata (", std::setprecision(2), totalBytes / 1e6, " MB)...\r\n");
+				Rain::tsCout(std::fixed, "Info: Received file lengths from update client. Receiving filedata (", std::setprecision(2), totalBytes / 1e6, " MB)...\r\n", std::setfill(' '));
 				for (int a = 0; a < cfiles; a++) {
 					Rain::tsCout(std::setw(8), fileLen[a] / 1e6, " MB ", requested[a], "\r\n");
 				}
@@ -244,7 +244,7 @@ namespace Emilia {
 
 					std::string response = method + " \n";
 					std::size_t totalBytes = 0, currentBytes;
-					Rain::tsCout(std::fixed, std::setprecision(2));
+					Rain::tsCout(std::fixed, std::setprecision(2), std::setfill(' '));
 					for (int a = 0; a < requested.size(); a++) {
 						currentBytes = Rain::getFileSize(root + requested[a]);
 						totalBytes += currentBytes;
