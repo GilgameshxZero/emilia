@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.2.4
+
+* Failed authentication no longer crashes application.
+
 ## 5.2.3
 
 * Console output now fills hexes with 0s and others with spaces.

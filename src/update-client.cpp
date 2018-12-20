@@ -32,7 +32,7 @@ namespace Emilia {
 		int HandleRequest(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam) {
 			static const std::map<std::string, RequestMethodHandler> methodHandlerMap{
 				{"authenticate", HRAuthenticate}, //validates a socket connection session
-				{ "push", HRPush},
+				{"push", HRPush},
 				{"push-exclusive", HRPushExclusive},
 				{"pull", HRPull},
 				{"sync", HRSync},
