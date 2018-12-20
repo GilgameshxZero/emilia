@@ -30,7 +30,13 @@ namespace Emilia {
 		Rain::tsCout("Prompt: Use configuration authentication? (y/n): ");
 		std::cin >> passResponse;
 		if (passResponse == "y") {
-			pass = (*cmhParam.config)["emilia-auth-pass"];
+			//depending on the remote, take the password from the exclusive configuration for that remote; if not available, use the local password in the config
+			std::string remoteCfgPath = Rain::pathToAbsolute((*cmhParam.config)["update-root"] + (*cmhParam.config)["update-exclusive-dir"] + remoteAddr + "\\config\\config.ini");
+			if (Rain::fileExists(remoteCfgPath)) {
+				pass = Rain::readParameterFile(remoteCfgPath)["emilia-auth-pass"];
+			} else {
+				pass = (*cmhParam.config)["emilia-auth-pass"];
+			}
 		} else {
 			Rain::tsCout("Prompt: Password for remote: ");
 			std::cin >> pass;
