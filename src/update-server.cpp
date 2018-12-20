@@ -15,13 +15,15 @@ namespace Emilia {
 			}
 
 			ccParam.clientConnected = true;
-			ccParam.hrPushState = "start";
 			Rain::tsCout("Info: Update client connected.\r\n");
 			fflush(stdout);
 
 			//create the delegate parameter for the first time
 			ConnectionDelegateParam *cdParam = new ConnectionDelegateParam();
 			ssmdhParam.delegateParam = reinterpret_cast<void *>(cdParam);
+
+			//if we do any push requests, start it out as "start" state
+			cdParam->hrPushState = "start";
 
 			//initialize cdParam here
 			cdParam->authenticated = false;
