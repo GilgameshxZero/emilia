@@ -29,6 +29,11 @@ namespace Emilia {
 
 			//password for authentication on reconnect
 			std::string authPass;
+
+			//files used for push/push-exclusive
+			std::string state;
+			int cfiles;
+			std::vector<std::string> requested;
 		};
 	}
 }
