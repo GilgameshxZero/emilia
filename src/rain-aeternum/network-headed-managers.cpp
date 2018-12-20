@@ -20,7 +20,7 @@ namespace Rain {
 		hcsm.csmdhp.csm = csmdhp.csm;
 		hcsm.csmdhp.delegateParam = hcsm.headedDelegateParam;
 		hcsm.csmdhp.message = &hcsm.accMess;
-		return hcsm.onHeadedConnectDelegate(reinterpret_cast<void *>(&hcsm.csmdhp));
+		return hcsm.onHeadedConnectDelegate == NULL ? 0 : hcsm.onHeadedConnectDelegate(reinterpret_cast<void *>(&hcsm.csmdhp));
 	}
 	int HeadedClientSocketManager::onHeadedMessage(void *param) {
 		ClientSocketManager::DelegateHandlerParam &csmdhp = *reinterpret_cast<ClientSocketManager::DelegateHandlerParam *>(param);
@@ -31,7 +31,7 @@ namespace Rain {
 		while (isMessageComplete(hcsm.messageLength, hcsm.accMess)) {
 			std::string fragment = hcsm.accMess.substr(hcsm.messageLength, hcsm.accMess.length());
 			hcsm.accMess = hcsm.accMess.substr(0, hcsm.messageLength);
-			int delRet = hcsm.onHeadedMessageDelegate(reinterpret_cast<void *>(&hcsm.csmdhp));
+			int delRet = hcsm.onHeadedMessageDelegate == NULL ? 0 : hcsm.onHeadedMessageDelegate(reinterpret_cast<void *>(&hcsm.csmdhp));
 			ret = ret == 0 ? delRet : ret;
 			hcsm.accMess = fragment;
 			hcsm.messageLength = 0;
@@ -41,7 +41,7 @@ namespace Rain {
 	int HeadedClientSocketManager::onHeadedDisconnect(void *param) {
 		ClientSocketManager::DelegateHandlerParam &csmdhp = *reinterpret_cast<ClientSocketManager::DelegateHandlerParam *>(param);
 		HeadedClientSocketManager &hcsm = *reinterpret_cast<HeadedClientSocketManager *>(csmdhp.delegateParam);
-		return hcsm.onHeadedConnectDelegate(reinterpret_cast<void *>(&hcsm.csmdhp));
+		return hcsm.onHeadedDisconnectDelegate == NULL ? 0 : hcsm.onHeadedDisconnectDelegate(reinterpret_cast<void *>(&hcsm.csmdhp));
 	}
 
 	void HeadedServerManager::setEventHandlers(RecvHandlerParam::EventHandler onConnect, RecvHandlerParam::EventHandler onMessage, RecvHandlerParam::EventHandler onDisconnect, void *funcParam) {
@@ -70,7 +70,7 @@ namespace Rain {
 
 		dhp.messageLength = 0;
 
-		return hsm.onHeadedConnectDelegate(reinterpret_cast<void *>(&dhp.ssmdhp));
+		return hsm.onHeadedConnectDelegate == NULL ? 0 : hsm.onHeadedConnectDelegate(reinterpret_cast<void *>(&dhp.ssmdhp));
 	}
 	int HeadedServerManager::onHeadedMessage(void *param) {
 		ServerSocketManager::DelegateHandlerParam &ssmdhp = *reinterpret_cast<ServerSocketManager::DelegateHandlerParam *>(param);
@@ -81,7 +81,7 @@ namespace Rain {
 		while (isMessageComplete(dhp.messageLength, dhp.accMess)) {
 			std::string fragment = dhp.accMess.substr(dhp.messageLength, dhp.accMess.length());
 			dhp.accMess = dhp.accMess.substr(0, dhp.messageLength);
-			int delRet = hsm.onHeadedMessageDelegate(reinterpret_cast<void *>(&dhp.ssmdhp));
+			int delRet = hsm.onHeadedMessageDelegate == NULL ? 0 : hsm.onHeadedMessageDelegate(reinterpret_cast<void *>(&dhp.ssmdhp));
 			ret = ret == 0 ? delRet : ret;
 			dhp.accMess = fragment;
 			dhp.messageLength = 0;
@@ -92,7 +92,7 @@ namespace Rain {
 		ServerSocketManager::DelegateHandlerParam &ssmdhp = *reinterpret_cast<ServerSocketManager::DelegateHandlerParam *>(param);
 		HeadedServerManager &hsm = *reinterpret_cast<HeadedServerManager *>(ssmdhp.callerParam);
 		DelegateHandlerParam &dhp = *reinterpret_cast<DelegateHandlerParam *>(ssmdhp.delegateParam);
-		int ret = hsm.onHeadedDisconnectDelegate(reinterpret_cast<void *>(&dhp.ssmdhp));
+		int ret = hsm.onHeadedDisconnectDelegate == NULL ? 0 : hsm.onHeadedDisconnectDelegate(reinterpret_cast<void *>(&dhp.ssmdhp));
 		delete &dhp;
 		return ret;
 	}
