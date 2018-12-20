@@ -3,6 +3,20 @@
 const std::string LINE_END = "\r\n";
 
 int main(int argc, char *argv[]) {
+	//try to create a named mutex; if it already exists, then another instance of this application is running so terminate this
+	//mutex name cannot have backslashes
+	std::string mutexName = Rain::pathToAbsolute(Rain::getExePath());
+	for (std::size_t a = 0; a < mutexName.length(); a++) {
+		if (mutexName[a] == '\\') {
+			mutexName[a] = '/';
+		}
+	}
+	CreateMutex(NULL, FALSE, mutexName.c_str());
+	if (GetLastError() == ERROR_ALREADY_EXISTS) {
+		std::cout << "Another instance of application already running." << LINE_END;
+		return -1;
+	}
+
 	//restart the application if it didn't finish successfully
 	if (FAILED(RegisterApplicationRestart(Rain::mbStrToWStr("crash-restart").c_str(), 0))) {
 		std::cout << "RegisterApplicationRestart failed." << LINE_END;
