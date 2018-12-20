@@ -102,27 +102,13 @@ namespace Emilia {
 		std::map<std::string, std::string> &config = *cmhParam.config;
 		std::string root = Rain::pathToAbsolute(config["update-root"]);
 		std::vector<std::string> shared = Rain::getFilesRec(root, "*", &cmhParam.notSharedAbsSet);
-		Rain::tsCout("Found ", shared.size(), " shared files. CRC32s follow:", LINE_END);
+		Rain::tsCout("Found ", shared.size(), " shared files.", LINE_END);
 		fflush(stdout);
-
-		//generate checksums for all shared files
-		std::vector<unsigned int> crc32(shared.size());
-		Rain::tsCout(std::hex);
-		for (int a = 0; a < shared.size(); a++) {
-			crc32[a] = Rain::checksumFileCRC32(root + shared[a]);
-			Rain::tsCout(std::setw(8), crc32[a], " ", shared[a], LINE_END);
-			fflush(stdout);
-		}
-		Rain::tsCout(std::dec);
 
 		//send over list of files and checksums
+		Rain::sendHeadedMessage(*cmhParam.remoteCSM, "push" + CHHPushGenerateRequest(root, shared));
 		Rain::tsCout("Sending over 'push' request with checksums...", LINE_END);
 		fflush(stdout);
-		std::string message = "push " + Rain::tToStr(shared.size()) + "\n";
-		for (int a = 0; a < shared.size(); a++) {
-			message += Rain::tToStr(crc32[a]) + " " + shared[a] + "\n";
-		}
-		Rain::sendHeadedMessage(*cmhParam.remoteCSM, &message);
 
 		return 0;
 	}
@@ -146,24 +132,10 @@ namespace Emilia {
 		Rain::tsCout("Found ", exclusive.size(), " exclusive files for '", ip, "'.", LINE_END);
 		fflush(stdout);
 
-		//generate checksums for all exclusive files
-		std::vector<unsigned int> crc32(exclusive.size());
-		Rain::tsCout(std::hex);
-		for (int a = 0; a < exclusive.size(); a++) {
-			crc32[a] = Rain::checksumFileCRC32(excRoot + exclusive[a]);
-			Rain::tsCout(std::setw(8), crc32[a], " ", exclusive[a], LINE_END);
-			fflush(stdout);
-		}
-		Rain::tsCout(std::dec);
-
-		//send over the exclusive files as part of the push command (piggyback off of the command)
+		//send over list of files and checksums
+		Rain::sendHeadedMessage(*cmhParam.remoteCSM, "push-exclusive" + CHHPushGenerateRequest(excRoot, exclusive));
 		Rain::tsCout("Sending over 'push-exclusive' request with checksums...", LINE_END);
 		fflush(stdout);
-		std::string message = "push-exclusive " + Rain::tToStr(exclusive.size()) + "\n";
-		for (int a = 0; a < exclusive.size(); a++) {
-			message += Rain::tToStr(crc32[a]) + " " + exclusive[a] + "\n";
-		}
-		Rain::sendHeadedMessage(*cmhParam.remoteCSM, &message);
 
 		return 0;
 	}
@@ -218,5 +190,28 @@ namespace Emilia {
 		CHStop(cmhParam);
 		CHStart(cmhParam);
 		return 0;
+	}
+
+	std::string CHHPushGenerateRequest(std::string root, std::vector<std::string> &files) {
+		//generate hashes (using last write time instead of crc32)
+		std::vector<FILETIME> hash(files.size());
+		Rain::tsCout(std::hex);
+		for (int a = 0; a < files.size(); a++) {
+			HANDLE hFile;
+			hFile = CreateFile((root + files[a]).c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+			GetFileTime(hFile, NULL, NULL, &hash[a]);
+			CloseHandle(hFile);
+
+			Rain::tsCout(std::setw(8), hash[a].dwHighDateTime, std::setw(8), hash[a].dwLowDateTime, " ", files[a], LINE_END);
+			fflush(stdout);
+		}
+		Rain::tsCout(std::dec);
+
+		std::string message = " " + Rain::tToStr(files.size()) + "\n";
+		for (int a = 0; a < files.size(); a++) {
+			message += Rain::tToStr(hash[a].dwHighDateTime) + " " + Rain::tToStr(hash[a].dwLowDateTime) + " " + files[a] + "\n";
+		}
+
+		return message;
 	}
 }

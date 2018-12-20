@@ -25,4 +25,7 @@ namespace Emilia {
 	int CHStart(CommandHandlerParam &cmhParam);
 	int CHStop(CommandHandlerParam &cmhParam);
 	int CHRestart(CommandHandlerParam &cmhParam);
+
+	//helpers used by handlers
+	std::string CHHPushGenerateRequest(std::string root, std::vector<std::string> &files);
 }

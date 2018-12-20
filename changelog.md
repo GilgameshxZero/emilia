@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.2.2
+
+* During `push` commands, file diffing now uses last modified time instead of CRC32 hashes, which is faster.
+
 ## 5.2.1
 
 * Finished integrating `headed` servers and clients with the update process.

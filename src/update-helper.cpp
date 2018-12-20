@@ -12,6 +12,7 @@ namespace Emilia {
 			//parse message based on state of the request
 			static int cfiles;
 			static std::vector<std::string> requested;
+			static std::vector<FILETIME> requestedFiletimes;
 			static std::vector<std::size_t> fileLen;
 			static int curFile;
 			static std::size_t curFileLenLeft;
@@ -26,6 +27,7 @@ namespace Emilia {
 
 			if (ccParam.hrPushState == "start") { //receiving filelist
 				requested.clear();
+				requestedFiletimes.clear();
 				unwritable.clear();
 				noRemove.clear();
 
@@ -37,30 +39,37 @@ namespace Emilia {
 				ss << request;
 
 				ss >> cfiles;
-				std::vector<std::pair<unsigned int, std::string>> files;
+				std::vector<std::pair<FILETIME, std::string>> files;
 				for (int a = 0; a < cfiles; a++) {
-					files.push_back(std::make_pair(0, ""));
-					ss >> files.back().first;
+					files.push_back(std::make_pair(FILETIME(), ""));
+					ss >> files.back().first.dwHighDateTime >> files.back().first.dwLowDateTime;
 					std::getline(ss, files.back().second);
 					Rain::strTrimWhite(&files.back().second);
 				}
 				Rain::tsCout("Info: Received ", method, " request with header with ", cfiles, " files. Comparing with local files...\r\n");
 				fflush(stdout);
 
-				//compare filelist with local checksums and see which ones need to be updated/deleted
+				//compare filelist with local hashes (last write time; not crc32) and see which ones need to be updated/deleted
 				Rain::tsCout(std::hex);
 				for (int a = 0; a < files.size(); a++) {
-					unsigned int crc32 = Rain::checksumFileCRC32(root + files[a].second);
-					Rain::tsCout(std::setw(8), crc32, " ", std::setw(8), files[a].first, " ");
-					if (files[a].first != crc32) {
+					FILETIME lastWrite;
+					HANDLE hFile;
+					hFile = CreateFile((root + files[a].second).c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_ALWAYS, 0, NULL);
+					GetFileTime(hFile, NULL, NULL, &lastWrite);
+					CloseHandle(hFile);
+					Rain::tsCout(std::setw(8), lastWrite.dwHighDateTime, std::setw(8), lastWrite.dwLowDateTime, " | ",
+						std::setw(8), files[a].first.dwHighDateTime, std::setw(8), files[a].first.dwLowDateTime, " ");
+					if (files[a].first.dwHighDateTime != lastWrite.dwHighDateTime ||
+						files[a].first.dwLowDateTime != lastWrite.dwLowDateTime) {
 						requested.push_back(files[a].second);
-						Rain::tsCout("! ");
+						requestedFiletimes.push_back(files[a].first);
+						Rain::tsCout("!");
 					} else {
-						//CRC32s match, so add this file to the list of ignored files when we remove files
+						//hashes match, so add this file to the list of ignored files when we remove files
 						noRemove.insert(root + files[a].second);
-						Rain::tsCout("  ");
+						Rain::tsCout(" ");
 					}
-					Rain::tsCout(files[a].second, "\r\n");
+					Rain::tsCout(" ", files[a].second, "\r\n");
 					fflush(stdout);
 				}
 
@@ -96,7 +105,7 @@ namespace Emilia {
 					totalBytes += fileLen.back();
 				}
 
-				//remove all exclusive files except for those matched by CRC32
+				//remove all exclusive files except for those matched by hash
 				if (method == "push") {
 					Rain::rmDirRec(root, &noRemove);
 				} else if (method == "push-exclusive") {
@@ -134,7 +143,21 @@ namespace Emilia {
 				fflush(stdout);
 				curFileLenLeft -= request.length();
 
+				//done with current file?
 				if (curFileLenLeft == 0) {
+					//modify the last write time of the current file to match that sent in the push header
+					HANDLE hFile;
+					if (unwritable.find(curFile) == unwritable.end()) {
+						hFile = CreateFile((root + requested[curFile]).c_str(),
+							FILE_WRITE_ATTRIBUTES, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+					} else {
+						hFile = CreateFile((root + requested[curFile] + config["update-tmp-ext"]).c_str(),
+							FILE_WRITE_ATTRIBUTES, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+					}
+					SetFileTime(hFile, NULL, NULL, &requestedFiletimes[curFile]);
+					CloseHandle(hFile);
+
+					//move on to next file
 					curFile++;
 					curFileLenLeft = -1;
 				}
