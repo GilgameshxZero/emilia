@@ -10,8 +10,9 @@ namespace Rain {
 	}
 
 	bool fileExists(std::string file) {
-		struct stat buffer;
-		return (stat(file.c_str(), &buffer) == 0);
+		struct _stat buffer;
+		_stat(file.c_str(), &buffer);
+		return (buffer.st_mode & _S_IFREG) != 0;
 	}
 	bool dirExists(std::string dir) {
 		DWORD ftyp = GetFileAttributesW(pathToLongPath(pathToAbsolute(dir)).c_str());

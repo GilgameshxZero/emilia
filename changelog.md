@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.3.4
+
+* HTTP now gives 404 when directory is requested.
+* Ignored more files in config.
+
 ## 5.3.3
 
 * Move data encoding away from scripts to front-end.
