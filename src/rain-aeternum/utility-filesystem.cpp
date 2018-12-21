@@ -75,7 +75,7 @@ namespace Rain {
 		std::vector<std::string> ret;
 		if (hFind != INVALID_HANDLE_VALUE) {
 			do {
-				if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+				if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && !(fd.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT)) {
 					WideCharToMultiByte(CP_UTF8, 0, fd.cFileName, -1, multibyte, 32767, NULL, NULL);
 					ret.push_back(multibyte);
 				}
@@ -97,7 +97,7 @@ namespace Rain {
 		std::vector<std::string> ret;
 		if (hFind != INVALID_HANDLE_VALUE) {
 			do {
-				if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+				if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) || (fd.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT)) {
 					WideCharToMultiByte(CP_UTF8, 0, fd.cFileName, -1, multibyte, 32767, NULL, NULL);
 					ret.push_back(multibyte);
 				}
@@ -193,7 +193,10 @@ namespace Rain {
 					//want everything under this directory, so don't pass any argument forward
 					rmDirRec(dir + ldir[a] + '\\', ignore, NULL);
 
-					RemoveDirectoryW(pathToLongPath(std::wstring(unicode)).c_str());
+					//RemoveDirectory removes symbolic links even when not empty, so only call if the directory really is empty
+					if (isDirEmpty(pathToAbsolute(dir + ldir[a] + '\\'))) {
+						RemoveDirectoryW(pathToLongPath(std::wstring(unicode)).c_str());
+					}
 				}
 			}
 		}
@@ -354,5 +357,11 @@ namespace Rain {
 		}
 		fclose(fp);
 		return true;
+	}
+	bool isDirEmpty(std::string dir) {
+		std::vector<std::string> ldir, lfile;
+		ldir = getDirs(pathToAbsolute(dir), "*");
+		lfile = getFiles(pathToAbsolute(dir), "*");
+		return (ldir.size() == 2 && lfile.size() == 0);
 	}
 }

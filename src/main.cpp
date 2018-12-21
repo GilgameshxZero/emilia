@@ -144,7 +144,6 @@ namespace Emilia {
 			{"push", CHPush},
 			{"push-exclusive", CHPushExclusive},
 			{"pull", CHPull},
-			{"sync", CHSync},
 			{"start", CHStart},
 			{"stop", CHStop},
 			{"restart", CHRestart}

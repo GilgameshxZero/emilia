@@ -22,7 +22,6 @@ namespace Emilia {
 		int HRPush(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam);
 		int HRPushExclusive(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam);
 		int HRPull(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam);
-		int HRSync(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam);
 		int HRStart(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam);
 		int HRStop(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam);
 	}

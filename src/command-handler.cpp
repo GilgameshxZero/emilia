@@ -113,8 +113,8 @@ namespace Emilia {
 		std::cout.flush();
 
 		//send over list of files and checksums
-		Rain::sendHeadedMessage(*cmhParam.remoteCSM, "push" + CHHPushGenerateRequest(root, shared));
-		Rain::tsCout("Sending over 'push' request with checksums...", Rain::CRLF);
+		Rain::sendHeadedMessage(*cmhParam.remoteCSM, "push" + UpdateHelper::generatePushHeader(root, shared));
+		Rain::tsCout("Sending over 'push' request with hashes...", Rain::CRLF);
 		std::cout.flush();
 
 		cmhParam.canAcceptCommand = false;
@@ -142,8 +142,8 @@ namespace Emilia {
 		std::cout.flush();
 
 		//send over list of files and checksums
-		Rain::sendHeadedMessage(*cmhParam.remoteCSM, "push-exclusive" + CHHPushGenerateRequest(excRoot, exclusive));
-		Rain::tsCout("Sending over 'push-exclusive' request with checksums...", Rain::CRLF);
+		Rain::sendHeadedMessage(*cmhParam.remoteCSM, "push-exclusive" + UpdateHelper::generatePushHeader(excRoot, exclusive));
+		Rain::tsCout("Sending over 'push-exclusive' request with hashes...", Rain::CRLF);
 		std::cout.flush();
 
 		cmhParam.canAcceptCommand = false;
@@ -158,15 +158,10 @@ namespace Emilia {
 		}
 
 		//send request to remote for headers
+		Rain::sendHeadedMessage(*cmhParam.remoteCSM, "pull ");
+		Rain::tsCout("Sending `pull` request...", Rain::CRLF);
+		std::cout.flush();
 
-		return 0;
-	}
-	int CHSync(CommandHandlerParam &cmhParam) {
-		if (cmhParam.remoteCSM == NULL) {
-			//not yet connected
-			Rain::tsCout("Cannot execute this command when not connected with remote.", Rain::CRLF);
-			return 0;
-		}
 		return 0;
 	}
 	int CHStart(CommandHandlerParam &cmhParam) {
@@ -201,28 +196,5 @@ namespace Emilia {
 		CHStop(cmhParam);
 		CHStart(cmhParam);
 		return 0;
-	}
-
-	std::string CHHPushGenerateRequest(std::string root, std::vector<std::string> &files) {
-		//generate hashes (using last write time instead of crc32)
-		std::vector<FILETIME> hash(files.size());
-		Rain::tsCout(std::hex, std::setfill('0'));
-		for (int a = 0; a < files.size(); a++) {
-			HANDLE hFile;
-			hFile = CreateFile((root + files[a]).c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-			GetFileTime(hFile, NULL, NULL, &hash[a]);
-			CloseHandle(hFile);
-
-			Rain::tsCout(std::setw(8), hash[a].dwHighDateTime, std::setw(8), hash[a].dwLowDateTime, " ", files[a], Rain::CRLF);
-			std::cout.flush();
-		}
-		Rain::tsCout(std::dec);
-
-		std::string message = " " + Rain::tToStr(files.size()) + "\n";
-		for (int a = 0; a < files.size(); a++) {
-			message += Rain::tToStr(hash[a].dwHighDateTime) + " " + Rain::tToStr(hash[a].dwLowDateTime) + " " + files[a] + "\n";
-		}
-
-		return message;
 	}
 }

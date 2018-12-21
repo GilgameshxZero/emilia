@@ -2,43 +2,47 @@
 
 namespace Emilia {
 	namespace UpdateHelper {
-		int ServerPushProc(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam, std::string method) {
-			UpdateServer::ConnectionCallerParam &ccParam = *reinterpret_cast<UpdateServer::ConnectionCallerParam *>(ssmdhParam.callerParam);
-			UpdateServer::ConnectionDelegateParam &cdParam = *reinterpret_cast<UpdateServer::ConnectionDelegateParam *>(ssmdhParam.delegateParam);
-			CommandHandlerParam &cmhParam = *ccParam.cmhParam;
+		int pullProc(std::string method, CommandHandlerParam &cmhParam, PullProcParam &pullPP, std::string &message, Rain::SocketManager &sm) {
 			std::map<std::string, std::string> &config = *cmhParam.config;
-			std::string &request = *ssmdhParam.message;
 
 			//parse message based on state of the request
 
 			//relative root for all files to be pushed
-			std::string root = Rain::pathToAbsolute(config["update-root"]);
+			std::string root;
+			
+			if (method == "pull") {
+				root = Rain::pathToAbsolute(config["update-root"]) + config["update-exclusive-dir"] + static_cast<Rain::ClientSocketManager &>(sm).getTargetIP() + "\\";
+			} else {
+				root = Rain::pathToAbsolute(config["update-root"]);
+			}
 
 			//set this to true; if true at the end of function, terminates program for restart
 			bool shouldRestart = false;
 
-			if (cdParam.hrPushState == "start") { //receiving filelist
-				cdParam.requested.clear();
-				cdParam.requestedFiletimes.clear();
-				cdParam.unwritable.clear();
-				cdParam.noRemove.clear();
+			if (pullPP.hrPushState == "start") { //receiving filelist
+				pullPP.requested.clear();
+				pullPP.requestedFiletimes.clear();
+				pullPP.unwritable.clear();
+				pullPP.noRemove.clear();
 
 				if (method == "push") {
-					cdParam.noRemove.insert(cmhParam.notSharedAbsSet.begin(), cmhParam.notSharedAbsSet.end());
+					pullPP.noRemove.insert(cmhParam.notSharedAbsSet.begin(), cmhParam.notSharedAbsSet.end());
 				}
 
-				std::stringstream ss;
-				ss << request;
+				//pull commands operate relative the the domain-specific exclusive files, which should all be removed unless matched by hash
 
-				ss >> cdParam.cfiles;
+				std::stringstream ss;
+				ss << message;
+
+				ss >> pullPP.cfiles;
 				std::vector<std::pair<FILETIME, std::string>> files;
-				for (int a = 0; a < cdParam.cfiles; a++) {
+				for (int a = 0; a < pullPP.cfiles; a++) {
 					files.push_back(std::make_pair(FILETIME(), ""));
 					ss >> files.back().first.dwHighDateTime >> files.back().first.dwLowDateTime;
 					std::getline(ss, files.back().second);
 					Rain::strTrimWhite(&files.back().second);
 				}
-				Rain::tsCout("Received ", method, " request with header with ", std::dec, cdParam.cfiles, " files. Comparing with local files..." + Rain::CRLF);
+				Rain::tsCout("Received ", method, " request with header with ", std::dec, pullPP.cfiles, " files. Comparing with local files..." + Rain::CRLF);
 				std::cout.flush();
 
 				//compare filelist with local hashes (last write time; not crc32) and see which ones need to be updated/deleted
@@ -53,113 +57,119 @@ namespace Emilia {
 						std::setw(8), files[a].first.dwHighDateTime, std::setw(8), files[a].first.dwLowDateTime, " ");
 					if (files[a].first.dwHighDateTime != lastWrite.dwHighDateTime ||
 						files[a].first.dwLowDateTime != lastWrite.dwLowDateTime) {
-						cdParam.requested.push_back(files[a].second);
-						cdParam.requestedFiletimes.push_back(files[a].first);
+						pullPP.requested.push_back(files[a].second);
+						pullPP.requestedFiletimes.push_back(files[a].first);
 						Rain::tsCout("!");
 					} else {
 						//hashes match, so add this file to the list of ignored files when we remove files
-						cdParam.noRemove.insert(root + files[a].second);
+						pullPP.noRemove.insert(root + files[a].second);
 						Rain::tsCout(" ");
 					}
 					Rain::tsCout(" ", files[a].second, Rain::CRLF);
 					std::cout.flush();
 				}
 
-				if (cdParam.requested.size() == 0) {
+				if (pullPP.requested.size() == 0) {
 					//if we don't need any files, don't send the request.
-					cdParam.hrPushState = "start";
-					Rain::tsCout("Local is up-to-date. '", method, "' from client is unnecessary." + Rain::CRLF);
+					pullPP.hrPushState = "start";
+					Rain::tsCout("Local is up-to-date. '", method, "' is unnecessary." + Rain::CRLF);
 					std::cout.flush();
-					Rain::sendHeadedMessage(*ssmdhParam.ssm, method + " 0");
+					Rain::sendHeadedMessage(sm, method + " 0");
 				} else {
-					cdParam.cfiles = static_cast<int>(cdParam.requested.size());
+					pullPP.cfiles = static_cast<int>(pullPP.requested.size());
 					Rain::tsCout(std::dec);
-					Rain::tsCout("Requesting ", cdParam.requested.size(), " files in total from client..." + Rain::CRLF);
+					Rain::tsCout("Requesting ", pullPP.requested.size(), " files in total..." + Rain::CRLF);
 					std::cout.flush();
 
 					//send back a list of requested files.
-					std::string response = method + " " + Rain::tToStr(cdParam.requested.size()) + "\n";
-					for (int a = 0; a < cdParam.requested.size(); a++) {
-						response += cdParam.requested[a] + "\n";
+					std::string response = method + " " + Rain::tToStr(pullPP.requested.size()) + "\n";
+					for (int a = 0; a < pullPP.requested.size(); a++) {
+						response += pullPP.requested[a] + "\n";
 					}
-					Rain::sendHeadedMessage(*ssmdhParam.ssm, &response);
+					Rain::sendHeadedMessage(sm, &response);
 
-					cdParam.hrPushState = "wait-filelengths";
-					cdParam.fileLen.clear();
+					pullPP.hrPushState = "wait-filelengths";
+					pullPP.fileLen.clear();
 				}
-			} else if (cdParam.hrPushState == "wait-filelengths") {
+			} else if (pullPP.hrPushState == "wait-filelengths") {
 				std::stringstream ss;
-				ss << request;
-				cdParam.totalBytes = cdParam.currentBytes = 0;
-				for (int a = 0; a < cdParam.cfiles; a++) {
-					cdParam.fileLen.push_back(0);
-					ss >> cdParam.fileLen.back();
-					cdParam.totalBytes += cdParam.fileLen.back();
+				ss << message;
+				pullPP.totalBytes = pullPP.currentBytes = 0;
+				for (int a = 0; a < pullPP.cfiles; a++) {
+					pullPP.fileLen.push_back(0);
+					ss >> pullPP.fileLen.back();
+					pullPP.totalBytes += pullPP.fileLen.back();
 				}
 
 				//remove all exclusive files except for those matched by hash
 				if (method == "push") {
-					Rain::rmDirRec(root, &cdParam.noRemove);
+					Rain::rmDirRec(root, &pullPP.noRemove);
 				} else if (method == "push-exclusive") {
-					Rain::rmDirRec(root, &cdParam.noRemove, &cmhParam.excAbsSet);
+					Rain::rmDirRec(root, &pullPP.noRemove, &cmhParam.excAbsSet);
+				} else if (method == "pull") {
+					Rain::rmDirRec(root, &pullPP.noRemove);
 				}
 
-				cdParam.hrPushState = "wait-data";
-				cdParam.curFile = 0;
-				cdParam.curFileLenLeft = -1;
+				pullPP.hrPushState = "wait-data";
+				pullPP.curFile = 0;
+				pullPP.curFileLenLeft = -1;
 
-				Rain::tsCout(std::fixed, "Received file lengths from update client. Receiving filedata (", std::setprecision(2), cdParam.totalBytes / 1e6, " MB)..." + Rain::CRLF, std::setfill(' '));
-				for (int a = 0; a < cdParam.cfiles; a++) {
-					Rain::tsCout(std::setw(8), cdParam.fileLen[a] / 1e6, " MB ", cdParam.requested[a], Rain::CRLF);
+				Rain::tsCout(std::fixed, "Received file lengths. Receiving filedata (", std::setprecision(2), pullPP.totalBytes / 1e6, " MB)..." + Rain::CRLF, std::setfill(' '));
+				for (int a = 0; a < pullPP.cfiles; a++) {
+					Rain::tsCout(std::setw(8), pullPP.fileLen[a] / 1e6, " MB ", pullPP.requested[a], Rain::CRLF);
 				}
 				std::cout.flush();
-			} else if (cdParam.hrPushState == "wait-data") {
+
+				//temporarily disable logging until file transfer done
+				cmhParam.logger->setStdHandleSrc(STD_OUTPUT_HANDLE, false);
+			} else if (pullPP.hrPushState == "wait-data") {
 				//data is a block of everything in the same order as request, buffered
-				if (cdParam.curFileLenLeft == -1) {
+				if (pullPP.curFileLenLeft == -1) {
 					//try to write to a 'new' file on disk at this location; if not possible, save it to a tmp file and note it down
-					Rain::createDirRec(Rain::getPathDir(root + cdParam.requested[cdParam.curFile]));
-					if (!Rain::isFileWritable(root + cdParam.requested[cdParam.curFile])) {
-						cdParam.unwritable.insert(cdParam.curFile);
+					Rain::createDirRec(Rain::getPathDir(root + pullPP.requested[pullPP.curFile]));
+					if (!Rain::isFileWritable(root + pullPP.requested[pullPP.curFile])) {
+						pullPP.unwritable.insert(pullPP.curFile);
 					}
 
-					cdParam.curFileLenLeft = cdParam.fileLen[cdParam.curFile];
+					pullPP.curFileLenLeft = pullPP.fileLen[pullPP.curFile];
 				}
 
-				if (cdParam.unwritable.find(cdParam.curFile) == cdParam.unwritable.end()) {
-					Rain::printToFile(root + cdParam.requested[cdParam.curFile], &request, true);
+				if (pullPP.unwritable.find(pullPP.curFile) == pullPP.unwritable.end()) {
+					Rain::printToFile(root + pullPP.requested[pullPP.curFile], &message, true);
 				} else {
-					Rain::printToFile(root + cdParam.requested[cdParam.curFile] + config["update-tmp-ext"], &request, true);
+					Rain::printToFile(root + pullPP.requested[pullPP.curFile] + config["update-tmp-ext"], &message, true);
 				}
-				cdParam.currentBytes += request.length();
-				if (cdParam.totalBytes > 0) {
-					Rain::tsCout("Receiving filedata: ", 100.0 * cdParam.currentBytes / cdParam.totalBytes, "%\r");
+				pullPP.currentBytes += message.length();
+				if (pullPP.totalBytes > 0) {
+					Rain::tsCout("Receiving filedata: ", 100.0 * pullPP.currentBytes / pullPP.totalBytes, "%\r");
 					std::cout.flush();
 				}
-				cdParam.curFileLenLeft -= request.length();
+				pullPP.curFileLenLeft -= message.length();
 
 				//done with current file?
-				if (cdParam.curFileLenLeft == 0) {
+				if (pullPP.curFileLenLeft == 0) {
 					//modify the last write time of the current file to match that sent in the push header
 					HANDLE hFile;
-					if (cdParam.unwritable.find(cdParam.curFile) == cdParam.unwritable.end()) {
-						hFile = CreateFile((root + cdParam.requested[cdParam.curFile]).c_str(),
+					if (pullPP.unwritable.find(pullPP.curFile) == pullPP.unwritable.end()) {
+						hFile = CreateFile((root + pullPP.requested[pullPP.curFile]).c_str(),
 							FILE_WRITE_ATTRIBUTES, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
 					} else {
-						hFile = CreateFile((root + cdParam.requested[cdParam.curFile] + config["update-tmp-ext"]).c_str(),
+						hFile = CreateFile((root + pullPP.requested[pullPP.curFile] + config["update-tmp-ext"]).c_str(),
 							FILE_WRITE_ATTRIBUTES, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
 					}
-					SetFileTime(hFile, NULL, NULL, &cdParam.requestedFiletimes[cdParam.curFile]);
+					SetFileTime(hFile, NULL, NULL, &pullPP.requestedFiletimes[pullPP.curFile]);
 					CloseHandle(hFile);
 
 					//move on to next file
-					cdParam.curFile++;
-					cdParam.curFileLenLeft = -1;
+					pullPP.curFile++;
+					pullPP.curFileLenLeft = -1;
 				}
 
-				if (cdParam.curFile == cdParam.cfiles) {
+				if (pullPP.curFile == pullPP.cfiles) {
 					//reset state; done with this request
-					cdParam.hrPushState = "start";
+					pullPP.hrPushState = "start";
 
+					cmhParam.logger->setStdHandleSrc(STD_OUTPUT_HANDLE, true);
 					Rain::tsCout("\n");
 
 					//if we have unwritable files, note them and start the update script on them; restart the current executable again afterwards
@@ -172,25 +182,25 @@ namespace Emilia {
 						serverPath = "\"" + Rain::pathToAbsolute(Rain::getExePath()) + "\"";
 
 					//open a script for every unwritable file; these will attempt to start the server multiple times, but only one will succeed
-					for (auto it = cdParam.unwritable.begin(); it != cdParam.unwritable.end(); it++) {
-						std::string message = "Error: Could not write to " + cdParam.requested[*it] + "." + Rain::CRLF,
-							dest = root + cdParam.requested[*it];
+					for (auto it = pullPP.unwritable.begin(); it != pullPP.unwritable.end(); it++) {
+						std::string m = "Error: Could not write to " + pullPP.requested[*it] + "." + Rain::CRLF,
+							dest = root + pullPP.requested[*it];
 						shouldRestart = true;
 						ShellExecute(NULL, "open", updateScript.c_str(),
 							(serverPath + " \"" + dest + config["update-tmp-ext"] + "\" \"" + dest + "\"").c_str(),
 							Rain::getPathDir(updateScript).c_str(), SW_SHOWDEFAULT);
-						response += message;
-						Rain::tsCout(message);
+						response += m;
+						Rain::tsCout(m);
 					}
 
 					if (shouldRestart) {
-						std::string message = "Restarting server to write to locked files..." + Rain::CRLF;
-						response += message;
-						Rain::tsCout(message);
+						std::string m = "Restarting remote to write to locked files..." + Rain::CRLF;
+						response += m;
+						Rain::tsCout(m);
 					}
 
 					std::cout.flush();
-					Rain::sendHeadedMessage(*ssmdhParam.ssm, &response);
+					Rain::sendHeadedMessage(sm, &response);
 				}
 			}
 
@@ -199,64 +209,81 @@ namespace Emilia {
 				//exit is one of the cleanest ways to do this, short of using many low-level WinAPI calls
 				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 				exit(1);
-
-				Rain::tsCout("Input stream cancelled..." + Rain::CRLF);
-				std::cout.flush();
 			}
 
 			return 0;
 		}
-		int ClientPushProc(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam, std::string method) {
-			UpdateClient::ConnectionHandlerParam &chParam = *reinterpret_cast<UpdateClient::ConnectionHandlerParam *>(csmdhParam.delegateParam);
-			CommandHandlerParam &cmhParam = *chParam.cmhParam;
-			std::map<std::string, std::string> &config = *chParam.config;
-			std::string &request = *csmdhParam.message;
+		int pushProc(std::string method, CommandHandlerParam &cmhParam, PushProcParam &pushPP, std::string &message, Rain::SocketManager &sm) {
+			std::map<std::string, std::string> &config = *cmhParam.config;
 
 			//relative root update path to all of the requested files
 			std::string root;
-			if (method == "push") {
+			if (method == "push" || method == "pull") {
 				root = Rain::pathToAbsolute(config["update-root"]);
 			} else if (method == "push-exclusive") {
-				root = Rain::pathToAbsolute(config["update-root"]) + config["update-exclusive-dir"] + csmdhParam.csm->getTargetIP() + "\\";
+				root = Rain::pathToAbsolute(config["update-root"]) + config["update-exclusive-dir"] + static_cast<Rain::ClientSocketManager &>(sm).getTargetIP() + "\\";
 			}
 
-			if (chParam.state == "wait-request") {
+			if (pushPP.state == "start") {
+				if (method == "pull") {
+					//send headers, like in push exclusive request
+					std::vector<std::string> exclusive = Rain::getFilesRec(root, "*", NULL, &cmhParam.excAbsSet);
+					Rain::tsCout("Found ", exclusive.size(), " exclusive files to `pull`.", Rain::CRLF);
+
+					//send over list of files and checksums
+					Rain::sendHeadedMessage(sm, "pull" + UpdateHelper::generatePushHeader(root, exclusive));
+					Rain::tsCout("Sending over 'pull' request with hashes...", Rain::CRLF);
+					std::cout.flush();
+				}
+
+				//depending on the method, see if we want to process the transition right now
+				pushPP.state = "wait-request";
+				if (method == "pull") {
+					return 0;
+				} //otherwise we want to process the current message with the next state
+			}
+
+			if (pushPP.state == "wait-request") {
 				//HRPush handles a request which lists all the files which the server requests
 				std::stringstream ss;
-				ss << request;
+				ss << message;
 
-				ss >> chParam.cfiles;
+				ss >> pushPP.cfiles;
 
-				if (chParam.cfiles == 0) {
+				if (pushPP.cfiles == 0) {
 					Rain::tsCout("Remote is up-to-date. No '", method, "' necessary." + Rain::CRLF);
 					std::cout.flush();
 
 					cmhParam.canAcceptCommand = true;
 					cmhParam.canAcceptCommandCV.notify_one();
 				} else {
-					Rain::tsCout("Received ", chParam.cfiles, " requested files in response to '", method, "' command from remote. Sending file lengths..." + Rain::CRLF);
+					Rain::tsCout("Received ", pushPP.cfiles, " requested files in response to '", method, "' command. Sending file lengths..." + Rain::CRLF);
 					std::cout.flush();
+
+					//temporarily disable logging until file transfer done
+					//need to stop here so that logfile doesn't go beyond file length
+					cmhParam.logger->setStdHandleSrc(STD_OUTPUT_HANDLE, false);
 
 					std::string tmp;
 					std::getline(ss, tmp);
-					chParam.requested.clear();
-					for (int a = 0; a < chParam.cfiles; a++) {
-						chParam.requested.push_back("");
-						std::getline(ss, chParam.requested.back());
-						Rain::strTrimWhite(&chParam.requested.back());
+					pushPP.requested.clear();
+					for (int a = 0; a < pushPP.cfiles; a++) {
+						pushPP.requested.push_back("");
+						std::getline(ss, pushPP.requested.back());
+						Rain::strTrimWhite(&pushPP.requested.back());
 					}
 
 					std::string response = method + " \n";
 					std::size_t totalBytes = 0, currentBytes;
 					Rain::tsCout(std::fixed, std::setprecision(2), std::setfill(' '));
-					for (int a = 0; a < chParam.requested.size(); a++) {
-						currentBytes = Rain::getFileSize(root + chParam.requested[a]);
+					for (int a = 0; a < pushPP.requested.size(); a++) {
+						currentBytes = Rain::getFileSize(root + pushPP.requested[a]);
 						totalBytes += currentBytes;
 						response += Rain::tToStr(currentBytes) + "\n";
 
-						Rain::tsCout(std::setw(8), currentBytes / 1e6, " MB ", chParam.requested[a], Rain::CRLF);
+						Rain::tsCout(std::setw(8), currentBytes / 1e6, " MB ", pushPP.requested[a], Rain::CRLF);
 					}
-					Rain::sendHeadedMessage(*csmdhParam.csm, &response);
+					Rain::sendHeadedMessage(sm, &response);
 
 					Rain::tsCout("Sending filedata (", totalBytes / 1e6, " MB)..." + Rain::CRLF);
 					std::cout.flush();
@@ -265,15 +292,15 @@ namespace Emilia {
 					int bufferSize = Rain::strToT<int>(config["update-transfer-buffer"]);
 					char *buffer = new char[bufferSize];
 					std::size_t completedBytes = 0;
-					std::string message;
+					std::string m;
 					Rain::tsCout(std::fixed);
-					for (int a = 0; a < chParam.requested.size(); a++) {
-						std::ifstream in(root + chParam.requested[a], std::ios::binary);
+					for (int a = 0; a < pushPP.requested.size(); a++) {
+						std::ifstream in(root + pushPP.requested[a], std::ios::binary);
 						while (in) {
 							in.read(buffer, bufferSize);
-							message = method + " ";
-							message += std::string(buffer, std::size_t(in.gcount()));
-							Rain::sendHeadedMessage(*csmdhParam.csm, &message);
+							m = method + " ";
+							m += std::string(buffer, std::size_t(in.gcount()));
+							Rain::sendHeadedMessage(sm, &m);
 							completedBytes += in.gcount();
 							if (totalBytes > 0) {
 								Rain::tsCout("Sending filedata: ", 100.0 * completedBytes / totalBytes, "%\r");
@@ -282,25 +309,49 @@ namespace Emilia {
 						}
 						in.close();
 					}
+					cmhParam.logger->setStdHandleSrc(STD_OUTPUT_HANDLE, true);
 					delete[] buffer;
-					Rain::tsCout("\nDone. Waiting for server response..." + Rain::CRLF);
+					Rain::tsCout("\nDone. Waiting for remote response..." + Rain::CRLF);
 					std::cout.flush();
 
-					chParam.state = "wait-complete";
+					pushPP.state = "wait-complete";
 				}
-			} else if (chParam.state == "wait-complete") {
+			} else if (pushPP.state == "wait-complete") {
 				//everything in response is to be printed to cout and logs
-				Rain::tsCout("Remote: ", request);
+				Rain::tsCout("Remote: ", message);
 				std::cout.flush();
 
-				chParam.state = "wait-request";
-				chParam.requested.clear();
+				pushPP.state = "start";
+				pushPP.requested.clear();
 
 				cmhParam.canAcceptCommand = true;
 				cmhParam.canAcceptCommandCV.notify_one();
 			}
 
 			return 0;
+		}
+
+		std::string generatePushHeader(std::string root, std::vector<std::string> &files) {
+			//generate hashes (using last write time instead of crc32)
+			std::vector<FILETIME> hash(files.size());
+			Rain::tsCout(std::hex, std::setfill('0'));
+			for (int a = 0; a < files.size(); a++) {
+				HANDLE hFile;
+				hFile = CreateFile((root + files[a]).c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+				GetFileTime(hFile, NULL, NULL, &hash[a]);
+				CloseHandle(hFile);
+
+				Rain::tsCout(std::setw(8), hash[a].dwHighDateTime, std::setw(8), hash[a].dwLowDateTime, " ", files[a], Rain::CRLF);
+				std::cout.flush();
+			}
+			Rain::tsCout(std::dec);
+
+			std::string message = " " + Rain::tToStr(files.size()) + "\n";
+			for (int a = 0; a < files.size(); a++) {
+				message += Rain::tToStr(hash[a].dwHighDateTime) + " " + Rain::tToStr(hash[a].dwLowDateTime) + " " + files[a] + "\n";
+			}
+
+			return message;
 		}
 	}
 }

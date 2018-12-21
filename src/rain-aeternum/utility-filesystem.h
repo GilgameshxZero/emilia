@@ -110,4 +110,5 @@ namespace Rain {
 	void writeParameterFile(std::string filePath, std::map<std::string, std::string> params);
 
 	bool isFileWritable(std::string file);
+	bool isDirEmpty(std::string dir);
 }
