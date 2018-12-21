@@ -27,6 +27,11 @@ namespace Emilia {
 
 				if (method == "push") {
 					pullPP.noRemove.insert(cmhParam.notSharedAbsSet.begin(), cmhParam.notSharedAbsSet.end());
+				} else if (method == "push-exclusive" || method == "pull") {
+					//of the non-specific or specific exclusive files, don't remove those with the same relative path as those in the excIgnVec
+					for(int a = 0; a < cmhParam.excIgnVec.size(); a++) {
+						pullPP.noRemove.insert(root + cmhParam.excIgnVec[a]);
+					}
 				}
 
 				//pull commands operate relative the the domain-specific exclusive files, which should all be removed unless matched by hash
@@ -227,7 +232,11 @@ namespace Emilia {
 			if (pushPP.state == "start") {
 				if (method == "pull") {
 					//send headers, like in push exclusive request
-					std::vector<std::string> exclusive = Rain::getFilesRec(root, "*", NULL, &cmhParam.excAbsSet);
+					std::set<std::string> excIgnAbsSet;
+					for (int a = 0; a < cmhParam.excIgnVec.size(); a++) {
+						excIgnAbsSet.insert(root + cmhParam.excIgnVec[a]);
+					}
+					std::vector<std::string> exclusive = Rain::getFilesRec(root, "*", &excIgnAbsSet, &cmhParam.excAbsSet);
 					Rain::tsCout("Found ", exclusive.size(), " exclusive files to `pull`.", Rain::CRLF);
 
 					//send over list of files and checksums

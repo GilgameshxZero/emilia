@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.4.1
+
+* Added option to ignore files within the domain-specific exclusive files.
+
 ## 5.4.0
 
 * Updated readme to reflect commands.
