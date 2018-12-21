@@ -5,6 +5,7 @@
 #include "command-handler-param.h"
 #include "main.h"
 #include "update-client.h"
+#include "update-helper.h"
 
 #include <map>
 #include <ShellAPI.h>
@@ -21,11 +22,7 @@ namespace Emilia {
 	int CHPush(CommandHandlerParam &cmhParam);
 	int CHPushExclusive(CommandHandlerParam &cmhParam);
 	int CHPull(CommandHandlerParam &cmhParam);
-	int CHSync(CommandHandlerParam &cmhParam);
 	int CHStart(CommandHandlerParam &cmhParam);
 	int CHStop(CommandHandlerParam &cmhParam);
 	int CHRestart(CommandHandlerParam &cmhParam);
-
-	//helpers used by handlers
-	std::string CHHPushGenerateRequest(std::string root, std::vector<std::string> &files);
 }

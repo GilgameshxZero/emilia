@@ -3,6 +3,7 @@
 #include "rain-aeternum/rain-libraries.h"
 
 #include "command-handler-param.h"
+#include "update-helper-param.h"
 
 #include <map>
 #include <set>
@@ -37,10 +38,8 @@ namespace Emilia {
 			//password for authentication on reconnect
 			std::string authPass;
 
-			//files used for push/push-exclusive
-			std::string state;
-			int cfiles;
-			std::vector<std::string> requested;
+			UpdateHelper::PushProcParam pushPP;
+			UpdateHelper::PullProcParam pullPP;
 		};
 	}
 }

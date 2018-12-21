@@ -269,6 +269,7 @@
     <ClInclude Include="..\src\smtp-server.h" />
     <ClInclude Include="..\src\update-client-param.h" />
     <ClInclude Include="..\src\update-client.h" />
+    <ClInclude Include="..\src\update-helper-param.h" />
     <ClInclude Include="..\src\update-helper.h" />
     <ClInclude Include="..\src\update-server-param.h" />
     <ClInclude Include="..\src\update-server.h" />
@@ -355,6 +356,8 @@
     <None Include="..\exclusive\emilia-tan.com\config\http-headers.ini" />
     <None Include="..\exclusive\emilia-tan.com\config\update-exclusives.ini" />
     <None Include="..\exclusive\emilia-tan.com\config\update-ignores.ini" />
+    <None Include="..\exclusive\emilia-tan.com\data\mail-users.ini" />
+    <None Include="..\exclusive\emilia-tan.com\data\track-mac-ip.ini" />
     <None Include="..\readme.md" />
     <CopyFileToFolders Include="..\src\update-script.bat">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
