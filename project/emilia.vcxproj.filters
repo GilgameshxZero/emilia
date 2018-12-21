@@ -269,9 +269,6 @@
     <None Include="..\config\update-ignores.ini">
       <Filter>config</Filter>
     </None>
-    <None Include="..\src\update-script.bat">
-      <Filter>src</Filter>
-    </None>
     <None Include="..\bin\update-script.bat">
       <Filter>bin</Filter>
     </None>
@@ -350,5 +347,10 @@
     <Text Include="..\exclusive\emilia-tan.com\logs\memory-leaks.log">
       <Filter>exclusive\emilia-tan.com\logs</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\src\update-script.bat">
+      <Filter>src</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>
