@@ -323,6 +323,18 @@
     <None Include="..\exclusive\emilia-tan.com\data\track-mac-ip.ini">
       <Filter>exclusive\emilia-tan.com\data</Filter>
     </None>
+    <None Include="..\data\mlist-subs.ini">
+      <Filter>data</Filter>
+    </None>
+    <None Include="..\exclusive\emilia-tan.com\data\mlist-subs.ini">
+      <Filter>exclusive\emilia-tan.com\data</Filter>
+    </None>
+    <None Include="..\exclusive\emilia-tan.com\config\update-exc-ignores.ini">
+      <Filter>exclusive\emilia-tan.com\config</Filter>
+    </None>
+    <None Include="..\config\update-exc-ignores.ini">
+      <Filter>config</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\rc\icon.ico">

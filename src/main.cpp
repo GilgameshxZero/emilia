@@ -99,6 +99,7 @@ namespace Emilia {
 
 		cmhParam.excVec = Rain::readMultilineFile(config["config-path"] + config["update-exclusive-files"]);
 		cmhParam.ignVec = Rain::readMultilineFile(config["config-path"] + config["update-ignore-files"]);
+		cmhParam.excIgnVec = Rain::readMultilineFile(config["config-path"] + config["update-exc-ignore"]);
 		cmhParam.ignVec.push_back(config["update-exclusive-dir"]);
 
 		//format exclusives into absolute paths

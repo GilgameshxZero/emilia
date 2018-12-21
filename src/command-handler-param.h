@@ -25,7 +25,7 @@ namespace Emilia {
 
 		//types of files
 		std::set<std::string> excAbsSet, ignAbsSet, notSharedAbsSet;
-		std::vector<std::string> excVec, ignVec;
+		std::vector<std::string> excVec, ignVec, excIgnVec;
 		
 		//lock if we don't want to accept any commands just yet (e.g. when we're switching command input buffer)
 		bool canAcceptCommand;
