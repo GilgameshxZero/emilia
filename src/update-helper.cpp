@@ -195,20 +195,13 @@ namespace Emilia {
 			}
 
 			if (shouldRestart) {
-				//todo: fix this
-				exit(0);
-				return 0;
-
 				//restart the application here
-				cmhParam.shouldExitApp = true;
+				//exit is one of the cleanest ways to do this, short of using many low-level WinAPI calls
+				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+				exit(1);
 
-				//crash the command stream
-				cmhParam.cmdInput->putback('\n');
-				cmhParam.cmdInput->putback('a');
-				cmhParam.cmdInput->sync();
-
-				Rain::tsCout("Exit flag set and input stream crashed...\r\n");
-				fflush(stdout);
+				Rain::tsCout("Input stream cancelled...\r\n");
+				std::cout.flush();
 			}
 
 			return 0;

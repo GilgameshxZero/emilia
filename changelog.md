@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.2.9
+
+* Exit process on restart is more standardized (but still uses `exit`).
+
 ## 5.2.8
 
 * Command stream is paused during some commands.
