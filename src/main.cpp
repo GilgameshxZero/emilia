@@ -98,11 +98,11 @@ namespace Emilia {
 		cmhParam.logger = &logger;
 		cmhParam.httpSM = &httpSM;
 		cmhParam.smtpSM = &smtpSM;
-		 
+
 		cmhParam.excVec = Rain::readMultilineFile(config["config-path"] + config["update-exclusive-files"]);
 		cmhParam.ignVec = Rain::readMultilineFile(config["config-path"] + config["update-ignore-files"]);
 		cmhParam.ignVec.push_back(config["update-exclusive-dir"]);
-		
+
 		//format exclusives into absolute paths
 		for (int a = 0; a < cmhParam.excVec.size(); a++) {
 			cmhParam.excAbsSet.insert(Rain::pathToAbsolute(config["update-root"] + cmhParam.excVec[a]));
@@ -135,7 +135,9 @@ namespace Emilia {
 		//auto-start servers
 		CHStart(cmhParam);
 
-		//replace read from an istream, and replace its buffer with cin; when program needs to die, we'll replace the buffer with a buffer of our own
+		//command loop
+		std::mutex mtx;
+		std::unique_lock<std::mutex> lc(mtx);
 		std::map<std::string, CommandMethodHandler> commandHandlers{
 			{"exit", CHExit},
 			{"help", CHHelp},
@@ -149,13 +151,7 @@ namespace Emilia {
 			{"stop", CHStop},
 			{"restart", CHRestart}
 		};
-
-		std::mutex mtx;
-		std::unique_lock<std::mutex> lc(mtx);
 		cmhParam.canAcceptCommand = true;
-		cmhParam.shouldExitApp = false;
-		cmhParam.cmdInput = new std::istream(std::cin.rdbuf());
-
 		while (true) {
 			std::string command, tmp;
 			while (!cmhParam.canAcceptCommand) {
@@ -164,13 +160,9 @@ namespace Emilia {
 			Rain::tsCout("Accepting commands...\r\n");
 			fflush(stdout);
 
-			*cmhParam.cmdInput >> command;
+			std::cin >> command;
 			Rain::strTrimWhite(command);
-			std::getline(*cmhParam.cmdInput, tmp);
-
-			if (cmhParam.shouldExitApp) {
-				command = "exit";
-			}
+			std::getline(std::cin, tmp);
 
 			auto handler = commandHandlers.find(command);
 			if (handler != commandHandlers.end()) {
@@ -180,10 +172,6 @@ namespace Emilia {
 			} else {
 				Rain::tsCout("Command not recognized.\r\n");
 			}
-		}
-
-		if (cmhParam.cmdInput != NULL) {
-			delete cmhParam.cmdInput;
 		}
 
 		Rain::tsCout("The program has terminated.", LINE_END);

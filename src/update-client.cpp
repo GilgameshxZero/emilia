@@ -11,7 +11,7 @@ namespace Emilia {
 			chParam.state = "wait-request";
 
 			//authenticate automatically
-			Rain::tsCout("Info: Authenticating with update server...\r\n");
+			Rain::tsCout("Info: Connected with update server. Authenticating...\r\n");
 			fflush(stdout);
 			chParam.waitingRequests++;
 			ResetEvent(chParam.doneWaitingEvent);
