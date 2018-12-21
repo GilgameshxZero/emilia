@@ -21,13 +21,21 @@ namespace Rain {
 
 		this->connectEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 		this->messageDoneEvent = CreateEvent(NULL, TRUE, TRUE, NULL);
+		this->messageToSendEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 		this->recvExitComplete = CreateEvent(NULL, TRUE, TRUE, NULL);
 
+		this->destructing = false;
+
 		initWinsock22();
+
+		//create the send thread once for every manager
+		this->hSendThread = simpleCreateThread(ClientSocketManager::attemptSendMessageThread, this);
 	}
 	ClientSocketManager::~ClientSocketManager() {
 		//shutdown send threads, if any
+		this->destructing = true;
 		this->clearMessageQueue();
+		SetEvent(this->messageToSendEvent);
 		WaitForSingleObject(this->messageDoneEvent, INFINITE);
 
 		//shutsdown connect threads, if any
@@ -45,22 +53,18 @@ namespace Rain {
 	}
 	void ClientSocketManager::sendRawMessage(std::string *request) {
 		//uses copy constructor
+		//reset event outside of thread start so multiple calls to sendRawMessage won't create race conditions
 		this->queueMutex.lock();
+		if (this->messageQueue.size() == 0) {
+			SetEvent(this->messageToSendEvent);
+			ResetEvent(this->messageDoneEvent);
+		}
 		this->messageQueue.push(*request);
+		this->queueMutex.unlock();
 
 		//if we are logging socket communications, do that here for outgoing communications
 		if (this->logger != NULL)
 			this->logger->logString(request);
-
-		if (WaitForSingleObject(this->messageDoneEvent, 1) == WAIT_OBJECT_0) { //means that the object was set/the thread is not active currently
-			//reset event outside of thread start so multiple calls to sendRawMessage won't create race conditions
-			ResetEvent(this->messageDoneEvent);
-
-			//start thread to send messages
-			this->hSendThread = simpleCreateThread(ClientSocketManager::attemptSendMessageThread, this);
-		}
-		this->queueMutex.unlock();
-
 		if (this->blockSendRawMessage)
 			this->blockForMessageQueue(0);
 	}
@@ -206,8 +210,6 @@ namespace Rain {
 			}
 		}
 
-		CloseHandle(csm.hConnectThread);
-
 		//this event signals that the thread has exited; check status to see if successful
 		SetEvent(csm.connectEvent);
 		return 0;
@@ -215,30 +217,34 @@ namespace Rain {
 	DWORD WINAPI ClientSocketManager::attemptSendMessageThread(LPVOID param) {
 		ClientSocketManager &csm = *reinterpret_cast<ClientSocketManager *>(param);
 
-		csm.msSendMessageWait = 1;
+		while (!csm.destructing) {
+			//wait until we know there are messages in queue
+			WaitForSingleObject(csm.messageToSendEvent, INFINITE);
 
-		//attempt to send messages until csm.messageQueue is empty, at which point set the messageDoneEvent
-		csm.queueMutex.lock();
-		while (!csm.messageQueue.empty()) {
-			csm.blockForConnect(csm.msSendMessageWait);
+			csm.msSendMessageWait = 1;
 
-			//deal with differently depending on whether we connected on that block or not
-			if (csm.socketStatus != csm.STATUS_CONNECTED &&
-				csm.msSendMessageWait < csm.msSendWaitMax)
-				csm.msSendMessageWait = min(csm.msSendMessageWait * 2, csm.msSendWaitMax);
-			else if (csm.socketStatus == csm.STATUS_CONNECTED) {
-				//attempt to send messages until csm.messageQueue is empty, at which point set the messageDoneEvent
-				Rain::sendRawMessage(csm.socket, &csm.messageQueue.front());
-				csm.messageQueue.pop();
+			//attempt to send messages until csm.messageQueue is empty, at which point set the messageDoneEvent
+			csm.queueMutex.lock();
+			while (!csm.messageQueue.empty()) {
+				csm.blockForConnect(csm.msSendMessageWait);
+
+				//deal with differently depending on whether we connected on that block or not
+				if (csm.socketStatus != csm.STATUS_CONNECTED &&
+					csm.msSendMessageWait < csm.msSendWaitMax)
+					csm.msSendMessageWait = min(csm.msSendMessageWait * 2, csm.msSendWaitMax);
+				else if (csm.socketStatus == csm.STATUS_CONNECTED) {
+					Rain::sendRawMessage(csm.socket, &csm.messageQueue.front());
+					csm.messageQueue.pop();
+				}
+				csm.queueMutex.unlock();
+				//unlock temporarily to allow other functions to maybe continue
+				csm.queueMutex.lock();
 			}
 			csm.queueMutex.unlock();
-			csm.queueMutex.lock();
+			ResetEvent(csm.messageToSendEvent);
+			SetEvent(csm.messageDoneEvent);
 		}
-		csm.queueMutex.unlock();
 
-		CloseHandle(csm.hSendThread);
-
-		SetEvent(csm.messageDoneEvent);
 		return 0;
 	}
 	int ClientSocketManager::onConnect(void *param) {

@@ -75,6 +75,7 @@ namespace Rain {
 
 			//handle to the thread
 			HANDLE hThread;
+			std::thread hStdThread;
 		};
 
 		std::set<std::string> fileDst;

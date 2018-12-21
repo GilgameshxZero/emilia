@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.3.1
+
+* Fixed crash on `release` runs from `LogStream` after replacing all threads with `std::thread`.
+* CSM now creates one send thread in its lifetime instead of many.
+
 ## 5.3.0
 
 * Now uses `std::this_thread::sleep_for` instead of `Sleep`.

@@ -43,9 +43,8 @@ namespace Rain {
 			ssi.oshRepPipeWr = oshRepPipeWr;
 			ssi.repPipeRd = rd;
 			ssi.repPipeWr = wr;
-			std::thread newThread(LogStream::stdSrcRedirectThread, reinterpret_cast<LPVOID>(&ssi.thParam));
-			newThread.detach();
-			ssi.hThread = newThread.native_handle();
+			ssi.hStdThread = std::thread(LogStream::stdSrcRedirectThread, reinterpret_cast<LPVOID>(&ssi.thParam));
+			ssi.hThread = ssi.hStdThread.native_handle();
 		} else if (!enable && ret) {
 			fflush(stdFilePtr);
 
@@ -56,6 +55,7 @@ namespace Rain {
 			ssi.thParam.running = false;
 			CancelSynchronousIo(ssi.hThread);
 			WaitForSingleObject(ssi.hThread, INFINITE);
+			ssi.hStdThread.join();
 			_close(ssi.oshRepPipeWr); //calls CloseHandle on ssi.repPipeWr
 			CloseHandle(ssi.repPipeRd);
 
