@@ -36,6 +36,8 @@ int main(int argc, char *argv[]) {
     std::string response;
     std::map<std::string, std::string> query = Rain::getQueryToMap(std::getenv("QUERY_STRING"));
 
+	query["data"] = Rain::strEncodeURL(query["data"]);
+
 	std::stringstream request;
 	request << "EHLO emilia-tan.com" << Rain::CRLF
 		<< "MAIL FROM:<" << query["from"] << ">" << Rain::CRLF

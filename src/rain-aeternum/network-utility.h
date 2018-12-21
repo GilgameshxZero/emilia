@@ -8,6 +8,7 @@ Standard
 #include "network-recv-param.h"
 #include "network-socket-manager.h"
 #include "rain-window.h"
+#include "utility-string.h"
 
 #include <functional>
 #include <string>

@@ -2,8 +2,6 @@
 
 namespace Emilia {
 	namespace HTTPServer {
-		static const std::string headerDelim = Rain::CRLF + Rain::CRLF;
-
 		int onConnect(void *funcParam) {
 			Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam = *reinterpret_cast<Rain::ServerSocketManager::DelegateHandlerParam *>(funcParam);
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
@@ -25,6 +23,8 @@ namespace Emilia {
 			return 0;
 		}
 		int onMessage(void *funcParam) {
+			static const std::string headerDelim = Rain::CRLF + Rain::CRLF;
+
 			Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam = *reinterpret_cast<Rain::ServerSocketManager::DelegateHandlerParam *>(funcParam);
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
@@ -159,8 +159,6 @@ namespace Emilia {
 			if (requestFilePath[0] == '/')  //relative filepaths should not begin with a slash
 				requestFilePath = requestFilePath.substr(1, std::string::npos);
 			requestFilePath = Rain::strDecodeURL(requestFilePath);
-			requestQuery = Rain::strDecodeURL(requestQuery);
-			requestFragment = Rain::strDecodeURL(requestFragment);
 			for (int a = 0; a < requestFilePath.size(); a++)
 				if (requestFilePath[a] == '/')
 					requestFilePath[a] = '\\';

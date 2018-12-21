@@ -66,7 +66,7 @@ namespace Rain {
 		std::map<std::string, std::string> rt;
 		for (std::size_t a = 0; a < lines.size(); a++) {
 			std::size_t equals = lines[a].find('=');
-			rt.insert(std::make_pair(lines[a].substr(0, equals), lines[a].substr(equals + 1, lines[a].length())));
+			rt.insert(std::make_pair(strDecodeURL(lines[a].substr(0, equals)), strDecodeURL(lines[a].substr(equals + 1, lines[a].length()))));
 		}
 
 		return rt;
