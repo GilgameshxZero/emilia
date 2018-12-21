@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.3.3
+
+* Move data encoding away from scripts to front-end.
+
 ## 5.3.2
 
 * Query string URI conversion is now delayed from HTTP server to scripts, fixing any conversion issues before.
