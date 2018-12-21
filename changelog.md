@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.4.2
+
+* Added script to modify mailing list subscribers.
+
 ## 5.4.1
 
 * Added option to ignore files within the domain-specific exclusive files.
