@@ -2,8 +2,6 @@
 
 namespace Emilia {
 	namespace UpdateClient {
-		static const std::string headerDelim = Rain::CRLF + Rain::CRLF;
-
 		int onConnect(void *funcParam) {
 			Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam = *reinterpret_cast<Rain::ClientSocketManager::DelegateHandlerParam *>(funcParam);
 			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);

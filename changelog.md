@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.3.2
+
+* Query string URI conversion is now delayed from HTTP server to scripts, fixing any conversion issues before.
+* HTTP server headerDelim is fixed.
+
 ## 5.3.1
 
 * Fixed crash on `release` runs from `LogStream` after replacing all threads with `std::thread`.
