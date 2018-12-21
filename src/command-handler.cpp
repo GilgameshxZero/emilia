@@ -137,7 +137,11 @@ namespace Emilia {
 		for (int a = 0; a < cmhParam.excVec.size(); a++) {
 			want.insert(excRoot + cmhParam.excVec[a]);
 		}
-		std::vector<std::string> exclusive = Rain::getFilesRec(excRoot, "*", NULL, &want);
+		std::set<std::string> excIgnAbsSet;
+		for (int a = 0; a < cmhParam.excIgnVec.size(); a++) {
+			excIgnAbsSet.insert(excRoot + cmhParam.excIgnVec[a]);
+		}
+		std::vector<std::string> exclusive = Rain::getFilesRec(excRoot, "*", &excIgnAbsSet, &want);
 		Rain::tsCout("Found ", exclusive.size(), " exclusive files for '", ip, "'.", Rain::CRLF);
 		std::cout.flush();
 
