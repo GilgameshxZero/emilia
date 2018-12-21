@@ -117,6 +117,9 @@ namespace Rain {
 		std::size_t recvBufLen;
 		LogStream *logger;
 
+		//set to true when destructor called; terminate send thread here
+		bool destructing;
+
 		//current wait between connect attempts
 		DWORD msReconnectWait;
 
@@ -131,6 +134,9 @@ namespace Rain {
 
 		//triggerred when message queue is empty
 		HANDLE messageDoneEvent;
+
+		//triggered when message queue not empty again
+		HANDLE messageToSendEvent;
 
 		//recvThread parameter associated with the current recvThread
 		Rain::RecvHandlerParam rParam;
