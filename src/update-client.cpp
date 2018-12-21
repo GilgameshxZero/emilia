@@ -2,7 +2,7 @@
 
 namespace Emilia {
 	namespace UpdateClient {
-		static const std::string headerDelim = "\r\n\r\n";
+		static const std::string headerDelim = Rain::CRLF + Rain::CRLF;
 
 		int onConnect(void *funcParam) {
 			Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam = *reinterpret_cast<Rain::ClientSocketManager::DelegateHandlerParam *>(funcParam);
@@ -11,8 +11,8 @@ namespace Emilia {
 			chParam.state = "wait-request";
 
 			//authenticate automatically
-			Rain::tsCout("Info: Connected with update server. Authenticating...\r\n");
-			fflush(stdout);
+			Rain::tsCout("Connected with update server. Authenticating..." + Rain::CRLF);
+			std::cout.flush();
 			chParam.waitingRequests++;
 			ResetEvent(chParam.doneWaitingEvent);
 			Rain::sendHeadedMessage(*csmdhParam.csm, "authenticate " + chParam.authPass);
@@ -23,8 +23,8 @@ namespace Emilia {
 			Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam = *reinterpret_cast<Rain::ClientSocketManager::DelegateHandlerParam *>(funcParam);
 			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
 
-			Rain::tsCout("Info: Update server disconnected.\r\n");
-			fflush(stdout);
+			Rain::tsCout("Update server disconnected." + Rain::CRLF);
+			std::cout.flush();
 
 			return 0;
 		}
@@ -78,21 +78,21 @@ namespace Emilia {
 			chParam.waitingRequests--;
 			chParam.lastSuccess = 0;
 			if (request == "success") {
-				Rain::tsCout("Info: Authentication with update server successful.\r\n");
+				Rain::tsCout("Authentication with update server successful." + Rain::CRLF);
 			} else if (request == "auth-done") {
-				Rain::tsCout("Info: Already authenticated with update server.\r\n");
+				Rain::tsCout("Already authenticated with update server." + Rain::CRLF);
 			} else if (request == "fail") {
-				Rain::tsCout("Error: Failed to authenticate with update server; disconnecting...\r\n");
+				Rain::tsCout("Error: Failed to authenticate with update server; disconnecting..." + Rain::CRLF);
 				chParam.lastSuccess = -1;
-				fflush(stdout);
+				std::cout.flush();
 				return -1;
 			} else {
-				Rain::tsCout("Error: Unrecognized message from update server; disconnecting...\r\n");
+				Rain::tsCout("Error: Unrecognized message from update server; disconnecting..." + Rain::CRLF);
 				chParam.lastSuccess = -1;
-				fflush(stdout);
+				std::cout.flush();
 				return -1;
 			}
-			fflush(stdout);
+			std::cout.flush();
 			return 0;
 		}
 		int HRPush(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam) {
@@ -114,7 +114,7 @@ namespace Emilia {
 			std::string &request = *csmdhParam.message;
 
 			Rain::tsCout("Remote: ", request);
-			fflush(stdout);
+			std::cout.flush();
 
 			return 0;
 		}

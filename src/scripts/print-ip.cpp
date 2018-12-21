@@ -11,9 +11,9 @@ int main(int argc, char *argv[]) {
 
 	std::string response = std::getenv("CLIENT_IP");
 
-	std::cout << "HTTP/1.1 200 OK\r\n"
-		<< "content-type:text/html\r\n"
-		<< "\r\n"
+	std::cout << "HTTP/1.1 200 OK" << Rain::CRLF
+		<< "content-type:text/html" << Rain::CRLF
+		<< Rain::CRLF
 		<< response;
 
 	return 0;

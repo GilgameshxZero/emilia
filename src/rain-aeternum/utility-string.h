@@ -18,6 +18,9 @@ Compatiable with all OS.
 #include <vector>
 
 namespace Rain {
+	extern const std::string CRLF,
+		LF;
+
 	//converts from any type to string using stringstream
 	template <typename T>
 	std::string tToStr(T x) {

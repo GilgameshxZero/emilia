@@ -1,6 +1,9 @@
 #include "utility-string.h"
 
 namespace Rain {
+	const std::string CRLF = "\r\n",
+		LF = "\n";
+
 	std::wstring mbStrToWStr(std::string s) {
 		wchar_t *buffer;
 		int bytes;

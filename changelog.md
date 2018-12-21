@@ -1,5 +1,13 @@
 # Changelog
 
+## 5.3.0
+
+* Now uses `std::this_thread::sleep_for` instead of `Sleep`.
+* Use `std::cout.flush()` instead of `fflush(stdout)`.
+* Slightly more informative logging distinguishes between HTTP & SMTP client connects/disconnects and removes `Info:` tag.
+* Uses `Rain` integrated line endings instead of `\r\n` which is more platform-independant.
+* Replace all uses of `CreateThread` with `std::thread`.
+
 ## 5.2.9
 
 * Exit process on restart is more standardized (but still uses `exit`).

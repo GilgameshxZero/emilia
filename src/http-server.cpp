@@ -2,15 +2,15 @@
 
 namespace Emilia {
 	namespace HTTPServer {
-		static const std::string headerDelim = "\r\n\r\n";
+		static const std::string headerDelim = Rain::CRLF + Rain::CRLF;
 
 		int onConnect(void *funcParam) {
 			Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam = *reinterpret_cast<Rain::ServerSocketManager::DelegateHandlerParam *>(funcParam);
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 
 			//logging
-			Rain::tsCout("Info: Client connected from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ". Total: ", ++ccParam.connectedClients, ".\r\n");
-			fflush(stdout);
+			Rain::tsCout("HTTP Client connected from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ". Total: ", ++ccParam.connectedClients, ".", Rain::CRLF);
+			std::cout.flush();
 
 			//create the delegate parameter for the first time
 			ConnectionDelegateParam *cdParam = new ConnectionDelegateParam();
@@ -101,8 +101,8 @@ namespace Emilia {
 									   bodyBlock);
 
 			//log the request manually so that we don't log responses
-			Rain::tsCout(Rain::getClientNumIP(*ssmdhParam.cSocket), ": ", cdParam.requestMethod, " ", requestURI, "\r\n");
-			fflush(stdout);
+			Rain::tsCout(Rain::getClientNumIP(*ssmdhParam.cSocket), ": ", cdParam.requestMethod, " ", requestURI, Rain::CRLF);
+			std::cout.flush();
 			ccParam.logger->logString(&cdParam.request);
 
 			//if it decides to keep the connection open after this full request, then reset request-specific parameters for the recvThread
@@ -121,8 +121,8 @@ namespace Emilia {
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 
 			//logging
-			Rain::tsCout("Info: Client disconnected from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ". Total: ", --ccParam.connectedClients, ".\r\n");
-			fflush(stdout);
+			Rain::tsCout("HTTP Client disconnected from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ". Total: ", --ccParam.connectedClients, ".", Rain::CRLF);
+			std::cout.flush();
 
 			//free the delegate parameter
 			delete ssmdhParam.delegateParam;
@@ -243,10 +243,10 @@ namespace Emilia {
 				responseHeaders["content-length"] = Rain::tToStr(responseBody.length());
 				responseHeaders["content-type"] = "text/html";
 
-				std::string response = responseStatus + "\r\n";
+				std::string response = responseStatus + Rain::CRLF;
 				for (auto it : responseHeaders)
-					response += it.first + ":" + it.second + "\r\n";
-				response += "\r\n" + responseBody;
+					response += it.first + ":" + it.second + Rain::CRLF;
+				response += Rain::CRLF + responseBody;
 				if (!Rain::sendRawMessage(cSocket, response.c_str(), static_cast<int>(response.length()))) {
 					Rain::reportError(GetLastError(), "error while sending response to client; response: " + response);
 					return -7;
@@ -431,10 +431,10 @@ namespace Emilia {
 				fileIn.seekg(0, fileIn.beg);
 
 				//send what we know
-				std::string response = responseStatus + "\r\n";
+				std::string response = responseStatus + Rain::CRLF;
 				for (auto it : responseHeaders)
-					response += it.first + ":" + it.second + "\r\n";
-				response += "\r\n";
+					response += it.first + ":" + it.second + Rain::CRLF;
+				response += Rain::CRLF;
 				if (!Rain::sendRawMessage(cSocket, &response)) {
 					Rain::reportError(GetLastError(), "error while sending response to client; response: " + response);
 					return -7;

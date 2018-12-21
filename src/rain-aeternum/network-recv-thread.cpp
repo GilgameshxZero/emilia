@@ -62,6 +62,8 @@ namespace Rain {
 		if (recvparam == NULL)
 			recvparam = new RecvHandlerParam(connection, message, buflen, funcParam, onConnect, onMessage, onDisconnect);
 
-		return CreateThread(lpThreadAttributes, dwStackSize, recvThread, reinterpret_cast<LPVOID>(recvparam), dwCreationFlags, lpThreadId);
+		std::thread newThread(recvThread, reinterpret_cast<LPVOID>(recvparam));
+		newThread.detach();
+		return newThread.native_handle();
 	}
 }

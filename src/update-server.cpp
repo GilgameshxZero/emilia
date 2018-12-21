@@ -2,21 +2,21 @@
 
 namespace Emilia {
 	namespace UpdateServer {
-		static const std::string headerDelim = "\r\n\r\n";
+		static const std::string headerDelim = Rain::CRLF + Rain::CRLF;
 
 		int onConnect(void *funcParam) {
 			Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam = *reinterpret_cast<Rain::ServerSocketManager::DelegateHandlerParam *>(funcParam);
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 
 			if (ccParam.clientConnected) {
-				Rain::tsCout("Info: Update client connection request refused; client already connected.\r\n");
-				fflush(stdout);
+				Rain::tsCout("Update client connection request refused; client already connected." + Rain::CRLF);
+				std::cout.flush();
 				return 1; //immediately terminate
 			}
 
 			ccParam.clientConnected = true;
-			Rain::tsCout("Info: Update client connected.\r\n");
-			fflush(stdout);
+			Rain::tsCout("Update client connected." + Rain::CRLF);
+			std::cout.flush();
 
 			//create the delegate parameter for the first time
 			ConnectionDelegateParam *cdParam = new ConnectionDelegateParam();
@@ -41,8 +41,8 @@ namespace Emilia {
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 
 			ccParam.clientConnected = false;
-			Rain::tsCout("Info: Update client disconnected.\r\n");
-			fflush(stdout);
+			Rain::tsCout("Update client disconnected." + Rain::CRLF);
+			std::cout.flush();
 
 			//free the delegate parameter
 			delete ssmdhParam.delegateParam;
@@ -77,12 +77,12 @@ namespace Emilia {
 			if (handler != methodHandlerMap.end()) {
 				//block if not authenticated
 				if (cdParam.requestMethod != "authenticate" && !cdParam.authenticated) {
-					Rain::sendHeadedMessage(*ssmdhParam.ssm, cdParam.requestMethod + " not authenticated\r\n");
+					Rain::sendHeadedMessage(*ssmdhParam.ssm, cdParam.requestMethod + " not authenticated" + Rain::CRLF);
 				} else {
 					handlerRet = handler->second(ssmdhParam);
 				}
 			} else {
-				Rain::tsCout("Error: Received unknown method from update client: ", cdParam.requestMethod, ".\r\n");
+				Rain::tsCout("Error: Received unknown method from update client: ", cdParam.requestMethod, "." + Rain::CRLF);
 			}
 
 			return handlerRet;
@@ -95,19 +95,19 @@ namespace Emilia {
 
 			if (cdParam.authenticated) {
 				Rain::sendHeadedMessage(*ssmdhParam.ssm, "authenticate auth-done");
-				Rain::tsCout("Info: Update client authenticated already.\r\n");
+				Rain::tsCout("Update client authenticated already." + Rain::CRLF);
 			} else if (ccParam.config->at("emilia-auth-pass") != request) {
 				Rain::sendHeadedMessage(*ssmdhParam.ssm, "authenticate fail");
-				Rain::tsCout("Error: Update client authenticate fail.\r\n");
-				fflush(stdout);
+				Rain::tsCout("Error: Update client authenticate fail." + Rain::CRLF);
+				std::cout.flush();
 				return -1;
 			} else {
 				Rain::sendHeadedMessage(*ssmdhParam.ssm, "authenticate success");
 				cdParam.authenticated = true;
-				Rain::tsCout("Info: Update client authenticate success.\r\n");
+				Rain::tsCout("Update client authenticate success." + Rain::CRLF);
 			}
 
-			fflush(stdout);
+			std::cout.flush();
 			return 0;
 		}
 		int HRPush(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam) {
@@ -137,24 +137,24 @@ namespace Emilia {
 			std::string response;
 			Rain::tsCout(std::dec);
 			if (!cmhParam.httpSM->setServerListen(80, 80)) {
-				response = "Info: HTTP server listening on port " + Rain::tToStr(cmhParam.httpSM->getListeningPort()) + "." + "\r\n";
-				Rain::tsCout("Info: HTTP server listening on port ", cmhParam.httpSM->getListeningPort(), ".", "\r\n");
+				response = "HTTP server listening on port " + Rain::tToStr(cmhParam.httpSM->getListeningPort()) + "." + Rain::CRLF;
+				Rain::tsCout("HTTP server listening on port ", cmhParam.httpSM->getListeningPort(), ".", Rain::CRLF);
 			} else {
 				DWORD error = GetLastError();
-				response = "Error: could not setup HTTP server listening.\r\n";
+				response = "Error: could not setup HTTP server listening." + Rain::CRLF;
 				Rain::errorAndCout(error, "Error: could not setup HTTP server listening.");
 			}
 			Rain::sendHeadedMessage(*ssmdhParam.ssm, "start " + response);
 
 			if (!cmhParam.smtpSM->setServerListen(25, 25)) {
-				response = "Info: SMTP server listening on port " + Rain::tToStr(cmhParam.smtpSM->getListeningPort()) + "." + "\r\n";
-				Rain::tsCout("Info: SMTP server listening on port ", cmhParam.smtpSM->getListeningPort(), ".", "\r\n");
+				response = "SMTP server listening on port " + Rain::tToStr(cmhParam.smtpSM->getListeningPort()) + "." + Rain::CRLF;
+				Rain::tsCout("SMTP server listening on port ", cmhParam.smtpSM->getListeningPort(), ".", Rain::CRLF);
 			} else {
 				DWORD error = GetLastError();
-				response = "Error: could not setup SMTP server listening.\r\n";
+				response = "Error: could not setup SMTP server listening." + Rain::CRLF;
 				Rain::errorAndCout(error, "Error: could not setup SMTP server listening.");
 			}
-			fflush(stdout);
+			std::cout.flush();
 			Rain::sendHeadedMessage(*ssmdhParam.ssm, "start " + response);
 
 			return 0;

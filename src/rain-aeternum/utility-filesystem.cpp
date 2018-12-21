@@ -339,7 +339,7 @@ namespace Rain {
 		std::ofstream fileOut(filePath, std::ios::binary);
 
 		for (auto it = params.begin(); it != params.end(); it++) {
-			fileOut << it->first << ": " << it->second << "\r\n";
+			fileOut << it->first << ": " << it->second << CRLF;
 		}
 
 		fileOut.close();

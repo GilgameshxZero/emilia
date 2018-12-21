@@ -2,7 +2,9 @@
 
 namespace Rain {
 	HANDLE simpleCreateThread(LPTHREAD_START_ROUTINE threadfunc, LPVOID threadparam) {
-		return CreateThread(NULL, 0, threadfunc, threadparam, 0, NULL);
+		std::thread newThread(threadfunc, threadparam);
+		newThread.detach();
+		return newThread.native_handle();
 	}
 
 	COLORREF colorFromHex(std::string hex) {

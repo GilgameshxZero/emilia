@@ -12,14 +12,14 @@ namespace Emilia {
 	}
 	int CHHelp(CommandHandlerParam &cmhParam) {
 		//see readme for what each of these do
-		Rain::tsCout("Available commands: exit, help, connect, disconnect, push, push-exclusive, pull, sync, start, stop, restart.", LINE_END);
+		Rain::tsCout("Available commands: exit, help, connect, disconnect, push, push-exclusive, pull, sync, start, stop, restart.", Rain::CRLF);
 		return 0;
 	}
 
 	int CHConnect(CommandHandlerParam &cmhParam) {
 		if (cmhParam.remoteCSM != NULL) {
 			//already connected, don't allow another connect
-			Rain::tsCout("Cannot execute 'connect' while already connected to remote.", LINE_END);
+			Rain::tsCout("Cannot execute 'connect' while already connected to remote.", Rain::CRLF);
 			return 0;
 		}
 
@@ -44,7 +44,7 @@ namespace Emilia {
 		}
 
 		//attempt to connect to remote
-		Rain::tsCout("Info: Attempting to connect...", LINE_END);
+		Rain::tsCout("Attempting to connect...", Rain::CRLF);
 		DWORD updateServerPort = Rain::strToT<DWORD>((*cmhParam.config)["update-server-port"]);
 		cmhParam.remoteCSM = new Rain::HeadedClientSocketManager();
 		cmhParam.chParam = new UpdateClient::ConnectionHandlerParam();
@@ -59,14 +59,14 @@ namespace Emilia {
 
 		int status = cmhParam.remoteCSM->getSocketStatus();
 		if (status == 0) {
-			Rain::tsCout("Info: Connected successfully!", LINE_END);
+			Rain::tsCout("Connected successfully!", Rain::CRLF);
 		} else if (status == 1) {
-			Rain::tsCout("Error: Connection timeout.", LINE_END);
+			Rain::tsCout("Error: Connection timeout.", Rain::CRLF);
 			delete cmhParam.remoteCSM;
 			cmhParam.remoteCSM = NULL;
 			return 0;
 		} else {
-			Rain::tsCout("Error: Disconnected.", LINE_END);
+			Rain::tsCout("Error: Disconnected.", Rain::CRLF);
 			delete cmhParam.remoteCSM;
 			cmhParam.remoteCSM = NULL;
 			return 0;
@@ -80,7 +80,7 @@ namespace Emilia {
 			cmhParam.remoteCSM->blockForConnect();
 			delete cmhParam.remoteCSM;
 			cmhParam.remoteCSM = NULL;
-			Rain::tsCout("Info: Update client is disconnected.", LINE_END);
+			Rain::tsCout("Update client is disconnected.", Rain::CRLF);
 			return 0;
 		}
 
@@ -89,7 +89,7 @@ namespace Emilia {
 	int CHDisconnect(CommandHandlerParam &cmhParam) {
 		if (cmhParam.remoteCSM == NULL) {
 			//not yet connected
-			Rain::tsCout("Cannot disconnect when not connected.", LINE_END);
+			Rain::tsCout("Cannot disconnect when not connected.", Rain::CRLF);
 			return 0;
 		}
 
@@ -101,7 +101,7 @@ namespace Emilia {
 	int CHPush(CommandHandlerParam &cmhParam) {
 		if (cmhParam.remoteCSM == NULL) {
 			//not yet connected
-			Rain::tsCout("Cannot execute this command when not connected with remote.", LINE_END);
+			Rain::tsCout("Cannot execute this command when not connected with remote.", Rain::CRLF);
 			return 0;
 		}
 
@@ -109,13 +109,13 @@ namespace Emilia {
 		std::map<std::string, std::string> &config = *cmhParam.config;
 		std::string root = Rain::pathToAbsolute(config["update-root"]);
 		std::vector<std::string> shared = Rain::getFilesRec(root, "*", &cmhParam.notSharedAbsSet);
-		Rain::tsCout("Found ", shared.size(), " shared files.", LINE_END);
-		fflush(stdout);
+		Rain::tsCout("Found ", shared.size(), " shared files.", Rain::CRLF);
+		std::cout.flush();
 
 		//send over list of files and checksums
 		Rain::sendHeadedMessage(*cmhParam.remoteCSM, "push" + CHHPushGenerateRequest(root, shared));
-		Rain::tsCout("Sending over 'push' request with checksums...", LINE_END);
-		fflush(stdout);
+		Rain::tsCout("Sending over 'push' request with checksums...", Rain::CRLF);
+		std::cout.flush();
 
 		cmhParam.canAcceptCommand = false;
 
@@ -124,7 +124,7 @@ namespace Emilia {
 	int CHPushExclusive(CommandHandlerParam &cmhParam) {
 		if (cmhParam.remoteCSM == NULL) {
 			//not yet connected
-			Rain::tsCout("Cannot execute this command when not connected with remote.", LINE_END);
+			Rain::tsCout("Cannot execute this command when not connected with remote.", Rain::CRLF);
 			return 0;
 		}
 
@@ -138,13 +138,13 @@ namespace Emilia {
 			want.insert(excRoot + cmhParam.excVec[a]);
 		}
 		std::vector<std::string> exclusive = Rain::getFilesRec(excRoot, "*", NULL, &want);
-		Rain::tsCout("Found ", exclusive.size(), " exclusive files for '", ip, "'.", LINE_END);
-		fflush(stdout);
+		Rain::tsCout("Found ", exclusive.size(), " exclusive files for '", ip, "'.", Rain::CRLF);
+		std::cout.flush();
 
 		//send over list of files and checksums
 		Rain::sendHeadedMessage(*cmhParam.remoteCSM, "push-exclusive" + CHHPushGenerateRequest(excRoot, exclusive));
-		Rain::tsCout("Sending over 'push-exclusive' request with checksums...", LINE_END);
-		fflush(stdout);
+		Rain::tsCout("Sending over 'push-exclusive' request with checksums...", Rain::CRLF);
+		std::cout.flush();
 
 		cmhParam.canAcceptCommand = false;
 
@@ -153,7 +153,7 @@ namespace Emilia {
 	int CHPull(CommandHandlerParam &cmhParam) {
 		if (cmhParam.remoteCSM == NULL) {
 			//not yet connected
-			Rain::tsCout("Cannot execute this command when not connected with remote.", LINE_END);
+			Rain::tsCout("Cannot execute this command when not connected with remote.", Rain::CRLF);
 			return 0;
 		}
 
@@ -164,7 +164,7 @@ namespace Emilia {
 	int CHSync(CommandHandlerParam &cmhParam) {
 		if (cmhParam.remoteCSM == NULL) {
 			//not yet connected
-			Rain::tsCout("Cannot execute this command when not connected with remote.", LINE_END);
+			Rain::tsCout("Cannot execute this command when not connected with remote.", Rain::CRLF);
 			return 0;
 		}
 		return 0;
@@ -172,13 +172,13 @@ namespace Emilia {
 	int CHStart(CommandHandlerParam &cmhParam) {
 		if (cmhParam.remoteCSM == NULL) {
 			if (!cmhParam.httpSM->setServerListen(80, 80)) {
-				Rain::tsCout("HTTP server listening on port ", cmhParam.httpSM->getListeningPort(), ".", LINE_END);
+				Rain::tsCout("HTTP server listening on port ", cmhParam.httpSM->getListeningPort(), ".", Rain::CRLF);
 			} else {
 				DWORD error = GetLastError();
 				Rain::errorAndCout(error, "Error: could not setup HTTP server listening.");
 			}
 			if (!cmhParam.smtpSM->setServerListen(25, 25)) {
-				Rain::tsCout("SMTP server listening on port ", cmhParam.smtpSM->getListeningPort(), ".", LINE_END);
+				Rain::tsCout("SMTP server listening on port ", cmhParam.smtpSM->getListeningPort(), ".", Rain::CRLF);
 			} else {
 				DWORD error = GetLastError();
 				Rain::errorAndCout(error, "Error: could not setup SMTP server listening.");
@@ -213,8 +213,8 @@ namespace Emilia {
 			GetFileTime(hFile, NULL, NULL, &hash[a]);
 			CloseHandle(hFile);
 
-			Rain::tsCout(std::setw(8), hash[a].dwHighDateTime, std::setw(8), hash[a].dwLowDateTime, " ", files[a], LINE_END);
-			fflush(stdout);
+			Rain::tsCout(std::setw(8), hash[a].dwHighDateTime, std::setw(8), hash[a].dwLowDateTime, " ", files[a], Rain::CRLF);
+			std::cout.flush();
 		}
 		Rain::tsCout(std::dec);
 

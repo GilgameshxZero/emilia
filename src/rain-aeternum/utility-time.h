@@ -10,7 +10,10 @@ Utility functions related to time formats.
 
 #include <string>
 #include <time.h>
+#include <thread>
 
 namespace Rain {
 	std::string getTime(std::string format = "%D.%T%z");
+
+	void sleep(int ms);
 }
