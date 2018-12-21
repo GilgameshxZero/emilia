@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.4.0
+
+* Updated readme to reflect commands.
+* Implemented `pull`.
+* Bugfix: `Rain` now deals with symbolic links as directories correctly.
+
 ## 5.3.4
 
 * HTTP now gives 404 when directory is requested.

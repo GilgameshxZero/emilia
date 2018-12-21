@@ -21,7 +21,8 @@ namespace Emilia {
 			ssmdhParam.delegateParam = reinterpret_cast<void *>(cdParam);
 
 			//if we do any push requests, start it out as "start" state
-			cdParam->hrPushState = "start";
+			cdParam->pullPP.hrPushState = "start";
+			cdParam->pushPP.state = "start";
 
 			//initialize cdParam here
 			cdParam->authenticated = false;
@@ -53,7 +54,6 @@ namespace Emilia {
 				{"push", HRPush},
 				{"push-exclusive", HRPushExclusive},
 				{"pull", HRPull},
-				{"sync", HRSync},
 				{"start", HRStart},
 				{"stop", HRStop}
 			};
@@ -109,22 +109,19 @@ namespace Emilia {
 			return 0;
 		}
 		int HRPush(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam) {
-			return Emilia::UpdateHelper::ServerPushProc(ssmdhParam, "push");
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
+			return Emilia::UpdateHelper::pullProc("push", *ccParam.cmhParam, cdParam.pullPP, *ssmdhParam.message, *ssmdhParam.ssm);
 		}
 		int HRPushExclusive(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam) {
-			return Emilia::UpdateHelper::ServerPushProc(ssmdhParam, "push-exclusive");
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
+			return Emilia::UpdateHelper::pullProc("push-exclusive", *ccParam.cmhParam, cdParam.pullPP, *ssmdhParam.message, *ssmdhParam.ssm);
 		}
 		int HRPull(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam) {
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
-
-			return 0;
-		}
-		int HRSync(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam) {
-			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
-			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
-
-			return 0;
+			return Emilia::UpdateHelper::pushProc("pull", *ccParam.cmhParam, cdParam.pushPP, *ssmdhParam.message, *ssmdhParam.ssm);
 		}
 		int HRStart(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam) {
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);

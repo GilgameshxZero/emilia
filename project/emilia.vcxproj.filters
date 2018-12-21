@@ -40,6 +40,9 @@
     <Filter Include="scripts">
       <UniqueIdentifier>{820afa31-555c-4ed2-ac9e-c10ad2fea96b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="exclusive\emilia-tan.com\data">
+      <UniqueIdentifier>{8c666b16-b246-4db7-ae35-019f3034a8e6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\smtp-server.h">
@@ -146,6 +149,9 @@
     </ClInclude>
     <ClInclude Include="..\src\rain-aeternum\network-headed-managers.h">
       <Filter>rain-aeternum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\update-helper-param.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -310,6 +316,12 @@
     </None>
     <None Include="..\build\post-build-event.bat">
       <Filter>build</Filter>
+    </None>
+    <None Include="..\exclusive\emilia-tan.com\data\mail-users.ini">
+      <Filter>exclusive\emilia-tan.com\data</Filter>
+    </None>
+    <None Include="..\exclusive\emilia-tan.com\data\track-mac-ip.ini">
+      <Filter>exclusive\emilia-tan.com\data</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

@@ -6,7 +6,8 @@ namespace Emilia {
 			Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam = *reinterpret_cast<Rain::ClientSocketManager::DelegateHandlerParam *>(funcParam);
 			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
 
-			chParam.state = "wait-request";
+			chParam.pushPP.state = "start";
+			chParam.pullPP.hrPushState = "start";
 
 			//authenticate automatically
 			Rain::tsCout("Connected with update server. Authenticating..." + Rain::CRLF);
@@ -39,7 +40,6 @@ namespace Emilia {
 				{"push", HRPush},
 				{"push-exclusive", HRPushExclusive},
 				{"pull", HRPull},
-				{"sync", HRSync},
 				{"start", HRStart},
 				{"stop", HRStop}
 			};
@@ -94,18 +94,16 @@ namespace Emilia {
 			return 0;
 		}
 		int HRPush(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam) {
-			return UpdateHelper::ClientPushProc(csmdhParam, "push");
+			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
+			return UpdateHelper::pushProc("push", *chParam.cmhParam, chParam.pushPP, *csmdhParam.message, *csmdhParam.csm);
 		}
 		int HRPushExclusive(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam) {
-			return UpdateHelper::ClientPushProc(csmdhParam, "push-exclusive");
+			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
+			return UpdateHelper::pushProc("push-exclusive", *chParam.cmhParam, chParam.pushPP, *csmdhParam.message, *csmdhParam.csm);
 		}
 		int HRPull(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam) {
 			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
-			return 0;
-		}
-		int HRSync(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam) {
-			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
-			return 0;
+			return UpdateHelper::pullProc("pull", *chParam.cmhParam, chParam.pullPP, *csmdhParam.message, *csmdhParam.csm);
 		}
 		int HRStart(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam) {
 			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
@@ -117,10 +115,7 @@ namespace Emilia {
 			return 0;
 		}
 		int HRStop(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam) {
-			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
-
 			//nothing reaches here
-
 			return 0;
 		}
 	}
