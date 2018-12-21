@@ -10,12 +10,12 @@ namespace Emilia {
 
 			ssmdhParam.delegateParam = new ConnectionDelegateParam();
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
-			Rain::tsCout("Info: Client ", Rain::getClientNumIP(*ssmdhParam.cSocket), " connected. Total: ", ++ccParam.connectedClients, ".\r\n");
-			fflush(stdout);
+			Rain::tsCout("SMTP Client ", Rain::getClientNumIP(*ssmdhParam.cSocket), " connected. Total: ", ++ccParam.connectedClients, ".", Rain::CRLF);
+			std::cout.flush();
 
 			//in either request type, send a 220
 			//in send requests, the 220 will be ignored, but that's fine
-			ssmdhParam.ssm->sendRawMessage("220 Emilia is ready\r\n");
+			ssmdhParam.ssm->sendRawMessage("220 Emilia is ready" + Rain::CRLF);
 			cdParam.rcd.reqHandler = HRREhlo;
 
 			return 0;
@@ -31,7 +31,7 @@ namespace Emilia {
 			while (true) {
 				if (cdParam.rcd.reqHandler != HRRData) {
 					//message terminated by CRLF
-					std::size_t end = cdParam.request.find("\r\n");
+					std::size_t end = cdParam.request.find(Rain::CRLF);
 					if (end != std::string::npos) {
 						//message complete, send to handler
 						std::string fragment = cdParam.request.substr(end + 2, cdParam.request.length());
@@ -43,7 +43,7 @@ namespace Emilia {
 					}
 				} else {
 					//message terminated by \r\n.\r\n
-					std::size_t end = cdParam.request.find("\r\n.\r\n");
+					std::size_t end = cdParam.request.find(Rain::CRLF + "." + Rain::CRLF);
 					if (end != std::string::npos) {
 						//message complete, send to handler
 						std::string fragment = cdParam.request.substr(end + 5, cdParam.request.length());
@@ -65,14 +65,14 @@ namespace Emilia {
 
 			ccParam.logger->setSocketSrc(ssmdhParam.ssm, false);
 
-			Rain::tsCout("Info: Client ", Rain::getClientNumIP(*ssmdhParam.cSocket), " disconnected. Total: ", --ccParam.connectedClients, ".\r\n");
-			fflush(stdout);
+			Rain::tsCout("SMTP Client ", Rain::getClientNumIP(*ssmdhParam.cSocket), " disconnected. Total: ", --ccParam.connectedClients, "." + Rain::CRLF);
+			std::cout.flush();
 
 			//if receiving mail, process it now if possible
 			if (cdParam.rcd.mailData.length() > 0) {
-				Rain::tsCout("Success: Parsed receive mail request from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ".\r\n");
-				Rain::tsCout("Info: Forwarding receive mail request to respective recipients.\r\n");
-				fflush(stdout);
+				Rain::tsCout("Success: Parsed receive mail request from ", Rain::getClientNumIP(*ssmdhParam.cSocket), "." + Rain::CRLF);
+				Rain::tsCout("Forwarding receive mail request to respective recipients." + Rain::CRLF);
+				std::cout.flush();
 
 				//refresh userdata
 				std::map<std::string, std::string> users = Rain::readParameterFile((*ccParam.config)["data-path"] + (*ccParam.config)["smtp-users"]);
@@ -88,14 +88,14 @@ namespace Emilia {
 					if (Rain::getEmailDomain(rcpt) == (*ccParam.config)["smtp-domain"]) {
 						if (ccParam.b64Users.find(Rain::strEncodeB64(Rain::getEmailUser(rcpt))) == ccParam.b64Users.end()) {
 							//if the user doesn't exist, throw away the email
-							Rain::tsCout("Failure: Client could not find local user ", rcpt, "; email recipient ignored and email discarded.\r\n");
-							fflush(stdout);
+							Rain::tsCout("Failure: Client could not find local user ", rcpt, "; email recipient ignored and email discarded." + Rain::CRLF);
+							std::cout.flush();
 							continue;
 						} else {
 							//user exists, so get the email
 							trueTo = Rain::strDecodeB64(ccParam.b64Users[Rain::strEncodeB64(Rain::getEmailUser(rcpt))]);
-							Rain::tsCout("Info: Forwarding email intended for user ", rcpt, " to ", trueTo, ".\r\n");
-							fflush(stdout);
+							Rain::tsCout("Forwarding email intended for user ", rcpt, " to ", trueTo, "." + Rain::CRLF);
+							std::cout.flush();
 						}
 					}
 
@@ -110,12 +110,12 @@ namespace Emilia {
 							curDNSR = curDNSR->pNext;
 						}
 						DnsRecordListFree(dnsRecord, DnsFreeRecordList);
-						Rain::tsCout("Success: Successfully queried ", smtpServers.size(), " MX DNS record(s) for domain ", emailHostDomain, ". Connecting to SMTP server...\r\n");
-						fflush(stdout);
+						Rain::tsCout("Success: Successfully queried ", smtpServers.size(), " MX DNS record(s) for domain ", emailHostDomain, ". Connecting to SMTP server..." + Rain::CRLF);
+						std::cout.flush();
 					} else {
-						Rain::tsCout("Failure: Failed query for MX DNS record for domain ", emailHostDomain, ". Client will discard email and terminate...\r\n");
-						fflush(stdout);
-						ssmdhParam.ssm->sendRawMessage("Failure: Failed query for MX DNS record for domain " + emailHostDomain + ". Client will discard email and terminate...\r\n");
+						Rain::tsCout("Failure: Failed query for MX DNS record for domain ", emailHostDomain, ". Client will discard email and terminate..." + Rain::CRLF);
+						std::cout.flush();
+						ssmdhParam.ssm->sendRawMessage("Failure: Failed query for MX DNS record for domain " + emailHostDomain + ". Client will discard email and terminate..." + Rain::CRLF);
 						return 1;
 					}
 
@@ -141,19 +141,19 @@ namespace Emilia {
 						//only allow connecting to client for a timeout before discarding email
 						csm.blockForConnect(Rain::strToT<DWORD>((*ccParam.config)["smtp-connect-timeout"]));
 						if (csm.getSocketStatus() != csm.STATUS_CONNECTED) {
-							Rain::tsCout("Failure: Could not connect to SMTP server ", server, ". Client will try next MX SMTP server if available...\r\n");
-							fflush(stdout);
+							Rain::tsCout("Failure: Could not connect to SMTP server ", server, ". Client will try next MX SMTP server if available..." + Rain::CRLF);
+							std::cout.flush();
 						} else {
-							Rain::tsCout("Success: Connected to SMTP server ", server, ". Sending email...\r\n");
-							fflush(stdout);
+							Rain::tsCout("Success: Connected to SMTP server ", server, ". Sending email..." + Rain::CRLF);
+							std::cout.flush();
 							connected = true;
 							break;
 						}
 					}
 
 					if (!connected) {
-						Rain::tsCout("Failure: All MX record SMTP servers failed to connect. Client will discard email and terminate.\r\n");
-						fflush(stdout);
+						Rain::tsCout("Failure: All MX record SMTP servers failed to connect. Client will discard email and terminate." + Rain::CRLF);
+						std::cout.flush();
 						ssmdhParam.ssm->sendRawMessage("-3");
 						return 1;
 					}
@@ -165,12 +165,12 @@ namespace Emilia {
 					ccParam.logger->setSocketSrc(&csm, false);
 				}
 
-				Rain::tsCout("Info: Finished processing receive mail request from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ".\r\n");
+				Rain::tsCout("Finished processing receive mail request from ", Rain::getClientNumIP(*ssmdhParam.cSocket), "." + Rain::CRLF);
 			} else {
-				Rain::tsCout("Failure: Invalid mail request from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ".\r\n");
+				Rain::tsCout("Failure: Invalid mail request from ", Rain::getClientNumIP(*ssmdhParam.cSocket), "." + Rain::CRLF);
 			}
 
-			fflush(stdout);
+			std::cout.flush();
 			delete ssmdhParam.delegateParam;
 			return 0;
 		}
@@ -183,12 +183,12 @@ namespace Emilia {
 
 			//we don't want to deal with HELO commands, which are not RFC compliant anyway
 			if (command == "HELO") {
-				ssmdhParam.ssm->sendRawMessage("500 Emilia doesn't accept HELO, only EHLO\r\n");
+				ssmdhParam.ssm->sendRawMessage("500 Emilia doesn't accept HELO, only EHLO" + Rain::CRLF);
 				return 0;
 			}
 
-			ssmdhParam.ssm->sendRawMessage("250-Emilia is best girl!\r\n");
-			ssmdhParam.ssm->sendRawMessage("250 AUTH LOGIN\r\n");
+			ssmdhParam.ssm->sendRawMessage("250-Emilia is best girl!" + Rain::CRLF);
+			ssmdhParam.ssm->sendRawMessage("250 AUTH LOGIN" + Rain::CRLF);
 			cdParam.rcd.reqHandler = HRRPreData;
 
 			return 0;
@@ -200,7 +200,7 @@ namespace Emilia {
 			//process commands before DATA
 			std::string command = cdParam.request.substr(0, 4);
 			if (command == "DATA") {
-				ssmdhParam.ssm->sendRawMessage("354 Emilia ready for data\r\n");
+				ssmdhParam.ssm->sendRawMessage("354 Emilia ready for data" + Rain::CRLF);
 				cdParam.rcd.reqHandler = HRRData;
 			} else if (command == "AUTH") {
 				return HRRAuthLogin(ssmdhParam);
@@ -209,7 +209,7 @@ namespace Emilia {
 			} else if (command == "RCPT") {
 				return HRRRcptTo(ssmdhParam);
 			} else {
-				ssmdhParam.ssm->sendRawMessage("502 Emilia hasn't learned this yet\r\n");
+				ssmdhParam.ssm->sendRawMessage("502 Emilia hasn't learned this yet" + Rain::CRLF);
 			}
 
 			return 0;
@@ -238,9 +238,9 @@ namespace Emilia {
 
 			//we are willing to send email to and from anybody
 			if (true || isAtDomain) {
-				ssmdhParam.ssm->sendRawMessage("250 OK\r\n");
+				ssmdhParam.ssm->sendRawMessage("250 OK" + Rain::CRLF);
 			} else {
-				ssmdhParam.ssm->sendRawMessage("510 Emilia doesn't like talking for strangers (one of either 'RCPT TO' or 'MAIL FROM' must be at the local domain\r\n");
+				ssmdhParam.ssm->sendRawMessage("510 Emilia doesn't like talking for strangers (one of either 'RCPT TO' or 'MAIL FROM' must be at the local domain" + Rain::CRLF);
 				cdParam.rcd.mailData.clear();
 			}
 
@@ -252,7 +252,7 @@ namespace Emilia {
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 
 			if (cdParam.request.substr(0, 10) != "AUTH LOGIN") {
-				ssmdhParam.ssm->sendRawMessage("500 Emilia doesn't understand AUTH request\r\n");
+				ssmdhParam.ssm->sendRawMessage("500 Emilia doesn't understand AUTH request" + Rain::CRLF);
 				return 0;
 			}
 
@@ -261,7 +261,7 @@ namespace Emilia {
 				//might be sending login request username in first go
 				return HRRAuthLoginUsername(ssmdhParam);
 			} else {
-				ssmdhParam.ssm->sendRawMessage("334 VXNlcm5hbWU6\r\n");
+				ssmdhParam.ssm->sendRawMessage("334 VXNlcm5hbWU6" + Rain::CRLF);
 				cdParam.rcd.reqHandler = HRRAuthLoginUsername;
 			}
 			return 0;
@@ -274,7 +274,7 @@ namespace Emilia {
 
 			//don't check if user exists here, wait until password to hide information
 			cdParam.rcd.b64User = cdParam.request;
-			ssmdhParam.ssm->sendRawMessage("334 UGFzc3dvcmQ6\r\n");
+			ssmdhParam.ssm->sendRawMessage("334 UGFzc3dvcmQ6" + Rain::CRLF);
 			cdParam.rcd.reqHandler = HRRAuthLoginPassword;
 
 			return 0;
@@ -295,9 +295,9 @@ namespace Emilia {
 			auto it = ccParam.b64Users.find(cdParam.rcd.b64User);
 			if (it != ccParam.b64Users.end() &&
 				it->second == cdParam.request) {
-				ssmdhParam.ssm->sendRawMessage("235 Emilia authenticated you\r\n");
+				ssmdhParam.ssm->sendRawMessage("235 Emilia authenticated you" + Rain::CRLF);
 			} else {
-				ssmdhParam.ssm->sendRawMessage("530 Emilia could not authenticate you\r\n");
+				ssmdhParam.ssm->sendRawMessage("530 Emilia could not authenticate you" + Rain::CRLF);
 				cdParam.rcd.b64User.clear();
 			}
 			cdParam.rcd.reqHandler = HRRPreData;
@@ -309,7 +309,7 @@ namespace Emilia {
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 
 			if (cdParam.request.substr(0, 9) != "MAIL FROM" || cdParam.request.length() <= 10) {
-				ssmdhParam.ssm->sendRawMessage("500 Emilia doesn't understand MAIL request\r\n");
+				ssmdhParam.ssm->sendRawMessage("500 Emilia doesn't understand MAIL request" + Rain::CRLF);
 				return 0;
 			}
 
@@ -318,7 +318,7 @@ namespace Emilia {
 			std::size_t b1 = afterColon.find("<"),
 				b2 = afterColon.rfind(">");
 			if (b1 == std::string::npos || b2 == std::string::npos) {
-				ssmdhParam.ssm->sendRawMessage("500 Emilia doesn't understand MAIL request\r\n");
+				ssmdhParam.ssm->sendRawMessage("500 Emilia doesn't understand MAIL request" + Rain::CRLF);
 				return 0;
 			}
 			cdParam.rcd.mailFrom = Rain::strTrimWhite(afterColon.substr(b1 + 1, b2 - b1 - 1));
@@ -326,9 +326,9 @@ namespace Emilia {
 			//if sending from current domain, need to be authenticated, unless it's from server@emilia-tan.com, which is publicly accessible without password
 			if (Rain::getEmailDomain(cdParam.rcd.mailFrom) == (*ccParam.config)["smtp-domain"] &&
 				cdParam.rcd.b64User.length() == 0 && cdParam.rcd.mailFrom != "server@emilia-tan.com") {
-				ssmdhParam.ssm->sendRawMessage("502 Emilia hasn't authenticated you to do that (sending from a managed domain requires authentication)\r\n");
+				ssmdhParam.ssm->sendRawMessage("502 Emilia hasn't authenticated you to do that (sending from a managed domain requires authentication)" + Rain::CRLF);
 			} else
-				ssmdhParam.ssm->sendRawMessage("250 OK\r\n");
+				ssmdhParam.ssm->sendRawMessage("250 OK" + Rain::CRLF);
 			return 0;
 		}
 		int HRRRcptTo(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam) {
@@ -336,7 +336,7 @@ namespace Emilia {
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 
 			if (cdParam.request.substr(0, 7) != "RCPT TO" || cdParam.request.length() <= 8) {
-				ssmdhParam.ssm->sendRawMessage("500 Emilia doesn't understand RCPT request\r\n");
+				ssmdhParam.ssm->sendRawMessage("500 Emilia doesn't understand RCPT request" + Rain::CRLF);
 				return 0;
 			}
 
@@ -345,12 +345,12 @@ namespace Emilia {
 			std::size_t b1 = afterColon.find("<"),
 				b2 = afterColon.rfind(">");
 			if (b1 == std::string::npos || b2 == std::string::npos) {
-				ssmdhParam.ssm->sendRawMessage("500 Emilia doesn't understand RCPT request\r\n");
+				ssmdhParam.ssm->sendRawMessage("500 Emilia doesn't understand RCPT request" + Rain::CRLF);
 				return 0;
 			}
 			cdParam.rcd.rcptTo.insert(Rain::strTrimWhite(afterColon.substr(b1 + 1, b2 - b1 - 1)));
 
-			ssmdhParam.ssm->sendRawMessage("250 OK\r\n");
+			ssmdhParam.ssm->sendRawMessage("250 OK" + Rain::CRLF);
 			return 0;
 		}
 	}  // namespace SMTPServer

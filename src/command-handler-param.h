@@ -5,6 +5,7 @@
 #include "update-client-param.h"
 
 namespace Emilia {
+	//forward declaration for circular reference
 	namespace UpdateClient {
 		struct ConnectionHandlerParam;
 	}

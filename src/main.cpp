@@ -1,7 +1,5 @@
 #include "main.h"
 
-const std::string LINE_END = "\r\n";
-
 int main(int argc, char *argv[]) {
 	//try to create a named mutex; if it already exists, then another instance of this application is running so terminate this
 	//mutex name cannot have backslashes
@@ -13,22 +11,22 @@ int main(int argc, char *argv[]) {
 	}
 	CreateMutex(NULL, FALSE, mutexName.c_str());
 	if (GetLastError() == ERROR_ALREADY_EXISTS) {
-		std::cout << "Another instance of application already running." << LINE_END;
+		std::cout << "Another instance of application already running." << Rain::CRLF;
 		return -1;
 	}
 
 	//restart the application if it didn't finish successfully
 	if (FAILED(RegisterApplicationRestart(Rain::mbStrToWStr("crash-restart").c_str(), 0))) {
-		std::cout << "RegisterApplicationRestart failed." << LINE_END;
+		std::cout << "RegisterApplicationRestart failed." << Rain::CRLF;
 	}
 
 	int error = Emilia::start(argc, argv);
-	std::cout << "Start returned error code " << error << "." << LINE_END;
+	std::cout << "Start returned error code " << error << "." << Rain::CRLF;
 
 	//finished successfully, so don't restart it
 	UnregisterApplicationRestart();
 
-	fflush(stdout);
+	std::cout.flush();
 	return error;
 }
 
@@ -50,25 +48,25 @@ namespace Emilia {
 		logger.setStdHandleSrc(STD_OUTPUT_HANDLE, true);
 
 		//print parameters & command line
-		Rain::tsCout("Starting...\r\n" + Rain::tToStr(config.size()), " configuration options:", LINE_END);
+		Rain::tsCout("Starting..." + Rain::CRLF + Rain::tToStr(config.size()), " configuration options:", Rain::CRLF);
 		for (std::map<std::string, std::string>::iterator it = config.begin(); it != config.end(); it++) {
-			Rain::tsCout("\t" + it->first + ": " + it->second + "\r\n");
+			Rain::tsCout("\t" + it->first + ": " + it->second + Rain::CRLF);
 		}
 
-		Rain::tsCout("\r\nCommand line arguments: ", Rain::tToStr(argc), LINE_END);
+		Rain::tsCout(Rain::CRLF, "Command line arguments: ", Rain::tToStr(argc), Rain::CRLF);
 		for (int a = 0; a < argc; a++) {
-			Rain::tsCout(std::string(argv[a]) + "\r\n");
+			Rain::tsCout(std::string(argv[a]) + Rain::CRLF);
 		}
-		Rain::tsCout("\r\n");
+		Rain::tsCout(Rain::CRLF);
 
 		//check command line for notifications
 		if (argc >= 2) {
 			std::string arg1 = argv[1];
 			Rain::strTrimWhite(&arg1);
 			if (arg1 == "update-restart") {
-				Rain::tsCout("Important: Successfully restarted server after replacing from .tmp file from update operation.", LINE_END);
+				Rain::tsCout("Important: Successfully restarted server after replacing from .tmp file from update operation.", Rain::CRLF);
 			} else if (arg1 == "crash-restart") {
-				Rain::tsCout("Important: Successfully recovering from crash.", LINE_END);
+				Rain::tsCout("Important: Successfully recovering from crash.", Rain::CRLF);
 			}
 		}
 
@@ -126,7 +124,7 @@ namespace Emilia {
 		updSM.setEventHandlers(UpdateServer::onConnect, UpdateServer::onMessage, UpdateServer::onDisconnect, &updCCP);
 		updSM.setRecvBufLen(Rain::strToT<std::size_t>(config["update-transfer-buffer"]));
 		if (!updSM.setServerListen(updateServerPort, updateServerPort)) {
-			Rain::tsCout("Update server listening on port ", updSM.getListeningPort(), ".\r\n");
+			Rain::tsCout("Update server listening on port ", updSM.getListeningPort(), ".", Rain::CRLF);
 		} else {
 			DWORD error = GetLastError();
 			Rain::errorAndCout(error, "Error: could not setup update server listening.");
@@ -157,8 +155,8 @@ namespace Emilia {
 			while (!cmhParam.canAcceptCommand) {
 				cmhParam.canAcceptCommandCV.wait(lc);
 			}
-			Rain::tsCout("Accepting commands...\r\n");
-			fflush(stdout);
+			Rain::tsCout("Accepting commands...", Rain::CRLF);
+			std::cout.flush();
 
 			std::cin >> command;
 			Rain::strTrimWhite(command);
@@ -170,12 +168,12 @@ namespace Emilia {
 					break;
 				}
 			} else {
-				Rain::tsCout("Command not recognized.\r\n");
+				Rain::tsCout("Command not recognized.", Rain::CRLF);
 			}
 		}
 
-		Rain::tsCout("The program has terminated.", LINE_END);
-		fflush(stdout);
+		Rain::tsCout("The program has terminated.", Rain::CRLF);
+		std::cout.flush();
 
 		logger.setStdHandleSrc(STD_OUTPUT_HANDLE, false);
 		std::cerr.rdbuf(cerrRedirect.first);

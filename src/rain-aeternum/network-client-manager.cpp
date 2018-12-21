@@ -169,7 +169,7 @@ namespace Rain {
 		createSocket(csm.socket);
 
 		while (csm.socketStatus == csm.STATUS_CONNECTING) {
-			Sleep(csm.msReconnectWait);
+			Rain::sleep(csm.msReconnectWait);
 			if (csm.msReconnectWait < csm.msReconnectWaitMax)
 				csm.msReconnectWait = min(csm.msReconnectWait * 2, csm.msReconnectWaitMax);
 

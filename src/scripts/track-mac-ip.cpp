@@ -26,9 +26,9 @@ int main(int argc, char *argv[]) {
 		response += it->first + ": " + it->second + "<br>";
 	}
 
-	std::cout << "HTTP/1.1 200 OK\r\n"
-		<< "content-type:text/html\r\n"
-		<< "\r\n"
+	std::cout << "HTTP/1.1 200 OK" << Rain::CRLF
+		<< "content-type:text/html" << Rain::CRLF
+		<< Rain::CRLF
 		<< response;
 
 	return 0;
