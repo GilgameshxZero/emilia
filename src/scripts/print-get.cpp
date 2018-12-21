@@ -13,13 +13,13 @@ int main(int argc, char *argv[]) {
     std::map<std::string, std::string> query = Rain::getQueryToMap(std::getenv("QUERY_STRING"));
 
     for (auto it = query.begin(); it != query.end(); it++) {
-		response += it->first + ": " + it->second + "\r\n";
+		response += it->first + ": " + it->second + Rain::CRLF;
 	}
 
-    std::cout << "HTTP/1.1 200 OK\r\n"
-              << "content-type:text/html\r\n"
-              << "\r\n"
-              << response;
+	std::cout << "HTTP/1.1 200 OK" << Rain::CRLF
+		<< "content-type:text/html" << Rain::CRLF
+		<< Rain::CRLF
+		<< response;
 
     return 0;
 }

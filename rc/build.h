@@ -2,6 +2,6 @@
 #define STRINGIZE2(s) #s
 #define STRINGIZE(s) STRINGIZE2(s)
 #define VERSION_MAJOR            5
-#define VERSION_MINOR            2
-#define VERSION_REVISION         9
-#define VERSION_BUILD            1813
+#define VERSION_MINOR            3
+#define VERSION_REVISION         0
+#define VERSION_BUILD            1829

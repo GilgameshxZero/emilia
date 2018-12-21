@@ -20,9 +20,9 @@ namespace Emilia {
 			//accumulate requests
 			//a request is complete when its final line has a space immediately after a few consecutive numbers
 			ecParam.request += *csmdhParam.message;
-			std::size_t pos = ecParam.request.rfind("\r\n");
+			std::size_t pos = ecParam.request.rfind(Rain::CRLF);
 			if (pos == ecParam.request.length() - 2) {
-				std::size_t pos2 = ecParam.request.rfind("\r\n", pos - 1);
+				std::size_t pos2 = ecParam.request.rfind(Rain::CRLF, pos - 1);
 				std::string finalLine;
 				if (pos2 != ecParam.request.npos) {
 					finalLine = ecParam.request.substr(pos2 + 2, pos);
@@ -64,7 +64,7 @@ namespace Emilia {
 			if (Rain::getSMTPStatus(ecParam.request) != 220)
 				return 1;
 
-			csmdhParam.csm->sendRawMessage("EHLO emilia-tan.com\r\n");
+			csmdhParam.csm->sendRawMessage("EHLO emilia-tan.com" + Rain::CRLF);
 			ecParam.reqHandler = EHRMailFrom;
 			return 0;
 		}
@@ -73,9 +73,7 @@ namespace Emilia {
 			if (Rain::getSMTPStatus(ecParam.request) != 250)
 				return 1;
 
-			csmdhParam.csm->sendRawMessage("MAIL FROM:<");
-			csmdhParam.csm->sendRawMessage(ecParam.from);
-			csmdhParam.csm->sendRawMessage(">\r\n");
+			csmdhParam.csm->sendRawMessage("MAIL FROM:<" + *ecParam.from + ">" + Rain::CRLF);
 			ecParam.reqHandler = EHRRcptTo;
 			return 0;
 		}
@@ -84,9 +82,7 @@ namespace Emilia {
 			if (Rain::getSMTPStatus(ecParam.request) != 250)
 				return 1;
 
-			csmdhParam.csm->sendRawMessage("RCPT TO:<");
-			csmdhParam.csm->sendRawMessage(ecParam.to);
-			csmdhParam.csm->sendRawMessage(">\r\n");
+			csmdhParam.csm->sendRawMessage("RCPT TO:<" + *ecParam.to + ">" + Rain::CRLF);
 			ecParam.reqHandler = EHRPreData;
 			return 0;
 		}
@@ -95,7 +91,7 @@ namespace Emilia {
 			if (Rain::getSMTPStatus(ecParam.request) != 250)
 				return 1;
 
-			csmdhParam.csm->sendRawMessage("DATA\r\n");
+			csmdhParam.csm->sendRawMessage("DATA" + Rain::CRLF);
 			ecParam.reqHandler = EHRData;
 			return 0;
 		}
@@ -113,7 +109,7 @@ namespace Emilia {
 			if (Rain::getSMTPStatus(ecParam.request) != 250)
 				return 1;
 
-			csmdhParam.csm->sendRawMessage("QUIT\r\n");
+			csmdhParam.csm->sendRawMessage("QUIT" + Rain::CRLF);
 			ecParam.reqHandler = NULL;
 
 			//if we're here, then we've successfully sent the mail

@@ -8,7 +8,7 @@
 #include "smtp-server.h"
 #include "update-server.h"
 
-extern const std::string LINE_END;
+extern const std::string Rain::CRLF;
 
 int main(int argc, char *argv[]);
 

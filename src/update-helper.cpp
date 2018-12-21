@@ -38,8 +38,8 @@ namespace Emilia {
 					std::getline(ss, files.back().second);
 					Rain::strTrimWhite(&files.back().second);
 				}
-				Rain::tsCout("Info: Received ", method, " request with header with ", std::dec, cdParam.cfiles, " files. Comparing with local files...\r\n");
-				fflush(stdout);
+				Rain::tsCout("Received ", method, " request with header with ", std::dec, cdParam.cfiles, " files. Comparing with local files..." + Rain::CRLF);
+				std::cout.flush();
 
 				//compare filelist with local hashes (last write time; not crc32) and see which ones need to be updated/deleted
 				Rain::tsCout(std::hex, std::setfill('0'));
@@ -61,21 +61,21 @@ namespace Emilia {
 						cdParam.noRemove.insert(root + files[a].second);
 						Rain::tsCout(" ");
 					}
-					Rain::tsCout(" ", files[a].second, "\r\n");
-					fflush(stdout);
+					Rain::tsCout(" ", files[a].second, Rain::CRLF);
+					std::cout.flush();
 				}
 
 				if (cdParam.requested.size() == 0) {
 					//if we don't need any files, don't send the request.
 					cdParam.hrPushState = "start";
-					Rain::tsCout("Local is up-to-date. '", method, "' from client is unnecessary.\r\n");
-					fflush(stdout);
+					Rain::tsCout("Local is up-to-date. '", method, "' from client is unnecessary." + Rain::CRLF);
+					std::cout.flush();
 					Rain::sendHeadedMessage(*ssmdhParam.ssm, method + " 0");
 				} else {
 					cdParam.cfiles = static_cast<int>(cdParam.requested.size());
 					Rain::tsCout(std::dec);
-					Rain::tsCout("Info: Requesting ", cdParam.requested.size(), " files in total from client...\r\n");
-					fflush(stdout);
+					Rain::tsCout("Requesting ", cdParam.requested.size(), " files in total from client..." + Rain::CRLF);
+					std::cout.flush();
 
 					//send back a list of requested files.
 					std::string response = method + " " + Rain::tToStr(cdParam.requested.size()) + "\n";
@@ -108,11 +108,11 @@ namespace Emilia {
 				cdParam.curFile = 0;
 				cdParam.curFileLenLeft = -1;
 
-				Rain::tsCout(std::fixed, "Info: Received file lengths from update client. Receiving filedata (", std::setprecision(2), cdParam.totalBytes / 1e6, " MB)...\r\n", std::setfill(' '));
+				Rain::tsCout(std::fixed, "Received file lengths from update client. Receiving filedata (", std::setprecision(2), cdParam.totalBytes / 1e6, " MB)..." + Rain::CRLF, std::setfill(' '));
 				for (int a = 0; a < cdParam.cfiles; a++) {
-					Rain::tsCout(std::setw(8), cdParam.fileLen[a] / 1e6, " MB ", cdParam.requested[a], "\r\n");
+					Rain::tsCout(std::setw(8), cdParam.fileLen[a] / 1e6, " MB ", cdParam.requested[a], Rain::CRLF);
 				}
-				fflush(stdout);
+				std::cout.flush();
 			} else if (cdParam.hrPushState == "wait-data") {
 				//data is a block of everything in the same order as request, buffered
 				if (cdParam.curFileLenLeft == -1) {
@@ -133,7 +133,7 @@ namespace Emilia {
 				cdParam.currentBytes += request.length();
 				if (cdParam.totalBytes > 0) {
 					Rain::tsCout("Receiving filedata: ", 100.0 * cdParam.currentBytes / cdParam.totalBytes, "%\r");
-					fflush(stdout);
+					std::cout.flush();
 				}
 				cdParam.curFileLenLeft -= request.length();
 
@@ -164,8 +164,8 @@ namespace Emilia {
 
 					//if we have unwritable files, note them and start the update script on them; restart the current executable again afterwards
 					std::string response;
-					response = method + " '" + method + "' completed.\r\n";
-					Rain::tsCout("'", method, "' completed.\r\n");
+					response = method + " '" + method + "' completed." + Rain::CRLF;
+					Rain::tsCout("'", method, "' completed." + Rain::CRLF);
 
 					//setup update script params
 					std::string updateScript = Rain::pathToAbsolute(root + config["update-script"]),
@@ -173,7 +173,7 @@ namespace Emilia {
 
 					//open a script for every unwritable file; these will attempt to start the server multiple times, but only one will succeed
 					for (auto it = cdParam.unwritable.begin(); it != cdParam.unwritable.end(); it++) {
-						std::string message = "Error: Could not write to " + cdParam.requested[*it] + ".\r\n",
+						std::string message = "Error: Could not write to " + cdParam.requested[*it] + "." + Rain::CRLF,
 							dest = root + cdParam.requested[*it];
 						shouldRestart = true;
 						ShellExecute(NULL, "open", updateScript.c_str(),
@@ -184,12 +184,12 @@ namespace Emilia {
 					}
 
 					if (shouldRestart) {
-						std::string message = "Restarting server to write to locked files...\r\n";
+						std::string message = "Restarting server to write to locked files..." + Rain::CRLF;
 						response += message;
 						Rain::tsCout(message);
 					}
 
-					fflush(stdout);
+					std::cout.flush();
 					Rain::sendHeadedMessage(*ssmdhParam.ssm, &response);
 				}
 			}
@@ -200,7 +200,7 @@ namespace Emilia {
 				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 				exit(1);
 
-				Rain::tsCout("Input stream cancelled...\r\n");
+				Rain::tsCout("Input stream cancelled..." + Rain::CRLF);
 				std::cout.flush();
 			}
 
@@ -228,14 +228,14 @@ namespace Emilia {
 				ss >> chParam.cfiles;
 
 				if (chParam.cfiles == 0) {
-					Rain::tsCout("Remote is up-to-date. No '", method, "' necessary.\r\n");
-					fflush(stdout);
+					Rain::tsCout("Remote is up-to-date. No '", method, "' necessary." + Rain::CRLF);
+					std::cout.flush();
 
 					cmhParam.canAcceptCommand = true;
 					cmhParam.canAcceptCommandCV.notify_one();
 				} else {
-					Rain::tsCout("Info: Received ", chParam.cfiles, " requested files in response to '", method, "' command from remote. Sending file lengths...\r\n");
-					fflush(stdout);
+					Rain::tsCout("Received ", chParam.cfiles, " requested files in response to '", method, "' command from remote. Sending file lengths..." + Rain::CRLF);
+					std::cout.flush();
 
 					std::string tmp;
 					std::getline(ss, tmp);
@@ -254,12 +254,12 @@ namespace Emilia {
 						totalBytes += currentBytes;
 						response += Rain::tToStr(currentBytes) + "\n";
 
-						Rain::tsCout(std::setw(8), currentBytes / 1e6, " MB ", chParam.requested[a], "\r\n");
+						Rain::tsCout(std::setw(8), currentBytes / 1e6, " MB ", chParam.requested[a], Rain::CRLF);
 					}
 					Rain::sendHeadedMessage(*csmdhParam.csm, &response);
 
-					Rain::tsCout("Info: Sending filedata (", totalBytes / 1e6, " MB)...\r\n");
-					fflush(stdout);
+					Rain::tsCout("Sending filedata (", totalBytes / 1e6, " MB)..." + Rain::CRLF);
+					std::cout.flush();
 
 					//move on to send buffered chunks of data from the files, in the same order as the requested files
 					int bufferSize = Rain::strToT<int>(config["update-transfer-buffer"]);
@@ -278,20 +278,20 @@ namespace Emilia {
 							if (totalBytes > 0) {
 								Rain::tsCout("Sending filedata: ", 100.0 * completedBytes / totalBytes, "%\r");
 							}
-							fflush(stdout);
+							std::cout.flush();
 						}
 						in.close();
 					}
 					delete[] buffer;
-					Rain::tsCout("\nDone. Waiting for server response...\r\n");
-					fflush(stdout);
+					Rain::tsCout("\nDone. Waiting for server response..." + Rain::CRLF);
+					std::cout.flush();
 
 					chParam.state = "wait-complete";
 				}
 			} else if (chParam.state == "wait-complete") {
 				//everything in response is to be printed to cout and logs
 				Rain::tsCout("Remote: ", request);
-				fflush(stdout);
+				std::cout.flush();
 
 				chParam.state = "wait-request";
 				chParam.requested.clear();

@@ -149,7 +149,7 @@ namespace Rain {
 		if (ret == 0) {//we successfully listened on a port, so create a thread to continuously accept clients
 			//very important to reset event outside of thread beginning to avoid race conditions
 			ResetEvent(this->ltEvent);
-			CreateThread(NULL, 0, listenThread, reinterpret_cast<LPVOID>(this), 0, NULL);
+			std::thread(listenThread, reinterpret_cast<LPVOID>(this)).detach();
 		} else
 			ret = WSAGetLastError();
 		return ret;

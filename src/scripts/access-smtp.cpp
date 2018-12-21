@@ -37,11 +37,11 @@ int main(int argc, char *argv[]) {
     std::map<std::string, std::string> query = Rain::getQueryToMap(std::getenv("QUERY_STRING"));
 
 	std::stringstream request;
-	request << "EHLO emilia-tan.com\r\n"
-		<< "MAIL FROM:<" << query["from"] << ">\r\n"
-		<< "RCPT TO:<" << query["to"] << ">\r\n"
-		<< "DATA\r\n" << query["data"] << "\r\n.\r\n"
-		<< "QUIT\r\n";
+	request << "EHLO emilia-tan.com" << Rain::CRLF
+		<< "MAIL FROM:<" << query["from"] << ">" << Rain::CRLF
+		<< "RCPT TO:<" << query["to"] << ">" << Rain::CRLF
+		<< "DATA" << Rain::CRLF << query["data"] << Rain::CRLF << "." << Rain::CRLF
+		<< "QUIT" << Rain::CRLF;
 
 	Rain::ClientSocketManager csm;
 	CSMParam csmp;
@@ -53,11 +53,11 @@ int main(int argc, char *argv[]) {
 
 	WaitForSingleObject(csmp.dcEvent, INFINITE);
 	CloseHandle(csmp.dcEvent);
-	response = request.str() + "\r\n" + csmp.response;
+	response = request.str() + Rain::CRLF + csmp.response;
 
-    std::cout << "HTTP/1.1 200 OK\r\n"
-              << "content-type:text/html\r\n"
-              << "\r\n"
+    std::cout << "HTTP/1.1 200 OK" << Rain::CRLF
+              << "content-type:text/html" << Rain::CRLF
+              << Rain::CRLF
               << response;
 
     return 0;

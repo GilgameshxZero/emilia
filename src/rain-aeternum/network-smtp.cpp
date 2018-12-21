@@ -3,8 +3,8 @@
 namespace Rain {
 	int getSMTPStatus(std::string *message) {
 		//get the last line
-		std::size_t lastCLRF = message->rfind("\r\n"),
-			stlCLRF = message->rfind("\r\n", lastCLRF - 1);
+		std::size_t lastCLRF = message->rfind(CRLF),
+			stlCLRF = message->rfind(CRLF, lastCLRF - 1);
 		if (lastCLRF == std::string::npos)
 			return -1;
 		std::string lastLine = message->substr((stlCLRF == std::string::npos ? 0 : stlCLRF), lastCLRF);

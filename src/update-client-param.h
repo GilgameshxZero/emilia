@@ -8,6 +8,7 @@
 #include <set>
 
 namespace Emilia {
+	//forward declaration for circular reference
 	struct CommandHandlerParam;
 
 	namespace UpdateClient {
