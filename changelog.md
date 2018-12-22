@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.4.4
+
+* Change to SMTP connect timeout in config to 5 seconds.
+
 ## 5.4.3
 
 * Update server now only pulls files if they are newer than existing.
