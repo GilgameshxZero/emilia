@@ -55,13 +55,18 @@ namespace Emilia {
 				for (int a = 0; a < files.size(); a++) {
 					FILETIME lastWrite;
 					HANDLE hFile;
+					//try to get last write time of the file; if it doesn't exist or if the remote time is more recent, request it
 					hFile = CreateFile((root + files[a].second).c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_ALWAYS, 0, NULL);
-					GetFileTime(hFile, NULL, NULL, &lastWrite);
-					CloseHandle(hFile);
+					if (GetLastError() == ERROR_FILE_NOT_FOUND) {
+						lastWrite.dwHighDateTime = lastWrite.dwLowDateTime = 0;
+					} else {
+						GetFileTime(hFile, NULL, NULL, &lastWrite);
+						CloseHandle(hFile);
+					}
 					Rain::tsCout(std::setw(8), lastWrite.dwHighDateTime, std::setw(8), lastWrite.dwLowDateTime, " ",
 						std::setw(8), files[a].first.dwHighDateTime, std::setw(8), files[a].first.dwLowDateTime, " ");
-					if (files[a].first.dwHighDateTime != lastWrite.dwHighDateTime ||
-						files[a].first.dwLowDateTime != lastWrite.dwLowDateTime) {
+					if (files[a].first.dwHighDateTime > lastWrite.dwHighDateTime ||
+						(files[a].first.dwHighDateTime == lastWrite.dwHighDateTime && files[a].first.dwLowDateTime > lastWrite.dwLowDateTime)) {
 						pullPP.requested.push_back(files[a].second);
 						pullPP.requestedFiletimes.push_back(files[a].first);
 						Rain::tsCout("!");

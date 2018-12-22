@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.4.3
+
+* Update server now only pulls files if they are newer than existing.
+
 ## 5.4.2
 
 * Added script to modify mailing list subscribers.
