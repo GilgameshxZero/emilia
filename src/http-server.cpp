@@ -14,14 +14,6 @@ namespace Emilia {
 			ConnectionDelegateParam *cdParam = new ConnectionDelegateParam();
 			ssmdhParam.delegateParam = reinterpret_cast<void *>(cdParam);
 
-			//initialize things in the delegate parameter
-			cdParam->thLLMutex.lock();
-			cdParam->thLLBegin.prev = NULL;
-			cdParam->thLLBegin.next = &cdParam->thLLEnd;
-			cdParam->thLLEnd.prev = &cdParam->thLLBegin;
-			cdParam->thLLEnd.next = NULL;
-			cdParam->thLLMutex.unlock();
-
 			//delay all possible initialization of rtParam to here
 			cdParam->request = "";
 			cdParam->requestMethod = "";
@@ -99,58 +91,24 @@ namespace Emilia {
 			ss >> cdParam.requestMethod >> requestURI >> httpVersion;
 			parseHeaders(ss, headers);
 
+			//create thread to process the request
+			if (cdParam.prThread.get_id() != std::thread::id()) {
+				CancelSynchronousIo(cdParam.prThread.native_handle());
+				cdParam.prThread.join();
+			}
+			cdParam.prThread = std::thread(processRequest,
+				ssmdhParam.cSocket,
+				ccParam.config,
+				cdParam.requestMethod,
+				requestURI,
+				httpVersion,
+				headers,
+				bodyBlock);
+
 			//log the request manually so that we don't log responses
 			Rain::tsCout("HTTP ", Rain::getClientNumIP(*ssmdhParam.cSocket), ": ", cdParam.requestMethod, " ", requestURI, Rain::CRLF);
 			std::cout.flush();
 			ccParam.logger->logString(&cdParam.request);
-
-			//create thread to process the request
-			cdParam.thLLMutex.lock();
-			ConnectionDelegateParam::ThreadNode *tn = new ConnectionDelegateParam::ThreadNode();
-			cdParam.thLLEnd.prev->next = tn;
-			tn->prev = cdParam.thLLEnd.prev;
-			tn->next = &cdParam.thLLEnd;
-			cdParam.thLLEnd.prev = tn;
-			//lambda captures by copy
-			SOCKET *lambdaSocket = ssmdhParam.cSocket;
-			std::map<std::string, std::string> *lambdaConfig = ccParam.config;
-			std::string lambdaRequestMethod = cdParam.requestMethod;
-			std::mutex *lambdaMutex = &cdParam.thLLMutex;
-			tn->th = std::thread([lambdaMutex,
-				tn,
-				lambdaSocket,
-				lambdaConfig,
-				lambdaRequestMethod,
-				requestURI,
-				httpVersion,
-				headers,
-				bodyBlock]() {
-				//send the parsed headers and bodyBlock and other parameters over to processRequest
-				int prRet = processRequest(lambdaSocket,
-					lambdaConfig,
-					lambdaRequestMethod,
-					requestURI,
-					httpVersion,
-					headers,
-					bodyBlock);
-
-				//remove thread from LL
-				lambdaMutex->lock();
-				tn->prev->next = tn->next;
-				tn->next->prev = tn->prev;
-				lambdaMutex->unlock();
-
-				//free memory
-				//detach let's us call the destructor without problem
-				tn->th.detach();
-				delete tn;
-
-				//decide if we want to terminate connection
-				if (prRet != 0) {
-					Rain::shutdownSocketSend(*lambdaSocket);
-				}
-			});
-			cdParam.thLLMutex.unlock();
 
 			//reset request params
 			cdParam.request = "";
@@ -169,19 +127,11 @@ namespace Emilia {
 			Rain::tsCout("HTTP Client disconnected from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ". Total: ", --ccParam.connectedClients, ".", Rain::CRLF);
 			std::cout.flush();
 
-			//terminate all the threads associated with this connection
-			cdParam.thLLMutex.lock();
-			ConnectionDelegateParam::ThreadNode *cur = cdParam.thLLBegin.next;
-			while (cur != &cdParam.thLLEnd) {
-				CancelSynchronousIo(cur->th.native_handle());
-				cur = cur->next;
+			//terminate the threads associated with this connection
+			if (cdParam.prThread.get_id() != std::thread::id()) {
+				CancelSynchronousIo(cdParam.prThread.native_handle());
+				cdParam.prThread.join();
 			}
-			cur = cdParam.thLLBegin.next;
-			while (cur != &cdParam.thLLEnd) {
-				cur->th.join();
-				cur = cur->next;
-			}
-			cdParam.thLLMutex.unlock();
 
 			//free the delegate parameter
 			delete &cdParam;
