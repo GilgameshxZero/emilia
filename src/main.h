@@ -4,6 +4,7 @@
 
 #include "command-handler.h"
 
+#include "build-helper.h"
 #include "http-server.h"
 #include "smtp-server.h"
 #include "update-server.h"
