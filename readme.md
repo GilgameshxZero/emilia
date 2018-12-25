@@ -23,13 +23,15 @@ File types are specified in the config file of a server. `shared` files are thos
 
 Command | Action
 | - | - |
-exit | Exits the process, or, if connected to a remote update server, the remote process (which will also disconnect).
+exit | Exits the process.
 help | Lists all available commands.
 connect | Connect to remote update server. Not available if already connected to a remote server.
 disconnect | Disconnect from a remote connection.
 push | Overwrite the remote `shared` files with the local ones.
 push-exclusive | Overwrite the remote `exclusive` files with the local ones specific to the domain.
 pull | Overwrite local `exclusive` files specific to the domain with remote `exclusive` files.
-start | Starts the HTTP and SMTP servers.
-stop | Stops the HTTP and SMTP servers.
-restart | Restarts the HTTP and SMTP servers.
+sync | Runs `push`, then `push-exclusive`, then `pull` in series.
+start | Starts the HTTP and SMTP servers, or the remote HTTP and SMTP servers if connected.
+stop | Stops the HTTP and SMTP servers, or the remote HTTP and SMTP servers if connected.
+restart | Restarts the HTTP and SMTP servers, or the remote HTTP and SMTP servers if connected.
+restart-all | Restarts the application, or the remote application if connected.

@@ -244,6 +244,7 @@
     <ClInclude Include="..\src\http-server.h" />
     <ClInclude Include="..\src\main.h" />
     <ClInclude Include="..\src\rain-aeternum\algorithm-libraries.h" />
+    <ClInclude Include="..\src\rain-aeternum\condition-variable.h" />
     <ClInclude Include="..\src\rain-aeternum\gdi-plus-include.h" />
     <ClInclude Include="..\src\rain-aeternum\network-base.h" />
     <ClInclude Include="..\src\rain-aeternum\network-client-manager.h" />
@@ -280,6 +281,7 @@
     <ClCompile Include="..\src\http-server.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\rain-aeternum\algorithm-libraries.cpp" />
+    <ClCompile Include="..\src\rain-aeternum\condition-variable.cpp" />
     <ClCompile Include="..\src\rain-aeternum\network-base.cpp" />
     <ClCompile Include="..\src\rain-aeternum\network-client-manager.cpp" />
     <ClCompile Include="..\src\rain-aeternum\network-headed-managers.cpp" />

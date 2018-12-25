@@ -7,6 +7,7 @@
 #include "update-helper-param.h"
 
 #include <ShellAPI.h>
+#include <sys/utime.h>
 
 namespace Emilia {
 	namespace UpdateHelper {

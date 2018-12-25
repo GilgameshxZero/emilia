@@ -153,6 +153,9 @@
     <ClInclude Include="..\src\update-helper-param.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\rain-aeternum\condition-variable.h">
+      <Filter>rain-aeternum</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\http-server.cpp">
@@ -244,6 +247,9 @@
     </ClCompile>
     <ClCompile Include="..\src\scripts\update-mlist-subs.cpp">
       <Filter>scripts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\rain-aeternum\condition-variable.cpp">
+      <Filter>rain-aeternum</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

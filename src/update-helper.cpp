@@ -5,8 +5,6 @@ namespace Emilia {
 		int pullProc(std::string method, CommandHandlerParam &cmhParam, PullProcParam &pullPP, std::string &message, Rain::SocketManager &sm) {
 			std::map<std::string, std::string> &config = *cmhParam.config;
 
-			//parse message based on state of the request
-
 			//relative root for all files to be pushed
 			std::string root;
 			
@@ -40,10 +38,10 @@ namespace Emilia {
 				ss << message;
 
 				ss >> pullPP.cfiles;
-				std::vector<std::pair<FILETIME, std::string>> files;
+				std::vector<std::pair<time_t, std::string>> files;
 				for (int a = 0; a < pullPP.cfiles; a++) {
-					files.push_back(std::make_pair(FILETIME(), ""));
-					ss >> files.back().first.dwHighDateTime >> files.back().first.dwLowDateTime;
+					files.push_back(std::make_pair(time_t(), ""));
+					ss >> files.back().first;
 					std::getline(ss, files.back().second);
 					Rain::strTrimWhite(&files.back().second);
 				}
@@ -53,20 +51,15 @@ namespace Emilia {
 				//compare filelist with local hashes (last write time; not crc32) and see which ones need to be updated/deleted
 				Rain::tsCout(std::hex, std::setfill('0'));
 				for (int a = 0; a < files.size(); a++) {
-					FILETIME lastWrite;
-					HANDLE hFile;
-					//try to get last write time of the file; if it doesn't exist or if the remote time is more recent, request it
-					hFile = CreateFile((root + files[a].second).c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_ALWAYS, 0, NULL);
-					if (GetLastError() == ERROR_FILE_NOT_FOUND) {
-						lastWrite.dwHighDateTime = lastWrite.dwLowDateTime = 0;
+					time_t lastWrite;
+					if (!Rain::fileExists(root + files[a].second)) {
+						lastWrite = 0;
 					} else {
-						GetFileTime(hFile, NULL, NULL, &lastWrite);
-						CloseHandle(hFile);
+						lastWrite = Rain::getFileLastModifyTime(root + files[a].second);
 					}
-					Rain::tsCout(std::setw(8), lastWrite.dwHighDateTime, std::setw(8), lastWrite.dwLowDateTime, " ",
-						std::setw(8), files[a].first.dwHighDateTime, std::setw(8), files[a].first.dwLowDateTime, " ");
-					if (files[a].first.dwHighDateTime > lastWrite.dwHighDateTime ||
-						(files[a].first.dwHighDateTime == lastWrite.dwHighDateTime && files[a].first.dwLowDateTime > lastWrite.dwLowDateTime)) {
+					Rain::tsCout(std::setw(8), lastWrite, " ",
+						std::setw(8), files[a].first, " ");
+					if (files[a].first > lastWrite) {
 						pullPP.requested.push_back(files[a].second);
 						pullPP.requestedFiletimes.push_back(files[a].first);
 						Rain::tsCout("!");
@@ -85,6 +78,11 @@ namespace Emilia {
 					Rain::tsCout("Local is up-to-date. '", method, "' is unnecessary." + Rain::CRLF);
 					std::cout.flush();
 					Rain::sendHeadedMessage(sm, method + " 0");
+
+					//if we are the side pulling, unlock the command thread now that the command is done
+					if (method == "pull") {
+						cmhParam.chParam->connectedCommandCV.notify_one();
+					}
 				} else {
 					pullPP.cfiles = static_cast<int>(pullPP.requested.size());
 					Rain::tsCout(std::dec);
@@ -158,17 +156,15 @@ namespace Emilia {
 
 				//done with current file?
 				if (pullPP.curFileLenLeft == 0) {
+					struct _utimbuf ut;
+					ut.actime = ut.modtime = pullPP.requestedFiletimes[pullPP.curFile];
+
 					//modify the last write time of the current file to match that sent in the push header
-					HANDLE hFile;
 					if (pullPP.unwritable.find(pullPP.curFile) == pullPP.unwritable.end()) {
-						hFile = CreateFile((root + pullPP.requested[pullPP.curFile]).c_str(),
-							FILE_WRITE_ATTRIBUTES, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+						_utime((root + pullPP.requested[pullPP.curFile]).c_str(), &ut);
 					} else {
-						hFile = CreateFile((root + pullPP.requested[pullPP.curFile] + config["update-tmp-ext"]).c_str(),
-							FILE_WRITE_ATTRIBUTES, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+						_utime((root + pullPP.requested[pullPP.curFile] + config["update-tmp-ext"]).c_str(), &ut);
 					}
-					SetFileTime(hFile, NULL, NULL, &pullPP.requestedFiletimes[pullPP.curFile]);
-					CloseHandle(hFile);
 
 					//move on to next file
 					pullPP.curFile++;
@@ -204,13 +200,18 @@ namespace Emilia {
 					}
 
 					if (shouldRestart) {
-						std::string m = "Restarting remote to write to locked files..." + Rain::CRLF;
+						std::string m = "Restarting to write to locked files..." + Rain::CRLF;
 						response += m;
 						Rain::tsCout(m);
 					}
 
 					std::cout.flush();
 					Rain::sendHeadedMessage(sm, &response);
+
+					//if we are the side pulling, unlock the command thread now that the command is done
+					if (method == "pull") {
+						cmhParam.chParam->connectedCommandCV.notify_one();
+					}
 				}
 			}
 
@@ -268,8 +269,10 @@ namespace Emilia {
 					Rain::tsCout("Remote is up-to-date. No '", method, "' necessary." + Rain::CRLF);
 					std::cout.flush();
 
-					cmhParam.canAcceptCommand = true;
-					cmhParam.canAcceptCommandCV.notify_one();
+					//notify to the waiting command thread, only if we are the side pushing
+					if (method == "push" || method == "push-exclusive") {
+						cmhParam.chParam->connectedCommandCV.notify_one();
+					}
 				} else {
 					Rain::tsCout("Received ", pushPP.cfiles, " requested files in response to '", method, "' command. Sending file lengths..." + Rain::CRLF);
 					std::cout.flush();
@@ -335,11 +338,27 @@ namespace Emilia {
 				Rain::tsCout("Remote: ", message);
 				std::cout.flush();
 
+				//reset state
 				pushPP.state = "start";
 				pushPP.requested.clear();
 
-				cmhParam.canAcceptCommand = true;
-				cmhParam.canAcceptCommandCV.notify_one();
+				//if message contains "Restarting", then wait for reconnect and re-authenticate before marking command as complete
+				if (Rain::rabinKarpMatch(message, "Restarting") != -1) {
+					std::thread([cmhParam, method]() {
+						std::unique_lock<std::mutex> lck(cmhParam.chParam->authCV.getMutex());
+						cmhParam.chParam->authCV.wait(lck);
+						
+						//notify to the waiting command thread, only if we are the side pushing
+						if (method == "push" || method == "push-exclusive") {
+							cmhParam.chParam->connectedCommandCV.notify_one();
+						}
+					}).detach();
+				} else {
+					//notify to the waiting command thread, only if we are the side pushing
+					if (method == "push" || method == "push-exclusive") {
+						cmhParam.chParam->connectedCommandCV.notify_one();
+					}
+				}
 			}
 
 			return 0;
@@ -347,22 +366,19 @@ namespace Emilia {
 
 		std::string generatePushHeader(std::string root, std::vector<std::string> &files) {
 			//generate hashes (using last write time instead of crc32)
-			std::vector<FILETIME> hash(files.size());
+			std::vector<time_t> hash(files.size());
 			Rain::tsCout(std::hex, std::setfill('0'));
 			for (int a = 0; a < files.size(); a++) {
-				HANDLE hFile;
-				hFile = CreateFile((root + files[a]).c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-				GetFileTime(hFile, NULL, NULL, &hash[a]);
-				CloseHandle(hFile);
+				hash[a] = Rain::getFileLastModifyTime(root + files[a]);
 
-				Rain::tsCout(std::setw(8), hash[a].dwHighDateTime, std::setw(8), hash[a].dwLowDateTime, " ", files[a], Rain::CRLF);
+				Rain::tsCout(std::setw(8), hash[a], " ", files[a], Rain::CRLF);
 				std::cout.flush();
 			}
 			Rain::tsCout(std::dec);
 
 			std::string message = " " + Rain::tToStr(files.size()) + "\n";
 			for (int a = 0; a < files.size(); a++) {
-				message += Rain::tToStr(hash[a].dwHighDateTime) + " " + Rain::tToStr(hash[a].dwLowDateTime) + " " + files[a] + "\n";
+				message += Rain::tToStr(hash[a]) + " " + files[a] + "\n";
 			}
 
 			return message;

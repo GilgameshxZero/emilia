@@ -1,5 +1,14 @@
 # Changelog
 
+## 5.5.0
+
+* Block console input until commands are complete.
+* Implemented `sync` command.
+* Implemented `restart-all` command.
+* Created `ConditionVariable` in `Rain`, which safeguards against spurious wakeups.
+* Server will boot update connection if not authenticated within 5 seconds of connecting.
+* Last access time checking and settings is done using Unix functions, which are much faster.
+
 ## 5.4.4
 
 * Change to SMTP connect timeout in config to 5 seconds.
