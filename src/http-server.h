@@ -35,12 +35,27 @@ namespace Emilia {
 			//content length header content for POST requests; -1 if don't know yet
 			//also identifies the length of the body block
 			std::size_t contentLength;
+
+			//allow messages to be processed in a separate thread from recvThread & handlers
+			std::thread requestThread;
+
+			//event triggered once each time a new messages is added to the request string
+			HANDLE newMessageEvent;
+
+			//locked when newMessage or request is being changed
+			std::mutex requestModifyMutex;
+
+			//set when disconnect function begins
+			bool disconnectStarted = false;
 		};
 
 		//handlers for RecvThread
 		int onConnect(void *funcParam);
 		int onMessage(void *funcParam);
 		int onDisconnect(void *funcParam);
+
+		//thread which processes messages that comes in, parallel with the handlers & recvThread
+		int requestThreadFunc(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam);
 
 		//called by RecvThread handlers when a full message comes in
 		//header keys are all lowercase

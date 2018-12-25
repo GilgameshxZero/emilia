@@ -20,11 +20,13 @@ namespace Emilia {
 			cdParam->contentLength = -1;
 			cdParam->headerBlockLength = -1;
 
+			//thread to process messages in parallel
+			cdParam->newMessageEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+			cdParam->requestThread = std::thread(requestThreadFunc, std::ref(ssmdhParam));
+
 			return 0;
 		}
 		int onMessage(void *funcParam) {
-			static const std::string headerDelim = Rain::CRLF + Rain::CRLF;
-
 			Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam = *reinterpret_cast<Rain::ServerSocketManager::DelegateHandlerParam *>(funcParam);
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
@@ -32,101 +34,141 @@ namespace Emilia {
 			//accumulate messages until a complete request is found
 			//for now, only accept GET requests and non-chunked POST requests (those with a content-length header)
 			//of course, for POST requests, we will need to accumulate not just the header but also the body of the request
-			//onProcessMessage is also responsible for parsing the header before passing it on to processRequest
+			//onMessage is also responsible for parsing the header before passing it on to processRequest
+
+			//trigger the other thread while doing this
+			cdParam.requestModifyMutex.lock();
 			cdParam.request += *ssmdhParam.message;
+			cdParam.requestModifyMutex.unlock();
+			SetEvent(cdParam.newMessageEvent);
 
-			//if we don't know the requestMethod yet, attempt to calculate it now
-			if (cdParam.requestMethod == "") {
-				std::size_t firstSpace = cdParam.request.find(' ');
-
-				if (firstSpace != std::string::npos)  //if there's a space, then everything before that is the requestMethod
-					cdParam.requestMethod = cdParam.request.substr(0, firstSpace);
-			}
-
-			//determine whether the request is complete based on the requestMethod and the currently received request
-			if (cdParam.requestMethod == "") {  //still don't know the request method yet, so we should wait for more messages to come in
-				return 0;
-			} else if (cdParam.requestMethod == "GET") {                                       //GET requests complete when the last four characters are "\r\n\r\n"
-				if (cdParam.request.substr(cdParam.request.length() - 4, 4) == headerDelim) {  //get ready to process the request
-					cdParam.contentLength = 0;
-					cdParam.headerBlockLength = cdParam.request.length() - headerDelim.length();
-				} else  //if the last line isn't blank, keep on waiting for more messages
-					return 0;
-			} else if (cdParam.requestMethod == "POST") {  //identify the header block, find the 'content-length' header, and only process the request when the body is of the correct length
-				cdParam.headerBlockLength = Rain::rabinKarpMatch(cdParam.request, headerDelim);
-				if (cdParam.headerBlockLength == -1)  //still waiting on headers
-					return 0;
-
-				//if don't know contentLength yet from previous times we get here, try again to get it
-				if (cdParam.contentLength == -1) {
-					//a lot of these parameters are not used, but that's fine, since it's a one time cost
-					std::map<std::string, std::string> headers;
-					std::string headerBlock = cdParam.request.substr(0, cdParam.headerBlockLength);
-					std::stringstream ss;
-					std::string requestURI, httpVersion;
-
-					ss << headerBlock;
-					ss >> cdParam.requestMethod >> requestURI >> httpVersion;
-					parseHeaders(ss, headers);
-					cdParam.contentLength = Rain::strToT<unsigned long long>(headers["content-length"]);
-				}
-
-				//accumulate request until body is contentLength long
-				unsigned long long requestLength = cdParam.headerBlockLength + headerDelim.length() + cdParam.contentLength;
-				if (cdParam.request.length() < requestLength)
-					return 0;
-				else if (cdParam.request.length() > requestLength)  //for some reason, the request is longer than anticipated, so terminate the socket
-					return -1;
-			}
-
-			//at this point, we have a complete request and we know the size of the header block
-			//so, parse the header and log the request, then send it over to processRequest
-			std::map<std::string, std::string> headers;
-			std::string headerBlock = cdParam.request.substr(0, cdParam.headerBlockLength),
-				bodyBlock = cdParam.request.substr(cdParam.headerBlockLength + headerDelim.length(), cdParam.contentLength);  //the body is everything after the header deliminater
-			std::stringstream ss;
-			std::string requestURI, httpVersion;
-
-			ss << headerBlock;
-			ss >> cdParam.requestMethod >> requestURI >> httpVersion;
-			parseHeaders(ss, headers);
-
-			//send the parsed headers and bodyBlock and other parameters over to processRequest
-			int prRet = processRequest(*ssmdhParam.cSocket,
-									   *ccParam.config,
-									   cdParam.requestMethod,
-									   requestURI,
-									   httpVersion,
-									   headers,
-									   bodyBlock);
-
-			//log the request manually so that we don't log responses
-			Rain::tsCout(Rain::getClientNumIP(*ssmdhParam.cSocket), ": ", cdParam.requestMethod, " ", requestURI, Rain::CRLF);
-			std::cout.flush();
-			ccParam.logger->logString(&cdParam.request);
-
-			//if it decides to keep the connection open after this full request, then reset request-specific parameters for the recvThread
-			if (prRet == 0) {
-				cdParam.request = "";
-				cdParam.requestMethod = "";
-				cdParam.contentLength = -1;
-				cdParam.headerBlockLength = -1;
-			}
-
-			//< 0 is error, 0 is keep-alive, and > 0 is peacefully close
-			return prRet;
+			return 0;
 		}
 		int onDisconnect(void *funcParam) {
 			Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam = *reinterpret_cast<Rain::ServerSocketManager::DelegateHandlerParam *>(funcParam);
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
+
+			//join the message thread
+			cdParam.disconnectStarted = true;
+			SetEvent(cdParam.newMessageEvent);
+			CancelSynchronousIo(cdParam.requestThread.native_handle());
+			cdParam.requestThread.join();
+
+			//free the delegate parameter
+			delete &cdParam;
 
 			//logging
 			Rain::tsCout("HTTP Client disconnected from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ". Total: ", --ccParam.connectedClients, ".", Rain::CRLF);
 			std::cout.flush();
 
-			//free the delegate parameter
-			delete ssmdhParam.delegateParam;
+			return 0;
+		}
 
+		int requestThreadFunc(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam) {
+			static const std::string headerDelim = Rain::CRLF + Rain::CRLF;
+
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
+
+			while (true) {
+				//wait for new messages to be added to the request from onMessage
+				WaitForSingleObject(cdParam.newMessageEvent, INFINITE);
+
+				//check if socket disconnected; if so, terminate thread
+				if (cdParam.disconnectStarted) {
+					break;
+				}
+
+				//if we don't know the requestMethod yet, attempt to calculate it now
+				if (cdParam.requestMethod == "") {
+					std::size_t firstSpace = cdParam.request.find(' ');
+
+					if (firstSpace != std::string::npos)  //if there's a space, then everything before that is the requestMethod
+						cdParam.requestMethod = cdParam.request.substr(0, firstSpace);
+				}
+
+				//determine whether the request is complete based on the requestMethod and the currently received request
+				if (cdParam.requestMethod == "") {  //still don't know the request method yet, so we should wait for more messages to come in
+					continue;
+				} else if (cdParam.requestMethod == "GET") {                                       //GET requests complete when the last four characters are "\r\n\r\n"
+					if (cdParam.request.substr(cdParam.request.length() - 4, 4) == headerDelim) {  //get ready to process the request
+						cdParam.contentLength = 0;
+						cdParam.headerBlockLength = cdParam.request.length() - headerDelim.length();
+					} else  //if the last line isn't blank, keep on waiting for more messages
+						continue;
+				} else if (cdParam.requestMethod == "POST") {  //identify the header block, find the 'content-length' header, and only process the request when the body is of the correct length
+					cdParam.headerBlockLength = Rain::rabinKarpMatch(cdParam.request, headerDelim);
+					if (cdParam.headerBlockLength == -1)  //still waiting on headers
+						continue;
+
+					//if don't know contentLength yet from previous times we get here, try again to get it
+					if (cdParam.contentLength == -1) {
+						//a lot of these parameters are not used, but that's fine, since it's a one time cost
+						std::map<std::string, std::string> headers;
+						std::string headerBlock = cdParam.request.substr(0, cdParam.headerBlockLength);
+						std::stringstream ss;
+						std::string requestURI, httpVersion;
+
+						ss << headerBlock;
+						ss >> cdParam.requestMethod >> requestURI >> httpVersion;
+						parseHeaders(ss, headers);
+						cdParam.contentLength = Rain::strToT<unsigned long long>(headers["content-length"]);
+					}
+
+					//accumulate request until body is contentLength long
+					unsigned long long requestLength = cdParam.headerBlockLength + headerDelim.length() + cdParam.contentLength;
+					if (cdParam.request.length() < requestLength)
+						continue;
+					else if (cdParam.request.length() > requestLength) {//for some reason, the request is longer than anticipated, so terminate the socket
+						shutdown(*ssmdhParam.cSocket, SD_BOTH);
+						break;
+					}
+				}
+
+				//at this point, we have a complete request and we know the size of the header block
+				//so, parse the header and log the request, then send it over to processRequest
+				std::map<std::string, std::string> headers;
+				std::string headerBlock = cdParam.request.substr(0, cdParam.headerBlockLength),
+					bodyBlock = cdParam.request.substr(cdParam.headerBlockLength + headerDelim.length(), cdParam.contentLength);  //the body is everything after the header deliminater
+				std::stringstream ss;
+				std::string requestURI, httpVersion;
+
+				ss << headerBlock;
+				ss >> cdParam.requestMethod >> requestURI >> httpVersion;
+				parseHeaders(ss, headers);
+
+				//reset parameters
+				cdParam.requestModifyMutex.lock();
+				cdParam.request = "";
+				cdParam.requestModifyMutex.unlock();
+
+				//send the parsed headers and bodyBlock and other parameters over to processRequest
+				int prRet = processRequest(*ssmdhParam.cSocket,
+					*ccParam.config,
+					cdParam.requestMethod,
+					requestURI,
+					httpVersion,
+					headers,
+					bodyBlock);
+
+				//reset parameters
+				cdParam.requestMethod = "";
+				cdParam.contentLength = -1;
+				cdParam.headerBlockLength = -1;
+
+				//log the request manually so that we don't log responses
+				Rain::tsCout(Rain::getClientNumIP(*ssmdhParam.cSocket), ": ", cdParam.requestMethod, " ", requestURI, Rain::CRLF);
+				std::cout.flush();
+				ccParam.logger->logString(&cdParam.request);
+
+				//prRet: < 0 is error, 0 is keep-alive, and > 0 is peacefully close
+				if (prRet != 0) {
+					shutdown(*ssmdhParam.cSocket, SD_BOTH);
+					break;
+				}
+			}
+			
 			return 0;
 		}
 
@@ -137,7 +179,7 @@ namespace Emilia {
 						   std::string &httpVersion,
 						   std::map<std::string, std::string> &headers,
 						   std::string &bodyBlock) {
-			//a complete, partially parsed, request has come in; see onProcessMessage for the methods that we process and those that we don't
+			//a complete, partially parsed, request has come in; see onMessage for the methods that we process and those that we don't
 			//we can return 0 to keep socket open, and nonzero to close the socket
 
 			//only accept HTTP version 1.1
