@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.6.0
+
+* HTTP server now creates new threads to process requests.
+* On disconnect, HTTP server terminates all threads associated with a socket.
+* Added `wait-10-secs` script to text new functionality.
+
 ## 5.5.0
 
 * Block console input until commands are complete.
