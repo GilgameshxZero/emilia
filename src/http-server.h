@@ -23,12 +23,6 @@ namespace Emilia {
 		};
 
 		struct ConnectionDelegateParam {
-			//LL node for all threads which are handling requests for this connection
-			struct ThreadNode {
-				ThreadNode *prev, *next;
-				std::thread th;
-			};
-
 			//accumulated request from messages
 			std::string request;
 
@@ -42,9 +36,8 @@ namespace Emilia {
 			//also identifies the length of the body block
 			std::size_t contentLength;
 
-			//LL and mutex to manage threads associated with this connection
-			ThreadNode thLLBegin, thLLEnd;
-			std::mutex thLLMutex;
+			//thread for processing the request
+			std::thread prThread;
 		};
 
 		//handlers for RecvThread
