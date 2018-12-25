@@ -13,7 +13,7 @@ namespace Emilia {
 
 			int cfiles, curFile;
 			std::vector<std::string> requested;
-			std::vector<FILETIME> requestedFiletimes;
+			std::vector<time_t> requestedFiletimes;
 			std::vector<std::size_t> fileLen;
 			std::set<int> unwritable;
 			std::set<std::string> noRemove;

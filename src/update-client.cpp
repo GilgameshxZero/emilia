@@ -6,14 +6,13 @@ namespace Emilia {
 			Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam = *reinterpret_cast<Rain::ClientSocketManager::DelegateHandlerParam *>(funcParam);
 			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
 
+			//set up some state stuff with pushes and pulls
 			chParam.pushPP.state = "start";
 			chParam.pullPP.hrPushState = "start";
 
 			//authenticate automatically
 			Rain::tsCout("Connected with update server. Authenticating..." + Rain::CRLF);
 			std::cout.flush();
-			chParam.waitingRequests++;
-			ResetEvent(chParam.doneWaitingEvent);
 			Rain::sendHeadedMessage(*csmdhParam.csm, "authenticate " + chParam.authPass);
 
 			return 0;
@@ -63,34 +62,29 @@ namespace Emilia {
 			//clear request on exit
 			request = "";
 
-			//check if we need to trigger event
-			if (chParam.waitingRequests == 0)
-				SetEvent(chParam.doneWaitingEvent);
-
 			return handlerRet;
 		}
 
 		int HRAuthenticate(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam) {
 			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
 			std::string &request = *csmdhParam.message;
-			chParam.waitingRequests--;
-			chParam.lastSuccess = 0;
 			if (request == "success") {
 				Rain::tsCout("Authentication with update server successful." + Rain::CRLF);
 			} else if (request == "auth-done") {
 				Rain::tsCout("Already authenticated with update server." + Rain::CRLF);
 			} else if (request == "fail") {
 				Rain::tsCout("Error: Failed to authenticate with update server; disconnecting..." + Rain::CRLF);
-				chParam.lastSuccess = -1;
 				std::cout.flush();
 				return -1;
 			} else {
 				Rain::tsCout("Error: Unrecognized message from update server; disconnecting..." + Rain::CRLF);
-				chParam.lastSuccess = -1;
 				std::cout.flush();
 				return -1;
 			}
 			std::cout.flush();
+
+			chParam.authCV.notify_one();
+
 			return 0;
 		}
 		int HRPush(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam) {
@@ -109,13 +103,24 @@ namespace Emilia {
 			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
 			std::string &request = *csmdhParam.message;
 
-			Rain::tsCout("Remote: ", request);
+			Rain::tsCout("Remote response:", Rain::CRLF, request);
 			std::cout.flush();
+
+			//mark command complete
+			chParam.connectedCommandCV.notify_one();
 
 			return 0;
 		}
 		int HRStop(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam) {
-			//nothing reaches here
+			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
+			//we only get "complete messages
+
+			Rain::tsCout("Remote response:", Rain::CRLF, "HTTP & SMTP servers stopped.", Rain::CRLF);
+			std::cout.flush();
+
+			//mark command complete
+			chParam.connectedCommandCV.notify_one();
+
 			return 0;
 		}
 	}

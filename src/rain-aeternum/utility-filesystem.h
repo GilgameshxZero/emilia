@@ -93,8 +93,8 @@ namespace Rain {
 	void printToFile(std::string filename, std::string *output, bool append = false);
 	void printToFile(std::string filename, std::string output, bool append = false);
 
-	//file size in bytes
 	std::size_t getFileSize(std::string file);
+	time_t getFileLastModifyTime(std::string file);
 
 	//put the whole file into a string
 	//returns nothing, because copy constructor might be expensive

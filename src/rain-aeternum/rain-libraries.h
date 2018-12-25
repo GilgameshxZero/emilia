@@ -19,3 +19,4 @@ To use the libraries, all files in the Rain library directory must be added to t
 #include "algorithm-libraries.h"
 #include "network-libraries.h"
 #include "utility-libraries.h"
+#include "condition-variable.h"

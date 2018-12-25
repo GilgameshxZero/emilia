@@ -22,7 +22,9 @@ namespace Emilia {
 	int CHPush(CommandHandlerParam &cmhParam);
 	int CHPushExclusive(CommandHandlerParam &cmhParam);
 	int CHPull(CommandHandlerParam &cmhParam);
+	int CHSync(CommandHandlerParam &cmhParam);
 	int CHStart(CommandHandlerParam &cmhParam);
 	int CHStop(CommandHandlerParam &cmhParam);
 	int CHRestart(CommandHandlerParam &cmhParam);
+	int CHRestartAll(CommandHandlerParam &cmhParam);
 }

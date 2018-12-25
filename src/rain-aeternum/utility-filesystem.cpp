@@ -277,6 +277,11 @@ namespace Rain {
 		t.close();
 		return size;
 	}
+	time_t getFileLastModifyTime(std::string file) {
+		struct _stat buffer;
+		_stat(file.c_str(), &buffer);
+		return buffer.st_mtime;
+	}
 
 	void readFileToStr(std::string filePath, std::string &fileData) {
 		std::ifstream t(filePath, std::ios::binary);
