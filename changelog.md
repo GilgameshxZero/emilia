@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.6.2
+
+* Revert to 5.5.0 commit because of instability in 5.6.1.
+  * Reverts multithreaded HTTP server change.
+* Re-add `wait-10-secs` script.
+
 ## 5.6.1
 
 * Changed some lambda captures to pointers for speed.
@@ -8,7 +14,7 @@
 
 * HTTP server now creates new threads to process requests.
 * On disconnect, HTTP server terminates all threads associated with a socket.
-* Added `wait-10-secs` script to text new functionality.
+* Added `wait-10-secs` script to test new functionality.
 
 ## 5.5.0
 
