@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.6.1
+
+* Changed some lambda captures to pointers for speed.
+
 ## 5.6.0
 
 * HTTP server now creates new threads to process requests.
