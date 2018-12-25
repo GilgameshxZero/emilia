@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.6.3
+
+* HTTP server now creates an extra thread for each connection to process messages.
+  * This thread is able to be terminated by recvThread for fast connection closes.
+  * `wait-10-secs` works as expected now.
+
 ## 5.6.2
 
 * Revert to 5.5.0 commit because of instability in 5.6.1.

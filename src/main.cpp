@@ -178,4 +178,4 @@ namespace Emilia {
 		delete cerrRedirect.second;
 		return 0;
 	}
-}  // namespace Emilia
+}
