@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.6.4
+
+* Prints version string on startup.
+
 ## 5.6.3
 
 * HTTP server now creates an extra thread for each connection to process messages.

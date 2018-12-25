@@ -48,6 +48,8 @@ namespace Emilia {
 		logger.setStdHandleSrc(STD_OUTPUT_HANDLE, true);
 
 		//print parameters & command line
+		Rain::tsCout("Emilia, version ", getVersionStr(), Rain::CRLF, Rain::CRLF);
+
 		Rain::tsCout("Starting..." + Rain::CRLF + Rain::tToStr(config.size()), " configuration options:", Rain::CRLF);
 		for (std::map<std::string, std::string>::iterator it = config.begin(); it != config.end(); it++) {
 			Rain::tsCout("\t" + it->first + ": " + it->second + Rain::CRLF);
@@ -55,7 +57,7 @@ namespace Emilia {
 
 		Rain::tsCout(Rain::CRLF, "Command line arguments: ", Rain::tToStr(argc), Rain::CRLF);
 		for (int a = 0; a < argc; a++) {
-			Rain::tsCout(std::string(argv[a]) + Rain::CRLF);
+			Rain::tsCout("\t", std::string(argv[a]) + Rain::CRLF);
 		}
 		Rain::tsCout(Rain::CRLF);
 
