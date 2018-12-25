@@ -23,6 +23,12 @@ namespace Emilia {
 		};
 
 		struct ConnectionDelegateParam {
+			//LL node for all threads which are handling requests for this connection
+			struct ThreadNode {
+				ThreadNode *prev, *next;
+				std::thread th;
+			};
+
 			//accumulated request from messages
 			std::string request;
 
@@ -35,6 +41,10 @@ namespace Emilia {
 			//content length header content for POST requests; -1 if don't know yet
 			//also identifies the length of the body block
 			std::size_t contentLength;
+
+			//LL and mutex to manage threads associated with this connection
+			ThreadNode thLLBegin, thLLEnd;
+			std::mutex thLLMutex;
 		};
 
 		//handlers for RecvThread
@@ -44,13 +54,14 @@ namespace Emilia {
 
 		//called by RecvThread handlers when a full message comes in
 		//header keys are all lowercase
-		int processRequest(SOCKET &cSocket,
-						   std::map<std::string, std::string> &config,
-						   std::string &requestMethod,
-						   std::string &requestURI,
-						   std::string &httpVersion,
-						   std::map<std::string, std::string> &headers,
-						   std::string &bodyBlock);
+		//returns non-zero to close connection
+		int processRequest(SOCKET *cSocketPtr,
+			std::map<std::string, std::string> *configPtr,
+			const std::string &requestMethod,
+			const std::string &requestURI,
+			const std::string &httpVersion,
+			const std::map<std::string, std::string> &headers,
+			const std::string &bodyBlock);
 
 		//helper function to parse a header block in a SS
 		void parseHeaders(std::stringstream &headerStream, std::map<std::string, std::string> &headers);
