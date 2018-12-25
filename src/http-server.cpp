@@ -14,6 +14,14 @@ namespace Emilia {
 			ConnectionDelegateParam *cdParam = new ConnectionDelegateParam();
 			ssmdhParam.delegateParam = reinterpret_cast<void *>(cdParam);
 
+			//initialize things in the delegate parameter
+			cdParam->thLLMutex.lock();
+			cdParam->thLLBegin.prev = NULL;
+			cdParam->thLLBegin.next = &cdParam->thLLEnd;
+			cdParam->thLLEnd.prev = &cdParam->thLLBegin;
+			cdParam->thLLEnd.next = NULL;
+			cdParam->thLLMutex.unlock();
+
 			//delay all possible initialization of rtParam to here
 			cdParam->request = "";
 			cdParam->requestMethod = "";
@@ -91,52 +99,106 @@ namespace Emilia {
 			ss >> cdParam.requestMethod >> requestURI >> httpVersion;
 			parseHeaders(ss, headers);
 
-			//send the parsed headers and bodyBlock and other parameters over to processRequest
-			int prRet = processRequest(*ssmdhParam.cSocket,
-									   *ccParam.config,
-									   cdParam.requestMethod,
-									   requestURI,
-									   httpVersion,
-									   headers,
-									   bodyBlock);
-
 			//log the request manually so that we don't log responses
-			Rain::tsCout(Rain::getClientNumIP(*ssmdhParam.cSocket), ": ", cdParam.requestMethod, " ", requestURI, Rain::CRLF);
+			Rain::tsCout("HTTP ", Rain::getClientNumIP(*ssmdhParam.cSocket), ": ", cdParam.requestMethod, " ", requestURI, Rain::CRLF);
 			std::cout.flush();
 			ccParam.logger->logString(&cdParam.request);
 
-			//if it decides to keep the connection open after this full request, then reset request-specific parameters for the recvThread
-			if (prRet == 0) {
-				cdParam.request = "";
-				cdParam.requestMethod = "";
-				cdParam.contentLength = -1;
-				cdParam.headerBlockLength = -1;
-			}
+			//create thread to process the request
+			cdParam.thLLMutex.lock();
+			ConnectionDelegateParam::ThreadNode *tn = new ConnectionDelegateParam::ThreadNode();
+			cdParam.thLLEnd.prev->next = tn;
+			tn->prev = cdParam.thLLEnd.prev;
+			tn->next = &cdParam.thLLEnd;
+			cdParam.thLLEnd.prev = tn;
+			//lambda captures by copy
+			SOCKET *lambdaSocket = ssmdhParam.cSocket;
+			std::map<std::string, std::string> *lambdaConfig = ccParam.config;
+			std::string lambdaRequestMethod = cdParam.requestMethod;
+			std::mutex *lambdaMutex = &cdParam.thLLMutex;
+			tn->th = std::thread([lambdaMutex,
+				tn,
+				lambdaSocket,
+				lambdaConfig,
+				lambdaRequestMethod,
+				requestURI,
+				httpVersion,
+				headers,
+				bodyBlock]() {
+				//send the parsed headers and bodyBlock and other parameters over to processRequest
+				int prRet = processRequest(lambdaSocket,
+					lambdaConfig,
+					lambdaRequestMethod,
+					requestURI,
+					httpVersion,
+					headers,
+					bodyBlock);
 
-			//< 0 is error, 0 is keep-alive, and > 0 is peacefully close
-			return prRet;
+				//remove thread from LL
+				lambdaMutex->lock();
+				tn->prev->next = tn->next;
+				tn->next->prev = tn->prev;
+				lambdaMutex->unlock();
+
+				//free memory
+				//detach let's us call the destructor without problem
+				tn->th.detach();
+				delete tn;
+
+				//decide if we want to terminate connection
+				if (prRet != 0) {
+					Rain::shutdownSocketSend(*lambdaSocket);
+				}
+			});
+			cdParam.thLLMutex.unlock();
+
+			//reset request params
+			cdParam.request = "";
+			cdParam.requestMethod = "";
+			cdParam.contentLength = -1;
+			cdParam.headerBlockLength = -1;
+
+			return 0;
 		}
 		int onDisconnect(void *funcParam) {
 			Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam = *reinterpret_cast<Rain::ServerSocketManager::DelegateHandlerParam *>(funcParam);
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 
 			//logging
 			Rain::tsCout("HTTP Client disconnected from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ". Total: ", --ccParam.connectedClients, ".", Rain::CRLF);
 			std::cout.flush();
 
+			//terminate all the threads associated with this connection
+			cdParam.thLLMutex.lock();
+			ConnectionDelegateParam::ThreadNode *cur = cdParam.thLLBegin.next;
+			while (cur != &cdParam.thLLEnd) {
+				CancelSynchronousIo(cur->th.native_handle());
+				cur = cur->next;
+			}
+			cur = cdParam.thLLBegin.next;
+			while (cur != &cdParam.thLLEnd) {
+				cur->th.join();
+				cur = cur->next;
+			}
+			cdParam.thLLMutex.unlock();
+
 			//free the delegate parameter
-			delete ssmdhParam.delegateParam;
+			delete &cdParam;
 
 			return 0;
 		}
 
-		int processRequest(SOCKET &cSocket,
-						   std::map<std::string, std::string> &config,
-						   std::string &requestMethod,
-						   std::string &requestURI,
-						   std::string &httpVersion,
-						   std::map<std::string, std::string> &headers,
-						   std::string &bodyBlock) {
+		int processRequest(SOCKET *cSocketPtr,
+			std::map<std::string, std::string> *configPtr,
+			const std::string &requestMethod,
+			const std::string &requestURI,
+			const std::string &httpVersion,
+			const std::map<std::string, std::string> &headers,
+			const std::string &bodyBlock) {
+			SOCKET &cSocket = *cSocketPtr;
+			std::map<std::string, std::string> &config = *configPtr;
+
 			//a complete, partially parsed, request has come in; see onProcessMessage for the methods that we process and those that we don't
 			//we can return 0 to keep socket open, and nonzero to close the socket
 
@@ -235,7 +297,7 @@ namespace Emilia {
 			//ensures that the server will not serve outside its root directory unless a cgi script is specified
 			if (!Rain::fileExists(requestFilePath) ||
 				(!Rain::isSubPath(config["http-server-root"], requestFilePathAbs) &&
-				 cgiScripts.find(requestFilePathAbs) == cgiScripts.end())) {
+					cgiScripts.find(requestFilePathAbs) == cgiScripts.end())) {
 				responseStatus = "HTTP/1.1 404 Not Found";
 				responseBody = notFound404HTML;
 				responseHeaders["content-length"] = Rain::tToStr(responseBody.length());
@@ -256,7 +318,7 @@ namespace Emilia {
 				std::string envBlock;
 				envBlock += "QUERY_STRING=" + requestQuery;
 				envBlock.push_back('\0');
-				std::map<std::string, std::string>::iterator iterator = headers.find("referer");
+				std::map<std::string, std::string>::const_iterator iterator = headers.find("referer");
 				if (iterator != headers.end()) {
 					envBlock += "HTTP_REFERER=" + iterator->second;
 					envBlock.push_back('\0');
@@ -271,7 +333,7 @@ namespace Emilia {
 					envBlock += "HTTP_HOST=" + iterator->second;
 					envBlock.push_back('\0');
 				}
-				
+
 				//also, store some other useful information as environment variables
 				envBlock += "CLIENT_IP=" + Rain::getClientNumIP(cSocket);
 				envBlock.push_back('\0');
@@ -373,7 +435,8 @@ namespace Emilia {
 						DWORD error = GetLastError();
 						if (error == ERROR_BROKEN_PIPE)  //the pipe broke because the process has shut it down, this is okay
 							break;
-						else {  //actually bad, terminate process
+						else {  //ERROR_OPERATION_ABORTED is alright; it means that the connection closed while the script is executing, in which case we want to terminate the script and exit this thread
+							//otherwise, something went wrong, and we want to terminate anyway
 							TerminateProcess(pinfo.hProcess, 0);
 							Rain::reportError(error, "something went wrong with ReadFile");
 							break;
@@ -455,7 +518,7 @@ namespace Emilia {
 			}
 
 			//depending on the "connection" header, close or keep open the socket
-			if (Rain::strToLower(headers["connection"]) == "keep-alive")
+			if (Rain::strToLower(headers.find("connection")->second) == "keep-alive")
 				return 0;
 			else
 				return 1;
