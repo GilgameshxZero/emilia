@@ -51,38 +51,26 @@ namespace Emilia {
 		cmhParam.chParam->cmhParam = &cmhParam;
 		cmhParam.chParam->config = cmhParam.config;
 		cmhParam.chParam->authPass = pass;
-		cmhParam.chParam->doneWaitingEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-		ResetEvent(cmhParam.chParam->doneWaitingEvent);
 		cmhParam.remoteCSM->setEventHandlers(UpdateClient::onConnect, UpdateClient::onMessage, UpdateClient::onDisconnect, cmhParam.chParam);
 		cmhParam.remoteCSM->setClientTarget(remoteAddr, updateServerPort, updateServerPort);
-		cmhParam.remoteCSM->blockForConnect(10000);
+		cmhParam.remoteCSM->blockForConnect(5000);
 
 		int status = cmhParam.remoteCSM->getSocketStatus();
-		if (status == 0) {
-			Rain::tsCout("Connected successfully!", Rain::CRLF);
-		} else if (status == 1) {
+		if (status == 1) {
 			Rain::tsCout("Error: Connection timeout.", Rain::CRLF);
 			delete cmhParam.remoteCSM;
 			cmhParam.remoteCSM = NULL;
 			return 0;
-		} else {
-			Rain::tsCout("Error: Disconnected.", Rain::CRLF);
+		} else if (status != 0) {
+			Rain::tsCout("Error: Could not connect.", Rain::CRLF);
 			delete cmhParam.remoteCSM;
 			cmhParam.remoteCSM = NULL;
 			return 0;
-		}
+		} //if status == 0 then we have connected successfully
 
-		//wait for response, then see if we are still connected
-		WaitForSingleObject(cmhParam.chParam->doneWaitingEvent, 30000);
-		if (cmhParam.chParam->lastSuccess != 0) {
-			cmhParam.remoteCSM->setEventHandlers(NULL, NULL, NULL, NULL);
-			cmhParam.remoteCSM->setClientTarget("", 0, 0);
-			cmhParam.remoteCSM->blockForConnect();
-			delete cmhParam.remoteCSM;
-			cmhParam.remoteCSM = NULL;
-			Rain::tsCout("Update client is disconnected.", Rain::CRLF);
-			return 0;
-		}
+		//wait for authentication response
+		std::unique_lock<std::mutex> lck(cmhParam.chParam->authCV.getMutex());
+		cmhParam.chParam->authCV.wait(lck);
 
 		return 0;
 	}
@@ -117,7 +105,9 @@ namespace Emilia {
 		Rain::tsCout("Sending over 'push' request with hashes...", Rain::CRLF);
 		std::cout.flush();
 
-		cmhParam.canAcceptCommand = false;
+		//wait until the command is complete before accepting more commands
+		std::unique_lock<std::mutex> lck(cmhParam.chParam->connectedCommandCV.getMutex());
+		cmhParam.chParam->connectedCommandCV.wait(lck);
 
 		return 0;
 	}
@@ -150,7 +140,9 @@ namespace Emilia {
 		Rain::tsCout("Sending over 'push-exclusive' request with hashes...", Rain::CRLF);
 		std::cout.flush();
 
-		cmhParam.canAcceptCommand = false;
+		//wait until the command is complete before accepting more commands
+		std::unique_lock<std::mutex> lck(cmhParam.chParam->connectedCommandCV.getMutex());
+		cmhParam.chParam->connectedCommandCV.wait(lck);
 
 		return 0;
 	}
@@ -166,6 +158,16 @@ namespace Emilia {
 		Rain::tsCout("Sending `pull` request...", Rain::CRLF);
 		std::cout.flush();
 
+		//wait for command to finish
+		std::unique_lock<std::mutex> lck(cmhParam.chParam->connectedCommandCV.getMutex());
+		cmhParam.chParam->connectedCommandCV.wait(lck);
+
+		return 0;
+	}
+	int CHSync(CommandHandlerParam &cmhParam) {
+		CHPush(cmhParam);
+		CHPushExclusive(cmhParam);
+		CHPull(cmhParam);
 		return 0;
 	}
 	int CHStart(CommandHandlerParam &cmhParam) {
@@ -182,8 +184,13 @@ namespace Emilia {
 				DWORD error = GetLastError();
 				Rain::errorAndCout(error, "Error: could not setup SMTP server listening.");
 			}
+			std::cout.flush();
 		} else {
 			Rain::sendHeadedMessage(*cmhParam.remoteCSM, "start");
+
+			//wait for command to finish
+			std::unique_lock<std::mutex> lck(cmhParam.chParam->connectedCommandCV.getMutex());
+			cmhParam.chParam->connectedCommandCV.wait(lck);
 		}
 		return 0;
 	}
@@ -191,14 +198,42 @@ namespace Emilia {
 		if (cmhParam.remoteCSM == NULL) {
 			cmhParam.httpSM->setServerListen(0, 0);
 			cmhParam.smtpSM->setServerListen(0, 0);
+			Rain::tsCout("HTTP & SMTP servers stopped.", Rain::CRLF);
+			std::cout.flush();
 		} else {
 			Rain::sendHeadedMessage(*cmhParam.remoteCSM, "stop");
+
+			//wait for command to finish
+			std::unique_lock<std::mutex> lck(cmhParam.chParam->connectedCommandCV.getMutex());
+			cmhParam.chParam->connectedCommandCV.wait(lck);
 		}
 		return 0;
 	}
 	int CHRestart(CommandHandlerParam &cmhParam) {
 		CHStop(cmhParam);
 		CHStart(cmhParam);
+		return 0;
+	}
+	int CHRestartAll(CommandHandlerParam &cmhParam) {
+		std::map<std::string, std::string> &config = *cmhParam.config;
+
+		if (cmhParam.remoteCSM == NULL) {
+			std::string updateScript = Rain::pathToAbsolute(config["update-root"] + config["update-script"]),
+				serverPath = "\"" + Rain::pathToAbsolute(Rain::getExePath()) + "\"";
+			ShellExecute(NULL, "open", updateScript.c_str(),
+				(serverPath + " " + serverPath).c_str(),
+				Rain::getPathDir(updateScript).c_str(), SW_SHOWDEFAULT);
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+			exit(1);
+		} else {
+			Rain::sendHeadedMessage(*cmhParam.remoteCSM, "restart-all");
+
+			//wait for re-authenticate
+			std::unique_lock<std::mutex> lck(cmhParam.chParam->authCV.getMutex());
+			cmhParam.chParam->authCV.wait(lck);
+		}
+
 		return 0;
 	}
 }

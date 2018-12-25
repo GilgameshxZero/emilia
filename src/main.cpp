@@ -145,16 +145,14 @@ namespace Emilia {
 			{"push", CHPush},
 			{"push-exclusive", CHPushExclusive},
 			{"pull", CHPull},
+			{"sync", CHSync},
 			{"start", CHStart},
 			{"stop", CHStop},
-			{"restart", CHRestart}
+			{"restart", CHRestart},
+			{"restart-all", CHRestartAll}
 		};
-		cmhParam.canAcceptCommand = true;
 		while (true) {
 			std::string command, tmp;
-			while (!cmhParam.canAcceptCommand) {
-				cmhParam.canAcceptCommandCV.wait(lc);
-			}
 			Rain::tsCout("Accepting commands...", Rain::CRLF);
 			std::cout.flush();
 
