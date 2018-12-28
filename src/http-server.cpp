@@ -138,6 +138,11 @@ namespace Emilia {
 				ss >> cdParam.requestMethod >> requestURI >> httpVersion;
 				parseHeaders(ss, headers);
 
+				//log the request manually so that we don't log responses
+				Rain::tsCout(Rain::getClientNumIP(*ssmdhParam.cSocket), ": ", cdParam.requestMethod, " ", requestURI, Rain::CRLF);
+				std::cout.flush();
+				ccParam.logger->logString(&cdParam.request);
+
 				//reset parameters
 				cdParam.requestModifyMutex.lock();
 				cdParam.request = "";
@@ -156,11 +161,6 @@ namespace Emilia {
 				cdParam.requestMethod = "";
 				cdParam.contentLength = -1;
 				cdParam.headerBlockLength = -1;
-
-				//log the request manually so that we don't log responses
-				Rain::tsCout(Rain::getClientNumIP(*ssmdhParam.cSocket), ": ", cdParam.requestMethod, " ", requestURI, Rain::CRLF);
-				std::cout.flush();
-				ccParam.logger->logString(&cdParam.request);
 
 				//prRet: < 0 is error, 0 is keep-alive, and > 0 is peacefully close
 				if (prRet != 0) {
