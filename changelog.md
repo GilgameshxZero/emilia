@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.6.5
+
+* Bugfix: Logging in the HTTP server now logs requests as intended.
+* Added new script `prototype-stream-random`.
+
 ## 5.6.4
 
 * Prints version string on startup.
