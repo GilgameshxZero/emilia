@@ -90,7 +90,9 @@ namespace Emilia {
 		cgiScriptsConfigIn.close();
 
 		httpCCP.customHeaders = Rain::readParameterFile(config["config-path"] + config["http-custom-headers"]);
-		httpCCP.customHeaders["server"] += " (version " + getVersionStr() + ")";
+		if (httpCCP.customHeaders.find("server-version") != httpCCP.customHeaders.end()) {
+			httpCCP.customHeaders["server-version"] = getVersionStr();
+		}
 
 		if (Rain::fileExists(config["config-path"] + config["http-404"])) {
 			Rain::readFileToStr(config["config-path"] + config["http-404"], httpCCP.notFound404HTML);
