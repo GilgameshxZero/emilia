@@ -268,6 +268,11 @@ namespace Emilia {
 					envBlock += "HTTP_HOST=" + iterator->second;
 					envBlock.push_back('\0');
 				}
+				iterator = headers.find("range");
+				if (iterator != headers.end()) {
+					envBlock += "HTTP_RANGE=" + iterator->second;
+					envBlock.push_back('\0');
+				}
 				
 				//also, store some other useful information as environment variables
 				envBlock += "CLIENT_IP=" + Rain::getClientNumIP(cSocket);
@@ -419,12 +424,25 @@ namespace Emilia {
 				responseStatus = "HTTP/1.1 200 OK";
 				responseHeaders["content-type"] = contentType + ";charset=UTF-8";
 
-				//get file length
-				std::ifstream fileIn(requestFilePath, std::ios_base::binary);
-				std::streampos fileBeg = fileIn.tellg();
-				fileIn.seekg(0, fileIn.end);
-				responseHeaders["content-length"] = Rain::tToStr(fileIn.tellg() - fileBeg);
-				fileIn.seekg(0, fileIn.beg);
+				//get file length and set headers
+				std::size_t fileSize = Rain::getFileSize(requestFilePath),
+					fileBegin = 0,
+					fileEnd = fileSize - 1;
+
+				//make sure to parse range requests (only single range for now)
+				if (headers.find("range") != headers.end()) {
+					std::string range = headers["range"].substr(headers["range"].find("=") + 1);
+					std::size_t rangeDelim = range.find("-");
+					fileBegin = Rain::strToT<std::size_t>(range.substr(0, rangeDelim));
+					if (rangeDelim != range.length() - 1) {
+						fileEnd = Rain::strToT<std::size_t>(range.substr(rangeDelim + 1));
+					}
+				}
+
+				responseHeaders["content-length"] = Rain::tToStr(fileEnd - fileBegin + 1);
+				if (responseHeaders.find("content-range") != responseHeaders.end()) {
+					responseHeaders["content-range"] = "bytes " + Rain::tToStr(fileBegin) + "-" + Rain::tToStr(fileEnd) + "/" + Rain::tToStr(fileSize);
+				}
 
 				//send what we know
 				std::string response = responseStatus + Rain::CRLF;
@@ -437,10 +455,12 @@ namespace Emilia {
 				}
 
 				//send file buffered
+				std::ifstream fileIn(requestFilePath, std::ios_base::binary);
+				fileIn.seekg(fileIn.beg + fileBegin);
 				std::size_t fileLen = Rain::strToT<std::size_t>(responseHeaders["content-length"]),
 					actualRead;
-				for (std::size_t a = 0; a < fileLen; a += cdParam.fileBufLen) {
-					actualRead = min(cdParam.fileBufLen, fileLen - a);
+				for (std::size_t a = fileBegin; a <= fileEnd; a += cdParam.fileBufLen) {
+					actualRead = min(cdParam.fileBufLen, fileEnd + 1 - a);
 					fileIn.read(cdParam.buffer, actualRead);
 					if (!Rain::sendRawMessage(cSocket, cdParam.buffer, static_cast<int>(actualRead))) {
 						Rain::errorAndCout(GetLastError(), "error while sending response to client; response segment: " + std::string(cdParam.buffer, actualRead));

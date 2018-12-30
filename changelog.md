@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.7.0
+
+* Added preliminary support for `range` headers in the HTTP server.
+* Headers in the specification can be empty; the server will fill them in automatically.
+
 ## 5.6.6
 
 * Added content-type header specs and range header.
