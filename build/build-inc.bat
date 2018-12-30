@@ -17,4 +17,3 @@ for /F "tokens=*" %%R in (%filename%) do (
 )
 del "%filename%"
 ren "%filename%.temp" "%filename%"
-

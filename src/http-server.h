@@ -20,6 +20,12 @@ namespace Emilia {
 
 			//total number of connected clients
 			int connectedClients;
+
+			//more config
+			std::set<std::string> cgiScripts;
+			std::map<std::string, std::string> customHeaders;
+			std::string notFound404HTML;
+			std::map<std::string, std::string> contentTypeSpec;
 		};
 
 		struct ConnectionDelegateParam {
@@ -47,6 +53,10 @@ namespace Emilia {
 
 			//set when disconnect function begins
 			bool disconnectStarted = false;
+
+			//buffer for sending anything
+			std::size_t fileBufLen;
+			char *buffer;
 		};
 
 		//handlers for RecvThread
@@ -59,9 +69,7 @@ namespace Emilia {
 
 		//called by RecvThread handlers when a full message comes in
 		//header keys are all lowercase
-		int processRequest(SOCKET &cSocket,
-						   std::map<std::string, std::string> &config,
-						   std::string &requestMethod,
+		int processRequest(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam,
 						   std::string &requestURI,
 						   std::string &httpVersion,
 						   std::map<std::string, std::string> &headers,

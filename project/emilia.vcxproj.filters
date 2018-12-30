@@ -254,7 +254,7 @@
     <ClCompile Include="..\src\scripts\wait-10-secs.cpp">
       <Filter>scripts</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\scripts\prototype-stream-order.cpp">
+    <ClCompile Include="..\src\scripts\prototype-stream-random.cpp">
       <Filter>scripts</Filter>
     </ClCompile>
   </ItemGroup>

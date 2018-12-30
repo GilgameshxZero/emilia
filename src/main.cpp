@@ -78,6 +78,26 @@ namespace Emilia {
 		httpCCP.logger = &logger;
 		httpCCP.connectedClients = 0;
 
+		std::ifstream cgiScriptsConfigIn(config["config-path"] + config["http-cgi-scripts"], std::ios::binary);
+		while (cgiScriptsConfigIn.good()) {
+			static std::string line;
+			std::getline(cgiScriptsConfigIn, line);
+			Rain::strTrimWhite(&line);
+			if (line.length() > 0)
+				//transform the cgi script paths into absolute paths
+				httpCCP.cgiScripts.insert(Rain::pathToAbsolute(config["http-server-root"] + line));
+		}
+		cgiScriptsConfigIn.close();
+
+		httpCCP.customHeaders = Rain::readParameterFile(config["config-path"] + config["http-custom-headers"]);
+		httpCCP.customHeaders["server"] += " (version " + getVersionStr() + ")";
+
+		if (Rain::fileExists(config["config-path"] + config["http-404"])) {
+			Rain::readFileToStr(config["config-path"] + config["http-404"], httpCCP.notFound404HTML);
+		}
+
+		httpCCP.contentTypeSpec = Rain::readParameterFile(config["config-path"] + config["http-content-type"]);
+
 		Rain::ServerManager httpSM;
 		httpSM.setEventHandlers(HTTPServer::onConnect, HTTPServer::onMessage, HTTPServer::onDisconnect, &httpCCP);
 		httpSM.setRecvBufLen(Rain::strToT<std::size_t>(config["http-transfer-buffer"]));

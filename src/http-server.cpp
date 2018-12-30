@@ -24,6 +24,10 @@ namespace Emilia {
 			cdParam->newMessageEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 			cdParam->requestThread = std::thread(requestThreadFunc, std::ref(ssmdhParam));
 
+			//other things
+			cdParam->fileBufLen = Rain::strToT<std::size_t>((*ccParam.config)["http-transfer-buffer"]);
+			cdParam->buffer = new char[cdParam->fileBufLen];
+
 			return 0;
 		}
 		int onMessage(void *funcParam) {
@@ -56,6 +60,7 @@ namespace Emilia {
 			cdParam.requestThread.join();
 
 			//free the delegate parameter
+			delete cdParam.buffer;
 			delete &cdParam;
 
 			//logging
@@ -149,9 +154,7 @@ namespace Emilia {
 				cdParam.requestModifyMutex.unlock();
 
 				//send the parsed headers and bodyBlock and other parameters over to processRequest
-				int prRet = processRequest(*ssmdhParam.cSocket,
-					*ccParam.config,
-					cdParam.requestMethod,
+				int prRet = processRequest(ssmdhParam,
 					requestURI,
 					httpVersion,
 					headers,
@@ -172,114 +175,66 @@ namespace Emilia {
 			return 0;
 		}
 
-		int processRequest(SOCKET &cSocket,
-						   std::map<std::string, std::string> &config,
-						   std::string &requestMethod,
+		int processRequest(Rain::ServerSocketManager::DelegateHandlerParam 
+			&ssmdhParam,
 						   std::string &requestURI,
 						   std::string &httpVersion,
 						   std::map<std::string, std::string> &headers,
 						   std::string &bodyBlock) {
 			//a complete, partially parsed, request has come in; see onMessage for the methods that we process and those that we don't
 			//we can return 0 to keep socket open, and nonzero to close the socket
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
+			std::map<std::string, std::string> &config = *ccParam.config;
+			SOCKET &cSocket = *ssmdhParam.cSocket;
 
 			//only accept HTTP version 1.1
 			if (httpVersion != "HTTP/1.1")
-				return -1;
+				return 1;
 
 			//decompose the requestURI
 			std::size_t questionMarkPos = requestURI.find("?"),
 				hashtagPos = requestURI.find("#");
 			std::string requestFilePath = requestURI.substr(0, questionMarkPos),
-				requestQuery = "",
-				requestFragment = "";
+				requestQuery = "";
 			if (questionMarkPos != std::string::npos)
-				requestQuery = requestURI.substr(questionMarkPos + 1, hashtagPos);
-			if (hashtagPos != std::string::npos)
-				requestFragment = requestURI.substr(hashtagPos + 1, std::string::npos);
+				requestQuery = requestURI.substr(questionMarkPos + 1, hashtagPos);;
 
 			//parse the URIs
-			if (requestFilePath[0] == '/')  //relative filepaths should not begin with a slash
-				requestFilePath = requestFilePath.substr(1, std::string::npos);
 			requestFilePath = Rain::strDecodeURL(requestFilePath);
-			for (int a = 0; a < requestFilePath.size(); a++)
-				if (requestFilePath[a] == '/')
-					requestFilePath[a] = '\\';
+			std::replace(requestFilePath.begin(), requestFilePath.end(), '/', '\\');
 
 			//decompose requestFilePath and check if we need to substitute a default file
-			std::string requestFile = requestFilePath.substr(requestFilePath.rfind("\\") + 1, std::string::npos),
-				requestFileDir = requestFilePath.substr(0, requestFilePath.length() - requestFile.length());
+			std::string requestFile = Rain::getPathFile(requestFilePath),
+				requestFileDir = Rain::getPathDir(requestFilePath);
 			if (requestFile.length() == 0)
 				requestFile = config["http-default-index"];
 
 			//compose the final path
 			requestFileDir = Rain::pathToAbsolute(Rain::getWorkingDirectory() + config["http-server-root"] + requestFileDir);
 			requestFilePath = Rain::pathToAbsolute(requestFileDir + requestFile);
-			//recompose the combined filepath; it is now absolute path
-			std::string requestFilePathAbs = requestFileDir + requestFile;
 
-			//make sure cgi scripts are parsed
-			static bool cgiScriptsParsed = false;
-			static std::set<std::string> cgiScripts;
-			if (!cgiScriptsParsed) {
-				//if this is the first time we're here, we also need to read the cgiScripts config file and get a list of all the cgiScripts
-				std::ifstream cgiScriptsConfigIn(config["config-path"] + config["http-cgi-scripts"], std::ios::binary);
-				while (cgiScriptsConfigIn.good()) {
-					static std::string line;
-					std::getline(cgiScriptsConfigIn, line);
-					Rain::strTrimWhite(&line);
-					if (line.length() > 0)
-						//transform the cgi script paths into absolute paths
-						cgiScripts.insert(Rain::pathToAbsolute(config["http-server-root"] + line));
-				}
-				cgiScriptsConfigIn.close();
-				cgiScriptsParsed = true;
-			}
-
-			//we are a cgi script if the current requestFilePathAbs has any of the cgiScript strings as a substring
+			//we are a cgi script if the current r has any of the requestFilePath cgiScript strings as a substring
 			bool isCgiScript = false;
-			for (auto it = cgiScripts.begin(); it != cgiScripts.end(); it++) {
-				if (requestFilePathAbs.substr(0, it->length()) == *it) {
+			for (auto it = ccParam.cgiScripts.begin(); it != ccParam.cgiScripts.end(); it++) {
+				if (requestFilePath.substr(0, it->length()) == *it) {
 					isCgiScript = true;
 					break;
 				}
 			}
 
-			//make sure custom response headers are parsed
-			static bool customHeadersParsed = false;
-			static std::map<std::string, std::string> customHeaders;
-			if (!customHeadersParsed) {
-				customHeaders = Rain::readParameterFile(config["config-path"] + config["http-custom-headers"]);
-
-				//add server versioning info to "server" header
-				customHeaders["server"] = customHeaders["server"] + " (version " + getVersionStr() + ")";
-
-				customHeadersParsed = true;
-			}
-
-			//make sure 404 response is parsed
-			static bool notFound404Parsed = false;
-			static std::string notFound404HTML;
-			if (!notFound404Parsed) {
-				if (Rain::fileExists(config["config-path"] + config["http-404"])) {
-					Rain::readFileToStr(config["config-path"] + config["http-404"], notFound404HTML);
-				} else {
-					notFound404HTML = "";
-				}
-				notFound404Parsed = true;
-			}
-
 			//response headers that we actually send back should be built on top of customHeaders, so copy customHeaders
-			std::map<std::string, std::string> responseHeaders(customHeaders);
+			std::map<std::string, std::string> responseHeaders(ccParam.customHeaders);
 			std::string responseStatus, responseBody;
 
 			//assert that the requestFile exists; if not, send back prespecified 404 file
 			//moreover, the path has to be under the server root path, unless its a cgi script
 			//ensures that the server will not serve outside its root directory unless a cgi script is specified
 			if (!Rain::fileExists(requestFilePath) ||
-				(!Rain::isSubPath(config["http-server-root"], requestFilePathAbs) &&
-				 cgiScripts.find(requestFilePathAbs) == cgiScripts.end())) {
+				(!Rain::isSubPath(config["http-server-root"], requestFilePath) &&
+				 ccParam.cgiScripts.find(requestFilePath) == ccParam.cgiScripts.end())) {
 				responseStatus = "HTTP/1.1 404 Not Found";
-				responseBody = notFound404HTML;
+				responseBody = ccParam.notFound404HTML;
 				responseHeaders["content-length"] = Rain::tToStr(responseBody.length());
 				responseHeaders["content-type"] = "text/html";
 
@@ -288,8 +243,8 @@ namespace Emilia {
 					response += it.first + ":" + it.second + Rain::CRLF;
 				response += Rain::CRLF + responseBody;
 				if (!Rain::sendRawMessage(cSocket, response.c_str(), static_cast<int>(response.length()))) {
-					Rain::reportError(GetLastError(), "error while sending response to client; response: " + response);
-					return -7;
+					Rain::errorAndCout(GetLastError(), "Error while sending response to client. Response: " + response);
+					return -1;
 				}
 			} else if (isCgiScript) {
 				//branch if the file is a cgi script
@@ -350,8 +305,8 @@ namespace Emilia {
 					!SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0) ||
 					!CreatePipe(&g_hChildStd_IN_Rd, &g_hChildStd_IN_Wr, &sa, 0) ||
 					!SetHandleInformation(g_hChildStd_IN_Wr, HANDLE_FLAG_INHERIT, 0)) {
-					Rain::reportError(GetLastError(), "error while setting up pipe for cgi script " + requestFilePath);
-					return -2;  //something went wrong, terminate socket, try to fail peacefully
+					Rain::errorAndCout(GetLastError(), "Error while setting up pipe for cgi script " + requestFilePath);
+					return -1;  //something went wrong, terminate socket, try to fail peacefully
 				}
 
 				//execute the script with the pipes and environment block
@@ -374,25 +329,24 @@ namespace Emilia {
 					Rain::getPathDir(requestFilePath).c_str(),
 					&sinfo,
 					&pinfo)) {  //try to fail peacefully
-					Rain::reportError(GetLastError(), "error while starting cgi script " + requestFilePath);
-					return -3;
+					Rain::errorAndCout(GetLastError(), "Error while starting cgi script " + requestFilePath);
+					return -1;
 				}
 
 				//pipe the requestBody to the in pipe of the script
 
 				//if we are processing a POST request, pipe the request body into the in pipe and redirect it to the script
-				static std::size_t cgiInPipeBufLen = Rain::strToT<std::size_t>(config["http-transfer-buffer"]);
 				for (std::size_t a = 0; a < bodyBlock.length();) {
 					static DWORD dwWritten;
 					static BOOL bSuccess;
-					if (a + cgiInPipeBufLen >= bodyBlock.length())  //if the current buffer will pipe everything in, make sure not to exceed the end
+					if (a + cdParam.fileBufLen >= bodyBlock.length())  //if the current buffer will pipe everything in, make sure not to exceed the end
 						bSuccess = WriteFile(g_hChildStd_IN_Wr, bodyBlock.c_str() + a, static_cast<DWORD>(bodyBlock.length() - a), &dwWritten, NULL);
 					else  //there's still a lot to pipe in, so fill the buffer and pipe it in
-						bSuccess = WriteFile(g_hChildStd_IN_Wr, bodyBlock.c_str() + a, static_cast<DWORD>(cgiInPipeBufLen), &dwWritten, NULL);
+						bSuccess = WriteFile(g_hChildStd_IN_Wr, bodyBlock.c_str() + a, static_cast<DWORD>(cdParam.fileBufLen), &dwWritten, NULL);
 
 					if (!bSuccess) {  //something went wrong while piping input, try to fail peacefully
 						Rain::reportError(GetLastError(), "error while piping request body to cgi script; request body:\n" + bodyBlock);
-						return -4;
+						return -1;
 					}
 					a += dwWritten;
 				}
@@ -407,31 +361,42 @@ namespace Emilia {
 
 				//compose response
 				//get buffered output from the script, and send it over the socket buffered
-				static std::size_t cgiOutPipeBufLen = Rain::strToT<std::size_t>(config["http-transfer-buffer"]);
-				CHAR *chBuf = new CHAR[cgiOutPipeBufLen];
 				for (;;) {
 					static DWORD dwRead;
-					if (!ReadFile(g_hChildStd_OUT_Rd, chBuf, static_cast<DWORD>(cgiOutPipeBufLen), &dwRead, NULL)) {  //maybe error
+					if (!ReadFile(g_hChildStd_OUT_Rd, cdParam.buffer, static_cast<DWORD>(cdParam.fileBufLen), &dwRead, NULL)) {  //maybe error
 						DWORD error = GetLastError();
-						if (error == ERROR_BROKEN_PIPE)  //the pipe broke because the process has shut it down, this is okay
+						if (error == ERROR_BROKEN_PIPE) {
+							//the pipe broke because the process has shut it down, this is okay
 							break;
-						else {  //actually bad, terminate process
+						} else if (error == ERROR_OPERATION_ABORTED) {
+							//thread probably shut down because client disconnect; terminate the process and exit
 							TerminateProcess(pinfo.hProcess, 0);
-							Rain::reportError(error, "something went wrong with ReadFile");
+							break;
+						} else {  //actually bad, terminate process
+							TerminateProcess(pinfo.hProcess, 0);
+							Rain::errorAndCout(error, "Something went wrong with ReadFile.");
 							break;
 						}
 					}
-					if (dwRead == 0)  //nothing left in pipe
+
+					//check if we want to terminate here if the thread is already terminated
+					if (cdParam.disconnectStarted) {
+						TerminateProcess(pinfo.hProcess, 0);
 						break;
+					}
+
+					if (dwRead == 0) {
+						//nothing left in pipe, so script must have finished
+						break;
+					}
 
 					//send buffer through socket
-					responseBody = std::string(chBuf, dwRead);
+					responseBody = std::string(cdParam.buffer, dwRead);
 					if (!Rain::sendRawMessage(cSocket, &responseBody)) {
-						Rain::reportError(GetLastError(), "error while sending response to client; responseBody part: " + responseBody);
-						return -7;
+						Rain::errorAndCout(GetLastError(), "Error while sending response to client; responseBody part: " + responseBody);
+						return -1;
 					}
 				}
-				delete[] chBuf;
 				CloseHandle(g_hChildStd_OUT_Rd);
 				CloseHandle(pinfo.hProcess);
 
@@ -443,24 +408,15 @@ namespace Emilia {
 				std::string requestFileExt = requestFile.substr(requestFile.rfind(".") + 1, std::string::npos);
 				Rain::strToLower(&requestFileExt);
 
-				//read config to determine contenttype
-				static bool contentTypeParsed = false;
-				static std::map<std::string, std::string> contentTypeSpec;
-				if (!contentTypeParsed) {
-					contentTypeSpec = Rain::readParameterFile(config["config-path"] + config["http-content-type"]);
-					contentTypeParsed = true;
-				}
-
 				std::string contentType;
-				std::map<std::string, std::string>::iterator iterator = contentTypeSpec.find(requestFileExt);
-				if (iterator == contentTypeSpec.end())
+				std::map<std::string, std::string>::iterator iterator = ccParam.contentTypeSpec.find(requestFileExt);
+				if (iterator == ccParam.contentTypeSpec.end())
 					contentType = config["http-default-ctype"];
 				else
 					contentType = iterator->second;
 
 				//compose response
 				responseStatus = "HTTP/1.1 200 OK";
-				responseHeaders["content-disposition"] = "inline;filename=" + requestFile;
 				responseHeaders["content-type"] = contentType + ";charset=UTF-8";
 
 				//get file length
@@ -476,23 +432,21 @@ namespace Emilia {
 					response += it.first + ":" + it.second + Rain::CRLF;
 				response += Rain::CRLF;
 				if (!Rain::sendRawMessage(cSocket, &response)) {
-					Rain::reportError(GetLastError(), "error while sending response to client; response: " + response);
-					return -7;
+					Rain::errorAndCout(GetLastError(), "error while sending response to client; response: " + response);
+					return -1;
 				}
 
 				//send file buffered
-				static std::size_t fileBufLen = Rain::strToT<std::size_t>(config["http-transfer-buffer"]);
-				char *buffer = new char[fileBufLen];
-				std::size_t fileLen = Rain::strToT<std::size_t>(responseHeaders["content-length"]);
-				for (std::size_t a = 0; a < fileLen; a += fileBufLen) {
-					std::size_t actualRead = min(fileBufLen, fileLen - a);
-					fileIn.read(buffer, actualRead);
-					if (!Rain::sendRawMessage(cSocket, buffer, static_cast<int>(actualRead))) {
-						Rain::reportError(GetLastError(), "error while sending response to client; response segment: " + std::string(buffer, actualRead));
-						return -7;
+				std::size_t fileLen = Rain::strToT<std::size_t>(responseHeaders["content-length"]),
+					actualRead;
+				for (std::size_t a = 0; a < fileLen; a += cdParam.fileBufLen) {
+					actualRead = min(cdParam.fileBufLen, fileLen - a);
+					fileIn.read(cdParam.buffer, actualRead);
+					if (!Rain::sendRawMessage(cSocket, cdParam.buffer, static_cast<int>(actualRead))) {
+						Rain::errorAndCout(GetLastError(), "error while sending response to client; response segment: " + std::string(cdParam.buffer, actualRead));
+						return -1;
 					}
 				}
-				delete[] buffer;
 				fileIn.close();
 			}
 
