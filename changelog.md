@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.6.6
+
+* Added content-type header specs and range header.
+* HTTP server now properly terminates threads even when threads are still transferring content on disconnect.
+* Moved some HTTP server config parsing to main.
+* Optimized some routines in HTTP server response parsing.
+
 ## 5.6.5
 
 * Bugfix: Logging in the HTTP server now logs requests as intended.
