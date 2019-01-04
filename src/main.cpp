@@ -127,10 +127,10 @@ namespace Emilia {
 		cmhParam.ignVec.push_back(config["update-exclusive-dir"]);
 
 		//format exclusives into absolute paths
-		for (int a = 0; a < cmhParam.excVec.size(); a++) {
+		for (std::size_t a = 0; a < cmhParam.excVec.size(); a++) {
 			cmhParam.excAbsSet.insert(Rain::pathToAbsolute(config["update-root"] + cmhParam.excVec[a]));
 		}
-		for (int a = 0; a < cmhParam.ignVec.size(); a++) {
+		for (std::size_t a = 0; a < cmhParam.ignVec.size(); a++) {
 			cmhParam.ignAbsSet.insert(Rain::pathToAbsolute(config["update-root"] + cmhParam.ignVec[a]));
 		}
 		cmhParam.notSharedAbsSet = cmhParam.excAbsSet;

@@ -118,7 +118,7 @@ namespace Emilia {
 						ss << headerBlock;
 						ss >> cdParam.requestMethod >> requestURI >> httpVersion;
 						parseHeaders(ss, headers);
-						cdParam.contentLength = Rain::strToT<unsigned long long>(headers["content-length"]);
+						cdParam.contentLength = Rain::strToT<std::size_t>(headers["content-length"]);
 					}
 
 					//accumulate request until body is contentLength long

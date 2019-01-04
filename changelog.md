@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.7.2
+
+* Release build.
+* Fix some warnings related to `int` vs `size_t` comparisons.
+
 ## 5.7.1
 
 * Added preliminary script to manage Prototype radio.

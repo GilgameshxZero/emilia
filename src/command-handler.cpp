@@ -124,11 +124,11 @@ namespace Emilia {
 			ip = cmhParam.remoteCSM->getTargetIP();
 		std::string excRoot = root + config["update-exclusive-dir"] + ip + "\\";
 		std::set<std::string> want;
-		for (int a = 0; a < cmhParam.excVec.size(); a++) {
+		for (std::size_t a = 0; a < cmhParam.excVec.size(); a++) {
 			want.insert(excRoot + cmhParam.excVec[a]);
 		}
 		std::set<std::string> excIgnAbsSet;
-		for (int a = 0; a < cmhParam.excIgnVec.size(); a++) {
+		for (std::size_t a = 0; a < cmhParam.excIgnVec.size(); a++) {
 			excIgnAbsSet.insert(excRoot + cmhParam.excIgnVec[a]);
 		}
 		std::vector<std::string> exclusive = Rain::getFilesRec(excRoot, "*", &excIgnAbsSet, &want);
