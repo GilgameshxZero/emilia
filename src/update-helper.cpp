@@ -27,7 +27,7 @@ namespace Emilia {
 					pullPP.noRemove.insert(cmhParam.notSharedAbsSet.begin(), cmhParam.notSharedAbsSet.end());
 				} else if (method == "push-exclusive" || method == "pull") {
 					//of the non-specific or specific exclusive files, don't remove those with the same relative path as those in the excIgnVec
-					for(int a = 0; a < cmhParam.excIgnVec.size(); a++) {
+					for(std::size_t a = 0; a < cmhParam.excIgnVec.size(); a++) {
 						pullPP.noRemove.insert(root + cmhParam.excIgnVec[a]);
 					}
 				}
@@ -50,7 +50,7 @@ namespace Emilia {
 
 				//compare filelist with local hashes (last write time; not crc32) and see which ones need to be updated/deleted
 				Rain::tsCout(std::hex, std::setfill('0'));
-				for (int a = 0; a < files.size(); a++) {
+				for (std::size_t a = 0; a < files.size(); a++) {
 					time_t lastWrite;
 					if (!Rain::fileExists(root + files[a].second)) {
 						lastWrite = 0;
@@ -91,7 +91,7 @@ namespace Emilia {
 
 					//send back a list of requested files.
 					std::string response = method + " " + Rain::tToStr(pullPP.requested.size()) + "\n";
-					for (int a = 0; a < pullPP.requested.size(); a++) {
+					for (std::size_t a = 0; a < pullPP.requested.size(); a++) {
 						response += pullPP.requested[a] + "\n";
 					}
 					Rain::sendHeadedMessage(sm, &response);
@@ -239,7 +239,7 @@ namespace Emilia {
 				if (method == "pull") {
 					//send headers, like in push exclusive request
 					std::set<std::string> excIgnAbsSet;
-					for (int a = 0; a < cmhParam.excIgnVec.size(); a++) {
+					for (std::size_t a = 0; a < cmhParam.excIgnVec.size(); a++) {
 						excIgnAbsSet.insert(root + cmhParam.excIgnVec[a]);
 					}
 					std::vector<std::string> exclusive = Rain::getFilesRec(root, "*", &excIgnAbsSet, &cmhParam.excAbsSet);
@@ -293,7 +293,7 @@ namespace Emilia {
 					std::string response = method + " \n";
 					std::size_t totalBytes = 0, currentBytes;
 					Rain::tsCout(std::fixed, std::setprecision(2), std::setfill(' '));
-					for (int a = 0; a < pushPP.requested.size(); a++) {
+					for (std::size_t a = 0; a < pushPP.requested.size(); a++) {
 						currentBytes = Rain::getFileSize(root + pushPP.requested[a]);
 						totalBytes += currentBytes;
 						response += Rain::tToStr(currentBytes) + "\n";
@@ -311,14 +311,14 @@ namespace Emilia {
 					std::size_t completedBytes = 0;
 					std::string m;
 					Rain::tsCout(std::fixed);
-					for (int a = 0; a < pushPP.requested.size(); a++) {
+					for (std::size_t a = 0; a < pushPP.requested.size(); a++) {
 						std::ifstream in(root + pushPP.requested[a], std::ios::binary);
 						while (in) {
 							in.read(buffer, bufferSize);
 							m = method + " ";
 							m += std::string(buffer, std::size_t(in.gcount()));
 							Rain::sendHeadedMessage(sm, &m);
-							completedBytes += in.gcount();
+							completedBytes += static_cast<std::size_t>(in.gcount());
 							if (totalBytes > 0) {
 								Rain::tsCout("Sending filedata: ", 100.0 * completedBytes / totalBytes, "%\r");
 							}
@@ -368,7 +368,7 @@ namespace Emilia {
 			//generate hashes (using last write time instead of crc32)
 			std::vector<time_t> hash(files.size());
 			Rain::tsCout(std::hex, std::setfill('0'));
-			for (int a = 0; a < files.size(); a++) {
+			for (std::size_t a = 0; a < files.size(); a++) {
 				hash[a] = Rain::getFileLastModifyTime(root + files[a]);
 
 				Rain::tsCout(std::setw(8), hash[a], " ", files[a], Rain::CRLF);
@@ -377,7 +377,7 @@ namespace Emilia {
 			Rain::tsCout(std::dec);
 
 			std::string message = " " + Rain::tToStr(files.size()) + "\n";
-			for (int a = 0; a < files.size(); a++) {
+			for (std::size_t a = 0; a < files.size(); a++) {
 				message += Rain::tToStr(hash[a]) + " " + files[a] + "\n";
 			}
 
