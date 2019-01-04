@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.7.1
+
+* Added preliminary script to manage Prototype radio.
+* Changed build options for more speed optimizations.
+
 ## 5.7.0
 
 * Added preliminary support for `range` headers in the HTTP server.
