@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.7.4
+
+* Further project build path updates.
+
 ## 5.7.3
 
 * Updated project properties to compile to x86.
