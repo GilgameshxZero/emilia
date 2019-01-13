@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.7.3
+
+* Updated project properties to compile to x86.
+* Renamed radio script and re-coded it, but it still doesn't work for mobile.
+
 ## 5.7.2
 
 * Release build.
