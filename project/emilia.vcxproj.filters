@@ -10,9 +10,6 @@
     <Filter Include="rc">
       <UniqueIdentifier>{1dda29b2-3abf-45a1-8d6a-47436c079702}</UniqueIdentifier>
     </Filter>
-    <Filter Include="rain-aeternum">
-      <UniqueIdentifier>{b30b134a-d98e-4e14-8747-ffb825b87052}</UniqueIdentifier>
-    </Filter>
     <Filter Include="logs">
       <UniqueIdentifier>{b7abf1b1-d54b-4abe-8613-659d043d8d40}</UniqueIdentifier>
     </Filter>
@@ -37,11 +34,11 @@
     <Filter Include="exclusive\emilia-tan.com\logs">
       <UniqueIdentifier>{b26c3850-321b-41eb-8987-29a5f4efde43}</UniqueIdentifier>
     </Filter>
-    <Filter Include="scripts">
-      <UniqueIdentifier>{820afa31-555c-4ed2-ac9e-c10ad2fea96b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="exclusive\emilia-tan.com\data">
       <UniqueIdentifier>{8c666b16-b246-4db7-ae35-019f3034a8e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\rain-aeternum">
+      <UniqueIdentifier>{b30b134a-d98e-4e14-8747-ffb825b87052}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -55,64 +52,64 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\src\rain-aeternum\algorithm-libraries.h">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClInclude>
     <ClInclude Include="..\src\rain-aeternum\gdi-plus-include.h">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClInclude>
     <ClInclude Include="..\src\rain-aeternum\network-base.h">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClInclude>
     <ClInclude Include="..\src\rain-aeternum\network-client-manager.h">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClInclude>
     <ClInclude Include="..\src\rain-aeternum\network-libraries.h">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClInclude>
     <ClInclude Include="..\src\rain-aeternum\network-recv-thread.h">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClInclude>
     <ClInclude Include="..\src\rain-aeternum\network-server-manager.h">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClInclude>
     <ClInclude Include="..\src\rain-aeternum\network-smtp.h">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClInclude>
     <ClInclude Include="..\src\rain-aeternum\network-socket-manager.h">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClInclude>
     <ClInclude Include="..\src\rain-aeternum\network-utility.h">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClInclude>
     <ClInclude Include="..\src\rain-aeternum\network-wsa-include.h">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClInclude>
     <ClInclude Include="..\src\rain-aeternum\rain-libraries.h">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClInclude>
     <ClInclude Include="..\src\rain-aeternum\rain-window.h">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClInclude>
     <ClInclude Include="..\src\rain-aeternum\utility-error.h">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClInclude>
     <ClInclude Include="..\src\rain-aeternum\utility-filesystem.h">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClInclude>
     <ClInclude Include="..\src\rain-aeternum\utility-libraries.h">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClInclude>
     <ClInclude Include="..\src\rain-aeternum\utility-logging.h">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClInclude>
     <ClInclude Include="..\src\rain-aeternum\utility-string.h">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClInclude>
     <ClInclude Include="..\src\rain-aeternum\utility-time.h">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClInclude>
     <ClInclude Include="..\src\rain-aeternum\windows-lam-include.h">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClInclude>
     <ClInclude Include="..\src\update-server.h">
       <Filter>src</Filter>
@@ -145,16 +142,16 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\src\rain-aeternum\network-recv-param.h">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClInclude>
     <ClInclude Include="..\src\rain-aeternum\network-headed-managers.h">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClInclude>
     <ClInclude Include="..\src\update-helper-param.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\src\rain-aeternum\condition-variable.h">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -168,46 +165,46 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\rain-aeternum\algorithm-libraries.cpp">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClCompile>
     <ClCompile Include="..\src\rain-aeternum\network-base.cpp">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClCompile>
     <ClCompile Include="..\src\rain-aeternum\network-client-manager.cpp">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClCompile>
     <ClCompile Include="..\src\rain-aeternum\network-recv-thread.cpp">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClCompile>
     <ClCompile Include="..\src\rain-aeternum\network-server-manager.cpp">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClCompile>
     <ClCompile Include="..\src\rain-aeternum\network-smtp.cpp">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClCompile>
     <ClCompile Include="..\src\rain-aeternum\network-utility.cpp">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClCompile>
     <ClCompile Include="..\src\rain-aeternum\rain-window.cpp">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClCompile>
     <ClCompile Include="..\src\rain-aeternum\utility-error.cpp">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClCompile>
     <ClCompile Include="..\src\rain-aeternum\utility-filesystem.cpp">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClCompile>
     <ClCompile Include="..\src\rain-aeternum\utility-libraries.cpp">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClCompile>
     <ClCompile Include="..\src\rain-aeternum\utility-logging.cpp">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClCompile>
     <ClCompile Include="..\src\rain-aeternum\utility-string.cpp">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClCompile>
     <ClCompile Include="..\src\rain-aeternum\utility-time.cpp">
-      <Filter>rain-aeternum</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClCompile>
     <ClCompile Include="..\src\update-server.cpp">
       <Filter>src</Filter>
@@ -227,38 +224,11 @@
     <ClCompile Include="..\src\smtp-external-client.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\scripts\access-smtp.cpp">
-      <Filter>scripts</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\scripts\print-get.cpp">
-      <Filter>scripts</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\scripts\print-post.cpp">
-      <Filter>scripts</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\scripts\track-mac-ip.cpp">
-      <Filter>scripts</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\scripts\print-ip.cpp">
-      <Filter>scripts</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\rain-aeternum\network-headed-managers.cpp">
-      <Filter>rain-aeternum</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\scripts\update-mlist-subs.cpp">
-      <Filter>scripts</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClCompile>
     <ClCompile Include="..\src\rain-aeternum\condition-variable.cpp">
-      <Filter>rain-aeternum</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\scripts\wait-10-secs.cpp">
-      <Filter>scripts</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\scripts\prototype-stream-random.cpp">
-      <Filter>scripts</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\scripts\prototype-radio-backend.cpp">
-      <Filter>scripts</Filter>
+      <Filter>src\rain-aeternum</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
