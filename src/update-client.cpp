@@ -15,6 +15,9 @@ namespace Emilia {
 			std::cout.flush();
 			Rain::sendHeadedMessage(*csmdhParam.csm, "authenticate " + chParam.authPass);
 
+			//don't reconnect automatically in general
+			csmdhParam.csm->setRetryOnDisconnect(false);
+
 			return 0;
 		}
 		int onDisconnect(void *funcParam) {
@@ -22,7 +25,20 @@ namespace Emilia {
 			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
 
 			Rain::tsCout("Update server disconnected." + Rain::CRLF);
+
+			//if it was originally set
+			if (csmdhParam.csm->setRetryOnDisconnect(false)) {
+				csmdhParam.csm->setRetryOnDisconnect(true);
+				Rain::tsCout("Attempting to reconnect after restart..." + Rain::CRLF);
+			}
+
 			std::cout.flush();
+
+			//if this flag is set, we want to notify one on disconnect for some command
+			if (chParam.notifyCVOnDisconnect) {
+				chParam.notifyCVOnDisconnect = false;
+				chParam.authCV.notify_one();
+			}
 
 			return 0;
 		}
@@ -58,6 +74,20 @@ namespace Emilia {
 			int handlerRet = 0;
 			if (handler != methodHandlerMap.end())
 				handlerRet = handler->second(csmdhParam);
+			else if (chParam.requestMethod == "connect") {
+				//a connect message; the only one is that we failed to connect because something else is already connected
+				Rain::tsCout("Error: Failed to connect with update server, because another client is already connected." + Rain::CRLF);
+				Rain::shutdownSocketSend(csmdhParam.csm->getSocket());
+				closesocket(csmdhParam.csm->getSocket());
+				chParam.notifyCVOnDisconnect = true;
+				return 1;
+			}
+			else {
+				//invalid message, just abort
+				Rain::shutdownSocketSend(csmdhParam.csm->getSocket());
+				closesocket(csmdhParam.csm->getSocket());
+				return 1;
+			}
 
 			//clear request on exit
 			request = "";

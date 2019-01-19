@@ -35,6 +35,9 @@ namespace Emilia {
 
 			UpdateHelper::PushProcParam pushPP;
 			UpdateHelper::PullProcParam pullPP;
+
+			//whether to notify_one with authCV on disconnect, usually because server rejected connection
+			bool notifyCVOnDisconnect;
 		};
 	}
 }

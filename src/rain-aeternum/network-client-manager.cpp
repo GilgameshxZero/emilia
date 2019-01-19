@@ -13,6 +13,8 @@ namespace Rain {
 		this->recvBufLen = 65536;
 		this->logger = NULL;
 
+		this->retryOnDisconnect = false;
+
 		this->hConnectThread = this->hSendThread = NULL;
 
 		this->csmdhParam.csm = this;
@@ -111,6 +113,19 @@ namespace Rain {
 			ResetEvent(this->connectEvent);
 			this->hConnectThread = simpleCreateThread(ClientSocketManager::attemptConnectThread, this);
 		}
+	}
+	void ClientSocketManager::retryConnect() {
+		if (this->socketStatus == this->STATUS_DISCONNECTED) {
+			//create thread to attempt connect
+			//thread exits when connect success
+			ResetEvent(this->connectEvent);
+			this->hConnectThread = simpleCreateThread(ClientSocketManager::attemptConnectThread, this);
+		}
+	}
+	bool ClientSocketManager::setRetryOnDisconnect(bool value) {
+		bool orig = this->retryOnDisconnect;
+		this->retryOnDisconnect = value;
+		return orig;
 	}
 	void ClientSocketManager::setEventHandlers(RecvHandlerParam::EventHandler onConnect, RecvHandlerParam::EventHandler onMessage, RecvHandlerParam::EventHandler onDisconnect, void *funcParam) {
 		this->onConnectDelegate = onConnect;
@@ -267,9 +282,16 @@ namespace Rain {
 	int ClientSocketManager::onDisconnect(void *param) {
 		ClientSocketManager &csm = *reinterpret_cast<ClientSocketManager *>(param);
 
-		//retry to connect, if original status was connected
-		//if original status was disconnected, then don't reconnect
-		if (csm.socketStatus == csm.STATUS_CONNECTED) {
+		csm.socketStatus = csm.STATUS_DISCONNECTED;
+
+		//call delegate if it exists
+		int ret = csm.onDisconnectDelegate == NULL ? 0 : csm.onDisconnectDelegate(&csm.csmdhParam);
+
+		//set an event to listeners, that this function has been called
+		SetEvent(csm.recvExitComplete);
+
+		//if set, we want to try to reconnect
+		if (csm.retryOnDisconnect) {
 			csm.socketStatus = csm.STATUS_CONNECTING;
 
 			//create thread to attempt connect
@@ -277,12 +299,6 @@ namespace Rain {
 			ResetEvent(csm.connectEvent);
 			csm.hConnectThread = simpleCreateThread(ClientSocketManager::attemptConnectThread, &csm);
 		}
-
-		//call delegate if it exists
-		int ret = csm.onDisconnectDelegate == NULL ? 0 : csm.onDisconnectDelegate(&csm.csmdhParam);
-
-		//set an event to listeners, that this function has been called
-		SetEvent(csm.recvExitComplete);
 
 		return ret;
 	}

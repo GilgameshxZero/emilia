@@ -292,6 +292,7 @@
     <ClCompile Include="..\src\rain-aeternum\network-base.cpp" />
     <ClCompile Include="..\src\rain-aeternum\network-client-manager.cpp" />
     <ClCompile Include="..\src\rain-aeternum\network-headed-managers.cpp" />
+    <ClCompile Include="..\src\rain-aeternum\network-recv-param.cpp" />
     <ClCompile Include="..\src\rain-aeternum\network-recv-thread.cpp" />
     <ClCompile Include="..\src\rain-aeternum\network-server-manager.cpp" />
     <ClCompile Include="..\src\rain-aeternum\network-smtp.cpp" />
