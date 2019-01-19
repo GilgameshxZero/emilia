@@ -344,6 +344,11 @@ namespace Emilia {
 
 				//if message contains "Restarting", then wait for reconnect and re-authenticate before marking command as complete
 				if (Rain::rabinKarpMatch(message, "Restarting") != -1) {
+					if (method == "push" || method == "push-exclusive") {
+						//tell the CSM to attempt to reconnect on disconnect
+						Rain::ClientSocketManager &csm = reinterpret_cast<Rain::ClientSocketManager &>(sm);
+						csm.setRetryOnDisconnect(true);
+					}
 					std::thread([cmhParam, method]() {
 						std::unique_lock<std::mutex> lck(cmhParam.chParam->authCV.getMutex());
 						cmhParam.chParam->authCV.wait(lck);

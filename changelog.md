@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.7.6
+
+* Update server and client now disconnect if server detects an existing connection with another client.
+* Added options in `ClientSocketManager` to enable reconnect on disconnect functionality rather than by default.
+* Create a separate .cpp for `RecvHandlerParam`.
+
 ## 5.7.5
 
 * Add configuration specification section in readme.
