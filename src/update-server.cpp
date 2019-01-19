@@ -9,7 +9,10 @@ namespace Emilia {
 			if (ccParam.clientConnected) {
 				Rain::tsCout("Update client connection request refused; client already connected." + Rain::CRLF);
 				std::cout.flush();
-				return 1; //immediately terminate connection
+				Rain::sendHeadedMessage(*ssmdhParam.ssm, "connect Connection refused because another client is already connected.");
+				Rain::shutdownSocketSend(*ssmdhParam.cSocket);
+				closesocket(*ssmdhParam.cSocket);
+				return 1; //immediately close recv thread
 			}
 
 			ccParam.clientConnected = true;

@@ -78,6 +78,12 @@ namespace Rain {
 		//if called, will terminate current connection
 		void setClientTarget(std::string ipAddress, DWORD lowPort, DWORD highPort);
 
+		//if disconnected, start trying to connect again
+		void retryConnect();
+
+		//whether to retry connection when disconnect; returns previous value
+		bool setRetryOnDisconnect(bool value);
+
 		//set event handlers in addition to those of class
 		//pass NULL to any parameter to remove the custom handler
 		void setEventHandlers(RecvHandlerParam::EventHandler onConnect,
@@ -150,6 +156,9 @@ namespace Rain {
 
 		//lock this when modifying message queue
 		std::mutex queueMutex;
+
+		//if set to true, CSM will attempt to reconnect on disconnect ONCE
+		bool retryOnDisconnect;
 
 		//disconnects socket immediately, regardless of state
 		//sets state as -1
