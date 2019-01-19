@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.7.5
+
+* Add configuration specification section in readme.
+* Specify more granular update files.
+* Update .gitignore and remove some resource files from VC.
+
 ## 5.7.4
 
 * Further project build path updates.

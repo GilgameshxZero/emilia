@@ -1,15 +1,15 @@
-/.vscode
-/.vs
-/emilia-tan.com
-/exclusive
+**/.vscode
+**/.vs
+**.user
 
 /bin
 /data
-/root
-/obj
+/emilia-tan.com
+/exclusive
 /logs
+/obj
+/root
 
 rc/rc.aps
-
-project/.vs
-project/emilia.vcxproj.user
+rc/icon.png
+rc/orig.png
