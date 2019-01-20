@@ -5,13 +5,13 @@ if not defined DevEnvDir (
 )
 
 call pre-build-event.bat
-cd ..\src\scripts
+cd ..\root\src
 
 if "%~2"=="aeternum" (
     call cl ^
     /EHsc ^
     /Fo"..\..\obj\scripts\\" ^
-    /Fe"..\..\bin\scripts\%filename%.exe" ^
+    /Fe"..\scripts\%filename%.exe" ^
     /Fd"..\..\obj\scripts\\" ^
     /O2 ^
     /Ot ^
@@ -19,13 +19,13 @@ if "%~2"=="aeternum" (
     /MT ^
     /MP ^
     /incremental ^
-    ..\rain-aeternum\*.cpp ^
+    ..\..\src\rain-aeternum\*.cpp ^
     "%filename%.cpp"
 ) ELSE (
     call cl ^
     /EHsc ^
     /Fo"..\..\obj\scripts\\" ^
-    /Fe"..\..\bin\scripts\%filename%.exe" ^
+    /Fe"..\scripts\%filename%.exe" ^
     /Fd"..\..\obj\scripts\\" ^
     /O2 ^
     /Ot ^

@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.7.8
+
+* Removed scripts from version control.
+
 ## 5.7.7
 
 * Preliminary work on the `Timer` class, which allows for timed waits and timer adjustment.
