@@ -266,6 +266,7 @@
     <ClInclude Include="..\src\rain-aeternum\rain-libraries.h" />
     <ClInclude Include="..\src\rain-aeternum\rain-window.h" />
     <ClInclude Include="..\src\rain-aeternum\network-recv-param.h" />
+    <ClInclude Include="..\src\rain-aeternum\timer.h" />
     <ClInclude Include="..\src\rain-aeternum\utility-error.h" />
     <ClInclude Include="..\src\rain-aeternum\utility-filesystem.h" />
     <ClInclude Include="..\src\rain-aeternum\utility-libraries.h" />
@@ -298,6 +299,7 @@
     <ClCompile Include="..\src\rain-aeternum\network-smtp.cpp" />
     <ClCompile Include="..\src\rain-aeternum\network-utility.cpp" />
     <ClCompile Include="..\src\rain-aeternum\rain-window.cpp" />
+    <ClCompile Include="..\src\rain-aeternum\timer.cpp" />
     <ClCompile Include="..\src\rain-aeternum\utility-error.cpp" />
     <ClCompile Include="..\src\rain-aeternum\utility-filesystem.cpp" />
     <ClCompile Include="..\src\rain-aeternum\utility-libraries.cpp" />

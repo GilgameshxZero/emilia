@@ -30,7 +30,7 @@ namespace Emilia {
 			//initialize cdParam here
 			cdParam->authenticated = false;
 
-			//start thread to shutdown connection if not authenticated within 5 seconds.
+			//start thread to shutdown connection if not authenticated within 5 seconds
 			std::thread([cdParam, ssmdhParam]() {
 				std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 
@@ -45,7 +45,6 @@ namespace Emilia {
 		}
 		int onMessage(void *funcParam) {
 			Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam = *reinterpret_cast<Rain::ServerSocketManager::DelegateHandlerParam *>(funcParam);
-			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 
 			return HandleRequest(ssmdhParam);
 		}
