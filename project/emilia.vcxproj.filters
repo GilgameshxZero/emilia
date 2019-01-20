@@ -153,6 +153,9 @@
     <ClInclude Include="..\src\rain-aeternum\condition-variable.h">
       <Filter>src\rain-aeternum</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\rain-aeternum\timer.h">
+      <Filter>src\rain-aeternum</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\http-server.cpp">
@@ -231,6 +234,9 @@
       <Filter>src\rain-aeternum</Filter>
     </ClCompile>
     <ClCompile Include="..\src\rain-aeternum\network-recv-param.cpp">
+      <Filter>src\rain-aeternum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\rain-aeternum\timer.cpp">
       <Filter>src\rain-aeternum</Filter>
     </ClCompile>
   </ItemGroup>

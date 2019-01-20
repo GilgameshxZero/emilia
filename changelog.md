@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.7.7
+
+* Preliminary work on the `Timer` class, which allows for timed waits and timer adjustment.
+
 ## 5.7.6
 
 * Update server and client now disconnect if server detects an existing connection with another client.

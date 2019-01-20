@@ -159,8 +159,6 @@ namespace Emilia {
 		CHStart(cmhParam);
 
 		//command loop
-		std::mutex mtx;
-		std::unique_lock<std::mutex> lc(mtx);
 		std::map<std::string, CommandMethodHandler> commandHandlers{
 			{"exit", CHExit},
 			{"help", CHHelp},
