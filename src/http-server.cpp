@@ -8,7 +8,6 @@ namespace Emilia {
 
 			//logging
 			Rain::tsCout("HTTP Client connected from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ". Total: ", ++ccParam.connectedClients, ".", Rain::CRLF);
-			std::cout.flush();
 
 			//create the delegate parameter for the first time
 			ConnectionDelegateParam *cdParam = new ConnectionDelegateParam();
@@ -25,7 +24,7 @@ namespace Emilia {
 			cdParam->requestThread = std::thread(requestThreadFunc, std::ref(ssmdhParam));
 
 			//other things
-			cdParam->fileBufLen = Rain::strToT<std::size_t>((*ccParam.config)["http-transfer-buffer"]);
+			cdParam->fileBufLen = (*ccParam.config)["emilia-buffer"].i();
 			cdParam->buffer = new char[cdParam->fileBufLen];
 
 			return 0;
@@ -146,7 +145,7 @@ namespace Emilia {
 				//log the request manually so that we don't log responses
 				Rain::tsCout(Rain::getClientNumIP(*ssmdhParam.cSocket), ": ", cdParam.requestMethod, " ", requestURI, Rain::CRLF);
 				std::cout.flush();
-				ccParam.logger->logString(&cdParam.request);
+				ccParam.logHTTP->logString(&cdParam.request);
 
 				//reset parameters
 				cdParam.requestModifyMutex.lock();
@@ -171,21 +170,21 @@ namespace Emilia {
 					break;
 				}
 			}
-			
+
 			return 0;
 		}
 
-		int processRequest(Rain::ServerSocketManager::DelegateHandlerParam 
+		int processRequest(Rain::ServerSocketManager::DelegateHandlerParam
 			&ssmdhParam,
-						   std::string &requestURI,
-						   std::string &httpVersion,
-						   std::map<std::string, std::string> &headers,
-						   std::string &bodyBlock) {
+			std::string &requestURI,
+			std::string &httpVersion,
+			std::map<std::string, std::string> &headers,
+			std::string &bodyBlock) {
 			//a complete, partially parsed, request has come in; see onMessage for the methods that we process and those that we don't
 			//we can return 0 to keep socket open, and nonzero to close the socket
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
-			std::map<std::string, std::string> &config = *ccParam.config;
+			Rain::Configuration &config = *ccParam.config;
 			SOCKET &cSocket = *ssmdhParam.cSocket;
 
 			//only accept HTTP version 1.1
@@ -208,45 +207,40 @@ namespace Emilia {
 			std::string requestFile = Rain::getPathFile(requestFilePath),
 				requestFileDir = Rain::getPathDir(requestFilePath);
 			if (requestFile.length() == 0)
-				requestFile = config["http-default-index"];
+				requestFile = config["http-index"].s();
 
 			//compose the final path
-			requestFileDir = Rain::pathToAbsolute(Rain::getWorkingDirectory() + config["http-server-root"] + requestFileDir);
+			requestFileDir = Rain::pathToAbsolute(ccParam.project + config["http-root"].s() + requestFileDir);
 			requestFilePath = Rain::pathToAbsolute(requestFileDir + requestFile);
 
 			//we are a cgi script if the current r has any of the requestFilePath cgiScript strings as a substring
+			std::set<std::string> cgi = config["http-cgi"].keys();
 			bool isCgiScript = false;
-			for (auto it = ccParam.cgiScripts.begin(); it != ccParam.cgiScripts.end(); it++) {
-				if (requestFilePath.substr(0, it->length()) == *it) {
+			for (auto it = cgi.begin(); it != cgi.end(); it++) {
+				std::string thisPath = ccParam.project + config["http-root"].s() + *it;
+				if (requestFilePath.substr(0, thisPath.length()) == thisPath) {
 					isCgiScript = true;
 					break;
 				}
 			}
 
 			//response headers that we actually send back should be built on top of customHeaders, so copy customHeaders
-			std::map<std::string, std::string> responseHeaders(ccParam.customHeaders);
+			std::map<std::string, std::string> responseHeaders;
 			std::string responseStatus, responseBody;
+			std::set<std::string> customHeaders = config["http-headers"].keys();
+			for (auto it = customHeaders.begin(); it != customHeaders.end(); it++) {
+				responseHeaders.insert(std::make_pair(*it, config["http-headers"][*it].s()));
+			}
 
 			//assert that the requestFile exists; if not, send back prespecified 404 file
 			//moreover, the path has to be under the server root path, unless its a cgi script
 			//ensures that the server will not serve outside its root directory unless a cgi script is specified
 			if (!Rain::fileExists(requestFilePath) ||
-				(!Rain::isSubPath(config["http-server-root"], requestFilePath) &&
-				 ccParam.cgiScripts.find(requestFilePath) == ccParam.cgiScripts.end())) {
-				responseStatus = "HTTP/1.1 404 Not Found";
-				responseBody = ccParam.notFound404HTML;
-				responseHeaders["content-length"] = Rain::tToStr(responseBody.length());
-				responseHeaders["content-type"] = "text/html";
-
-				std::string response = responseStatus + Rain::CRLF;
-				for (auto it : responseHeaders)
-					response += it.first + ":" + it.second + Rain::CRLF;
-				response += Rain::CRLF + responseBody;
-				if (!Rain::sendRawMessage(cSocket, response.c_str(), static_cast<int>(response.length()))) {
-					Rain::errorAndCout(GetLastError(), "Error while sending response to client. Response: " + response);
-					return -1;
-				}
-			} else if (isCgiScript) {
+				(!Rain::isSubPath(ccParam.project + config["http-root"].s(), requestFilePath) &&
+					cgi.find(requestFilePath) == cgi.end())) {
+				requestFilePath = ccParam.project + config["http-404"].s();
+			}
+			if (isCgiScript) {
 				//branch if the file is a cgi script
 				//run the file at FilePath as a cgi script, and respond with its content
 				//set the current environment block as well as additional environment parameters for the script
@@ -273,7 +267,7 @@ namespace Emilia {
 					envBlock += "HTTP_RANGE=" + iterator->second;
 					envBlock.push_back('\0');
 				}
-				
+
 				//also, store some other useful information as environment variables
 				envBlock += "CLIENT_IP=" + Rain::getClientNumIP(cSocket);
 				envBlock.push_back('\0');
@@ -358,7 +352,7 @@ namespace Emilia {
 				CloseHandle(g_hChildStd_IN_Wr);
 
 				//wait for cgi script to finish, up to a timeout
-				WaitForInputIdle(pinfo.hProcess, Rain::strToT<DWORD>(config["http-cgi-timeout"]));
+				WaitForInputIdle(pinfo.hProcess, config["http-cgi-to"].i());
 
 				CloseHandle(pinfo.hThread);
 				CloseHandle(g_hChildStd_OUT_Wr);
@@ -414,11 +408,11 @@ namespace Emilia {
 				Rain::strToLower(&requestFileExt);
 
 				std::string contentType;
-				std::map<std::string, std::string>::iterator iterator = ccParam.contentTypeSpec.find(requestFileExt);
-				if (iterator == ccParam.contentTypeSpec.end())
-					contentType = config["http-default-ctype"];
-				else
-					contentType = iterator->second;
+				if (config["http-content"].has(requestFileExt)) {
+					contentType = config["http-content"][requestFileExt].s();
+				} else {
+					contentType = "application/octet-stream";
+				}
 
 				//compose response
 				responseStatus = "HTTP/1.1 200 OK";

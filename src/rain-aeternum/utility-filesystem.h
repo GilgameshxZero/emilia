@@ -1,8 +1,6 @@
 /*
 Standard
-*/
 
-/*
 All utilities dealing with files.
 
 When in doubt: directories are specified with an ending '/'. Sometimes functions may not work if this format is not followed.
@@ -100,15 +98,9 @@ namespace Rain {
 	//returns nothing, because copy constructor might be expensive
 	void readFileToStr(std::string filePath, std::string &fileData);
 
-	//multiple lines, each into a separate string in the vector.
-	std::vector<std::string> readMultilineFile(std::string filePath);
-
-	//read parameters from standard parameter string, organized in lines (terminated by \n) of key:value, possibly with whitespace inbetween elements
-	std::map<std::string, std::string> readParameterStream(std::stringstream &paramStream);
-	std::map<std::string, std::string> readParameterString(std::string paramString);
-	std::map<std::string, std::string> readParameterFile(std::string filePath);
-	void writeParameterFile(std::string filePath, std::map<std::string, std::string> params);
-
 	bool isFileWritable(std::string file);
 	bool isDirEmpty(std::string dir);
+
+	//get temporary filename in string
+	std::string getTmpFileName();
 }

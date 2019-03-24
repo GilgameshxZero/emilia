@@ -3,29 +3,17 @@
 
 #include "rain-aeternum/rain-libraries.h"
 
-#include "build-helper.h"
-
-#include <algorithm>
-#include <map>
-#include <set>
+#include "build-utils.h"
 
 namespace Emilia {
 	namespace HTTPServer {
 		struct ConnectionCallerParam {
-			//global config options
-			std::map<std::string, std::string> *config;
-
-			//used to log socket communications from main
-			Rain::LogStream *logger;
+			std::string project;
+			Rain::Configuration *config;
+			Rain::LogStream *logHTTP;
 
 			//total number of connected clients
-			int connectedClients;
-
-			//more config
-			std::set<std::string> cgiScripts;
-			std::map<std::string, std::string> customHeaders;
-			std::string notFound404HTML;
-			std::map<std::string, std::string> contentTypeSpec;
+			int connectedClients = 0;
 		};
 
 		struct ConnectionDelegateParam {
@@ -70,10 +58,10 @@ namespace Emilia {
 		//called by RecvThread handlers when a full message comes in
 		//header keys are all lowercase
 		int processRequest(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam,
-						   std::string &requestURI,
-						   std::string &httpVersion,
-						   std::map<std::string, std::string> &headers,
-						   std::string &bodyBlock);
+			std::string &requestURI,
+			std::string &httpVersion,
+			std::map<std::string, std::string> &headers,
+			std::string &bodyBlock);
 
 		//helper function to parse a header block in a SS
 		void parseHeaders(std::stringstream &headerStream, std::map<std::string, std::string> &headers);

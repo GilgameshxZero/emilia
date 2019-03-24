@@ -6,7 +6,7 @@ namespace Emilia {
 			Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam = *reinterpret_cast<Rain::ServerSocketManager::DelegateHandlerParam *>(param);
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 
-			ccParam.logger->setSocketSrc(ssmdhParam.ssm, true);
+			ccParam.logSMTP->setSocketSrc(ssmdhParam.ssm, true);
 
 			ssmdhParam.delegateParam = new ConnectionDelegateParam();
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
@@ -63,7 +63,7 @@ namespace Emilia {
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
 
-			ccParam.logger->setSocketSrc(ssmdhParam.ssm, false);
+			ccParam.logSMTP->setSocketSrc(ssmdhParam.ssm, false);
 
 			Rain::tsCout("SMTP Client ", Rain::getClientNumIP(*ssmdhParam.cSocket), " disconnected. Total: ", --ccParam.connectedClients, "." + Rain::CRLF);
 			std::cout.flush();
@@ -75,7 +75,7 @@ namespace Emilia {
 				std::cout.flush();
 
 				//refresh userdata
-				std::map<std::string, std::string> users = Rain::readParameterFile((*ccParam.config)["data-path"] + (*ccParam.config)["smtp-users"]);
+				std::map<std::string, std::string> users = Rain::readParameterFile(ccParam.project + (*ccParam.config)["smtp-users"].s());
 				for (auto it : users) {
 					ccParam.b64Users[Rain::strEncodeB64(it.first)] = Rain::strEncodeB64(it.second);
 				}
@@ -85,7 +85,7 @@ namespace Emilia {
 					//we know one of from or rcpt is @domain
 					//if to is @domain, get the real to
 					std::string trueTo = rcpt;
-					if (Rain::getEmailDomain(rcpt) == (*ccParam.config)["smtp-domain"]) {
+					if (Rain::getEmailDomain(rcpt) == (*ccParam.config)["smtp-domain"].s()) {
 						if (ccParam.b64Users.find(Rain::strEncodeB64(Rain::getEmailUser(rcpt))) == ccParam.b64Users.end()) {
 							//if the user doesn't exist, throw away the email
 							Rain::tsCout("Failure: Client could not find local user ", rcpt, "; email recipient ignored and email discarded." + Rain::CRLF);
@@ -123,7 +123,7 @@ namespace Emilia {
 					Rain::ClientSocketManager csm;
 					ExternalConnectionParam ecParam;
 
-					ccParam.logger->setSocketSrc(&csm, true);
+					ccParam.logSMTP->setSocketSrc(&csm, true);
 
 					ecParam.hFinish = CreateEvent(NULL, TRUE, FALSE, NULL);
 					ecParam.reqHandler = EHREhlo;
@@ -139,7 +139,7 @@ namespace Emilia {
 						csm.setClientTarget(server, 25, 25);
 
 						//only allow connecting to client for a timeout before discarding email
-						csm.blockForConnect(Rain::strToT<DWORD>((*ccParam.config)["smtp-connect-timeout"]));
+						csm.blockForConnect((*ccParam.config)["smtp-to"].i());
 						if (csm.getSocketStatus() != csm.STATUS_CONNECTED) {
 							Rain::tsCout("Failure: Could not connect to SMTP server ", server, ". Client will try next MX SMTP server if available..." + Rain::CRLF);
 							std::cout.flush();
@@ -162,7 +162,7 @@ namespace Emilia {
 					WaitForSingleObject(ecParam.hFinish, INFINITE);
 					CloseHandle(ecParam.hFinish);
 
-					ccParam.logger->setSocketSrc(&csm, false);
+					ccParam.logSMTP->setSocketSrc(&csm, false);
 				}
 
 				Rain::tsCout("Finished processing receive mail request from ", Rain::getClientNumIP(*ssmdhParam.cSocket), "." + Rain::CRLF);
@@ -223,12 +223,12 @@ namespace Emilia {
 			//check if everything looks right and prepare to close connection
 			//one of the email addresses in rcpt or from must be @domain
 			bool isAtDomain = false;
-			if (Rain::getEmailDomain(cdParam.rcd.mailFrom) == (*ccParam.config)["smtp-domain"])
+			if (Rain::getEmailDomain(cdParam.rcd.mailFrom) == (*ccParam.config)["smtp-domain"].s())
 				isAtDomain = true;
 			if (!isAtDomain) {
 				bool allAtDomain = true;
 				for (auto it : cdParam.rcd.rcptTo) {
-					if (Rain::getEmailDomain(it) != (*ccParam.config)["smtp-domain"]) {
+					if (Rain::getEmailDomain(it) != (*ccParam.config)["smtp-domain"].s()) {
 						allAtDomain = false;
 						break;
 					}
@@ -286,7 +286,7 @@ namespace Emilia {
 			Rain::strTrimWhite(&cdParam.request);
 
 			//refresh userdata
-			std::map<std::string, std::string> users = Rain::readParameterFile((*ccParam.config)["data-path"] + (*ccParam.config)["smtp-users"]);
+			std::map<std::string, std::string> users = Rain::readParameterFile(ccParam.project + (*ccParam.config)["smtp-users"].s());
 			for (auto it : users) {
 				ccParam.b64Users[Rain::strEncodeB64(it.first)] = Rain::strEncodeB64(it.second);
 			}
@@ -324,7 +324,7 @@ namespace Emilia {
 			cdParam.rcd.mailFrom = Rain::strTrimWhite(afterColon.substr(b1 + 1, b2 - b1 - 1));
 
 			//if sending from current domain, need to be authenticated, unless it's from server@emilia-tan.com, which is publicly accessible without password
-			if (Rain::getEmailDomain(cdParam.rcd.mailFrom) == (*ccParam.config)["smtp-domain"] &&
+			if (Rain::getEmailDomain(cdParam.rcd.mailFrom) == (*ccParam.config)["smtp-domain"].s() &&
 				cdParam.rcd.b64User.length() == 0 && cdParam.rcd.mailFrom != "server@emilia-tan.com") {
 				ssmdhParam.ssm->sendRawMessage("502 Emilia hasn't authenticated you to do that (sending from a managed domain requires authentication)" + Rain::CRLF);
 			} else
