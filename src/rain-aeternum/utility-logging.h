@@ -22,7 +22,7 @@ namespace Rain {
 	//thread-safe versatile class that can input from stdin, stdout, strings and sockets, and output to stdout and files
 	//one LogStream can IO from multiple sources, but its log stream will be the same to all outputs; if multiple logs are needed, use multiple RainLoggers
 	class LogStream {
-		public:
+	public:
 		LogStream();
 		~LogStream();
 
@@ -47,7 +47,7 @@ namespace Rain {
 		//doesn't work with STD_INPUT_HANDLE for now, and STD_ERROR_HANDLE is untested
 		void setStdoutDst(bool enable, std::size_t len = 0);
 
-		private:
+	private:
 		struct StdSrcRedirectThreadParam {
 			//pipe to read from and write to, in addition to logging the information in the process
 			HANDLE rd, wr;

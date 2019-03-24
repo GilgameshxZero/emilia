@@ -3,13 +3,14 @@
 #include "rain-aeternum/rain-libraries.h"
 
 #include "command-handler.h"
+#include "constants.h"
+#include "project-utils.h"
+#include "main-param.h"
 
-#include "build-helper.h"
+#include "build-utils.h"
 #include "http-server.h"
 #include "smtp-server.h"
-#include "update-server.h"
-
-extern const std::string Rain::CRLF;
+#include "deploy-server.h"
 
 int main(int argc, char *argv[]);
 

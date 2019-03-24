@@ -13,14 +13,14 @@ Extends ClientSocketManager and ServerManager with the `headed` protocol, which 
 
 namespace Rain {
 	class HeadedClientSocketManager : public ClientSocketManager {
-		public:
+	public:
 		//override
 		void setEventHandlers(RecvHandlerParam::EventHandler onConnect,
-							  RecvHandlerParam::EventHandler onMessage,
-							  RecvHandlerParam::EventHandler onDisconnect,
-							  void *funcParam);
+			RecvHandlerParam::EventHandler onMessage,
+			RecvHandlerParam::EventHandler onDisconnect,
+			void *funcParam);
 
-		private:
+	private:
 		std::size_t messageLength;
 		std::string accMess;
 		ClientSocketManager::DelegateHandlerParam csmdhp;
@@ -34,7 +34,7 @@ namespace Rain {
 	};
 
 	class HeadedServerManager : public ServerManager {
-		public:
+	public:
 		struct DelegateHandlerParam {
 			std::size_t messageLength = 0;
 			std::string accMess;
@@ -45,11 +45,11 @@ namespace Rain {
 
 		//override
 		void setEventHandlers(RecvHandlerParam::EventHandler onConnect,
-							  RecvHandlerParam::EventHandler onMessage,
-							  RecvHandlerParam::EventHandler onDisconnect,
-							  void *funcParam);
+			RecvHandlerParam::EventHandler onMessage,
+			RecvHandlerParam::EventHandler onDisconnect,
+			void *funcParam);
 
-		private:
+	private:
 		RecvHandlerParam::EventHandler onHeadedConnectDelegate, onHeadedMessageDelegate, onHeadedDisconnectDelegate;
 		void *headedDelegateParam;
 

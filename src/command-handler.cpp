@@ -1,239 +1,218 @@
 #include "command-handler.h"
 
 namespace Emilia {
-	int CHExit(CommandHandlerParam &cmhParam) {
-		if (cmhParam.remoteCSM != NULL) {
-			delete cmhParam.remoteCSM;
-			cmhParam.remoteCSM = NULL;
-		}
-
-		//return nonzero to exit program
-		return 1;
-	}
-	int CHHelp(CommandHandlerParam &cmhParam) {
-		//see readme for what each of these do
-		Rain::tsCout("Available commands: exit, help, connect, disconnect, push, push-exclusive, pull, sync, start, stop, restart.", Rain::CRLF);
-		return 0;
-	}
-
-	int CHConnect(CommandHandlerParam &cmhParam) {
-		if (cmhParam.remoteCSM != NULL) {
-			//already connected, don't allow another connect
-			Rain::tsCout("Cannot execute 'connect' while already connected to remote.", Rain::CRLF);
-			return 0;
-		}
-
-		//prompt for more information
-		std::string remoteAddr, passResponse, pass;
-		Rain::tsCout("Prompt: Remote address: ");
-		std::cin >> remoteAddr;
-		Rain::tsCout("Prompt: Use configuration authentication? (y/n): ");
-		std::cin >> passResponse;
-		if (passResponse == "y") {
-			//depending on the remote, take the password from the exclusive configuration for that remote; if not available, use the local password in the config
-			std::string remoteCfgPath = Rain::pathToAbsolute((*cmhParam.config)["update-root"] + (*cmhParam.config)["update-exclusive-dir"] + remoteAddr + "\\config\\config.ini");
-			if (Rain::fileExists(remoteCfgPath)) {
-				pass = Rain::readParameterFile(remoteCfgPath)["emilia-auth-pass"];
-			} else {
-				pass = (*cmhParam.config)["emilia-auth-pass"];
+	namespace CommandHandler {
+		int Exit(MainParam &mp) {
+			if (mp.remoteCSM != NULL) {
+				delete mp.remoteCSM;
+				mp.remoteCSM = NULL;
 			}
-		} else {
-			Rain::tsCout("Prompt: Password for remote: ");
-			std::cin >> pass;
-			Rain::strTrimWhite(&pass);
+			return 1;
 		}
-
-		//attempt to connect to remote
-		Rain::tsCout("Attempting to connect...", Rain::CRLF);
-		DWORD updateServerPort = Rain::strToT<DWORD>((*cmhParam.config)["update-server-port"]);
-		cmhParam.remoteCSM = new Rain::HeadedClientSocketManager();
-		cmhParam.chParam = new UpdateClient::ConnectionHandlerParam();
-		cmhParam.chParam->cmhParam = &cmhParam;
-		cmhParam.chParam->config = cmhParam.config;
-		cmhParam.chParam->authPass = pass;
-		cmhParam.remoteCSM->setEventHandlers(UpdateClient::onConnect, UpdateClient::onMessage, UpdateClient::onDisconnect, cmhParam.chParam);
-		cmhParam.remoteCSM->setClientTarget(remoteAddr, updateServerPort, updateServerPort);
-		cmhParam.remoteCSM->blockForConnect(5000);
-
-		int status = cmhParam.remoteCSM->getSocketStatus();
-		if (status == 1) {
-			Rain::tsCout("Error: Connection timeout.", Rain::CRLF);
-			delete cmhParam.remoteCSM;
-			cmhParam.remoteCSM = NULL;
-			return 0;
-		} else if (status != 0) {
-			Rain::tsCout("Error: Could not connect.", Rain::CRLF);
-			delete cmhParam.remoteCSM;
-			cmhParam.remoteCSM = NULL;
-			return 0;
-		} //if status == 0 then we have connected successfully
-
-		//wait for authentication response
-		std::unique_lock<std::mutex> lck(cmhParam.chParam->authCV.getMutex());
-		cmhParam.chParam->authCV.wait(lck);
-
-		return 0;
-	}
-	int CHDisconnect(CommandHandlerParam &cmhParam) {
-		if (cmhParam.remoteCSM == NULL) {
-			//not yet connected
-			Rain::tsCout("Cannot disconnect when not connected.", Rain::CRLF);
-			return 0;
-		}
-
-		delete cmhParam.remoteCSM;
-		cmhParam.remoteCSM = NULL;
-		delete cmhParam.chParam;
-		return 0;
-	}
-	int CHPush(CommandHandlerParam &cmhParam) {
-		if (cmhParam.remoteCSM == NULL) {
-			//not yet connected
-			Rain::tsCout("Cannot execute this command when not connected with remote.", Rain::CRLF);
-			return 0;
-		}
-
-		//list all files marked as shared
-		std::map<std::string, std::string> &config = *cmhParam.config;
-		std::string root = Rain::pathToAbsolute(config["update-root"]);
-		std::vector<std::string> shared = Rain::getFilesRec(root, "*", &cmhParam.notSharedAbsSet);
-		Rain::tsCout("Found ", shared.size(), " shared files.", Rain::CRLF);
-		std::cout.flush();
-
-		//send over list of files and checksums
-		Rain::sendHeadedMessage(*cmhParam.remoteCSM, "push" + UpdateHelper::generatePushHeader(root, shared));
-		Rain::tsCout("Sending over 'push' request with hashes...", Rain::CRLF);
-		std::cout.flush();
-
-		//wait until the command is complete before accepting more commands
-		std::unique_lock<std::mutex> lck(cmhParam.chParam->connectedCommandCV.getMutex());
-		cmhParam.chParam->connectedCommandCV.wait(lck);
-
-		return 0;
-	}
-	int CHPushExclusive(CommandHandlerParam &cmhParam) {
-		if (cmhParam.remoteCSM == NULL) {
-			//not yet connected
-			Rain::tsCout("Cannot execute this command when not connected with remote.", Rain::CRLF);
-			return 0;
-		}
-
-		//list all files marked as exclusive
-		std::map<std::string, std::string> &config = *cmhParam.config;
-		std::string root = Rain::pathToAbsolute(config["update-root"]),
-			ip = cmhParam.remoteCSM->getTargetIP();
-		std::string excRoot = root + config["update-exclusive-dir"] + ip + "\\";
-		std::set<std::string> want;
-		for (std::size_t a = 0; a < cmhParam.excVec.size(); a++) {
-			want.insert(excRoot + cmhParam.excVec[a]);
-		}
-		std::set<std::string> excIgnAbsSet;
-		for (std::size_t a = 0; a < cmhParam.excIgnVec.size(); a++) {
-			excIgnAbsSet.insert(excRoot + cmhParam.excIgnVec[a]);
-		}
-		std::vector<std::string> exclusive = Rain::getFilesRec(excRoot, "*", &excIgnAbsSet, &want);
-		Rain::tsCout("Found ", exclusive.size(), " exclusive files for '", ip, "'.", Rain::CRLF);
-		std::cout.flush();
-
-		//send over list of files and checksums
-		Rain::sendHeadedMessage(*cmhParam.remoteCSM, "push-exclusive" + UpdateHelper::generatePushHeader(excRoot, exclusive));
-		Rain::tsCout("Sending over 'push-exclusive' request with hashes...", Rain::CRLF);
-		std::cout.flush();
-
-		//wait until the command is complete before accepting more commands
-		std::unique_lock<std::mutex> lck(cmhParam.chParam->connectedCommandCV.getMutex());
-		cmhParam.chParam->connectedCommandCV.wait(lck);
-
-		return 0;
-	}
-	int CHPull(CommandHandlerParam &cmhParam) {
-		if (cmhParam.remoteCSM == NULL) {
-			//not yet connected
-			Rain::tsCout("Cannot execute this command when not connected with remote.", Rain::CRLF);
-			return 0;
-		}
-
-		//send request to remote for headers
-		Rain::sendHeadedMessage(*cmhParam.remoteCSM, "pull ");
-		Rain::tsCout("Sending `pull` request...", Rain::CRLF);
-		std::cout.flush();
-
-		//wait for command to finish
-		std::unique_lock<std::mutex> lck(cmhParam.chParam->connectedCommandCV.getMutex());
-		cmhParam.chParam->connectedCommandCV.wait(lck);
-
-		return 0;
-	}
-	int CHSync(CommandHandlerParam &cmhParam) {
-		CHPush(cmhParam);
-		CHPushExclusive(cmhParam);
-		CHPull(cmhParam);
-		return 0;
-	}
-	int CHStart(CommandHandlerParam &cmhParam) {
-		if (cmhParam.remoteCSM == NULL) {
-			if (!cmhParam.httpSM->setServerListen(80, 80)) {
-				Rain::tsCout("HTTP server listening on port ", cmhParam.httpSM->getListeningPort(), ".", Rain::CRLF);
-			} else {
-				DWORD error = GetLastError();
-				Rain::errorAndCout(error, "Error: could not setup HTTP server listening.");
+		int Connect(MainParam &mp) {
+			if (mp.remoteCSM != NULL && mp.remoteCSM->getSocketStatus() == -1) {
+				Disconnect(mp);
 			}
-			if (!cmhParam.smtpSM->setServerListen(25, 25)) {
-				Rain::tsCout("SMTP server listening on port ", cmhParam.smtpSM->getListeningPort(), ".", Rain::CRLF);
-			} else {
-				DWORD error = GetLastError();
-				Rain::errorAndCout(error, "Error: could not setup SMTP server listening.");
+			if (mp.remoteCSM != NULL) {
+				Rain::tsCout("Cannot execute 'connect' while already connected to remote.", Rain::CRLF);
+				return 0;
 			}
-			std::cout.flush();
-		} else {
-			Rain::sendHeadedMessage(*cmhParam.remoteCSM, "start");
+
+			Rain::Configuration &config = *mp.config;
+
+			//prompt for more information
+			std::string remoteAddr, cfgResponse, pass;
+			DWORD port;
+
+			Rain::tsCout("Remote address: ");
+			std::cin >> remoteAddr;
+			Rain::tsCout("Use current project configuration authentication? (y/n): ");
+			std::cin >> cfgResponse;
+
+			if (cfgResponse == "y") {
+				pass = config["deploy-pw"].s();
+				port = config["deploy-port"].i();
+			} else {
+				Rain::tsCout("Remote password: ");
+				std::cin >> pass;
+				Rain::strTrimWhite(&pass);
+				std::string s;
+				Rain::tsCout("Remote port: ");
+				std::cin >> s;
+				port = Rain::strToT<DWORD>(s);
+			}
+
+			//attempt to connect to remote
+			Rain::tsCout("Connecting...", Rain::CRLF);
+			mp.remoteCSM = new Rain::HeadedClientSocketManager();
+			mp.deployCHP = new DeployClient::ConnectionHandlerParam();
+			mp.deployCHP->project = mp.project;
+			mp.deployCHP->config = mp.config;
+			mp.deployCHP->logDeploy = mp.logDeploy;
+			mp.deployCHP->httpSM = &mp.httpSM;
+			mp.deployCHP->smtpSM = &mp.smtpSM;
+			mp.deployCHP->authPass = pass;
+			mp.remoteCSM->setEventHandlers(DeployClient::onConnect, DeployClient::onMessage, DeployClient::onDisconnect, mp.deployCHP);
+			mp.remoteCSM->setClientTarget(remoteAddr, port, port);
+			mp.remoteCSM->blockForConnect(3000);
+
+			int status = mp.remoteCSM->getSocketStatus();
+			if (status == 1) {
+				Rain::tsCout("Connection timeout.", Rain::CRLF);
+				delete mp.remoteCSM;
+				mp.remoteCSM = NULL;
+				return 0;
+			} else if (status != 0) {
+				Rain::tsCout("Could not connect.", Rain::CRLF);
+				delete mp.remoteCSM;
+				mp.remoteCSM = NULL;
+				return 0;
+			} //if status == 0 then we have connected successfully
+
+			//wait for authentication response
+			std::unique_lock<std::mutex> lck(mp.deployCHP->authCV.getMutex());
+			mp.deployCHP->authCV.wait(lck);
+
+			return 0;
+		}
+		int Disconnect(MainParam &mp) {
+			if (mp.remoteCSM == NULL) {
+				Rain::tsCout("Cannot disconnect when not connected.", Rain::CRLF);
+				return 0;
+			}
+
+			delete mp.remoteCSM;
+			mp.remoteCSM = NULL;
+			delete mp.deployCHP;
+			return 0;
+		}
+		int Server(MainParam &mp) {
+			if (mp.remoteCSM != NULL) {
+				Rain::tsCout("Connected to remote ", mp.remoteCSM->getTargetIP(), ".", Rain::CRLF);
+			}
+			if (mp.httpSM.getListeningPort() != -1) {
+				Rain::tsCout("Local HTTP server listening on port ", mp.httpSM.getListeningPort(), ".", Rain::CRLF);
+			} else {
+				Rain::tsCout("Local HTTP server not listening.", Rain::CRLF);
+			}
+			if (mp.smtpSM.getListeningPort() != -1) {
+				Rain::tsCout("Local SMTP server listening on port ", mp.smtpSM.getListeningPort(), ".", Rain::CRLF);
+			} else {
+				Rain::tsCout("Local SMTP server not listening.", Rain::CRLF);
+			}
+
+			std::string command;
+			Rain::tsCout("Type 'start', 'stop', or anything else to return to main menu: ");
+			std::cin >> command;
+			Rain::strTrimWhite(&command);
+
+			if (command == "start") {
+				if (mp.remoteCSM == NULL) {
+					startServers(mp, 3);
+				} else {
+					Rain::sendHeadedMessage(*mp.remoteCSM, "server start");
+
+					//wait for command to finish
+					std::unique_lock<std::mutex> lck(mp.deployCHP->connectedCommandCV.getMutex());
+					mp.deployCHP->connectedCommandCV.wait(lck);
+				}
+			} else if (command == "stop") {
+				if (mp.remoteCSM == NULL) {
+					mp.httpSM.setServerListen(0, 0);
+					mp.smtpSM.setServerListen(0, 0);
+					Rain::tsCout("HTTP & SMTP servers stopped.", Rain::CRLF);
+					std::cout.flush();
+				} else {
+					Rain::sendHeadedMessage(*mp.remoteCSM, "server stop");
+
+					//wait for command to finish
+					std::unique_lock<std::mutex> lck(mp.deployCHP->connectedCommandCV.getMutex());
+					mp.deployCHP->connectedCommandCV.wait(lck);
+				}
+			}
+
+			return 0;
+		}
+		int Restart(MainParam &mp) {
+			Rain::Configuration &config = *mp.config;
+
+			if (mp.remoteCSM == NULL) {
+				prepRestart(mp.project, &mp.httpSM, &mp.smtpSM);
+				return 1;
+			} else {
+				mp.remoteCSM->setRetryOnDisconnect(true);
+				Rain::sendHeadedMessage(*mp.remoteCSM, "restart");
+
+				//wait for re-authenticate
+				std::unique_lock<std::mutex> lck(mp.deployCHP->authCV.getMutex());
+				mp.deployCHP->authCV.wait(lck);
+			}
+
+			return 0;
+		}
+		int Project(MainParam &mp) {
+			Rain::tsCout("Project: ", mp.project, Rain::CRLF);
+			Rain::tsCout("Would you like to switch projects? (y/n): ");
+			std::string prompt;
+			std::cin >> prompt;
+
+			if (prompt == "y") {
+				std::string project;
+
+				Rain::tsCout("Directory to project: ");
+				std::cin >> prompt;
+				Rain::standardizeDirPath(&prompt);
+				prompt = Rain::pathToAbsolute(prompt);
+				Rain::createDirRec(prompt);
+
+				//check if path is already a project
+				std::vector<std::string> dirs = Rain::getDirs(prompt);
+				bool isProject = false;
+				for (int a = 0; a < dirs.size(); a++) {
+					if (dirs[a] == ".emilia") {
+						isProject = true;
+						break;
+					}
+				}
+
+				if (!isProject) {
+					Rain::tsCout("The specified directory is not a project. Would you like to create one? (y/n): ");
+					std::string create;
+					std::cin >> create;
+					if (create == "y") {
+						initProjectDir(prompt);
+						project = prompt;
+					} else {
+						Rain::tsCout("Aborting operation...", Rain::CRLF);
+						return 0;
+					}
+				} else {
+					project = prompt;
+				}
+
+				//switch out configuration options and everything else associated with them
+				freeMainParam(mp);
+				initMainParam(project, mp);
+			}
+
+			return 0;
+		}
+		int Sync(MainParam &mp) {
+			if (mp.remoteCSM != NULL && mp.remoteCSM->getSocketStatus() == -1) {
+				Disconnect(mp);
+			}
+			if (mp.remoteCSM == NULL) {
+				Rain::tsCout("Cannot sync when not connected.", Rain::CRLF);
+				return 0;
+			}
+
+			Rain::sendHeadedMessage(*mp.remoteCSM, "sync");
 
 			//wait for command to finish
-			std::unique_lock<std::mutex> lck(cmhParam.chParam->connectedCommandCV.getMutex());
-			cmhParam.chParam->connectedCommandCV.wait(lck);
+			std::unique_lock<std::mutex> lck(mp.deployCHP->connectedCommandCV.getMutex());
+			mp.deployCHP->connectedCommandCV.wait(lck);
+
+			return 0;
 		}
-		return 0;
-	}
-	int CHStop(CommandHandlerParam &cmhParam) {
-		if (cmhParam.remoteCSM == NULL) {
-			cmhParam.httpSM->setServerListen(0, 0);
-			cmhParam.smtpSM->setServerListen(0, 0);
-			Rain::tsCout("HTTP & SMTP servers stopped.", Rain::CRLF);
-			std::cout.flush();
-		} else {
-			Rain::sendHeadedMessage(*cmhParam.remoteCSM, "stop");
-
-			//wait for command to finish
-			std::unique_lock<std::mutex> lck(cmhParam.chParam->connectedCommandCV.getMutex());
-			cmhParam.chParam->connectedCommandCV.wait(lck);
-		}
-		return 0;
-	}
-	int CHRestart(CommandHandlerParam &cmhParam) {
-		CHStop(cmhParam);
-		CHStart(cmhParam);
-		return 0;
-	}
-	int CHRestartAll(CommandHandlerParam &cmhParam) {
-		std::map<std::string, std::string> &config = *cmhParam.config;
-
-		if (cmhParam.remoteCSM == NULL) {
-			std::string updateScript = Rain::pathToAbsolute(config["update-root"] + config["update-script"]),
-				serverPath = "\"" + Rain::pathToAbsolute(Rain::getExePath()) + "\"";
-			ShellExecute(NULL, "open", updateScript.c_str(),
-				(serverPath + " " + serverPath).c_str(),
-				Rain::getPathDir(updateScript).c_str(), SW_SHOWDEFAULT);
-
-			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-			exit(1);
-		} else {
-			Rain::sendHeadedMessage(*cmhParam.remoteCSM, "restart-all");
-
-			//wait for re-authenticate
-			std::unique_lock<std::mutex> lck(cmhParam.chParam->authCV.getMutex());
-			cmhParam.chParam->authCV.wait(lck);
-		}
-
-		return 0;
 	}
 }

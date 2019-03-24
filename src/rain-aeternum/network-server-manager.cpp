@@ -2,10 +2,10 @@
 
 namespace Rain {
 	ServerSocketManager::ServerSocketManager(SOCKET *cSocket,
-											 RecvHandlerParam::EventHandler onConnect,
-											 RecvHandlerParam::EventHandler onMessage,
-											 RecvHandlerParam::EventHandler onDisconnect,
-											 void *funcParam) {
+		RecvHandlerParam::EventHandler onConnect,
+		RecvHandlerParam::EventHandler onMessage,
+		RecvHandlerParam::EventHandler onDisconnect,
+		void *funcParam) {
 		this->socket = cSocket;
 		this->logger = NULL;
 		this->onConnectDelegate = onConnect;
@@ -47,6 +47,9 @@ namespace Rain {
 		bool ret = (this->logger != NULL);
 		this->logger = reinterpret_cast<LogStream *>(logger);
 		return ret;
+	}
+	void ServerSocketManager::blockForMessageQueue(DWORD msTimeout) {
+		//do nothing; server socket managers send when send is called
 	}
 	std::tuple<RecvHandlerParam::EventHandler, RecvHandlerParam::EventHandler, RecvHandlerParam::EventHandler> ServerSocketManager::getInternalHandlers() {
 		return std::make_tuple(this->onConnect, this->onMessage, this->onDisconnect);
@@ -98,6 +101,7 @@ namespace Rain {
 		this->recvBufLen = 65536;
 
 		this->ltEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+		this->newClientCall = NULL;
 
 		Rain::initWinsock22();
 	}
@@ -163,6 +167,9 @@ namespace Rain {
 		this->onDisconnectDelegate = onDisconnect;
 		this->funcParam = funcParam;
 	}
+	void *ServerManager::getFuncParam() {
+		return this->funcParam;
+	}
 	std::size_t ServerManager::setRecvBufLen(std::size_t newLen) {
 		std::size_t origValue = this->recvBufLen;
 		this->recvBufLen = newLen;
@@ -198,7 +205,7 @@ namespace Rain {
 				}
 			}
 
-			//once a client is accept, spawn a ServerSocketManager and call a function
+			//once a client is accepted, spawn a ServerSocketManager and call a function
 			ServerSocketManager *ssm = new ServerSocketManager(cSocket, sm.onConnectDelegate, sm.onMessageDelegate, sm.onDisconnectDelegate, sm.funcParam);
 			if (sm.newClientCall != NULL)
 				sm.newClientCall(ssm);

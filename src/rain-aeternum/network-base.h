@@ -23,16 +23,16 @@ namespace Rain {
 	//target returned needs to be freed
 	//if no error, returns 0
 	int getTargetAddr(struct addrinfo **target, std::string host, std::string port,
-					  int family = AF_UNSPEC, int sockType = SOCK_STREAM, int type = IPPROTO_TCP);
+		int family = AF_UNSPEC, int sockType = SOCK_STREAM, int type = IPPROTO_TCP);
 
 	//same thing as getTargetAddr, but with different default arguments, to be used for servers trying to listen on a port
 	//return 0 if no error
 	int getServerAddr(struct addrinfo **server, std::string port,
-					  int family = AF_INET, int sockType = SOCK_STREAM, int type = IPPROTO_TCP, int flags = AI_PASSIVE);
+		int family = AF_INET, int sockType = SOCK_STREAM, int type = IPPROTO_TCP, int flags = AI_PASSIVE);
 
 	//if no error, returns 0
 	int createSocket(SOCKET &newSocket,
-					 int family = AF_UNSPEC, int sockType = SOCK_STREAM, int type = IPPROTO_TCP);
+		int family = AF_UNSPEC, int sockType = SOCK_STREAM, int type = IPPROTO_TCP);
 
 	//run through all the target possibilities and try to connect to any of them
 	//if no error, returns 0

@@ -21,7 +21,7 @@ Implements class ClientSocketManager, which maintains a socket connection to an 
 
 namespace Rain {
 	class ClientSocketManager : public SocketManager {
-		public:
+	public:
 		struct DelegateHandlerParam {
 			//the current csm
 			ClientSocketManager *csm;
@@ -87,9 +87,9 @@ namespace Rain {
 		//set event handlers in addition to those of class
 		//pass NULL to any parameter to remove the custom handler
 		void setEventHandlers(RecvHandlerParam::EventHandler onConnect,
-							  RecvHandlerParam::EventHandler onMessage,
-							  RecvHandlerParam::EventHandler onDisconnect,
-							  void *funcParam);
+			RecvHandlerParam::EventHandler onMessage,
+			RecvHandlerParam::EventHandler onDisconnect,
+			void *funcParam);
 
 		//set reconnect attempt time max from default 3000
 		//will attempt to reconnect more often at the beginning, then slow down exponentially
@@ -104,14 +104,14 @@ namespace Rain {
 		//inheirited from SocketManager; sets logging on and off for communications on this socket; pass NULL to disable
 		bool setLogging(void *logger);
 
-		protected:
+	protected:
 		//have the message handlers be protected so that derived classes can access them
 		RecvHandlerParam::EventHandler onConnectDelegate, onMessageDelegate, onDisconnectDelegate;
 
 		//parameter passed to delegate handlers
 		DelegateHandlerParam csmdhParam;
 
-		private:
+	private:
 		SOCKET socket;
 		std::queue<std::string> messageQueue;
 		bool blockSendRawMessage;

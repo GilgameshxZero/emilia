@@ -26,7 +26,7 @@ namespace Rain {
 	//does not interfere with GWLP_USERDATA
 	//(!!) call destructor instead of sending WM_DESTROY
 	class RainWindow {
-		public:
+	public:
 		typedef LRESULT(*MSGFC)(HWND, UINT, WPARAM, LPARAM);
 
 		static const LPCTSTR NULLCLASSNAME;
@@ -65,7 +65,7 @@ namespace Rain {
 		//can be called by anything; enter message loop for all windows; returns when WM_QUIT is received
 		static WPARAM enterMessageLoop();
 
-		private:
+	private:
 		static int class_id;
 		static std::unordered_map<HWND, RainWindow *> objmap;
 
@@ -74,10 +74,10 @@ namespace Rain {
 		LPTSTR classname;
 
 		friend LRESULT CALLBACK rainWindowProc( //the windowproc is controlled by this class; process messages through the map in the initializer; if intfc != NULL, this function is not used
-											   HWND   hwnd,
-											   UINT   uMsg,
-											   WPARAM wParam,
-											   LPARAM lParam
+			HWND   hwnd,
+			UINT   uMsg,
+			WPARAM wParam,
+			LPARAM lParam
 		);
 	};
 

@@ -5,7 +5,7 @@
 
 namespace Rain {
 	class RecvHandlerParam {
-		public:
+	public:
 		//event handler function type
 		typedef int(*EventHandler) (void *);
 

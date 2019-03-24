@@ -255,9 +255,9 @@ namespace Rain {
 				//unlock temporarily to allow other functions to maybe continue
 				csm.queueMutex.lock();
 			}
-			csm.queueMutex.unlock();
 			ResetEvent(csm.messageToSendEvent);
 			SetEvent(csm.messageDoneEvent);
+			csm.queueMutex.unlock();
 		}
 
 		return 0;

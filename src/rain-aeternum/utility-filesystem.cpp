@@ -222,12 +222,12 @@ namespace Rain {
 
 	BY_HANDLE_FILE_INFORMATION getFileInformation(std::string path) {
 		HANDLE handle = CreateFileW(pathToLongPath(pathToAbsolute(path)).c_str(),
-									0,
-									FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-									NULL,
-									OPEN_EXISTING,
-									FILE_ATTRIBUTE_NORMAL,
-									NULL);
+			0,
+			FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+			NULL,
+			OPEN_EXISTING,
+			FILE_ATTRIBUTE_NORMAL,
+			NULL);
 		BY_HANDLE_FILE_INFORMATION info;
 		GetFileInformationByHandle(handle, &info);
 		return info;
@@ -236,8 +236,8 @@ namespace Rain {
 		BY_HANDLE_FILE_INFORMATION info1 = getFileInformation(path1),
 			info2 = getFileInformation(path2);
 		return (info1.dwVolumeSerialNumber == info2.dwVolumeSerialNumber &&
-				info1.nFileIndexLow == info2.nFileIndexLow &&
-				info1.nFileIndexHigh == info2.nFileIndexHigh);
+			info1.nFileIndexLow == info2.nFileIndexLow &&
+			info1.nFileIndexHigh == info2.nFileIndexHigh);
 	}
 
 	FILETIME getLastModTime(std::string path) {
@@ -293,67 +293,6 @@ namespace Rain {
 		t.close();
 	}
 
-	std::vector<std::string> readMultilineFile(std::string filePath) {
-		std::ifstream fileIn;
-		std::vector<std::string> ret;
-
-		fileIn.open(filePath, std::ios::binary);
-		std::stringstream ss;
-		ss << fileIn.rdbuf();
-
-		std::string value = "";
-		std::getline(ss, value);
-
-		while (value.length() != 0) {
-			ret.push_back(Rain::strTrimWhite(value));
-			value = "";
-			std::getline(ss, value);
-		}
-
-		fileIn.close();
-		return ret;
-	}
-
-	std::map<std::string, std::string> readParameterStream(std::stringstream &paramStream) {
-		std::string key = "", value;
-		std::map<std::string, std::string> params;
-		std::getline(paramStream, key, ':');
-
-		while (key.length() != 0) {
-			std::getline(paramStream, value);
-			Rain::strTrimWhite(&value);
-			Rain::strTrimWhite(&key);
-			params[key] = value;
-			key = "";
-			std::getline(paramStream, key, ':');
-		}
-		return params;
-	}
-	std::map<std::string, std::string> readParameterString(std::string paramString) {
-		std::stringstream ss;
-		ss << paramString;
-		return readParameterStream(ss);
-	}
-	std::map<std::string, std::string> readParameterFile(std::string filePath) {
-		std::ifstream fileIn;
-
-		fileIn.open(filePath, std::ios::binary);
-		std::stringstream ss;
-		ss << fileIn.rdbuf();
-		std::map<std::string, std::string> ret = readParameterStream(ss);
-		fileIn.close();
-		return ret;
-	}
-	void writeParameterFile(std::string filePath, std::map<std::string, std::string> params) {
-		std::ofstream fileOut(filePath, std::ios::binary);
-
-		for (auto it = params.begin(); it != params.end(); it++) {
-			fileOut << it->first << ": " << it->second << CRLF;
-		}
-
-		fileOut.close();
-	}
-
 	bool isFileWritable(std::string file) {
 		FILE *fp;
 		fopen_s(&fp, file.c_str(), "w");
@@ -368,5 +307,14 @@ namespace Rain {
 		ldir = getDirs(pathToAbsolute(dir), "*");
 		lfile = getFiles(pathToAbsolute(dir), "*");
 		return (ldir.size() == 2 && lfile.size() == 0);
+	}
+
+	std::string getTmpFileName() {
+		TCHAR path[MAX_PATH + 1];
+		GetTempPath(MAX_PATH + 1, path);
+
+		TCHAR file[MAX_PATH + 1];
+		GetTempFileName(path, "", 0, file);
+		return file;
 	}
 }

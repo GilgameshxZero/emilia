@@ -6,7 +6,7 @@ namespace Rain {
 		return WSAStartup(MAKEWORD(2, 2), &wsaData);
 	}
 	int getTargetAddr(struct addrinfo **target, std::string host, std::string port,
-					  int family, int sockType, int type) {
+		int family, int sockType, int type) {
 		static struct addrinfo hints;
 
 		ZeroMemory(&hints, sizeof(hints));
@@ -17,7 +17,7 @@ namespace Rain {
 		return getaddrinfo(host.c_str(), port.c_str(), &hints, target);
 	}
 	int getServerAddr(struct addrinfo **server, std::string port,
-					  int family, int sockType, int type, int flags) {
+		int family, int sockType, int type, int flags) {
 		struct addrinfo hints;
 
 		ZeroMemory(&hints, sizeof(hints));
@@ -29,7 +29,7 @@ namespace Rain {
 		return getaddrinfo(NULL, port.c_str(), &hints, server);
 	}
 	int createSocket(SOCKET &newSocket,
-					 int family, int sockType, int type) {
+		int family, int sockType, int type) {
 		newSocket = socket(family, sockType, type);
 		if (newSocket == INVALID_SOCKET)
 			return WSAGetLastError();
@@ -41,7 +41,7 @@ namespace Rain {
 
 		curaddr = (*target);
 		while (true) {
-			ret = connect(cSocket, curaddr->ai_addr, (int) curaddr->ai_addrlen);
+			ret = connect(cSocket, curaddr->ai_addr, (int)curaddr->ai_addrlen);
 			if (ret == SOCKET_ERROR)
 				ret = WSAGetLastError();
 			else
@@ -55,7 +55,7 @@ namespace Rain {
 		return ret;
 	}
 	int bindListenSocket(struct addrinfo **addr, SOCKET &lSocket) {
-		if (bind(lSocket, (*addr)->ai_addr, (int) (*addr)->ai_addrlen))
+		if (bind(lSocket, (*addr)->ai_addr, (int)(*addr)->ai_addrlen))
 			return -1;
 		if (listen(lSocket, SOMAXCONN))
 			return -1;
