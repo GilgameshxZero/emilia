@@ -131,7 +131,7 @@ namespace Rain {
 
 			// Any other characters are percent-encoded
 			escaped << std::uppercase;
-			escaped << '%' << std::setw(2) << int((unsigned char) c);
+			escaped << '%' << std::setw(2) << int((unsigned char)c);
 			escaped << std::nouppercase;
 		}
 

@@ -245,13 +245,16 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
       </ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="..\src\build-helper.h" />
-    <ClInclude Include="..\src\command-handler-param.h" />
+    <ClInclude Include="..\src\build-utils.h" />
     <ClInclude Include="..\src\command-handler.h" />
+    <ClInclude Include="..\src\constants.h" />
     <ClInclude Include="..\src\http-server.h" />
+    <ClInclude Include="..\src\main-param.h" />
     <ClInclude Include="..\src\main.h" />
+    <ClInclude Include="..\src\project-utils.h" />
     <ClInclude Include="..\src\rain-aeternum\algorithm-libraries.h" />
     <ClInclude Include="..\src\rain-aeternum\condition-variable.h" />
+    <ClInclude Include="..\src\rain-aeternum\config.h" />
     <ClInclude Include="..\src\rain-aeternum\gdi-plus-include.h" />
     <ClInclude Include="..\src\rain-aeternum\network-base.h" />
     <ClInclude Include="..\src\rain-aeternum\network-client-manager.h" />
@@ -276,20 +279,21 @@
     <ClInclude Include="..\src\rain-aeternum\windows-lam-include.h" />
     <ClInclude Include="..\src\smtp-external-client.h" />
     <ClInclude Include="..\src\smtp-server.h" />
-    <ClInclude Include="..\src\update-client-param.h" />
-    <ClInclude Include="..\src\update-client.h" />
-    <ClInclude Include="..\src\update-helper-param.h" />
-    <ClInclude Include="..\src\update-helper.h" />
-    <ClInclude Include="..\src\update-server-param.h" />
-    <ClInclude Include="..\src\update-server.h" />
+    <ClInclude Include="..\src\deploy-client-param.h" />
+    <ClInclude Include="..\src\deploy-client.h" />
+    <ClInclude Include="..\src\deploy-server-param.h" />
+    <ClInclude Include="..\src\deploy-server.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\build-helper.cpp" />
+    <ClCompile Include="..\src\build-utils.cpp" />
     <ClCompile Include="..\src\command-handler.cpp" />
+    <ClCompile Include="..\src\constants.cpp" />
     <ClCompile Include="..\src\http-server.cpp" />
     <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\project-utils.cpp" />
     <ClCompile Include="..\src\rain-aeternum\algorithm-libraries.cpp" />
     <ClCompile Include="..\src\rain-aeternum\condition-variable.cpp" />
+    <ClCompile Include="..\src\rain-aeternum\config.cpp" />
     <ClCompile Include="..\src\rain-aeternum\network-base.cpp" />
     <ClCompile Include="..\src\rain-aeternum\network-client-manager.cpp" />
     <ClCompile Include="..\src\rain-aeternum\network-headed-managers.cpp" />
@@ -308,71 +312,24 @@
     <ClCompile Include="..\src\rain-aeternum\utility-time.cpp" />
     <ClCompile Include="..\src\smtp-external-client.cpp" />
     <ClCompile Include="..\src\smtp-server.cpp" />
-    <ClCompile Include="..\src\update-client.cpp" />
-    <ClCompile Include="..\src\update-helper.cpp" />
-    <ClCompile Include="..\src\update-server.cpp" />
+    <ClCompile Include="..\src\deploy-client.cpp" />
+    <ClCompile Include="..\src\deploy-server.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
-    <None Include="..\bin\update-script.bat" />
+    <None Include="..\bin\emilia-x64-release.exe" />
     <None Include="..\build\build-inc.bat" />
-    <None Include="..\build\build-scripts.bat" />
-    <None Include="..\build\build.bat" />
     <None Include="..\build\post-build-event.bat" />
     <None Include="..\build\pre-build-event.bat" />
-    <None Include="..\build\setup-env.bat" />
     <None Include="..\changelog.md" />
-    <None Include="..\config\config.ini" />
-    <None Include="..\config\http-404.html" />
-    <None Include="..\config\http-cgi.ini" />
-    <None Include="..\config\http-content-type.ini" />
-    <None Include="..\config\http-headers.ini" />
-    <None Include="..\config\update-exc-ignores.ini" />
-    <None Include="..\config\update-exclusives.ini" />
-    <None Include="..\config\update-ignores.ini" />
-    <None Include="..\data\mac-ip.ini" />
-    <None Include="..\data\mail-users.ini" />
-    <None Include="..\data\mlist-subs.ini" />
-    <None Include="..\exclusive\emilia-tan.com\config\config.ini" />
-    <None Include="..\exclusive\emilia-tan.com\config\http-404.html" />
-    <None Include="..\exclusive\emilia-tan.com\config\http-cgi.ini" />
-    <None Include="..\exclusive\emilia-tan.com\config\http-content-type.ini" />
-    <None Include="..\exclusive\emilia-tan.com\config\http-headers.ini" />
-    <None Include="..\exclusive\emilia-tan.com\config\update-exc-ignores.ini" />
-    <None Include="..\exclusive\emilia-tan.com\config\update-exclusives.ini" />
-    <None Include="..\exclusive\emilia-tan.com\config\update-ignores.ini" />
-    <None Include="..\exclusive\emilia-tan.com\data\mail-users.ini" />
-    <None Include="..\exclusive\emilia-tan.com\data\mlist-subs.ini" />
-    <None Include="..\exclusive\emilia-tan.com\data\track-mac-ip.ini" />
     <None Include="..\readme.md" />
-    <CopyFileToFolders Include="..\src\update-script.bat">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
-      </ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">
-      </ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|x64'">
-      </ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
-      </ExcludedFromBuild>
-      <FileType>Document</FileType>
-    </CopyFileToFolders>
     <None Include="..\todo.md" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\rc\icon.ico" />
-    <Image Include="..\rc\icon.png" />
-    <Image Include="..\rc\orig.png" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\rc\rc.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\exclusive\emilia-tan.com\logs\errors.log" />
-    <Text Include="..\exclusive\emilia-tan.com\logs\log.log" />
-    <Text Include="..\exclusive\emilia-tan.com\logs\memory-leaks.log" />
-    <Text Include="..\logs\errors.log" />
-    <Text Include="..\logs\log.log" />
-    <Text Include="..\logs\memory-leaks.log" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

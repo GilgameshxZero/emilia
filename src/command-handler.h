@@ -2,29 +2,23 @@
 
 #include "rain-aeternum/rain-libraries.h"
 
-#include "command-handler-param.h"
+#include "main-param.h"
+#include "project-utils.h"
 #include "main.h"
-#include "update-client.h"
-#include "update-helper.h"
 
-#include <map>
-#include <ShellAPI.h>
-#include <string>
+#include "deploy-client.h"
 
 namespace Emilia {
-	typedef int(*CommandMethodHandler)(CommandHandlerParam &);
+	namespace CommandHandler {
+		//handlers should return nonzero to immediately terminate program
+		typedef int(*CommandHandler)(MainParam &);
 
-	//handlers should return nonzero to immediately terminate program
-	int CHExit(CommandHandlerParam &cmhParam);
-	int CHHelp(CommandHandlerParam &cmhParam);
-	int CHConnect(CommandHandlerParam &cmhParam);
-	int CHDisconnect(CommandHandlerParam &cmhParam);
-	int CHPush(CommandHandlerParam &cmhParam);
-	int CHPushExclusive(CommandHandlerParam &cmhParam);
-	int CHPull(CommandHandlerParam &cmhParam);
-	int CHSync(CommandHandlerParam &cmhParam);
-	int CHStart(CommandHandlerParam &cmhParam);
-	int CHStop(CommandHandlerParam &cmhParam);
-	int CHRestart(CommandHandlerParam &cmhParam);
-	int CHRestartAll(CommandHandlerParam &cmhParam);
+		int Exit(MainParam &mp);
+		int Restart(MainParam &mp);
+		int Server(MainParam &mp);
+		int Connect(MainParam &mp);
+		int Disconnect(MainParam &mp);
+		int Project(MainParam &mp);
+		int Sync(MainParam &mp);
+	}
 }

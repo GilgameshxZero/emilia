@@ -21,4 +21,5 @@ To use the libraries, all files in the Rain library directory must be added to t
 #include "utility-libraries.h"
 
 #include "condition-variable.h"
+#include "config.h"
 #include "timer.h"

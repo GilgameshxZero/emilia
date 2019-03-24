@@ -16,8 +16,8 @@ namespace Rain {
 	std::pair<std::streambuf *, std::ofstream *> redirectCerrFile(std::string filename, bool append) {
 		std::ofstream *cerrfile = new std::ofstream();
 		cerrfile->open(filename, std::ios_base::out |
-					  std::ios_base::binary |
-					  (append ? std::ios_base::app : 1));
+			std::ios_base::binary |
+			(append ? std::ios_base::app : 1));
 		return std::make_pair(std::cerr.rdbuf(cerrfile->rdbuf()), cerrfile);
 	}
 }

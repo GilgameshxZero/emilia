@@ -10,32 +10,8 @@
     <Filter Include="rc">
       <UniqueIdentifier>{1dda29b2-3abf-45a1-8d6a-47436c079702}</UniqueIdentifier>
     </Filter>
-    <Filter Include="logs">
-      <UniqueIdentifier>{b7abf1b1-d54b-4abe-8613-659d043d8d40}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="config">
-      <UniqueIdentifier>{ab1b3081-c7c7-44a1-8d9f-767075bd48ff}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="data">
-      <UniqueIdentifier>{b417e276-a129-4a7a-b08d-b6f7dabbf367}</UniqueIdentifier>
-    </Filter>
     <Filter Include="bin">
       <UniqueIdentifier>{1da75a11-4f7c-458a-b83e-9692b48b681a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="exclusive">
-      <UniqueIdentifier>{8e8f8bf7-6602-460b-b3b9-83ea8842e64e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="exclusive\emilia-tan.com">
-      <UniqueIdentifier>{7de07f48-d714-42c6-8f0f-bd95699d7204}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="exclusive\emilia-tan.com\config">
-      <UniqueIdentifier>{ce0340ff-1bb5-48a7-a7ae-0eaf41965328}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="exclusive\emilia-tan.com\logs">
-      <UniqueIdentifier>{b26c3850-321b-41eb-8987-29a5f4efde43}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="exclusive\emilia-tan.com\data">
-      <UniqueIdentifier>{8c666b16-b246-4db7-ae35-019f3034a8e6}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\rain-aeternum">
       <UniqueIdentifier>{b30b134a-d98e-4e14-8747-ffb825b87052}</UniqueIdentifier>
@@ -111,28 +87,7 @@
     <ClInclude Include="..\src\rain-aeternum\windows-lam-include.h">
       <Filter>src\rain-aeternum</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\update-server.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\update-client.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\command-handler-param.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\command-handler.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\update-client-param.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\update-helper.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\update-server-param.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\build-helper.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\rc\build.h">
@@ -147,14 +102,38 @@
     <ClInclude Include="..\src\rain-aeternum\network-headed-managers.h">
       <Filter>src\rain-aeternum</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\update-helper-param.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\rain-aeternum\condition-variable.h">
       <Filter>src\rain-aeternum</Filter>
     </ClInclude>
     <ClInclude Include="..\src\rain-aeternum\timer.h">
       <Filter>src\rain-aeternum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\deploy-client.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\deploy-client-param.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\deploy-server.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\deploy-server-param.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\rain-aeternum\config.h">
+      <Filter>src\rain-aeternum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\constants.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\project-utils.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\main-param.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\build-utils.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -209,19 +188,7 @@
     <ClCompile Include="..\src\rain-aeternum\utility-time.cpp">
       <Filter>src\rain-aeternum</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\update-server.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\update-client.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\command-handler.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\update-helper.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\build-helper.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\smtp-external-client.cpp">
@@ -239,108 +206,45 @@
     <ClCompile Include="..\src\rain-aeternum\timer.cpp">
       <Filter>src\rain-aeternum</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\deploy-client.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\deploy-server.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\rain-aeternum\config.cpp">
+      <Filter>src\rain-aeternum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\constants.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\project-utils.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\build-utils.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\build\build.bat">
-      <Filter>build</Filter>
-    </None>
-    <None Include="..\config\config.ini">
-      <Filter>config</Filter>
-    </None>
-    <None Include="..\config\http-404.html">
-      <Filter>config</Filter>
-    </None>
-    <None Include="..\config\http-cgi.ini">
-      <Filter>config</Filter>
-    </None>
-    <None Include="..\config\http-content-type.ini">
-      <Filter>config</Filter>
-    </None>
-    <None Include="..\config\http-headers.ini">
-      <Filter>config</Filter>
-    </None>
     <None Include="..\.gitignore" />
     <None Include="..\changelog.md" />
     <None Include="..\readme.md" />
     <None Include="..\todo.md" />
-    <None Include="..\config\update-exclusives.ini">
-      <Filter>config</Filter>
-    </None>
-    <None Include="..\data\mail-users.ini">
-      <Filter>data</Filter>
-    </None>
-    <None Include="..\config\update-ignores.ini">
-      <Filter>config</Filter>
-    </None>
-    <None Include="..\bin\update-script.bat">
-      <Filter>bin</Filter>
-    </None>
-    <None Include="..\exclusive\emilia-tan.com\config\update-ignores.ini">
-      <Filter>exclusive\emilia-tan.com\config</Filter>
-    </None>
-    <None Include="..\exclusive\emilia-tan.com\config\config.ini">
-      <Filter>exclusive\emilia-tan.com\config</Filter>
-    </None>
-    <None Include="..\exclusive\emilia-tan.com\config\http-404.html">
-      <Filter>exclusive\emilia-tan.com\config</Filter>
-    </None>
-    <None Include="..\exclusive\emilia-tan.com\config\http-cgi.ini">
-      <Filter>exclusive\emilia-tan.com\config</Filter>
-    </None>
-    <None Include="..\exclusive\emilia-tan.com\config\http-content-type.ini">
-      <Filter>exclusive\emilia-tan.com\config</Filter>
-    </None>
-    <None Include="..\exclusive\emilia-tan.com\config\http-headers.ini">
-      <Filter>exclusive\emilia-tan.com\config</Filter>
-    </None>
-    <None Include="..\exclusive\emilia-tan.com\config\update-exclusives.ini">
-      <Filter>exclusive\emilia-tan.com\config</Filter>
-    </None>
     <None Include="..\build\build-inc.bat">
       <Filter>build</Filter>
     </None>
     <None Include="..\build\pre-build-event.bat">
       <Filter>build</Filter>
     </None>
-    <None Include="..\build\setup-env.bat">
-      <Filter>build</Filter>
-    </None>
-    <None Include="..\data\mac-ip.ini">
-      <Filter>data</Filter>
-    </None>
-    <None Include="..\build\build-scripts.bat">
-      <Filter>build</Filter>
-    </None>
     <None Include="..\build\post-build-event.bat">
       <Filter>build</Filter>
     </None>
-    <None Include="..\exclusive\emilia-tan.com\data\mail-users.ini">
-      <Filter>exclusive\emilia-tan.com\data</Filter>
-    </None>
-    <None Include="..\exclusive\emilia-tan.com\data\track-mac-ip.ini">
-      <Filter>exclusive\emilia-tan.com\data</Filter>
-    </None>
-    <None Include="..\data\mlist-subs.ini">
-      <Filter>data</Filter>
-    </None>
-    <None Include="..\exclusive\emilia-tan.com\data\mlist-subs.ini">
-      <Filter>exclusive\emilia-tan.com\data</Filter>
-    </None>
-    <None Include="..\exclusive\emilia-tan.com\config\update-exc-ignores.ini">
-      <Filter>exclusive\emilia-tan.com\config</Filter>
-    </None>
-    <None Include="..\config\update-exc-ignores.ini">
-      <Filter>config</Filter>
+    <None Include="..\bin\emilia-x64-release.exe">
+      <Filter>bin</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\rc\icon.ico">
-      <Filter>rc</Filter>
-    </Image>
-    <Image Include="..\rc\icon.png">
-      <Filter>rc</Filter>
-    </Image>
-    <Image Include="..\rc\orig.png">
       <Filter>rc</Filter>
     </Image>
   </ItemGroup>
@@ -348,30 +252,5 @@
     <ResourceCompile Include="..\rc\rc.rc">
       <Filter>rc</Filter>
     </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\logs\errors.log">
-      <Filter>logs</Filter>
-    </Text>
-    <Text Include="..\logs\log.log">
-      <Filter>logs</Filter>
-    </Text>
-    <Text Include="..\logs\memory-leaks.log">
-      <Filter>logs</Filter>
-    </Text>
-    <Text Include="..\exclusive\emilia-tan.com\logs\errors.log">
-      <Filter>exclusive\emilia-tan.com\logs</Filter>
-    </Text>
-    <Text Include="..\exclusive\emilia-tan.com\logs\log.log">
-      <Filter>exclusive\emilia-tan.com\logs</Filter>
-    </Text>
-    <Text Include="..\exclusive\emilia-tan.com\logs\memory-leaks.log">
-      <Filter>exclusive\emilia-tan.com\logs</Filter>
-    </Text>
-  </ItemGroup>
-  <ItemGroup>
-    <CopyFileToFolders Include="..\src\update-script.bat">
-      <Filter>src</Filter>
-    </CopyFileToFolders>
   </ItemGroup>
 </Project>

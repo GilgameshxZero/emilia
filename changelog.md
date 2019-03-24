@@ -1,5 +1,24 @@
 # Changelog
 
+## 6.0.0
+
+* Conceptual
+  * Revamped deployment routine.
+  * Revamped configuration specification.
+  * Separated logging into separate streams for each server.
+  * Added blocking for send as an option for all `SocketManager`s.
+* Formatting & code
+  * Reformatted some files to have `else` on same line as bracket.
+  * Moved command line arguments to `constants.h` file.
+  * Batch executable update script and default configuration have been moved to strings within project.
+* Deployment
+  * Sync now concurrently uploads and downloads.
+* Configuration
+  * By default, HTTP server has a content-type of `application/octet-stream`, which is not specified in the configuration anymore.
+  * Connecting to a remote server can choose which port to connect on as well.
+* Bugfixes
+  * Fixed multithreading in `NetworkClientManager` causing sporadic failures during sending.
+
 ## 5.7.8
 
 * Removed scripts from version control.
@@ -12,13 +31,13 @@
 
 * Update server and client now disconnect if server detects an existing connection with another client.
 * Added options in `ClientSocketManager` to enable reconnect on disconnect functionality rather than by default.
-* Create a separate .cpp for `RecvHandlerParam`.
+* Create a separate `.cpp` for `RecvHandlerParam`.
 
 ## 5.7.5
 
 * Add configuration specification section in readme.
 * Specify more granular update files.
-* Update .gitignore and remove some resource files from VC.
+* Update `.gitignore` and remove some resource files from VC.
 
 ## 5.7.4
 
@@ -63,7 +82,7 @@
 ## 5.6.3
 
 * HTTP server now creates an extra thread for each connection to process messages.
-  * This thread is able to be terminated by recvThread for fast connection closes.
+  * This thread is able to be terminated by `recvThread` for fast connection closes.
   * `wait-10-secs` works as expected now.
 
 ## 5.6.2
@@ -125,7 +144,7 @@
 ## 5.3.2
 
 * Query string URI conversion is now delayed from HTTP server to scripts, fixing any conversion issues before.
-* HTTP server headerDelim is fixed.
+* HTTP server `headerDelim` is fixed.
 
 ## 5.3.1
 
@@ -137,7 +156,7 @@
 * Now uses `std::this_thread::sleep_for` instead of `Sleep`.
 * Use `std::cout.flush()` instead of `fflush(stdout)`.
 * Slightly more informative logging distinguishes between HTTP & SMTP client connects/disconnects and removes `Info:` tag.
-* Uses `Rain` integrated line endings instead of `\r\n` which is more platform-independant.
+* Uses `Rain` integrated line endings instead of `\r\n` which is more platform-independent.
 * Replace all uses of `CreateThread` with `std::thread`.
 
 ## 5.2.9
@@ -153,7 +172,7 @@
 
 * Small console output change to server side of `push`.
 * Only one instance of the application can run at the same time from the same .exe.
-* `push-exclusive` now restarts application with update script when there are unwritable locked files.
+* `push-exclusive` now restarts application with update script when there are un-writable locked files.
 * Sending 0 bytes no longer displays as `nan-ind%`.
 
 ## 5.2.6
@@ -186,7 +205,7 @@
 
 ## 5.2.0
 
-* Added todos.
+* Added to-do's.
 * Cleaned `Rain` headers.
 * Started ideating and implementing `headed` socket messages, which have a predefined length like `blocked` messages but are more concise.
 
@@ -207,7 +226,7 @@
 
 ## 5.1.5
 
-* Flush stdout more often with `push` on server end.
+* Flush `stdout` more often with `push` on server end.
 * Server closes connection on authentication fail.
 * Internal SMTP server is now gone; all mail is directly forwarded/sent.
 
@@ -221,13 +240,13 @@
 * Merged common code between `push` and `push-exclusive`.
 * Requires authentication for high-level commands.
 * Automatically re-authenticates on reconnect.
-* Client shows requested filelist on `push`, and `push-exclusive`.
+* Client shows requested file list on `push`, and `push-exclusive`.
 * HTTP & SMTP servers automatically start on startup.
 
 ## 5.1.2
 
 * New build versioning makes compiles faster.
-* Moved some params to external header files.
+* Moved some parameters to external header files.
 
 ## 5.1.1
 

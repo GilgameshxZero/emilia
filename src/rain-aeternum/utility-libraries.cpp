@@ -9,7 +9,7 @@ namespace Rain {
 
 	COLORREF colorFromHex(std::string hex) {
 		return RGB(static_cast<unsigned char>(hexToChr(std::make_pair(hex[0], hex[1]))),
-				   static_cast<unsigned char>(hexToChr(std::make_pair(hex[2], hex[3]))),
-				   static_cast<unsigned char>(hexToChr(std::make_pair(hex[4], hex[5]))));
+			static_cast<unsigned char>(hexToChr(std::make_pair(hex[2], hex[3]))),
+			static_cast<unsigned char>(hexToChr(std::make_pair(hex[4], hex[5]))));
 	}
 }  // namespace Rain

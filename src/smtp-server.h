@@ -5,7 +5,6 @@
 
 #include "smtp-external-client.h"
 
-#include <map>
 #include <WinDNS.h>
 
 namespace Emilia {
@@ -30,16 +29,15 @@ namespace Emilia {
 		};
 
 		struct ConnectionCallerParam {
-			std::map<std::string, std::string> *config;
+			std::string project;
+			Rain::Configuration *config;
+			Rain::LogStream *logSMTP;
+
+			//total number of connected clients
+			int connectedClients = 0;
 
 			//username/password pairs in base-64
 			std::map<std::string, std::string> b64Users;
-
-			//used to log socket coms from main
-			Rain::LogStream *logger;
-
-			//total number of connected clients
-			int connectedClients;
 		};
 
 		struct ConnectionDelegateParam {
