@@ -2,10 +2,10 @@
 
 namespace Rain {
 	int reportError(int code, std::string desc) {
+		std::cerr << code;
 		if (desc != "")
-			std::cerr << desc << std::endl;
-
-		std::cerr << "Error code: " << code << std::endl;
+			std::cerr << ": " << desc;
+		std::cerr << Rain::CRLF;
 		return code;
 	}
 	int errorAndCout(int code, std::string desc, std::string endl) {

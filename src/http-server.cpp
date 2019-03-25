@@ -271,10 +271,12 @@ namespace Emilia {
 				//also, store some other useful information as environment variables
 				envBlock += "CLIENT_IP=" + Rain::getClientNumIP(cSocket);
 				envBlock.push_back('\0');
+				envBlock += "EMILIA_VERSION=" + getVersionStr();
+				envBlock.push_back('\0');
 
 				//append current environment block
 				LPCH curEnvBlock = GetEnvironmentStrings();
-				int prevVarBeg = 0;
+				int prevVarBeg = -1;
 				for (int a = 0;; a++) {
 					if (curEnvBlock[a] == '\0') {
 						envBlock += std::string(curEnvBlock + prevVarBeg + 1, curEnvBlock + a);
@@ -284,6 +286,7 @@ namespace Emilia {
 							break;
 					}
 				}
+				FreeEnvironmentStrings(curEnvBlock);
 
 				//end the environment variables
 				envBlock.push_back('\0');
@@ -404,7 +407,7 @@ namespace Emilia {
 			} else {
 				//not a cgi script, must be a file request
 				//extract file extension
-				std::string requestFileExt = requestFile.substr(requestFile.rfind(".") + 1, std::string::npos);
+				std::string requestFileExt = requestFilePath.substr(requestFilePath.rfind(".") + 1, std::string::npos);
 				Rain::strToLower(&requestFileExt);
 
 				std::string contentType;

@@ -28,7 +28,10 @@ namespace Rain {
 
 		this->destructing = false;
 
-		initWinsock22();
+		int error = initWinsock22();
+		if (error) {
+			reportError(error, "ClientSocketManager: initWinsock22 failed, no resolution implemented");
+		}
 
 		//create the send thread once for every manager
 		this->hSendThread = simpleCreateThread(ClientSocketManager::attemptSendMessageThread, this);
@@ -185,7 +188,11 @@ namespace Rain {
 		csm.freePortAddrs();
 		csm.portAddrs.resize(csm.highPort - csm.lowPort + 1, NULL);
 
-		createSocket(csm.socket);
+		if (createSocket(csm.socket)) {
+			reportError(WSAGetLastError(), "ClientSocketManager: createSocket failed, aborting...");
+			SetEvent(csm.connectEvent);
+			return -1;
+		}
 
 		while (csm.socketStatus == csm.STATUS_CONNECTING) {
 			Rain::sleep(csm.msReconnectWait);
@@ -200,7 +207,7 @@ namespace Rain {
 
 				if (csm.portAddrs[a - csm.lowPort] == NULL) { //address not yet found, get it now
 					if (getTargetAddr(&csm.portAddrs[a - csm.lowPort], csm.ipAddress, Rain::tToStr(a))) {
-						reportError(WSAGetLastError(), "getaddrinfo error while connecting ClientSocketManager");
+						reportError(WSAGetLastError(), "ClientSocketManager: getTargetAddr failed, retrying...");
 						continue;
 					}
 				}
@@ -221,6 +228,10 @@ namespace Rain {
 					createRecvThread(&csm.rParam);
 
 					break;
+				} else {
+					reportError(WSAGetLastError(), "ClientSocketManager: connectTarget failed, retrying...");
+					std::cerr << csm.socket << Rain::CRLF;
+					continue;
 				}
 			}
 		}

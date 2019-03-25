@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	//restart the application if it didn't finish successfully
-	if (FAILED(RegisterApplicationRestart(Rain::mbStrToWStr("-r " + Emilia::CMDL_CRASH_RESTART + "-s 3").c_str(), 0))) {
+	if (FAILED(RegisterApplicationRestart(Rain::mbStrToWStr("-r " + Emilia::CMDL_CRASH_RESTART + " -s 3").c_str(), 0))) {
 		std::cout << "RegisterApplicationRestart failed." << Rain::CRLF;
 	}
 

@@ -22,6 +22,6 @@ namespace Emilia {
 			return "0.0.0.0";
 		}
 
-		return std::string(reinterpret_cast<LPCSTR>(pvProductVersion), iProductVersionLen);
+		return std::string(reinterpret_cast<LPCSTR>(pvProductVersion), iProductVersionLen - 1);
 	}
 }

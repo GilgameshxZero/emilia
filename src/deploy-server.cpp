@@ -239,6 +239,8 @@ namespace Emilia {
 					DeleteFile(tmpIdxFile.c_str());
 				}
 
+				//TODO: pick an ignore set
+
 				//compute status of each managed file (modified/deleted at time T) w.r.t. index
 				std::vector<std::string> files = listProjectFiles(project, config["deploy-ignore"]);
 
@@ -365,6 +367,8 @@ namespace Emilia {
 					si.receiving.push_back(std::make_pair(file, Rain::strToT<size_t>(len)));
 				}
 
+				Rain::tsCout(std::fixed, std::setprecision(2));
+
 				//start thread to send files in same order as in si.sending
 				si.sendThread = std::thread(syncSendFiles, project, config["emilia-buffer"].i(), &si.sending, &remote);
 
@@ -374,7 +378,7 @@ namespace Emilia {
 				if (si.receiving.size() > 0) {
 					Rain::createDirRec(Rain::getPathDir(project + si.receiving[0].first));
 					DeleteFile((project + si.receiving[0].first).c_str());
-					Rain::tsCout("Receiving file 1 of ", si.receiving.size(), " (", si.receiving[0].second, " bytes @ ", si.receiving[0].first, ")...", Rain::CRLF);
+					Rain::tsCout("Receiving file 1 of ", si.receiving.size(), " (", si.receiving[0].second / 1e6, " MB @ ", si.receiving[0].first, ")...", Rain::CRLF);
 					std::cout.flush();
 				}
 				si.stage = "recv-files";
@@ -399,14 +403,14 @@ namespace Emilia {
 						//ensure directory containing file exists
 						Rain::createDirRec(Rain::getPathDir(project + si.receiving[si.curFile].first));
 						DeleteFile((project + si.receiving[si.curFile].first).c_str());
-						Rain::tsCout("Receiving file ", si.curFile + 1, " of ", si.receiving.size(), " (", si.receiving[si.curFile].second, " bytes @ ", si.receiving[si.curFile].first, ")...", Rain::CRLF);
+						Rain::tsCout("Receiving file ", si.curFile + 1, " of ", si.receiving.size(), " (", si.receiving[si.curFile].second / 1e6, " MB @ ", si.receiving[si.curFile].first, ")...", Rain::CRLF);
 						std::cout.flush();
 					}
 				}
 
 				//done with receiving?
 				if (si.curFile == si.receiving.size()) {
-					Rain::tsCout("Finished receiving files!", Rain::CRLF);
+					Rain::tsCout(std::defaultfloat, "Finished receiving files!", Rain::CRLF);
 
 					//wait until sending done
 					si.sendThread.join();
@@ -465,7 +469,7 @@ namespace Emilia {
 			char *buffer = new char[bufferSize];
 			Rain::tsCout(std::fixed);
 			for (size_t a = 0; a < sref.size(); a++) {
-				Rain::tsCout("Sending file ", a + 1, " of ", sref.size(), " (", sref[a].second, " bytes @ ", sref[a].first, ")...", Rain::CRLF);
+				Rain::tsCout("Sending file ", a + 1, " of ", sref.size(), " (", sref[a].second / 1e6, " MB @ ", sref[a].first, ")...", Rain::CRLF);
 				std::cout.flush();
 				std::ifstream in(project + sref[a].first, std::ios::binary);
 				size_t readFromFile = 0;
