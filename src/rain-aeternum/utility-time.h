@@ -13,7 +13,7 @@ Utility functions related to time formats.
 #include <thread>
 
 namespace Rain {
-	std::string getTime(std::string format = "%D.%T%z");
+	std::string getTime(std::string format = "%D.%T%z", time_t now = time(0));
 
 	void sleep(int ms);
 }

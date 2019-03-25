@@ -1,8 +1,7 @@
 #include "utility-time.h"
 
 namespace Rain {
-	std::string getTime(std::string format) {
-		time_t     now = time(0);
+	std::string getTime(std::string format, time_t now) {
 		struct tm  tstruct;
 		char       buf[80];
 		localtime_s(&tstruct, &now);

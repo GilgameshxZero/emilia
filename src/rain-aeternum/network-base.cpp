@@ -2,12 +2,12 @@
 
 namespace Rain {
 	int initWinsock22() {
-		static WSADATA wsaData;
+		WSADATA wsaData;
 		return WSAStartup(MAKEWORD(2, 2), &wsaData);
 	}
 	int getTargetAddr(struct addrinfo **target, std::string host, std::string port,
 		int family, int sockType, int type) {
-		static struct addrinfo hints;
+		struct addrinfo hints;
 
 		ZeroMemory(&hints, sizeof(hints));
 		hints.ai_family = family;
@@ -36,8 +36,8 @@ namespace Rain {
 		return 0;
 	}
 	int connectTarget(SOCKET &cSocket, struct addrinfo **target) {
-		static struct addrinfo *curaddr;
-		static int ret;
+		struct addrinfo *curaddr;
+		int ret;
 
 		curaddr = (*target);
 		while (true) {
@@ -74,7 +74,7 @@ namespace Rain {
 	}
 
 	int sendRawMessage(SOCKET &sock, const char *cstrtext, int len) {
-		static int sent, ret;
+		int sent, ret;
 
 		sent = ret = 0;
 		while (sent < len) {
