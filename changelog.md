@@ -1,5 +1,21 @@
 # Changelog
 
+## 6.0.1
+
+* Features
+  * Added environment variable `EMILIA_VERSION` for CGI scripts to retrieve server version.
+* QOL
+  * Transfer sizes now in MB.
+  * `getTime` now allows to get specified `time_t` in format.
+  * `ClientSocketManager` now has more comprehensive error reporting.
+  * `reportError` now puts error code on same line as error description.
+* Bugfixes
+  * Removed `static` qualifier on some function variables in `network-base`.
+  * Fixed bug cutting off the first character in the first environment variable passed to CGI scripts.
+  * `getVersionStr` now removes the final '\0' character.
+  * 404 requests now resolve correctly.
+  * Crash restarts now start servers automatically correctly.
+
 ## 6.0.0
 
 * Conceptual
