@@ -1,5 +1,29 @@
 # Changelog
 
+## 6.0.2
+
+* Features
+  * `CTRL-C` signals now terminate program as expected.
+  * Exiting the program is now accomplished with `WriteConsoleInput`, which allows peaceful termination.
+* Organization
+  * Removed unnecessary `.gitignore` lines.
+  * `bin` no longer in VS project.
+  * `build-utils` and `project-utils` combined into `utils` package.
+  * Separated out server parameter structs into `http-server-param` and `smtp-server-param`.
+  * Command handler functions are no longer capitalized.
+  * Moved some magic numbers and strings to `constants`.
+  * Restart codes are now defined as an `enum` in `constants`.
+  * `HandleRequest` functions merged into `onMessage`.
+* Quality-of-life
+  * Capitalized build event outputs.
+  * `build-inc` now outputs build number.
+  * `server` command now outputs remote server status when connected.
+* Style
+  * Command line interpretation is now a `switch` statement.
+  * `include`s are more compact, and ordering consistent.
+  * Added docstring to `checksumFileCRC32`.
+  * Added error handling for WinAPI functions in `main`.
+
 ## 6.0.1
 
 * Features

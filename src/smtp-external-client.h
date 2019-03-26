@@ -1,9 +1,4 @@
-/*
-Manages CSM to external SMTP servers; used by the internal client.
-*/
-
 #pragma once
-
 #include "rain-aeternum/rain-libraries.h"
 
 namespace Emilia {

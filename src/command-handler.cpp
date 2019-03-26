@@ -2,16 +2,16 @@
 
 namespace Emilia {
 	namespace CommandHandler {
-		int Exit(MainParam &mp) {
+		int exit(MainParam &mp) {
 			if (mp.remoteCSM != NULL) {
 				delete mp.remoteCSM;
 				mp.remoteCSM = NULL;
 			}
 			return 1;
 		}
-		int Connect(MainParam &mp) {
+		int connect(MainParam &mp) {
 			if (mp.remoteCSM != NULL && mp.remoteCSM->getSocketStatus() == -1) {
-				Disconnect(mp);
+				disconnect(mp);
 			}
 			if (mp.remoteCSM != NULL) {
 				Rain::tsCout("Cannot execute 'connect' while already connected to remote.", Rain::CRLF);
@@ -25,8 +25,10 @@ namespace Emilia {
 			DWORD port;
 
 			Rain::tsCout("Remote address: ");
+			std::cout.flush();
 			std::cin >> remoteAddr;
 			Rain::tsCout("Use current project configuration authentication? (y/n): ");
+			std::cout.flush();
 			std::cin >> cfgResponse;
 
 			if (cfgResponse == "y") {
@@ -34,16 +36,19 @@ namespace Emilia {
 				port = config["deploy-port"].i();
 			} else {
 				Rain::tsCout("Remote password: ");
+				std::cout.flush();
 				std::cin >> pass;
 				Rain::strTrimWhite(&pass);
 				std::string s;
 				Rain::tsCout("Remote port: ");
+				std::cout.flush();
 				std::cin >> s;
 				port = Rain::strToT<DWORD>(s);
 			}
 
 			//attempt to connect to remote
-			Rain::tsCout("Connecting...", Rain::CRLF);
+			static const int CONNECT_TO_MS = 5000;
+			Rain::tsCout("Connecting (", CONNECT_TO_MS, "ms timeout)...", Rain::CRLF);
 			mp.remoteCSM = new Rain::HeadedClientSocketManager();
 			mp.deployCHP = new DeployClient::ConnectionHandlerParam();
 			mp.deployCHP->project = mp.project;
@@ -63,7 +68,7 @@ namespace Emilia {
 				mp.remoteCSM = NULL;
 				return 0;
 			} else if (status != 0) {
-				Rain::tsCout("Could not connect.", Rain::CRLF);
+				Rain::tsCout("Could not connect to remote server.", Rain::CRLF);
 				delete mp.remoteCSM;
 				mp.remoteCSM = NULL;
 				return 0;
@@ -75,7 +80,7 @@ namespace Emilia {
 
 			return 0;
 		}
-		int Disconnect(MainParam &mp) {
+		int disconnect(MainParam &mp) {
 			if (mp.remoteCSM == NULL) {
 				Rain::tsCout("Cannot disconnect when not connected.", Rain::CRLF);
 				return 0;
@@ -86,19 +91,26 @@ namespace Emilia {
 			delete mp.deployCHP;
 			return 0;
 		}
-		int Server(MainParam &mp) {
+		int server(MainParam &mp) {
 			if (mp.remoteCSM != NULL) {
 				Rain::tsCout("Connected to remote ", mp.remoteCSM->getTargetIP(), ".", Rain::CRLF);
-			}
-			if (mp.httpSM.getListeningPort() != -1) {
-				Rain::tsCout("Local HTTP server listening on port ", mp.httpSM.getListeningPort(), ".", Rain::CRLF);
+				Rain::sendHeadedMessage(*mp.remoteCSM, "server");
+
+				//wait for command to finish
+				std::unique_lock<std::mutex> lck(mp.deployCHP->connectedCommandCV.getMutex());
+				mp.deployCHP->connectedCommandCV.wait(lck);
 			} else {
-				Rain::tsCout("Local HTTP server not listening.", Rain::CRLF);
-			}
-			if (mp.smtpSM.getListeningPort() != -1) {
-				Rain::tsCout("Local SMTP server listening on port ", mp.smtpSM.getListeningPort(), ".", Rain::CRLF);
-			} else {
-				Rain::tsCout("Local SMTP server not listening.", Rain::CRLF);
+				Rain::tsCout("Not connected to remote.", Rain::CRLF);
+				if (mp.httpSM.getListeningPort() != -1) {
+					Rain::tsCout("HTTP server listening on port ", mp.httpSM.getListeningPort(), ".", Rain::CRLF);
+				} else {
+					Rain::tsCout("HTTP server not listening.", Rain::CRLF);
+				}
+				if (mp.smtpSM.getListeningPort() != -1) {
+					Rain::tsCout("SMTP server listening on port ", mp.smtpSM.getListeningPort(), ".", Rain::CRLF);
+				} else {
+					Rain::tsCout("SMTP server not listening.", Rain::CRLF);
+				}
 			}
 
 			std::string command;
@@ -133,7 +145,7 @@ namespace Emilia {
 
 			return 0;
 		}
-		int Restart(MainParam &mp) {
+		int restart(MainParam &mp) {
 			Rain::Configuration &config = *mp.config;
 
 			if (mp.remoteCSM == NULL) {
@@ -150,7 +162,7 @@ namespace Emilia {
 
 			return 0;
 		}
-		int Project(MainParam &mp) {
+		int project(MainParam &mp) {
 			Rain::tsCout("Project: ", mp.project, Rain::CRLF);
 			Rain::tsCout("Would you like to switch projects? (y/n): ");
 			std::string prompt;
@@ -197,9 +209,9 @@ namespace Emilia {
 
 			return 0;
 		}
-		int Sync(MainParam &mp) {
+		int sync(MainParam &mp) {
 			if (mp.remoteCSM != NULL && mp.remoteCSM->getSocketStatus() == -1) {
-				Disconnect(mp);
+				disconnect(mp);
 			}
 			if (mp.remoteCSM == NULL) {
 				Rain::tsCout("Cannot sync when not connected.", Rain::CRLF);
