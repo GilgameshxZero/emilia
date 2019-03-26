@@ -39,33 +39,16 @@ namespace Emilia {
 			return 0;
 		}
 		int onMessage(void *funcParam) {
-			Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam = *reinterpret_cast<Rain::ServerSocketManager::DelegateHandlerParam *>(funcParam);
-
-			return HandleRequest(ssmdhParam);
-		}
-		int onDisconnect(void *funcParam) {
-			Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam = *reinterpret_cast<Rain::ServerSocketManager::DelegateHandlerParam *>(funcParam);
-			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
-
-			ccParam.clientConnected = false;
-			Rain::tsCout("Update client disconnected." + Rain::CRLF);
-
-			//free the delegate parameter
-			delete ssmdhParam.delegateParam;
-			std::cout.flush();
-			return 0;
-		}
-
-		int HandleRequest(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam) {
+			Rain::ServerSocketManager::DelegateHandlerParam &ssmdhp = *reinterpret_cast<Rain::ServerSocketManager::DelegateHandlerParam *>(funcParam);
 			static const std::map<std::string, RequestMethodHandler> methodHandlerMap{
-				{"authenticate", Authenticate}, //validates a socket connection session
-				{"sync", Sync},
-				{"server", Server},
-				{"restart", Restart}
+				{"authenticate", authenticate}, //validates a socket connection session
+				{"sync", sync},
+				{"server", server},
+				{"restart", restart}
 			};
-			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
-			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
-			std::string &request = *ssmdhParam.message;
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhp.callerParam);
+			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhp.delegateParam);
+			std::string &request = *ssmdhp.message;
 
 			//takes until the end of string if ' ' can't be found
 			size_t firstSpace = request.find(' ');
@@ -82,19 +65,30 @@ namespace Emilia {
 			if (handler != methodHandlerMap.end()) {
 				//block if not authenticated
 				if (cdParam.requestMethod != "authenticate" && !cdParam.authenticated) {
-					Rain::sendHeadedMessage(*ssmdhParam.ssm, cdParam.requestMethod + " Not authenticated!" + Rain::CRLF);
+					Rain::sendHeadedMessage(*ssmdhp.ssm, cdParam.requestMethod + " Not authenticated!" + Rain::CRLF);
 				} else {
-					handlerRet = handler->second(ssmdhParam);
+					handlerRet = handler->second(ssmdhp);
 				}
 			} else {
 				Rain::tsCout("Error: Received unknown method from update client: ", cdParam.requestMethod, "." + Rain::CRLF);
 			}
 
-			std::cout.flush();
 			return handlerRet;
 		}
+		int onDisconnect(void *funcParam) {
+			Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam = *reinterpret_cast<Rain::ServerSocketManager::DelegateHandlerParam *>(funcParam);
+			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 
-		int Authenticate(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhp) {
+			ccParam.clientConnected = false;
+			Rain::tsCout("Update client disconnected." + Rain::CRLF);
+
+			//free the delegate parameter
+			delete ssmdhParam.delegateParam;
+			std::cout.flush();
+			return 0;
+		}
+
+		int authenticate(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhp) {
 			ConnectionCallerParam &ccp = *reinterpret_cast<ConnectionCallerParam *>(ssmdhp.callerParam);
 			ConnectionDelegateParam &cdp = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhp.delegateParam);
 			std::string &request = *ssmdhp.message;
@@ -116,7 +110,7 @@ namespace Emilia {
 			std::cout.flush();
 			return 0;
 		}
-		int Sync(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhp) {
+		int sync(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhp) {
 			ConnectionCallerParam &ccp = *reinterpret_cast<ConnectionCallerParam *>(ssmdhp.callerParam);
 			ConnectionDelegateParam &cdp = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhp.delegateParam);
 
@@ -131,13 +125,24 @@ namespace Emilia {
 			std::cout.flush();
 			return 0;
 		}
-		int Server(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhp) {
+		int server(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhp) {
 			ConnectionCallerParam &ccp = *reinterpret_cast<ConnectionCallerParam *>(ssmdhp.callerParam);
 			ConnectionDelegateParam &cdp = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhp.delegateParam);
 			std::string &request = *ssmdhp.message;
 
 			std::string response;
-			if (request == "start") {
+			if (request == "") {
+				if (ccp.httpSM->getListeningPort() != -1) {
+					response += "HTTP server listening on port " + Rain::tToStr(ccp.httpSM->getListeningPort()) + "." + Rain::CRLF;
+				} else {
+					response += "HTTP server not listening." + Rain::CRLF;
+				}
+				if (ccp.smtpSM->getListeningPort() != -1) {
+					response += "SMTP server listening on port " + Rain::tToStr(ccp.smtpSM->getListeningPort()) + "." + Rain::CRLF;
+				} else {
+					response += "SMTP server not listening." + Rain::CRLF;
+				}
+			} if (request == "start") {
 				Rain::tsCout(std::dec);
 				if (!ccp.httpSM->setServerListen(80, 80)) {
 					response += "HTTP server listening on port " + Rain::tToStr(ccp.httpSM->getListeningPort()) + "." + Rain::CRLF;
@@ -161,16 +166,12 @@ namespace Emilia {
 			std::cout.flush();
 			return 0;
 		}
-		int Restart(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhp) {
+		int restart(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhp) {
 			ConnectionCallerParam &ccp = *reinterpret_cast<ConnectionCallerParam *>(ssmdhp.callerParam);
 			ConnectionDelegateParam &cdp = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhp.delegateParam);
 
 			prepRestart(ccp.project, ccp.httpSM, ccp.smtpSM);
-
-			//TODO: better exiting
-			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-			UnregisterApplicationRestart();
-			exit(1);
+			injectExitCommand();
 
 			//don't need to send anything
 			return 0;
@@ -219,7 +220,7 @@ namespace Emilia {
 				si.stage = "recv-index-timestamp";
 			} else if (si.stage == "recv-index-timestamp") {
 				//receive index timestamp
-					si.remoteIndexTime = Rain::strToT<time_t>(message);
+				si.remoteIndexTime = Rain::strToT<time_t>(message);
 
 				si.stage = "recv-index";
 			} else if (si.stage == "recv-index") {
@@ -439,11 +440,7 @@ namespace Emilia {
 						_utime(emiliaTmpFile.c_str(), &ut);
 
 						prepRestart(project, httpSM, smtpSM, emiliaTmpFile);
-
-						//TODO: better exiting
-						std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-						UnregisterApplicationRestart();
-						exit(1);
+						injectExitCommand();
 					}
 
 					//reset si & cleanup

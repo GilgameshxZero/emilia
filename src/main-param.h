@@ -2,8 +2,8 @@
 
 #include "rain-aeternum/rain-libraries.h"
 
-#include "http-server.h"
-#include "smtp-server.h"
+#include "http-server-param.h"
+#include "smtp-server-param.h"
 #include "deploy-server-param.h"
 #include "deploy-client-param.h"
 
