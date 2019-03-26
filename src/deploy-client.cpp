@@ -40,17 +40,11 @@ namespace Emilia {
 		int onMessage(void *funcParam) {
 			Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam = *reinterpret_cast<Rain::ClientSocketManager::DelegateHandlerParam *>(funcParam);
 			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
-
-			return HandleRequest(csmdhParam);
-		}
-
-		int HandleRequest(Rain::ClientSocketManager::DelegateHandlerParam &csmdhParam) {
 			static const std::map<std::string, RequestMethodHandler> methodHandlerMap{
-				{"authenticate", Authenticate}, //validates a socket connection session
-				{"sync", Sync},
-				{"server", Server}
+				{"authenticate", authenticate}, //validates a socket connection session
+				{"sync", sync},
+				{"server", server}
 			};
-			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhParam.delegateParam);
 			std::string &request = *csmdhParam.message;
 
 			//takes until the end of string if ' ' can't be found
@@ -79,7 +73,7 @@ namespace Emilia {
 			return handlerRet;
 		}
 
-		int Authenticate(Rain::ClientSocketManager::DelegateHandlerParam &csmdhp) {
+		int authenticate(Rain::ClientSocketManager::DelegateHandlerParam &csmdhp) {
 			ConnectionHandlerParam &chParam = *reinterpret_cast<ConnectionHandlerParam *>(csmdhp.delegateParam);
 			std::string &request = *csmdhp.message;
 
@@ -101,11 +95,11 @@ namespace Emilia {
 				return -1;
 			}
 			chParam.authCV.notify_one();
-			
+
 			std::cout.flush();
 			return 0;
 		}
-		int Sync(Rain::ClientSocketManager::DelegateHandlerParam &csmdhp) {
+		int sync(Rain::ClientSocketManager::DelegateHandlerParam &csmdhp) {
 			ConnectionHandlerParam &chp = *reinterpret_cast<ConnectionHandlerParam *>(csmdhp.delegateParam);
 
 			//the client and server share the same sync routine
@@ -114,7 +108,7 @@ namespace Emilia {
 			std::cout.flush();
 			return 0;
 		}
-		int Server(Rain::ClientSocketManager::DelegateHandlerParam &csmdhp) {
+		int server(Rain::ClientSocketManager::DelegateHandlerParam &csmdhp) {
 			ConnectionHandlerParam &chp = *reinterpret_cast<ConnectionHandlerParam *>(csmdhp.delegateParam);
 			std::string &request = *csmdhp.message;
 

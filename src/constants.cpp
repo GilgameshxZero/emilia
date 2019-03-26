@@ -1,9 +1,8 @@
 #include "constants.h"
 
 namespace Emilia {
-	const std::string CMDL_DEPLOY_RESTART = "deploy-restart",
-		CMDL_CRASH_RESTART = "crash-restart",
-		RESTART_SHELL_SCRIPT = R"(@echo off
+	const int MAX_PROJECT_DIR_SEARCH = 1000;
+	const std::string RESTART_SHELL_SCRIPT = R"(@echo off
 set server=%1
 set src=%2
 set dest=%3
@@ -31,7 +30,7 @@ rem allow for ConEmu to close tab
 timeout 10
 (goto) 2>nul & del "%~f0"
 )",
-		DEFAULT_CONFIGURATION = R"(emilia-buffer		65536
+DEFAULT_CONFIGURATION = R"(emilia-buffer		65536
 
 http-root			root\
 http-cgi
@@ -123,5 +122,7 @@ deploy-port			50368
 deploy-ignore
 	.git\
 	logs\)",
-	PROJECT_INDEX = ".emilia\\index.idx";
+		PROJECT_DIR = ".emilia\\",
+		PROJECT_INDEX = PROJECT_DIR + "index.idx",
+		PROJECT_CONFIG = PROJECT_DIR + "config.ini";
 }

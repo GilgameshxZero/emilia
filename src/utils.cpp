@@ -1,4 +1,4 @@
-#include "project-utils.h"
+#include "utils.h"
 
 namespace Emilia {
 	void initProjectDir(std::string dir) {
@@ -118,5 +118,49 @@ namespace Emilia {
 		ShellExecute(NULL, "open", deployScript.c_str(),
 			(serverPath + " " + (copySrc.size() == 0 ? serverPath : copySrc) + " " + serverPath + " \"\" \"" + project + " \" " + Rain::tToStr(defaultServers)).c_str(),
 			Rain::getPathDir(serverPath).c_str(), SW_SHOWDEFAULT);
+	}
+
+	std::string getVersionStr() {
+		static const std::string VERSION_RETRIEVE_ERROR = "Error: Could not retrieve version string.";
+		std::string exe = Rain::getExePath();
+
+		DWORD dummy;
+		DWORD dwSize = GetFileVersionInfoSize(exe.c_str(), &dummy);
+		if (dwSize == 0) {
+			return VERSION_RETRIEVE_ERROR;
+		}
+
+		std::vector<BYTE> data(dwSize);
+		if (!GetFileVersionInfo(exe.c_str(), NULL, dwSize, &data[0])) {
+			return VERSION_RETRIEVE_ERROR;
+		}
+
+		LPVOID pvProductVersion = NULL;
+		unsigned int iProductVersionLen = 0;
+		if (!VerQueryValue(&data[0], _T("\\StringFileInfo\\040904E4\\ProductVersion"), &pvProductVersion, &iProductVersionLen)) {
+			return VERSION_RETRIEVE_ERROR;
+		}
+
+		return std::string(reinterpret_cast<LPCSTR>(pvProductVersion), iProductVersionLen - 1);
+	}
+
+	void injectExitCommand() {
+		static const std::string COMMAND = "exit\r";
+		INPUT_RECORD ir[5];
+		for (int a = 0; a < COMMAND.size(); a++) {
+			ir[a].EventType = KEY_EVENT;
+			ir[a].Event.KeyEvent.bKeyDown = TRUE;
+			ir[a].Event.KeyEvent.dwControlKeyState = 0;
+			ir[a].Event.KeyEvent.uChar.UnicodeChar = COMMAND[a];
+			ir[a].Event.KeyEvent.wRepeatCount = 1;
+			ir[a].Event.KeyEvent.wVirtualKeyCode = COMMAND[a] - 'a' + 'A';
+			ir[a].Event.KeyEvent.wVirtualScanCode = MapVirtualKey(ir[a].Event.KeyEvent.wVirtualKeyCode, MAPVK_VK_TO_VSC);
+		}
+		ir[4].Event.KeyEvent.wVirtualKeyCode = VK_RETURN;
+		ir[4].Event.KeyEvent.wVirtualScanCode = MapVirtualKey(VK_RETURN, MAPVK_VK_TO_VSC);
+
+		HANDLE hConIn = GetStdHandle(STD_INPUT_HANDLE);
+		DWORD dwTmp;
+		WriteConsoleInput(hConIn, ir, 5, &dwTmp);
 	}
 }

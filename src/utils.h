@@ -4,10 +4,12 @@
 
 #include "constants.h"
 #include "main-param.h"
-
+#include "http-server.h"
+#include "smtp-server.h"
 #include "deploy-server.h"
 
 #include <ShellAPI.h>
+#pragma comment(lib, "Version.lib")
 
 namespace Emilia {
 	//initialize a default project at an existing directory
@@ -24,4 +26,10 @@ namespace Emilia {
 
 	//restart process, keeping the same project and server context
 	void prepRestart(std::string project, Rain::ServerManager *httpSM, Rain::ServerManager *smtpSM, std::string copySrc = "");
+
+	//return a MAJOR.MINOR.REVISION.BUILD version string
+	std::string getVersionStr();
+
+	//inject "exit\r" into the console, prompting the program to exit peacefully
+	void injectExitCommand();
 }

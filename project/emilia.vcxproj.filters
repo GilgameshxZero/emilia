@@ -10,9 +10,6 @@
     <Filter Include="rc">
       <UniqueIdentifier>{1dda29b2-3abf-45a1-8d6a-47436c079702}</UniqueIdentifier>
     </Filter>
-    <Filter Include="bin">
-      <UniqueIdentifier>{1da75a11-4f7c-458a-b83e-9692b48b681a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\rain-aeternum">
       <UniqueIdentifier>{b30b134a-d98e-4e14-8747-ffb825b87052}</UniqueIdentifier>
     </Filter>
@@ -126,13 +123,16 @@
     <ClInclude Include="..\src\constants.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\project-utils.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\main-param.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\build-utils.h">
+    <ClInclude Include="..\src\utils.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\http-server-param.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\smtp-server-param.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
@@ -218,10 +218,7 @@
     <ClCompile Include="..\src\constants.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\project-utils.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\build-utils.cpp">
+    <ClCompile Include="..\src\utils.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -230,18 +227,6 @@
     <None Include="..\changelog.md" />
     <None Include="..\readme.md" />
     <None Include="..\todo.md" />
-    <None Include="..\build\build-inc.bat">
-      <Filter>build</Filter>
-    </None>
-    <None Include="..\build\pre-build-event.bat">
-      <Filter>build</Filter>
-    </None>
-    <None Include="..\build\post-build-event.bat">
-      <Filter>build</Filter>
-    </None>
-    <None Include="..\bin\emilia-x64-release.exe">
-      <Filter>bin</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\rc\icon.ico">
@@ -252,5 +237,16 @@
     <ResourceCompile Include="..\rc\rc.rc">
       <Filter>rc</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\build\build-inc.bat">
+      <Filter>build</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\build\post-build-event.bat">
+      <Filter>build</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\build\pre-build-event.bat">
+      <Filter>build</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

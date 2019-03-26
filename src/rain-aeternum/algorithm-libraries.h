@@ -19,5 +19,6 @@ namespace Rain {
 	//returns -1 if not found, otherwise beginning index of the first match
 	std::size_t rabinKarpMatch(const std::string &text, std::string pattern, unsigned long long prime = 1610612741);
 
+	//generate the CRC32 checksum for a file given its path
 	unsigned int checksumFileCRC32(std::string file);
 }

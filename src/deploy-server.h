@@ -1,9 +1,8 @@
 #pragma once
-
 #include "rain-aeternum/rain-libraries.h"
 
 #include "constants.h"
-#include "project-utils.h"
+#include "utils.h"
 #include "deploy-server-param.h"
 
 #include <ShellAPI.h>
@@ -16,14 +15,11 @@ namespace Emilia {
 		int onMessage(void *funcParam);
 		int onDisconnect(void *funcParam);
 
-		//general method which takes request and distributes it to appropriate method handler
-		int HandleRequest(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam);
-
 		//specific handlers for different messages
-		int Authenticate(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhp);
-		int Sync(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhp);
-		int Server(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhp);
-		int Restart(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhp);
+		int authenticate(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhp);
+		int sync(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhp);
+		int server(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhp);
+		int restart(Rain::ServerSocketManager::DelegateHandlerParam &ssmdhp);
 
 		//sync routine shared by client and server
 		void syncRoutine(

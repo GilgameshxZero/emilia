@@ -10,6 +10,7 @@ for /F "tokens=*" %%R in (%filename%) do (
 		if !incflag! equ 1 (
 			set /a num=%%C+1
 			echo %%A %%B            !num!>> "%filename%.temp"
+			echo Build !num!
 		) else (
 			echo %%R>> "%filename%.temp"
 		)
