@@ -26,8 +26,8 @@ namespace Emilia {
 			Rain::LogStream *logDeploy;
 			Rain::ServerManager *httpSM, *smtpSM;
 
-			//whether a client is connected; only allow one client to connect at a time
-			bool clientConnected = false;
+			//the current SSM of connected client; only one client can connect at a time
+			Rain::ServerSocketManager *ssm = NULL;
 		};
 
 		struct ConnectionDelegateParam {
