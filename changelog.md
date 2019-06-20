@@ -1,5 +1,15 @@
 # Changelog
 
+## 6.0.3
+
+* Organization
+  * Replaced some `+`s with `,`s in `tsCout`s.
+* Quality-of-life
+  * New connects on the deploy server will boot the previous.
+  * Debug builds now run without DLLs linked.
+* Bugfixes
+  * `sync` used to fail because it was trying to convert "fail" into a `bool`, which would be `true`. Now it doesn't.
+
 ## 6.0.2
 
 * Features
