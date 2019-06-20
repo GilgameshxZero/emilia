@@ -6,15 +6,15 @@ namespace Emilia {
 			Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam = *reinterpret_cast<Rain::ServerSocketManager::DelegateHandlerParam *>(funcParam);
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 
-			if (ccParam.clientConnected) {
-				Rain::tsCout("Update client connection request refused; client already connected." + Rain::CRLF);
-				Rain::sendHeadedMessage(*ssmdhParam.ssm, "authenticate refuse");
-				Rain::shutdownSocketSend(*ssmdhParam.cSocket);
-				closesocket(*ssmdhParam.cSocket);
+			if (ccParam.ssm != NULL) {
+				Rain::tsCout("New update client connected; old client booted.", Rain::CRLF);
+				Rain::sendHeadedMessage(*ccParam.ssm, "authenticate refuse");
+				Rain::shutdownSocketSend(ccParam.ssm->getSocket());
+				closesocket(ccParam.ssm->getSocket());
 				return 1; //immediately close recv thread
 			}
 
-			ccParam.clientConnected = true;
+			ccParam.ssm = ssmdhParam.ssm;
 			Rain::tsCout("Update client connected from " + Rain::getClientNumIP(*ssmdhParam.cSocket) + ". Waiting for authentication (max 5 seconds)..." + Rain::CRLF);
 
 			//create the delegate parameter for the first time
@@ -70,7 +70,7 @@ namespace Emilia {
 					handlerRet = handler->second(ssmdhp);
 				}
 			} else {
-				Rain::tsCout("Error: Received unknown method from update client: ", cdParam.requestMethod, "." + Rain::CRLF);
+				Rain::tsCout("Error: Received unknown method from update client: ", cdParam.requestMethod, ".", Rain::CRLF);
 			}
 
 			return handlerRet;
@@ -79,8 +79,8 @@ namespace Emilia {
 			Rain::ServerSocketManager::DelegateHandlerParam &ssmdhParam = *reinterpret_cast<Rain::ServerSocketManager::DelegateHandlerParam *>(funcParam);
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 
-			ccParam.clientConnected = false;
-			Rain::tsCout("Update client disconnected." + Rain::CRLF);
+			ccParam.ssm = NULL;
+			Rain::tsCout("Update client disconnected.", Rain::CRLF);
 
 			//free the delegate parameter
 			delete ssmdhParam.delegateParam;
@@ -280,7 +280,7 @@ namespace Emilia {
 					int fileStatus;
 					time_t fileTime;
 					ss >> fileStatus >> fileTime;
-					si.remoteStatus[filename] = std::make_pair(fileStatus == 1 ? "true" : "false", fileTime);
+					si.remoteStatus[filename] = std::make_pair(fileStatus == 1, fileTime);
 
 					//remove the extra newline
 					std::getline(ss, filename);
