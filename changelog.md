@@ -1,5 +1,15 @@
 # Changelog
 
+## 6.0.4
+
+* Quality-of-life
+  * Updated to VS2019 toolset.
+* Bugfixes
+  * Deploy server will no longer terminate connection when new client connects.
+  * `Server-Version` header is now served correctly.
+  * `ConditionVariable` includes `functional` for `std::bind`.
+  * Fixed concurrency issue in `NetworkClientManager` w.r.t. `MessageDoneEvent`, which used to cause crashes after sending emails primarily.
+
 ## 6.0.3
 
 * Organization

@@ -11,7 +11,6 @@ namespace Emilia {
 				Rain::sendHeadedMessage(*ccParam.ssm, "authenticate refuse");
 				Rain::shutdownSocketSend(ccParam.ssm->getSocket());
 				closesocket(ccParam.ssm->getSocket());
-				return 1; //immediately close recv thread
 			}
 
 			ccParam.ssm = ssmdhParam.ssm;
