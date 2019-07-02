@@ -40,6 +40,7 @@ namespace Rain {
 		//shutdown send threads, if any
 		this->destructing = true;
 		this->clearMessageQueue();
+		ResetEvent(this->messageDoneEvent);
 		SetEvent(this->messageToSendEvent);
 		WaitForSingleObject(this->messageDoneEvent, INFINITE);
 
@@ -61,8 +62,8 @@ namespace Rain {
 		//reset event outside of thread start so multiple calls to sendRawMessage won't create race conditions
 		this->queueMutex.lock();
 		if (this->messageQueue.size() == 0) {
-			SetEvent(this->messageToSendEvent);
 			ResetEvent(this->messageDoneEvent);
+			SetEvent(this->messageToSendEvent);
 		}
 		this->messageQueue.push(*request);
 		this->queueMutex.unlock();
@@ -74,7 +75,9 @@ namespace Rain {
 			this->blockForMessageQueue(0);
 	}
 	void ClientSocketManager::clearMessageQueue() {
+		this->queueMutex.lock();
 		this->messageQueue = std::queue<std::string>();
+		this->queueMutex.unlock();
 	}
 	void ClientSocketManager::blockForMessageQueue(DWORD msTimeout) {
 		WaitForSingleObject(this->messageDoneEvent, msTimeout);
@@ -267,8 +270,8 @@ namespace Rain {
 				csm.queueMutex.lock();
 			}
 			ResetEvent(csm.messageToSendEvent);
-			SetEvent(csm.messageDoneEvent);
 			csm.queueMutex.unlock();
+			SetEvent(csm.messageDoneEvent);
 		}
 
 		return 0;

@@ -5,6 +5,7 @@ Standard
 #pragma once
 
 #include <condition_variable>
+#include <functional>
 
 namespace Rain {
 	//wrapper class around std::condition variable safe against spurious wakeups

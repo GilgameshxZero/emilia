@@ -440,6 +440,9 @@ namespace Emilia {
 				if (responseHeaders.find("content-range") != responseHeaders.end()) {
 					responseHeaders["content-range"] = "bytes " + Rain::tToStr(fileBegin) + "-" + Rain::tToStr(fileEnd) + "/" + Rain::tToStr(fileSize);
 				}
+				if (responseHeaders.find("server-version") != responseHeaders.end()) {
+					responseHeaders["server-version"] = getVersionStr();
+				}
 
 				//send what we know
 				std::string response = responseStatus + Rain::CRLF;
