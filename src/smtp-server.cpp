@@ -84,8 +84,10 @@ namespace Emilia {
 				for (auto rcpt : cdParam.rcd.rcptTo) {
 					//we know one of from or rcpt is @domain
 					//if to is @domain, get the real to
-					std::string trueTo = rcpt;
-					if (Rain::getEmailDomain(rcpt) == (*ccParam.config)["smtp-domain"].s()) {
+					std::string trueTo = rcpt,
+						rcptDomain = Rain::getEmailDomain(rcpt);
+					std::set<std::string> acceptedDomains = (*ccParam.config)["smtp-domain"].keys();
+					if (acceptedDomains.find(rcptDomain) != acceptedDomains.end()) {
 						if (ccParam.b64Users.find(Rain::strEncodeB64(Rain::getEmailUser(rcpt))) == ccParam.b64Users.end()) {
 							//if the user doesn't exist, throw away the email
 							Rain::tsCout("Failure: Client could not find local user ", rcpt, "; email recipient ignored and email discarded." + Rain::CRLF);
@@ -130,6 +132,7 @@ namespace Emilia {
 					ecParam.to = &trueTo;
 					ecParam.from = &cdParam.rcd.mailFrom;
 					ecParam.data = &cdParam.rcd.mailData;
+					ecParam.ehloDomain = *(*ccParam.config).keys().begin();
 
 					csm.setEventHandlers(onExternalConnect, onExternalMessage, onExternalDisconnect, &ecParam);
 
@@ -223,12 +226,13 @@ namespace Emilia {
 			//check if everything looks right and prepare to close connection
 			//one of the email addresses in rcpt or from must be @domain
 			bool isAtDomain = false;
-			if (Rain::getEmailDomain(cdParam.rcd.mailFrom) == (*ccParam.config)["smtp-domain"].s())
+			std::set<std::string> acceptedDomains = (*ccParam.config)["smtp-domain"].keys();
+			if (acceptedDomains.find(Rain::getEmailDomain(cdParam.rcd.mailFrom)) != acceptedDomains.end()) {
 				isAtDomain = true;
-			if (!isAtDomain) {
+			} else {
 				bool allAtDomain = true;
 				for (auto it : cdParam.rcd.rcptTo) {
-					if (Rain::getEmailDomain(it) != (*ccParam.config)["smtp-domain"].s()) {
+					if (acceptedDomains.find(Rain::getEmailDomain(it)) == acceptedDomains.end()) {
 						allAtDomain = false;
 						break;
 					}
@@ -323,9 +327,13 @@ namespace Emilia {
 			}
 			cdParam.rcd.mailFrom = Rain::strTrimWhite(afterColon.substr(b1 + 1, b2 - b1 - 1));
 
-			//if sending from current domain, need to be authenticated, unless it's from server@emilia-tan.com, which is publicly accessible without password
-			if (Rain::getEmailDomain(cdParam.rcd.mailFrom) == (*ccParam.config)["smtp-domain"].s() &&
-				cdParam.rcd.b64User.length() == 0 && cdParam.rcd.mailFrom != "server@emilia-tan.com") {
+			//TODO: if sending from current domain, need to be authenticated, unless it's from server@emilia-tan.com, which is publicly accessible without password
+			std::set<std::string> acceptedDomains = (*ccParam.config)["smtp-domain"].keys();
+			std::string mailFromUser = Rain::getEmailUser(cdParam.rcd.mailFrom),
+				mailFromDomain = Rain::getEmailDomain(cdParam.rcd.mailFrom);
+			if (acceptedDomains.find(mailFromDomain) != acceptedDomains.end() &&
+				cdParam.rcd.b64User.length() == 0 &&
+				mailFromUser != "server") {
 				ssmdhParam.ssm->sendRawMessage("502 Emilia hasn't authenticated you to do that (sending from a managed domain requires authentication)" + Rain::CRLF);
 			} else
 				ssmdhParam.ssm->sendRawMessage("250 OK" + Rain::CRLF);

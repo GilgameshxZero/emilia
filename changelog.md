@@ -1,5 +1,10 @@
 # Changelog
 
+## 6.0.5
+
+* Features
+  * Recognizes multiple SMTP domains.
+
 ## 6.0.4
 
 * Quality-of-life

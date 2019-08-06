@@ -20,7 +20,7 @@ namespace Emilia {
 			std::string request;
 
 			//email data
-			std::string *to, *from, *data;
+			std::string *to, *from, *data, ehloDomain;
 		};
 
 		int onExternalConnect(void *param);
