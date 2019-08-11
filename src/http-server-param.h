@@ -5,8 +5,8 @@ namespace Emilia {
 	namespace HTTPServer {
 		struct ConnectionCallerParam {
 			std::string project;
-			Rain::Configuration *config;
-			Rain::LogStream *logHTTP;
+			Rain::Configuration *config = NULL;
+			Rain::LogStream *logHTTP = NULL;
 
 			//total number of connected clients
 			int connectedClients = 0;
@@ -20,17 +20,17 @@ namespace Emilia {
 			std::string requestMethod;
 
 			//index of the first character of the end of the block of headers (two newlines), or -1
-			std::size_t headerBlockLength;
+			std::size_t headerBlockLength = 0;
 
 			//content length header content for POST requests; -1 if don't know yet
 			//also identifies the length of the body block
-			std::size_t contentLength;
+			std::size_t contentLength = 0;
 
 			//allow messages to be processed in a separate thread from recvThread & handlers
 			std::thread requestThread;
 
 			//event triggered once each time a new messages is added to the request string
-			HANDLE newMessageEvent;
+			HANDLE newMessageEvent = NULL;
 
 			//locked when newMessage or request is being changed
 			std::mutex requestModifyMutex;
@@ -39,8 +39,8 @@ namespace Emilia {
 			bool disconnectStarted = false;
 
 			//buffer for sending anything
-			std::size_t fileBufLen;
-			char *buffer;
+			std::size_t fileBufLen = 0;
+			char *buffer = NULL;
 		};
 	}
 }

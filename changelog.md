@@ -1,5 +1,13 @@
 # Changelog
 
+## 6.0.6
+
+* Quality-of-life
+  * Fixed some struct initialization warnings.
+  * Changed command argument parsing to use lambdas and be more error-tolerant.
+  * Total connections are now displayed at the start of console logs.
+  * Error reporting has a different format, and prints error code to console.
+
 ## 6.0.5
 
 * Features

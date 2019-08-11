@@ -7,7 +7,7 @@ namespace Emilia {
 
 		struct RecvConnectionDelegateParam {
 			//the current request handler
-			RequestMethodHandler reqHandler;
+			RequestMethodHandler reqHandler = NULL;
 
 			//the current logged in user
 			std::string b64User;

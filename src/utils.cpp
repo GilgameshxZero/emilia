@@ -61,7 +61,7 @@ namespace Emilia {
 		if (!mp.deploySM.setServerListen(updateServerPort, updateServerPort)) {
 			Rain::tsCout("Deploy server listening on port ", mp.deploySM.getListeningPort(), ".", Rain::CRLF);
 		} else {
-			Rain::errorAndCout(GetLastError(), "Could not setup deploy server listening.");
+			Rain::errorAndCout(GetLastError(), "Failed to setup deploy server listening.");
 		}
 	}
 
@@ -85,7 +85,7 @@ namespace Emilia {
 				Rain::tsCout("HTTP server listening on port ", mp.httpSM.getListeningPort(), ".", Rain::CRLF);
 			} else {
 				DWORD error = GetLastError();
-				Rain::errorAndCout(error, "Could not setup HTTP server listening.");
+				Rain::errorAndCout(error, "Failed to setup HTTP server listening.");
 			}
 		}
 		if (which & 2) {
@@ -93,7 +93,7 @@ namespace Emilia {
 				Rain::tsCout("SMTP server listening on port ", mp.smtpSM.getListeningPort(), ".", Rain::CRLF);
 			} else {
 				DWORD error = GetLastError();
-				Rain::errorAndCout(error, "Could not setup SMTP server listening.");
+				Rain::errorAndCout(error, "Failed to setup SMTP server listening.");
 			}
 		}
 	}
@@ -108,7 +108,7 @@ namespace Emilia {
 			defaultServers += 2;
 		}
 
-		std::string tmpFile = "restart-script.bat";
+		const std::string tmpFile = ".emilia.bat";
 		std::ofstream script(tmpFile);
 		script << RESTART_SHELL_SCRIPT;
 		script.close();
@@ -121,7 +121,7 @@ namespace Emilia {
 	}
 
 	std::string getVersionStr() {
-		static const std::string VERSION_RETRIEVE_ERROR = "Error: Could not retrieve version string.";
+		static const std::string VERSION_RETRIEVE_ERROR = "Failed to retrieve version string.";
 		std::string exe = Rain::getExePath();
 
 		DWORD dummy;

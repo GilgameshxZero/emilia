@@ -10,12 +10,12 @@ namespace Emilia {
 
 			ssmdhParam.delegateParam = new ConnectionDelegateParam();
 			ConnectionDelegateParam &cdParam = *reinterpret_cast<ConnectionDelegateParam *>(ssmdhParam.delegateParam);
-			Rain::tsCout("SMTP Client ", Rain::getClientNumIP(*ssmdhParam.cSocket), " connected. Total: ", ++ccParam.connectedClients, ".", Rain::CRLF);
+			Rain::tsCout("[", ++ccParam.connectedClients, "] SMTP Client ", Rain::getClientNumIP(*ssmdhParam.cSocket), " connected.", Rain::CRLF);
 			std::cout.flush();
 
 			//in either request type, send a 220
 			//in send requests, the 220 will be ignored, but that's fine
-			ssmdhParam.ssm->sendRawMessage("220 Emilia is ready" + Rain::CRLF);
+			ssmdhParam.ssm->sendRawMessage("220 Emilia is at your service! ^_^" + Rain::CRLF);
 			cdParam.rcd.reqHandler = HRREhlo;
 
 			return 0;
@@ -65,7 +65,7 @@ namespace Emilia {
 
 			ccParam.logSMTP->setSocketSrc(ssmdhParam.ssm, false);
 
-			Rain::tsCout("SMTP Client ", Rain::getClientNumIP(*ssmdhParam.cSocket), " disconnected. Total: ", --ccParam.connectedClients, "." + Rain::CRLF);
+			Rain::tsCout("[", --ccParam.connectedClients, "] SMTP Client ", Rain::getClientNumIP(*ssmdhParam.cSocket), " disconnected." + Rain::CRLF);
 			std::cout.flush();
 
 			//if receiving mail, process it now if possible
@@ -117,7 +117,7 @@ namespace Emilia {
 					} else {
 						Rain::tsCout("Failure: Failed query for MX DNS record for domain ", emailHostDomain, ". Client will discard email and terminate..." + Rain::CRLF);
 						std::cout.flush();
-						ssmdhParam.ssm->sendRawMessage("Failure: Failed query for MX DNS record for domain " + emailHostDomain + ". Client will discard email and terminate..." + Rain::CRLF);
+						ssmdhParam.ssm->sendRawMessage("Failure: Failed query for MX DNS record for domain " + emailHostDomain + ". Client will discard email and terminate connection." + Rain::CRLF);
 						return 1;
 					}
 
@@ -162,6 +162,10 @@ namespace Emilia {
 					}
 
 					//block for communications, which the event handlers will send
+					if (ecParam.hFinish == NULL) {
+						Rain::reportError(GetLastError(), "ecParam.hFinish event failed to be created. Aborting connection...");
+						return 1;
+					}
 					WaitForSingleObject(ecParam.hFinish, INFINITE);
 					CloseHandle(ecParam.hFinish);
 

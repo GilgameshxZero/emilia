@@ -29,7 +29,7 @@ start %server% %server% -r %r% -p %p% -s %s%
 rem allow for ConEmu to close tab
 timeout 10
 (goto) 2>nul & del "%~f0"
-)",
+)", //the shell script created the replace the executable and run a new one
 DEFAULT_CONFIGURATION = R"(emilia-buffer		65536
 
 http-root			root\

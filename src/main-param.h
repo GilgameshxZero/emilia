@@ -10,22 +10,25 @@
 namespace Emilia {
 	struct MainParam {
 		std::string project;
-		Rain::Configuration *config;
+		Rain::Configuration *config = NULL;
 
 		HTTPServer::ConnectionCallerParam httpCCP;
 		SMTPServer::ConnectionCallerParam smtpCCP;
 		DeployServer::ConnectionCallerParam deployCCP;
-		DeployClient::ConnectionHandlerParam *deployCHP;
+		DeployClient::ConnectionHandlerParam *deployCHP = NULL;
 		Rain::ServerManager httpSM, smtpSM;
 		Rain::HeadedServerManager deploySM;
 
-		Rain::LogStream *logGeneral, *logHTTP, *logSMTP, *logDeploy;
+		Rain::LogStream *logGeneral = NULL,
+			*logHTTP = NULL,
+			*logSMTP = NULL,
+			*logDeploy = NULL;
 
 		//NULL, or a valid socket to a remote server after connect is issued
 		Rain::HeadedClientSocketManager *remoteCSM = NULL;
 
 		//cerr and memory leak log handles
 		std::pair<std::streambuf *, std::ofstream *> cerrRedirect;
-		HANDLE hFMemLeak;
+		HANDLE hFMemLeak = NULL;
 	};
 }

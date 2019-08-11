@@ -2,14 +2,14 @@
 
 namespace Rain {
 	int reportError(int code, std::string desc) {
+		if (desc != "") std::cerr << "[";
 		std::cerr << code;
-		if (desc != "")
-			std::cerr << ": " << desc;
+		if (desc != "") std::cerr << "] " << desc;
 		std::cerr << Rain::CRLF;
 		return code;
 	}
 	int errorAndCout(int code, std::string desc, std::string endl) {
-		tsCout(desc, endl);
+		tsCout("[", code, "] ", desc, endl);
 		return reportError(code, desc);
 	}
 

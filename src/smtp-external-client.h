@@ -11,16 +11,19 @@ namespace Emilia {
 
 			//result of communications, as a code
 			//0 is success
-			int status;
+			int status = 0;
 
 			//request handler
-			ExternalRequestMethodHandler reqHandler;
+			ExternalRequestMethodHandler reqHandler = NULL;
 
 			//accumulated messages
 			std::string request;
 
 			//email data
-			std::string *to, *from, *data, ehloDomain;
+			std::string *to = NULL,
+				*from = NULL,
+				*data = NULL,
+				ehloDomain;
 		};
 
 		int onExternalConnect(void *param);

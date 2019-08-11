@@ -2,24 +2,25 @@
 
 int main(int argc, char *argv[]) {
 	//restart the application if it didn't finish successfully
-	//NOTE: only restarts if the application has been running successfully for 1 minute already
-	DWORD apiReturn = RegisterApplicationRestart(Rain::mbStrToWStr("-r " + Rain::tToStr(static_cast<int>(Emilia::CMD_OPTION_R::CRASH)) + " -s 3").c_str(), 0);
+	//NOTE: only restarts if the application has been running successfully for 1 minute already, as per the spec in RegisterApplicationRestart
+	DWORD apiReturn = RegisterApplicationRestart(Rain::mbStrToWStr("-r " + Rain::tToStr(static_cast<int>(Emilia::CMD_OPTION_R::CRASH))).c_str(), 0);
 	if (apiReturn != S_OK) {
 		Rain::reportError(apiReturn, "RegisterApplicationRestart failed; continuing...");
 	}
 
 	//set the ctrl+c handler
-	if (!SetConsoleCtrlHandler([](DWORD fdwCtrlType) ->BOOL {
+	if (!SetConsoleCtrlHandler([](DWORD fdwCtrlType) -> BOOL {
 		switch (fdwCtrlType) {
 		case CTRL_C_EVENT:
 			Rain::tsCout("CTRL+C signal detected. Exiting...", Rain::CRLF);
+			std::cout.flush();
 			Emilia::injectExitCommand();
 			return TRUE;
 		default:
 			return FALSE;
 		}
 	}, TRUE)) {
-		Rain::reportError(GetLastError(), "SetConsoleCtrlHandler failed; continuing...");
+		Rain::reportError(GetLastError(), "SetConsoleCtrlHandler failed while capturing ctrl+c signal; continuing...");
 	}
 
 	//run the application
@@ -44,23 +45,35 @@ namespace Emilia {
 
 		//process command line options
 		std::string project;
-		unsigned long long initialServers = 0;
 
-		//the first argument is always the executable
+		//by default, start both the HTTP and SMTP server
+		unsigned long long initialServers = 0b11;
+
+		//the first argument is always the executable, so don't process it
 		if (argc >= 2) {
 			for (int a = 1; a < argc; a++) {
-				//in the format -<x>
-				std::string arg = Rain::strTrimWhite(argv[a]);
-				CMD_OPTION_R rCode;
-				switch (arg[1]) {
-				case 'h':
+				//in the format -<string>; this trims the initial -
+				std::string arg = Rain::strTrimWhite(argv[a]).substr(1);
+				typedef int (*cmdArgHandler)(
+					const int, //argc
+					int*, //&a
+					char* [], //argv
+					std::string*, //&project
+					unsigned long long* //&initialServers
+				);
+				std::map<std::string, cmdArgHandler> cmdArgHandlers;
+
+				//the following handlers return nonzero to abort the main program
+				cmdArgHandlers["h"] = cmdArgHandlers["help"] = [](const int argc, int* a, char* argv[], std::string* project, unsigned long long* initialServers) -> int {
 					Rain::tsCout("Please read the readme for further instructions.", Rain::CRLF);
-					return 0;
-				case 'r':
-					if (a == argc - 1) {
+					return 1;
+				};
+				cmdArgHandlers["r"] = cmdArgHandlers["restart"] = [](const int argc, int* a, char* argv[], std::string* project, unsigned long long* initialServers) -> int {
+					CMD_OPTION_R rCode;
+					if (*a == argc - 1) {
 						rCode = CMD_OPTION_R::NONE;
 					} else {
-						rCode = static_cast<CMD_OPTION_R>(Rain::strToT<int>(argv[++a]));
+						rCode = static_cast<CMD_OPTION_R>(Rain::strToT<int>(argv[++ * a]));
 					}
 					switch (rCode) {
 					case CMD_OPTION_R::CRASH:
@@ -70,27 +83,38 @@ namespace Emilia {
 						Rain::tsCout("Restarting from planned restart during sync...", Rain::CRLF);
 						break;
 					default:
-						Rain::reportError(0, "Unrecognized -r code: " + Rain::tToStr(static_cast<int>(rCode)) + "; continuing...");
+						Rain::reportError(0, "Unrecognized restart (-r) code: " + Rain::tToStr(static_cast<int>(rCode)) + "; continuing...");
 					}
-					break;
-				case 'p':
-					if (a == argc - 1) {
-						Rain::reportError(0, "Unrecognized -p option; continuing...");
-						project = "";
+					return 0;
+				};
+				cmdArgHandlers["p"] = cmdArgHandlers["project"] = [](const int argc, int* a, char* argv[], std::string* project, unsigned long long* initialServers) -> int {
+					if (*a == argc - 1) {
+						Rain::reportError(0, "Unrecognized project (-p) option; continuing...");
+						*project = "";
 					} else {
-						project = Rain::pathToAbsolute(Rain::strTrimWhite(argv[++a]));
+						//convert the project path to a directory if not already
+						*project = Rain::standardizeDirPath(Rain::pathToAbsolute(Rain::strTrimWhite(argv[++ * a])));
 					}
-					break;
-				case 's':
-					if (a == argc - 1) {
-						Rain::reportError(0, "Unrecognized -s option; continuing...");
-						initialServers = 0;
+					return 0;
+				};
+				cmdArgHandlers["s"] = cmdArgHandlers["servers"] = [](const int argc, int* a, char* argv[], std::string* project, unsigned long long* initialServers) -> int {
+					if (*a == argc - 1) {
+						Rain::reportError(0, "Unrecognized server (-s) option; continuing...");
+						*initialServers = 0;
 					} else {
-						initialServers = Rain::strToT<unsigned long long>(argv[++a]);
+						*initialServers = Rain::strToT<unsigned long long>(argv[++ * a]);
 					}
-					break;
-				default:
-					Rain::reportError(0, "Unrecognized command line option: " + arg + "; continuing...");
+					return 0;
+				};
+
+				//call the handler
+				std::map<std::string, cmdArgHandler>::iterator handler = cmdArgHandlers.find(arg);
+				if (handler == cmdArgHandlers.end()) {
+					Rain::reportError(0, "Unrecognized command line options; continuing...");
+				} else {
+					if (handler->second(argc, &a, argv, &project, &initialServers)) {
+						return 0;
+					}
 				}
 			}
 		}
@@ -98,6 +122,7 @@ namespace Emilia {
 		//determine the project to equip
 		if (project.size() == 0) {
 			Rain::tsCout("Searching for nearby projects (max ", MAX_PROJECT_DIR_SEARCH, " directories)...", Rain::CRLF);
+			std::cout.flush();
 
 			std::queue<std::string> next;
 			std::set<std::string> searched;
@@ -123,11 +148,13 @@ namespace Emilia {
 
 			if (project.size() == 0) {
 				Rain::tsCout("Could not find any nearby projects. Creating a project at the current directory...", Rain::CRLF);
+				std::cout.flush();
 				project = Rain::pathToAbsolute(Rain::getPathDir(Rain::getExePath()));
 				initProjectDir(project);
 			}
 		}
 		Rain::tsCout("Project: ", project, Rain::CRLF);
+		std::cout.flush();
 
 		MainParam mp;
 		initMainParam(project, mp);
@@ -143,8 +170,8 @@ namespace Emilia {
 			{"project", CommandHandler::project},
 			{"sync", CommandHandler::sync}
 		};
+		std::string command, tmp;
 		while (true) {
-			std::string command, tmp;
 			Rain::tsCout("Accepting commands...", Rain::CRLF);
 			std::cout.flush();
 
@@ -153,9 +180,12 @@ namespace Emilia {
 				Rain::reportError(0, "std::cin in Emilia::start failed; aborting...");
 				break;
 			}
-			Rain::strTrimWhite(command);
+			Rain::strTrimWhite(&command);
+
+			//remove the newline from cin after getting the command
 			std::getline(std::cin, tmp);
 
+			//delegate to correct handler
 			auto handler = commandHandlers.find(command);
 			if (handler != commandHandlers.end()) {
 				if (handler->second(mp) != 0) {
