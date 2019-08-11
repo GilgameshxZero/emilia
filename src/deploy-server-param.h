@@ -22,9 +22,10 @@ namespace Emilia {
 
 		struct ConnectionCallerParam {
 			std::string project;
-			Rain::Configuration *config;
-			Rain::LogStream *logDeploy;
-			Rain::ServerManager *httpSM, *smtpSM;
+			Rain::Configuration *config = NULL;
+			Rain::LogStream *logDeploy = NULL;
+			Rain::ServerManager *httpSM = NULL,
+				*smtpSM = NULL;
 
 			//the current SSM of connected client; only one client can connect at a time
 			Rain::ServerSocketManager *ssm = NULL;

@@ -7,7 +7,7 @@ namespace Emilia {
 			ConnectionCallerParam &ccParam = *reinterpret_cast<ConnectionCallerParam *>(ssmdhParam.callerParam);
 
 			//logging
-			Rain::tsCout("HTTP Client connected from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ". Total: ", ++ccParam.connectedClients, ".", Rain::CRLF);
+			Rain::tsCout("[", ++ccParam.connectedClients, "] ", "HTTP Client connected from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ".", Rain::CRLF);
 
 			//create the delegate parameter for the first time
 			ConnectionDelegateParam *cdParam = new ConnectionDelegateParam();
@@ -63,7 +63,7 @@ namespace Emilia {
 			delete &cdParam;
 
 			//logging
-			Rain::tsCout("HTTP Client disconnected from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ". Total: ", --ccParam.connectedClients, ".", Rain::CRLF);
+			Rain::tsCout("[", --ccParam.connectedClients, "] HTTP Client disconnected from ", Rain::getClientNumIP(*ssmdhParam.cSocket), ".", Rain::CRLF);
 			std::cout.flush();
 
 			return 0;
