@@ -1,9 +1,10 @@
 **/.vscode/
 **/.vs/
+
 **.user
 **.dropbox.attr
+**.aps
+**.DS_Store
 
 /bin/
 /obj/
-
-rc/rc.aps

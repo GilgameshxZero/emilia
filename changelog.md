@@ -1,5 +1,10 @@
 # Changelog
 
+## 6.0.7
+
+* Organization
+  * Standardize `.gitignore`.
+
 ## 6.0.6
 
 * Quality-of-life
