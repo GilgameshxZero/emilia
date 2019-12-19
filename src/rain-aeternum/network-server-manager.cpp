@@ -244,14 +244,19 @@ namespace Rain {
 		llMutex.lock();
 		while (llHead.next != &llTail) {
 			//close client socket to force blocking WSA2 calls to finish
-			Rain::shutdownSocketSend(llHead.next->ssm->getSocket());
-			closesocket(llHead.next->ssm->getSocket());
+			//these calls will exit the loop in the RecvThread, prompting ServerManager's onDisconnect to be called, and thus calling CloseHandle on hRecvThread
+			SOCKET &socket = llHead.next->ssm->getSocket();
+			Rain::shutdownSocketSend(socket);
+			closesocket(socket);
+
 			//in case thread gets shutdown while some operations are happening with its handle
 			HANDLE curRecvThread = llHead.next->hRecvThread;
 
 			llMutex.unlock();
 
 			//join the recvThread
+			//NOTE: the handle may have already been closed at this point
+			//TODO fix WaitForSingleObject has undefined behavior if handle is closed during wait, which we do
 			CancelSynchronousIo(curRecvThread);
 			WaitForSingleObject(curRecvThread, 0);
 
