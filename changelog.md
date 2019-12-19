@@ -1,5 +1,12 @@
 # Changelog
 
+## 6.0.8
+
+* Bugfixes
+  * Fixed a concurrency bug which caused the SMTP external client's `ClientSocketManager` to be destructed before its `recvThread` had finished running, raising an exception in `onDisconnect`.
+* Quality-of-life
+  * Concurrent logs now report the socket number (unique) rather than the IP (non-unique).
+
 ## 6.0.7
 
 * Organization

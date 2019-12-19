@@ -64,7 +64,8 @@ namespace Emilia {
 			if (Rain::getSMTPStatus(ecParam.request) != 220)
 				return 1;
 
-			csmdhParam.csm->sendRawMessage("EHLO emilia-tan.com" + Rain::CRLF);
+			// change the domain to something more general
+			csmdhParam.csm->sendRawMessage("EHLO gilgamesh.cc" + Rain::CRLF);
 			ecParam.reqHandler = EHRMailFrom;
 			return 0;
 		}
