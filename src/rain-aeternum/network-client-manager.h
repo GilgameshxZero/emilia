@@ -147,9 +147,9 @@ namespace Rain {
 		//recvThread parameter associated with the current recvThread
 		Rain::RecvHandlerParam rParam;
 
-		//handle to the connect thread and send message thread
+		//handle to the connect thread and send message thread, and the recv thread
 		//close when threads end by the thread
-		HANDLE hConnectThread, hSendThread;
+		HANDLE hConnectThread, hSendThread, hRecvThread;
 
 		//event which will be set when there have been as many calls to onDisconnect as there have been to onConnect
 		HANDLE recvExitComplete;

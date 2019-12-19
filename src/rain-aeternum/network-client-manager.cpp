@@ -37,6 +37,9 @@ namespace Rain {
 		this->hSendThread = simpleCreateThread(ClientSocketManager::attemptSendMessageThread, this);
 	}
 	ClientSocketManager::~ClientSocketManager() {
+		// don't try to reconnect
+		this->retryOnDisconnect = false;
+
 		//shutdown send threads, if any
 		this->destructing = true;
 		this->clearMessageQueue();
@@ -46,6 +49,10 @@ namespace Rain {
 
 		//shutsdown connect threads, if any
 		this->disconnectSocket();
+
+		//wait for recvThread to exit
+		WaitForSingleObject(this->hRecvThread, INFINITE);
+		CloseHandle(this->hRecvThread);
 
 		//critical: free addrs after shutting down connect threads, or there will be multithreading problems
 		this->freePortAddrs();
@@ -228,7 +235,9 @@ namespace Rain {
 					csm.rParam.onConnect = csm.onConnect;
 					csm.rParam.onDisconnect = csm.onDisconnect;
 					csm.rParam.socket = &csm.socket;
-					createRecvThread(&csm.rParam);
+
+					// save the recv thread in case we need to wait on it later
+					csm.hRecvThread = createRecvThread(&csm.rParam);
 
 					break;
 				} else {
