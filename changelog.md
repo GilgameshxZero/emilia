@@ -1,5 +1,13 @@
 # Changelog
 
+## 6.0.9
+
+* Bugfixes
+  * Fixed several warnings in member variable initializations.
+  * Reordered operations in `ClientSocketManager::onDisconnect`, fixing a multithreading problem which would cause the `ClientSocketManager` to perhaps be deleted before `onDisconnect` finished executing.
+* Quality-of-life
+  * Moved buffer deletion to after `onDisconnect` call in `recvThread` to allow for easier debugging.
+
 ## 6.0.8
 
 * Bugfixes

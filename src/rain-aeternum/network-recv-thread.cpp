@@ -26,9 +26,9 @@ namespace Rain {
 			}
 		} while (ret > 0);
 
-		delete[] buffer;
 		if (recvparam->onDisconnect != NULL)
 			recvparam->onDisconnect(recvparam->funcParam); //going to return soon regardless if nonzero
+		delete[] buffer;
 
 		return ret;
 	}

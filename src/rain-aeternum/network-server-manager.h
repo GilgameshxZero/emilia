@@ -99,22 +99,22 @@ namespace Rain {
 		//also used as linked list node for all spawned ServerSocketManagers
 		struct RecvThreadParam {
 			//used to call the event handler delegates in the SSM
-			ServerSocketManager *ssm;
+			ServerSocketManager *ssm = NULL;
 
 			//wraps SSM in a linked list node
-			RecvThreadParam *prev, *next;
+			RecvThreadParam *prev = NULL, *next = NULL;
 
 			//locked when changing linked list
-			std::mutex *llMutex;
+			std::mutex *llMutex = NULL;
 
 			//storage for the message of this recvThread
 			std::string message;
 
 			//handle to the current recvThread for use when waiting on end
-			HANDLE hRecvThread;
+			HANDLE hRecvThread = NULL;
 
 			//pointer to the rhParam which has this object as its funcParam, so that the handler can free the recvParam
-			Rain::RecvHandlerParam *rhParam;
+			Rain::RecvHandlerParam *rhParam = NULL;
 		};
 
 		ServerManager();
