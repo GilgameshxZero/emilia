@@ -94,6 +94,7 @@ namespace Rain {
 	}
 
 	ServerManager::ServerManager() {
+		this->funcParam = NULL;
 		this->socket = NULL;
 		this->listeningPort = -1;
 		this->lowPort = this->highPort = 0;

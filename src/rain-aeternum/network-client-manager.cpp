@@ -196,7 +196,7 @@ namespace Rain {
 
 		csm.msReconnectWait = 1;
 		csm.freePortAddrs();
-		csm.portAddrs.resize(csm.highPort - csm.lowPort + 1, NULL);
+		csm.portAddrs.resize(static_cast<size_t>(csm.highPort) - static_cast<size_t>(csm.lowPort) + 1, NULL);
 
 		if (createSocket(csm.socket)) {
 			reportError(WSAGetLastError(), "ClientSocketManager: createSocket failed, aborting...");
@@ -236,7 +236,7 @@ namespace Rain {
 					csm.rParam.onDisconnect = csm.onDisconnect;
 					csm.rParam.socket = &csm.socket;
 
-					// save the recv thread in case we need to wait on it later
+					// save the recvThread; we need to wait on it later
 					csm.hRecvThread = createRecvThread(&csm.rParam);
 
 					break;
@@ -305,14 +305,6 @@ namespace Rain {
 	int ClientSocketManager::onDisconnect(void *param) {
 		ClientSocketManager &csm = *reinterpret_cast<ClientSocketManager *>(param);
 
-		csm.socketStatus = csm.STATUS_DISCONNECTED;
-
-		//call delegate if it exists
-		int ret = csm.onDisconnectDelegate == NULL ? 0 : csm.onDisconnectDelegate(&csm.csmdhParam);
-
-		//set an event to listeners, that this function has been called
-		SetEvent(csm.recvExitComplete);
-
 		//if set, we want to try to reconnect
 		if (csm.retryOnDisconnect) {
 			csm.socketStatus = csm.STATUS_CONNECTING;
@@ -321,8 +313,14 @@ namespace Rain {
 			//thread exits when connect success
 			ResetEvent(csm.connectEvent);
 			csm.hConnectThread = simpleCreateThread(ClientSocketManager::attemptConnectThread, &csm);
+		} else {
+			csm.socketStatus = csm.STATUS_DISCONNECTED;
+
+			//set an event to listeners, that this function has been called
+			SetEvent(csm.recvExitComplete);
 		}
 
-		return ret;
+		//call delegate if it exists regardless of disconnect attempt; this may activate CSM destructor; but it should block on recvThread
+		return csm.onDisconnectDelegate == NULL ? 0 : csm.onDisconnectDelegate(&csm.csmdhParam);
 	}
 }
