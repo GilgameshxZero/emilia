@@ -169,6 +169,8 @@ namespace Emilia {
 					CloseHandle(ecParam.hFinish);
 
 					ccParam.logSMTP->setSocketSrc(&csm, false);
+
+					// exiting this block calls the CSM destructor, so be careful
 				}
 
 				Rain::tsCout("[SMTP] [", ssmdhParam.ssm->getSocket(), "] Finished processing receive mail request from ", Rain::getClientNumIP(*ssmdhParam.cSocket), "." + Rain::CRLF);
