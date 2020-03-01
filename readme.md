@@ -10,6 +10,10 @@ See [changelog.md](changelog.md) for information on updates, and [todo.md](todo.
 
 `Emilia` serves from a `project`, defined by a local directory with a `.emilia` subdirectory. Upon startup, `Emilia` will attempt to find the closest `project` to equip. Before a project is equipped, functions associated with `Emilia`'s service will not be available. The user can also manually equip `Emilia` with a project or choose to initialize a new project in an existing directory.
 
+### Rain
+
+We use the source-controlled `rain` repository. Currently, we use version `1.0.0`.
+
 ### Configuration
 
 Upon equipping a `project`, `Emilia` will also begin utilizing the `project`'s configuration options in `.emilia/config.ini`. `Emilia` has no standalone configuration.

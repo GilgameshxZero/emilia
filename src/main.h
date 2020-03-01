@@ -1,6 +1,5 @@
 #pragma once
-
-#include "rain-aeternum/rain-libraries.h"
+#include "../rain/cpp/rain-libraries.hpp"
 
 #include "command-handler.h"
 #include "constants.h"
