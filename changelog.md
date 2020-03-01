@@ -1,5 +1,10 @@
 # Changelog
 
+## 6.0.10
+
+* Quality-of-life
+  * Standardized `rain` library to an external repository, and corrected paths to accommodate this.
+
 ## 6.0.9
 
 * Bugfixes

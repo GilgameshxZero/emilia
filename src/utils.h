@@ -1,6 +1,5 @@
 #pragma once
-
-#include "rain-aeternum/rain-libraries.h"
+#include "../rain/cpp/rain-libraries.hpp"
 
 #include "constants.h"
 #include "main-param.h"
