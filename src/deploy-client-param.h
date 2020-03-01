@@ -1,5 +1,5 @@
 #pragma once
-#include "rain-aeternum/rain-libraries.h"
+#include "../rain/cpp/rain-libraries.hpp"
 
 #include "deploy-server-param.h"
 
