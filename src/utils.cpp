@@ -1,4 +1,4 @@
-#include "utils.h"
+#include "utils.hpp"
 
 namespace Emilia {
 	void initProjectDir(std::string dir) {
