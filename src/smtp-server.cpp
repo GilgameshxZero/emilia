@@ -1,4 +1,4 @@
-#include "smtp-server.h"
+#include "smtp-server.hpp"
 
 namespace Emilia {
 	namespace SMTPServer {

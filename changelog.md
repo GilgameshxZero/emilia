@@ -1,8 +1,14 @@
 # Changelog
 
+## 6.0.11
+
+* Organization
+  * Update to `rain` version `1.2.0`.
+  * Rename header files to `.hpp`.
+
 ## 6.0.10
 
-* Quality-of-life
+* Organization
   * Standardized `rain` library to an external repository, and corrected paths to accommodate this.
 
 ## 6.0.9
@@ -10,7 +16,7 @@
 * Bugfixes
   * Fixed several warnings in member variable initializations.
   * Reordered operations in `ClientSocketManager::onDisconnect`, fixing a multithreading problem which would cause the `ClientSocketManager` to perhaps be deleted before `onDisconnect` finished executing.
-* Quality-of-life
+* Organization
   * Moved buffer deletion to after `onDisconnect` call in `recvThread` to allow for easier debugging.
 
 ## 6.0.8

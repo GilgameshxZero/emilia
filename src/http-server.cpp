@@ -1,4 +1,4 @@
-#include "http-server.h"
+#include "http-server.hpp"
 
 namespace Emilia {
 	namespace HTTPServer {
@@ -200,7 +200,7 @@ namespace Emilia {
 				requestQuery = requestURI.substr(questionMarkPos + 1, hashtagPos);;
 
 			//parse the URIs
-			requestFilePath = Rain::strDecodeURL(requestFilePath);
+			requestFilePath = Rain::strDecodeURI(requestFilePath);
 			std::replace(requestFilePath.begin(), requestFilePath.end(), '/', '\\');
 
 			//decompose requestFilePath and check if we need to substitute a default file

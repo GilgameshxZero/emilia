@@ -1,4 +1,4 @@
-#include "constants.h"
+#include "constants.hpp"
 
 namespace Emilia {
 	const int MAX_PROJECT_DIR_SEARCH = 1000;
