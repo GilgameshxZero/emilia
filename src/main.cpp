@@ -1,4 +1,4 @@
-#include "main.h"
+#include "main.hpp"
 
 int main(int argc, char *argv[]) {
 	//restart the application if it didn't finish successfully

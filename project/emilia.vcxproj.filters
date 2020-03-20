@@ -18,50 +18,8 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\smtp-server.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\http-server.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\main.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\command-handler.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\rc\build.h">
       <Filter>rc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\smtp-external-client.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\deploy-client.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\deploy-client-param.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\deploy-server.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\deploy-server-param.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\constants.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\main-param.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\utils.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\http-server-param.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\smtp-server-param.h">
-      <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\rain\cpp\algorithm-libraries.hpp">
       <Filter>rain\cpp</Filter>
@@ -69,13 +27,19 @@
     <ClInclude Include="..\rain\cpp\condition-variable.hpp">
       <Filter>rain\cpp</Filter>
     </ClInclude>
-    <ClInclude Include="..\rain\cpp\config.hpp">
+    <ClInclude Include="..\rain\cpp\configuration.hpp">
       <Filter>rain\cpp</Filter>
     </ClInclude>
     <ClInclude Include="..\rain\cpp\gdi-plus-include.hpp">
       <Filter>rain\cpp</Filter>
     </ClInclude>
     <ClInclude Include="..\rain\cpp\gdi-plus-libraries.hpp">
+      <Filter>rain\cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rain\cpp\logstream.hpp">
+      <Filter>rain\cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rain\cpp\minmax.hpp">
       <Filter>rain\cpp</Filter>
     </ClInclude>
     <ClInclude Include="..\rain\cpp\network-base.hpp">
@@ -111,7 +75,7 @@
     <ClInclude Include="..\rain\cpp\network-wsa-include.hpp">
       <Filter>rain\cpp</Filter>
     </ClInclude>
-    <ClInclude Include="..\rain\cpp\rain-libraries.hpp">
+    <ClInclude Include="..\rain\cpp\rain.hpp">
       <Filter>rain\cpp</Filter>
     </ClInclude>
     <ClInclude Include="..\rain\cpp\rain-window.hpp">
@@ -132,6 +96,9 @@
     <ClInclude Include="..\rain\cpp\utility-logging.hpp">
       <Filter>rain\cpp</Filter>
     </ClInclude>
+    <ClInclude Include="..\rain\cpp\utility-platform.hpp">
+      <Filter>rain\cpp</Filter>
+    </ClInclude>
     <ClInclude Include="..\rain\cpp\utility-string.hpp">
       <Filter>rain\cpp</Filter>
     </ClInclude>
@@ -140,6 +107,48 @@
     </ClInclude>
     <ClInclude Include="..\rain\cpp\windows-lam-include.hpp">
       <Filter>rain\cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\command-handler.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\constants.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\deploy-client.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\deploy-client-param.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\deploy-server.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\deploy-server-param.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\http-server.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\http-server-param.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\main.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\main-param.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\smtp-external-client.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\smtp-server.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\smtp-server-param.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\utils.hpp">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -176,10 +185,13 @@
     <ClCompile Include="..\rain\cpp\condition-variable.cpp">
       <Filter>rain\cpp</Filter>
     </ClCompile>
-    <ClCompile Include="..\rain\cpp\config.cpp">
+    <ClCompile Include="..\rain\cpp\configuration.cpp">
       <Filter>rain\cpp</Filter>
     </ClCompile>
     <ClCompile Include="..\rain\cpp\gdi-plus-libraries.cpp">
+      <Filter>rain\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rain\cpp\logstream.cpp">
       <Filter>rain\cpp</Filter>
     </ClCompile>
     <ClCompile Include="..\rain\cpp\network-base.cpp">
@@ -224,6 +236,9 @@
     <ClCompile Include="..\rain\cpp\utility-logging.cpp">
       <Filter>rain\cpp</Filter>
     </ClCompile>
+    <ClCompile Include="..\rain\cpp\utility-platform.cpp">
+      <Filter>rain\cpp</Filter>
+    </ClCompile>
     <ClCompile Include="..\rain\cpp\utility-string.cpp">
       <Filter>rain\cpp</Filter>
     </ClCompile>
@@ -236,6 +251,9 @@
     <None Include="..\changelog.md" />
     <None Include="..\readme.md" />
     <None Include="..\todo.md" />
+    <None Include="..\rain\cpp\readme.md">
+      <Filter>rain\cpp</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\rc\icon.ico">
