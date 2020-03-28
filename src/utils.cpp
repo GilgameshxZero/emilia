@@ -80,8 +80,10 @@ namespace Emilia {
 	}
 
 	void startServers(MainParam &mp, unsigned long long which) {
+		int httpPort = (*mp.config)["http-port"].i(),
+			smtpPort = (*mp.config)["smtp-port"].i();
 		if (which & 1) {
-			if (!mp.httpSM.setServerListen(80, 80)) {
+			if (!mp.httpSM.setServerListen(httpPort, httpPort)) {
 				Rain::tsCout("HTTP server listening on port ", mp.httpSM.getListeningPort(), ".", Rain::CRLF);
 			} else {
 				DWORD error = GetLastError();
@@ -89,7 +91,7 @@ namespace Emilia {
 			}
 		}
 		if (which & 2) {
-			if (!mp.smtpSM.setServerListen(25, 25)) {
+			if (!mp.smtpSM.setServerListen(smtpPort, smtpPort)) {
 				Rain::tsCout("SMTP server listening on port ", mp.smtpSM.getListeningPort(), ".", Rain::CRLF);
 			} else {
 				DWORD error = GetLastError();

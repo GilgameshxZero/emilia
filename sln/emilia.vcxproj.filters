@@ -18,9 +18,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\rc\build.h">
-      <Filter>rc</Filter>
-    </ClInclude>
     <ClInclude Include="..\rain\cpp\algorithm-libraries.hpp">
       <Filter>rain\cpp</Filter>
     </ClInclude>
@@ -149,6 +146,9 @@
     </ClInclude>
     <ClInclude Include="..\src\utils.hpp">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rc\build.hpp">
+      <Filter>rc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

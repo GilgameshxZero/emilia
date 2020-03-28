@@ -35,13 +35,13 @@ DEFAULT_CONFIGURATION = R"(emilia-buffer		65536
 http-root			root\
 http-cgi
 	root\scripts\
-http-cgi-to			0
+http-cgi-to		0
 http-headers
-	server				Emilia
+	server							Emilia
 	server-version
 	content-disposition	inline
 	content-range
-	accept-ranges		bytes
+	accept-ranges				bytes
 http-content
 	aac					audio/aac
 	bin					application/octet-stream
@@ -103,22 +103,24 @@ http-content
 	zip					application/zip
 	7z					application/x-7z-compressed
 http-404			root\404.html
-http-index			index.html
+http-index		index.html
+http-port			80
 
-smtp-users			smtp-users.ini
-smtp-domain			emilia-tan.com
+smtp-users		smtp-users.ini
+smtp-domain		emilia-tan.com
 smtp-to				10000
+stmp-port			25
 
 log-root			logs\
 log-error			errors.log
-log-memory			memory-leaks.log
-log-general			general.log
+log-memory		memory-leaks.log
+log-general		general.log
 log-http			http.log
 log-smtp			smtp.log
-log-deploy			deploy.log
+log-deploy		deploy.log
 
 deploy-pw			password
-deploy-port			50368
+deploy-port		50368
 deploy-ignore
 	.git\
 	logs\)",

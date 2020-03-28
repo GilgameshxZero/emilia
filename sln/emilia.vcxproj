@@ -266,7 +266,7 @@
     <ClInclude Include="..\rain\cpp\utility-string.hpp" />
     <ClInclude Include="..\rain\cpp\utility-time.hpp" />
     <ClInclude Include="..\rain\cpp\windows-lam-include.hpp" />
-    <ClInclude Include="..\rc\build.h">
+    <ClInclude Include="..\rc\build.hpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
       </ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">
