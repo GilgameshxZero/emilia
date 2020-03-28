@@ -1,5 +1,10 @@
 # Changelog
 
+## 6.0.12
+
+* Quality-of-life
+  * Configuration files now specify HTTP and SMTP ports.
+
 ## 6.0.11
 
 * Organization

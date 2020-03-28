@@ -1,6 +1,6 @@
 @echo off
 setlocal enabledelayedexpansion
-set filename=../rc/build.h
+set filename=../rc/build.hpp
 if exist "%filename%.temp" del "%filename%.temp"
 for /F "tokens=*" %%R in (%filename%) do (
 	if "%%R"=="" echo. >> "%filename%.temp"
