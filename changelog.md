@@ -1,5 +1,10 @@
 # Changelog
 
+## 6.0.13
+
+* Update `rain`.
+* Modify resource name and format.
+
 ## 6.0.12
 
 * Quality-of-life
