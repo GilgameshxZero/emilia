@@ -237,35 +237,35 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\rain\cpp\algorithm-libraries.hpp" />
-    <ClInclude Include="..\rain\cpp\condition-variable.hpp" />
-    <ClInclude Include="..\rain\cpp\configuration.hpp" />
-    <ClInclude Include="..\rain\cpp\gdi-plus-include.hpp" />
-    <ClInclude Include="..\rain\cpp\gdi-plus-libraries.hpp" />
-    <ClInclude Include="..\rain\cpp\logstream.hpp" />
-    <ClInclude Include="..\rain\cpp\minmax.hpp" />
-    <ClInclude Include="..\rain\cpp\network-base.hpp" />
-    <ClInclude Include="..\rain\cpp\network-client-manager.hpp" />
-    <ClInclude Include="..\rain\cpp\network-headed-managers.hpp" />
-    <ClInclude Include="..\rain\cpp\network-libraries.hpp" />
-    <ClInclude Include="..\rain\cpp\network-recv-param.hpp" />
-    <ClInclude Include="..\rain\cpp\network-recv-thread.hpp" />
-    <ClInclude Include="..\rain\cpp\network-server-manager.hpp" />
-    <ClInclude Include="..\rain\cpp\network-smtp.hpp" />
-    <ClInclude Include="..\rain\cpp\network-socket-manager.hpp" />
-    <ClInclude Include="..\rain\cpp\network-utility.hpp" />
-    <ClInclude Include="..\rain\cpp\network-wsa-include.hpp" />
-    <ClInclude Include="..\rain\cpp\rain-window.hpp" />
-    <ClInclude Include="..\rain\cpp\rain.hpp" />
-    <ClInclude Include="..\rain\cpp\timer.hpp" />
-    <ClInclude Include="..\rain\cpp\utility-error.hpp" />
-    <ClInclude Include="..\rain\cpp\utility-filesystem.hpp" />
-    <ClInclude Include="..\rain\cpp\utility-libraries.hpp" />
-    <ClInclude Include="..\rain\cpp\utility-logging.hpp" />
-    <ClInclude Include="..\rain\cpp\utility-platform.hpp" />
-    <ClInclude Include="..\rain\cpp\utility-string.hpp" />
-    <ClInclude Include="..\rain\cpp\utility-time.hpp" />
-    <ClInclude Include="..\rain\cpp\windows-lam-include.hpp" />
+    <ClInclude Include="..\rain\src\algorithm-libraries.hpp" />
+    <ClInclude Include="..\rain\src\condition-variable.hpp" />
+    <ClInclude Include="..\rain\src\configuration.hpp" />
+    <ClInclude Include="..\rain\src\gdi-plus-include.hpp" />
+    <ClInclude Include="..\rain\src\gdi-plus-libraries.hpp" />
+    <ClInclude Include="..\rain\src\logstream.hpp" />
+    <ClInclude Include="..\rain\src\minmax.hpp" />
+    <ClInclude Include="..\rain\src\network-base.hpp" />
+    <ClInclude Include="..\rain\src\network-client-manager.hpp" />
+    <ClInclude Include="..\rain\src\network-headed-managers.hpp" />
+    <ClInclude Include="..\rain\src\network-libraries.hpp" />
+    <ClInclude Include="..\rain\src\network-recv-param.hpp" />
+    <ClInclude Include="..\rain\src\network-recv-thread.hpp" />
+    <ClInclude Include="..\rain\src\network-server-manager.hpp" />
+    <ClInclude Include="..\rain\src\network-smtp.hpp" />
+    <ClInclude Include="..\rain\src\network-socket-manager.hpp" />
+    <ClInclude Include="..\rain\src\network-utility.hpp" />
+    <ClInclude Include="..\rain\src\network-wsa-include.hpp" />
+    <ClInclude Include="..\rain\src\rain-window.hpp" />
+    <ClInclude Include="..\rain\src\rain.hpp" />
+    <ClInclude Include="..\rain\src\timer.hpp" />
+    <ClInclude Include="..\rain\src\utility-error.hpp" />
+    <ClInclude Include="..\rain\src\utility-filesystem.hpp" />
+    <ClInclude Include="..\rain\src\utility-libraries.hpp" />
+    <ClInclude Include="..\rain\src\utility-logging.hpp" />
+    <ClInclude Include="..\rain\src\utility-platform.hpp" />
+    <ClInclude Include="..\rain\src\utility-string.hpp" />
+    <ClInclude Include="..\rain\src\utility-time.hpp" />
+    <ClInclude Include="..\rain\src\windows-lam-include.hpp" />
     <ClInclude Include="..\rc\build.hpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
       </ExcludedFromBuild>
@@ -292,28 +292,28 @@
     <ClInclude Include="..\src\deploy-server.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\rain\cpp\algorithm-libraries.cpp" />
-    <ClCompile Include="..\rain\cpp\condition-variable.cpp" />
-    <ClCompile Include="..\rain\cpp\configuration.cpp" />
-    <ClCompile Include="..\rain\cpp\gdi-plus-libraries.cpp" />
-    <ClCompile Include="..\rain\cpp\logstream.cpp" />
-    <ClCompile Include="..\rain\cpp\network-base.cpp" />
-    <ClCompile Include="..\rain\cpp\network-client-manager.cpp" />
-    <ClCompile Include="..\rain\cpp\network-headed-managers.cpp" />
-    <ClCompile Include="..\rain\cpp\network-recv-param.cpp" />
-    <ClCompile Include="..\rain\cpp\network-recv-thread.cpp" />
-    <ClCompile Include="..\rain\cpp\network-server-manager.cpp" />
-    <ClCompile Include="..\rain\cpp\network-smtp.cpp" />
-    <ClCompile Include="..\rain\cpp\network-utility.cpp" />
-    <ClCompile Include="..\rain\cpp\rain-window.cpp" />
-    <ClCompile Include="..\rain\cpp\timer.cpp" />
-    <ClCompile Include="..\rain\cpp\utility-error.cpp" />
-    <ClCompile Include="..\rain\cpp\utility-filesystem.cpp" />
-    <ClCompile Include="..\rain\cpp\utility-libraries.cpp" />
-    <ClCompile Include="..\rain\cpp\utility-logging.cpp" />
-    <ClCompile Include="..\rain\cpp\utility-platform.cpp" />
-    <ClCompile Include="..\rain\cpp\utility-string.cpp" />
-    <ClCompile Include="..\rain\cpp\utility-time.cpp" />
+    <ClCompile Include="..\rain\src\algorithm-libraries.cpp" />
+    <ClCompile Include="..\rain\src\condition-variable.cpp" />
+    <ClCompile Include="..\rain\src\configuration.cpp" />
+    <ClCompile Include="..\rain\src\gdi-plus-libraries.cpp" />
+    <ClCompile Include="..\rain\src\logstream.cpp" />
+    <ClCompile Include="..\rain\src\network-base.cpp" />
+    <ClCompile Include="..\rain\src\network-client-manager.cpp" />
+    <ClCompile Include="..\rain\src\network-headed-managers.cpp" />
+    <ClCompile Include="..\rain\src\network-recv-param.cpp" />
+    <ClCompile Include="..\rain\src\network-recv-thread.cpp" />
+    <ClCompile Include="..\rain\src\network-server-manager.cpp" />
+    <ClCompile Include="..\rain\src\network-smtp.cpp" />
+    <ClCompile Include="..\rain\src\network-utility.cpp" />
+    <ClCompile Include="..\rain\src\rain-window.cpp" />
+    <ClCompile Include="..\rain\src\timer.cpp" />
+    <ClCompile Include="..\rain\src\utility-error.cpp" />
+    <ClCompile Include="..\rain\src\utility-filesystem.cpp" />
+    <ClCompile Include="..\rain\src\utility-libraries.cpp" />
+    <ClCompile Include="..\rain\src\utility-logging.cpp" />
+    <ClCompile Include="..\rain\src\utility-platform.cpp" />
+    <ClCompile Include="..\rain\src\utility-string.cpp" />
+    <ClCompile Include="..\rain\src\utility-time.cpp" />
     <ClCompile Include="..\src\command-handler.cpp" />
     <ClCompile Include="..\src\constants.cpp" />
     <ClCompile Include="..\src\http-server.cpp" />
@@ -336,7 +336,6 @@
       <FileType>Document</FileType>
     </CustomBuild>
     <None Include="..\changelog.md" />
-    <None Include="..\rain\cpp\readme.md" />
     <None Include="..\readme.md" />
     <None Include="..\todo.md" />
   </ItemGroup>

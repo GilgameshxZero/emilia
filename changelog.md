@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.0.14
+
+* Update `rain` to `2.0.0` which removes `css` dependencies and relink.
+
 ## 6.0.13
 
 * Update `rain`.

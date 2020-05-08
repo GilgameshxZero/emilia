@@ -1,5 +1,5 @@
 #pragma once
-#include "../rain/cpp/rain.hpp"
+#include "../rain/src/rain.hpp"
 
 #include "smtp-server-param.hpp"
 #include "smtp-external-client.hpp"

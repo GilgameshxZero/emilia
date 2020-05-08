@@ -1,5 +1,5 @@
 #pragma once
-#include "../rain/cpp/rain.hpp"
+#include "../rain/src/rain.hpp"
 
 #include "constants.hpp"
 #include "main-param.hpp"
