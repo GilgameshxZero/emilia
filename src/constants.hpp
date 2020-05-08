@@ -1,5 +1,5 @@
 #pragma once
-#include "../rain/cpp/rain.hpp"
+#include "../rain/src/rain.hpp"
 
 namespace Emilia {
 	const enum class CMD_OPTION_R { NONE, CRASH, DEPLOY };

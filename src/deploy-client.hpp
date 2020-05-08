@@ -1,5 +1,5 @@
 #pragma once
-#include "../rain/cpp/rain.hpp"
+#include "../rain/src/rain.hpp"
 
 #include "utils.hpp"
 #include "deploy-client-param.hpp"
