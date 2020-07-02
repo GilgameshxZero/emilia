@@ -1,0 +1,27 @@
+{
+	BasedOnStyle: Chromium,
+
+	UseTab: Always,
+	TabWidth: 2,
+
+	PointerAlignment: Right,
+
+	IncludeBlocks: Preserve,
+	NamespaceIndentation: All,
+	FixNamespaceComments: false,
+
+	AccessModifierOffset: 0,
+	IndentCaseLabels: true,
+
+	ReflowComments: true,
+	ColumnLimit: 0,
+
+	AlignAfterOpenBracket: DontAlign,
+	AlignOperands: false,
+	ContinuationIndentWidth: 2,
+
+	BinPackArguments: false,
+	BinPackParameters: false,
+	AlignTrailingComments: false,
+	AlignConsecutiveDeclarations: false,
+}
