@@ -1,10 +1,11 @@
-**/.vscode/
 **/.vs/
+**/.vscode/
+**/bin/
+**/obj/
 
-**.user
-**.dropbox.attr
 **.aps
+**.db
+**.dropbox.attr
 **.DS_Store
-
-/bin/
-/obj/
+**.stackdump
+**.user
