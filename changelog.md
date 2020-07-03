@@ -1,5 +1,9 @@
 # Changelog
 
+## 7.0.2
+
+Implement basic example for socket client.
+
 ## 7.0.1
 
 Implemented basic command line parsing via `Rain::CommandLineParser`.

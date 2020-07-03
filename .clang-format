@@ -14,7 +14,7 @@
 	IndentCaseLabels: true,
 
 	ReflowComments: true,
-	ColumnLimit: 0,
+	ColumnLimit: 80,
 
 	AlignAfterOpenBracket: DontAlign,
 	AlignOperands: false,
