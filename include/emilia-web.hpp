@@ -2,8 +2,8 @@
 
 #define EMILIA_API_VERSION_MAJOR 7
 #define EMILIA_API_VERSION_MINOR 0
-#define EMILIA_API_VERSION_REVISION 2
+#define EMILIA_API_VERSION_REVISION 3
 
-#include "rain/rain.hpp"
+#include "rain.hpp"
 
 int main(int, char *[], char **);
