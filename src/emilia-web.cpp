@@ -20,20 +20,31 @@ int main(int argc, char *argv[], char **envp) {
 						<< "." << std::endl;
 
 	std::cout << std::endl << "Starting socket operations..." << std::endl;
-	;
-	Rain::Socket socket;
-	std::cout << "socket.create: " << socket.create() << std::endl;
-	std::cout << "socket.connect: " << socket.connect("usaco.org", "80")
+	Rain::HttpSocket client(Rain::Socket(), 16);
+	std::cout << "socket.connect: " << client.connect("mit.edu", "80")
 						<< std::endl;
 	std::cout << "socket.send: "
-						<< socket.send("GET / HTTP/1.1\r\nHost: usaco.org\r\n\r\n")
+						<< client.send("GET / HTTP/1.1\r\nHost: web.mit.edu\r\n\r\n")
 						<< std::endl;
+	int headerLen = client.recvHeader();
+	std::cout << "socket.recvHeader: " << headerLen << std::endl;
 	char buffer[8192];
 	memset(buffer, 0, sizeof(buffer));
-	std::cout << "socket.recv: " << socket.recv(buffer, 8192) << std::endl;
+	std::cout << "socket.recv: " << client.recv(buffer, 8192) << std::endl;
 	std::cout << buffer << std::endl;
-	std::cout << "socket.close: " << socket.close() << std::endl;
-	std::cout << "Socket shutdown." << std::endl;
+	std::cout << "socket.close: " << client.close() << std::endl;
+	/*
+	Rain::Socket server;
+	std::cout << "socket.bind: " << server.bind("80") << std::endl;
+	std::cout << "socket.listen: " << server.listen() << std::endl;
+	Rain::Socket conn(server.accept());
+	memset(buffer, 0, sizeof(buffer));
+	std::cout << "socket.recv: " << conn.recv(buffer, 8192) << std::endl;
+	std::cout << buffer << std::endl;
+
+	server.close();
+	conn.close();*/
+	Rain::Socket::cleanup();
 
 	return 0;
 }
