@@ -59,19 +59,23 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\rain.props" />
+    <Import Project="..\..\..\rain\build\rain.props" />
+    <Import Project="..\emilia-web.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\rain.props" />
+    <Import Project="..\..\..\rain\build\rain.props" />
+    <Import Project="..\emilia-web.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\rain.props" />
+    <Import Project="..\..\..\rain\build\rain.props" />
+    <Import Project="..\emilia-web.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\rain.props" />
+    <Import Project="..\..\..\rain\build\rain.props" />
+    <Import Project="..\emilia-web.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -143,21 +147,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\rain\src\parse.cpp" />
-    <ClCompile Include="..\..\..\rain\src\platform.cpp" />
-    <ClCompile Include="..\..\..\rain\src\socket.cpp" />
-    <ClCompile Include="..\..\..\rain\src\string.cpp" />
     <ClCompile Include="..\..\src\emilia-web.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\rain\include\rain\build.hpp" />
-    <ClInclude Include="..\..\..\rain\include\rain\gdiplus.hpp" />
-    <ClInclude Include="..\..\..\rain\include\rain\parse.hpp" />
-    <ClInclude Include="..\..\..\rain\include\rain\platform.hpp" />
-    <ClInclude Include="..\..\..\rain\include\rain\rain.hpp" />
-    <ClInclude Include="..\..\..\rain\include\rain\socket.hpp" />
-    <ClInclude Include="..\..\..\rain\include\rain\string.hpp" />
-    <ClInclude Include="..\..\..\rain\include\rain\windows.hpp" />
     <ClInclude Include="..\..\include\build.hpp" />
     <ClInclude Include="..\..\include\emilia-web.hpp" />
   </ItemGroup>
