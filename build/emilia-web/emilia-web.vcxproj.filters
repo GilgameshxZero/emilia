@@ -18,7 +18,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\emilia-api.cpp">
+    <ClCompile Include="..\..\src\emilia-web.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\rain\src\parse.cpp">
@@ -30,12 +30,15 @@
     <ClCompile Include="..\..\..\rain\src\string.cpp">
       <Filter>rain\src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\rain\src\socket.cpp">
+      <Filter>rain\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\build.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\emilia-api.hpp">
+    <ClInclude Include="..\..\include\emilia-web.hpp">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\rain\include\rain\build.hpp">
@@ -51,6 +54,15 @@
       <Filter>rain\include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\rain\include\rain\string.hpp">
+      <Filter>rain\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\rain\include\rain\socket.hpp">
+      <Filter>rain\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\rain\include\rain\gdiplus.hpp">
+      <Filter>rain\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\rain\include\rain\windows.hpp">
       <Filter>rain\include</Filter>
     </ClInclude>
   </ItemGroup>
