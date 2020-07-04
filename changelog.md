@@ -1,5 +1,9 @@
 # Changelog
 
+## 7.0.4
+
+The simplest web server which returns a 200 saying "i love you" regardless of the request.
+
 ## 7.0.3
 
 Switch to header-only `rain`. Use `HttpSocket` to setup a server and client. Piggyback off of shared code for property files in Visual Studio project.
