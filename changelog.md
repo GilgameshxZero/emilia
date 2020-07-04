@@ -1,5 +1,9 @@
 # Changelog
 
+## 7.0.5
+
+Create an asynchronous server with `ThreadPool` and "handle" incoming socket connections.
+
 ## 7.0.4
 
 The simplest web server which returns a 200 saying "i love you" regardless of the request.
