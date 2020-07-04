@@ -1,5 +1,9 @@
 # Changelog
 
+## 7.0.6
+
+Asynchronous server now parses incoming requests and prints them.
+
 ## 7.0.5
 
 Create an asynchronous server with `ThreadPool` and "handle" incoming socket connections.
