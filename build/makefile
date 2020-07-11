@@ -47,7 +47,7 @@ emilia-web: increment-build $(EMILIA_API_BIN)
 $(BIN_DIR)%: $(OBJ_DIR)emilia-web/%.o $(RAIN_OBJ) $(RAIN_INCLUDE) $(EMILIA_API_OBJ)
 	@mkdir -p $(@D)
 	$(CXX) -o $@ $< $(RAIN_OBJ) $(CXXFLAG)
-$(OBJ_DIR)emilia-web/%.o: $(SRC_DIR)%.cpp
+$(OBJ_DIR)emilia-web/%.o: $(SRC_DIR)%.cpp $(RAIN_INCLUDE)
 	@mkdir -p $(@D)
 	$(CXX) -c -o $@ $< $(CXXFLAG)
 
@@ -57,17 +57,16 @@ clean:
 	@rm -rf $(OBJ_DIR) $(BIN_DIR)
 
 # Rules for rain library objects.
-$(OBJ_DIR)rain/%.o: $(RAIN_SRC_DIR)%.cpp
+$(OBJ_DIR)rain/%.o: $(RAIN_SRC_DIR)%.cpp $(RAIN_INCLUDE)
 	@mkdir -p $(@D)
 	$(CXX) -c -o $@ $< $(CXXFLAG)
 
 # Increment build number.
 .PHONY: increment-build
 increment-build:
-	@while read line || [ -n "$$line" ]; do \
-		TOKENS=($$line); \
-		RAIN_VERSION_BUILD=$$(($${TOKENS[2]} + 1)); \
-		echo -e "$${TOKENS[0]} $${TOKENS[1]} $$RAIN_VERSION_BUILD\c" > \
-			$(VERSION_BUILD_INCLUDE); \
-	done < $(VERSION_BUILD_INCLUDE); \
+	@read line < $(VERSION_BUILD_INCLUDE); \
+	TOKENS=($$line); \
+	RAIN_VERSION_BUILD=$$(($${TOKENS[2]} + 1)); \
+	echo -e "$${TOKENS[0]} $${TOKENS[1]} $$RAIN_VERSION_BUILD\c" > \
+		$(VERSION_BUILD_INCLUDE); \
 	echo build $$RAIN_VERSION_BUILD
