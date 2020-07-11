@@ -1,9 +1,8 @@
 #include "emilia-web.hpp"
 
-#include <iostream>
-
 int main(int argc, char *argv[], char **envp) {
-	Rain::Thread::ThreadPool threadPool;
+	std::cout << EMILIA_WEB_VERSION_BUILD;
+	/*Rain::Thread::ThreadPool threadPool;
 	Rain::Memory::BufferPool bufferPool;
 	Rain::Networking::HttpServer server(&threadPool, &bufferPool);
 
@@ -61,6 +60,6 @@ int main(int argc, char *argv[], char **envp) {
 		}
 	}
 
-	Rain::Networking::Socket::cleanup();
+	Rain::Networking::Socket::cleanup();*/
 	return 0;
 }
