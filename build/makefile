@@ -24,7 +24,7 @@ EMILIA_WEB_BIN := $(BIN_DIR)$(BIN_NAME)
 
 # Flags for build. Release by default.
 CXX := g++
-CXXFLAG := -I$(INCLUDE_DIR) -I$(RAIN_INCLUDE_DIR) -std=c++17 -g -Wall -pthread
+CXXFLAG := -I$(INCLUDE_DIR) -I$(RAIN_INCLUDE_DIR) -std=c++17 -lstdc++fs -g -Wall -pthread
 CXXFLAG_DEBUG := -O0
 CXXFLAG_RELEASE := -O3 -march=native
 
