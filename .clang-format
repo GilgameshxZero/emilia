@@ -7,6 +7,7 @@
 	PointerAlignment: Right,
 
 	IncludeBlocks: Preserve,
+
 	NamespaceIndentation: All,
 	FixNamespaceComments: false,
 
@@ -19,6 +20,9 @@
 	AlignAfterOpenBracket: DontAlign,
 	AlignOperands: false,
 	ContinuationIndentWidth: 2,
+
+	AllowShortIfStatementsOnASingleLine: true,
+	AllowShortLoopsOnASingleLine: true,
 
 	BinPackArguments: false,
 	BinPackParameters: false,
