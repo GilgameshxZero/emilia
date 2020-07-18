@@ -12,7 +12,7 @@ BIN_NAME := emilia-web
 # Groups of files and filenames.
 VERSION_BUILD_INCLUDE := $(INCLUDE_DIR)build.hpp
 
-RAIN_INCLUDE := $(wildcard $(RAIN_INCLUDE_DIR)*)
+RAIN_INCLUDE := $(shell find $(RAIN_INCLUDE_DIR) -name *.hpp)
 
 EMILIA_WEB_INCLUDE := $(filter-out $(VERSION_BUILD_INCLUDE), \
 	$(wildcard $(INCLUDE_DIR)*.hpp))

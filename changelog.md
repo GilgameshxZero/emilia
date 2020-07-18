@@ -1,5 +1,9 @@
 # Changelog
 
+## 7.0.9
+
+Using `rain 6.0.20`, implement similar server functionality to `emilia-web 6.x.x`.
+
 ## 7.0.8
 
 Modify makefile to increment build number correctly. Remove dependency temporarily on higher-order functionality of `rain` while `rain` is undergoing refactoring.

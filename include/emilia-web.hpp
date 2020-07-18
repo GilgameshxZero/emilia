@@ -2,10 +2,10 @@
 
 #define EMILIA_WEB_VERSION_MAJOR 7
 #define EMILIA_WEB_VERSION_MINOR 0
-#define EMILIA_WEB_VERSION_REVISION 8
+#define EMILIA_WEB_VERSION_REVISION 9
 
 #include "build.hpp"
 
 #include <rain.hpp>
 
-int main(int, char *[], char **);
+int main(int, const char *[]);
