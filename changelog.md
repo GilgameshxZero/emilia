@@ -1,5 +1,10 @@
 # Changelog
 
+## 7.0.10
+
+* Use `-lstdc++fs` flag for `g++` to support `g++-8`.
+* Add `data` directory to version control.
+
 ## 7.0.9
 
 Using `rain 6.0.20`, implement similar server functionality to `emilia-web 6.x.x`.
