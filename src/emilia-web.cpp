@@ -48,12 +48,12 @@ int main(int argc, const char *argv[]) {
 	}
 	newsSubsIn.close();
 
-	// Server with max 64 threads.
-	Rain::Networking::Http::Server server(64);
+	// Server with max 512 threads.
+	Rain::Networking::Http::Server server(512);
 
 	// Set server parameters.
-	server.acceptTimeoutMs = 5000;
-	server.recvTimeoutMs = 5000;
+	server.acceptTimeoutMs = 30000;
+	server.recvTimeoutMs = 30000;
 
 	// Request handler.
 	server.onRequest = [&](Rain::Networking::Http::Server::Request *req) {
@@ -64,14 +64,14 @@ int main(int argc, const char *argv[]) {
 								<< " " << req->path << "\n";
 		}
 
-		// Cache up to 128 files of at most 1MB each.
-		Rain::Algorithm::LRUCache<std::string, std::string> fileCache(128);
-		static const std::size_t MAX_FILE_CACHE_SIZE = 1 << 20;
+		// Cache up to 128 files of at most 4MB each.
+		static Rain::Algorithm::LRUCache<std::string, std::string> fileCache(128);
+		static const std::size_t MAX_FILE_CACHE_SIZE = 1 << 22;
 
 		// 404 response.
 		Rain::Networking::Http::Server::Response notFound(
 			req->slave, 404, "Emilia couldn't find your page T_T");
-		notFound.body.appendBytes("I'm sorry, I couldn't find it T_T");
+		notFound.body.appendBytes("I'm sorry, I couldn't find what you wanted T_T");
 		notFound.header["Content-Type"] = "text/html";
 		notFound.header["Content-Length"] = notFound.body.getBytesLength();
 		if (req->method != "GET") {

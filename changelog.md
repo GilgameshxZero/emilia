@@ -1,5 +1,9 @@
 # Changelog
 
+## 7.0.11
+
+* Fix a bug where the file cache was wiped on every new request. This should improve performance for smaller files and minimize disk reads.
+
 ## 7.0.10
 
 * Use `-lstdc++fs` flag for `g++` to support `g++-8`.
