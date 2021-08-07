@@ -3,30 +3,27 @@
 
 	UseTab: Always,
 	TabWidth: 2,
-
 	PointerAlignment: Right,
-
-	IncludeBlocks: Preserve,
-	SortUsingDeclarations: false,
 
 	NamespaceIndentation: All,
 	FixNamespaceComments: false,
-
 	AccessModifierOffset: 0,
 	IndentCaseLabels: true,
 
-	ReflowComments: true,
-	ColumnLimit: 80,
-
-	AlignAfterOpenBracket: DontAlign,
+	AlignAfterOpenBracket: AlwaysBreak,
 	AlignOperands: false,
 	ContinuationIndentWidth: 2,
 
+	BinPackArguments: false,
+	BinPackParameters: false,
+	AlignConsecutiveDeclarations: false,
 	AllowShortIfStatementsOnASingleLine: true,
 	AllowShortLoopsOnASingleLine: true,
 
-	BinPackArguments: false,
-	BinPackParameters: false,
 	AlignTrailingComments: false,
-	AlignConsecutiveDeclarations: false,
+	ReflowComments: true,
+	ColumnLimit: 80,
+
+	IncludeBlocks: Preserve,
+	SortUsingDeclarations: false,
 }

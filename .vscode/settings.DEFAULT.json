@@ -1,0 +1,23 @@
+/* Recommended settings for VSCode. Copy and customize to `settings.json`. */
+{
+	"debug.console.closeOnEnd": false,
+	"editor.rulers": [80, 120],
+	"editor.insertSpaces": false,
+	"editor.tabSize": 2,
+	"files.insertFinalNewline": true,
+	"files.eol": "\n",
+
+	"C_Cpp.default.includePath": ["include/", "rain/include/"],
+	"C_Cpp.default.cppStandard": "c++17",
+
+	"[cpp]": {
+		"editor.defaultFormatter": "ms-vscode.cpptools",
+		"editor.wordWrap": "on"
+	},
+
+	"files.associations": {
+		/* Mirrors file association of settings.json. */
+		"settings.DEFAULT.json": "jsonc",
+		"*.vstemplate": "xml"
+	}
+}

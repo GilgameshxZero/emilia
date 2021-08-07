@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.0.0
+
+Changelog delayed to future version.
+
 ## 7.1.10
 
 * Update the host node config to match `rain v6.5.4`.
