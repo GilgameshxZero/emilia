@@ -2,82 +2,98 @@ SHELL := /bin/bash
 
 # Directories relative paths.
 ROOT_DIR := ../
-RAIN_INCLUDE_DIR := $(ROOT_DIR)../rain/include/
 INCLUDE_DIR := $(ROOT_DIR)include/
 SRC_DIR := $(ROOT_DIR)src/
 OBJ_DIR := $(ROOT_DIR)obj/
 BIN_DIR := $(ROOT_DIR)bin/
-BIN_NAME := emilia-web
+
+# Rain library files
+RAIN_INCLUDE_DIR := $(ROOT_DIR)rain/include/
+RAIN_INCLUDES := $(shell find $(RAIN_INCLUDE_DIR) -name *.hpp)
 
 # Groups of files and filenames.
 VERSION_BUILD_INCLUDE := $(INCLUDE_DIR)build.hpp
 
-RAIN_INCLUDES := $(shell find $(RAIN_INCLUDE_DIR) -name *.hpp)
-
-EMILIA_WEB_INCLUDES := $(filter-out $(VERSION_BUILD_INCLUDE), \
+# All of project's include files, excluding the build file.
+PROJECT_INCLUDES := $(filter-out $(VERSION_BUILD_INCLUDE), \
 	$(wildcard $(INCLUDE_DIR)*.hpp))
-EMILIA_WEB_SRCS := $(wildcard $(SRC_DIR)*.cpp)
-EMILIA_WEB_NAMES := $(basename $(notdir $(EMILIA_WEB_SRCS)))
-EMILIA_WEB_OBJS := $(addsuffix .o, \
-	$(addprefix $(OBJ_DIR), $(EMILIA_WEB_NAMES)))
-EMILIA_WEB_BIN := $(BIN_DIR)$(BIN_NAME)
+
+PROJECT_SRCS := $(wildcard $(SRC_DIR)*.cpp)
+PROJECT_SRC_NAMES := $(basename $(notdir $(wildcard $(SRC_DIR)*.cpp)))
+PROJECT_NAME := emilia
+PROJECT_OBJS := $(addprefix $(OBJ_DIR)$(PROJECT_NAME)/, \
+	$(addsuffix .o, $(PROJECT_SRC_NAMES)))
+PROJECT_BIN := $(BIN_DIR)$(PROJECT_NAME)
 
 # Flags for build. Debug by default.
 CXX := g++
-CXXFLAGS := -I$(INCLUDE_DIR) -I$(RAIN_INCLUDE_DIR) -std=c++17 -pthread -Wall
-CXXFLAGS_DEBUG := -O0 -g
-CXXFLAGS_RELEASE := -O3 -march=native
-LDLIBS := -lresolv
+CXXFLAGS := -I$(INCLUDE_DIR) -I$(RAIN_INCLUDE_DIR) -std=c++17 -m64 -pthread \
+	-Wall -Wextra -D_CONSOLE
+CXXFLAGS_DEBUG := -D_DEBUG -g -O0
+CXXFLAGS_RELEASE := -DNDEBUG -Ofast
+CXXFLAGS_INSTRUMENT := -fsanitize=address,undefined,leak
+LDLIBS := -pthread -lresolv
 
-# OS-specific behavior.
-UNAME_S := $(shell uname -s)
-ifneq ($(UNAME_S), Darwin)
-	LDLIBS := $(LDLIBS) -lstdc++fs
-endif
-
-# Check if RELEASE=1 is set.
+# Default to DEBUG builds. Check if RELEASE=1 is set.
 ifeq ($(RELEASE), 1)
   CXXFLAGS := $(CXXFLAGS) $(CXXFLAGS_RELEASE)
 else
   CXXFLAGS := $(CXXFLAGS) $(CXXFLAGS_DEBUG)
 endif
 
-# Object files should not be deleted to not recompile under no changes.
-.SECONDARY: $(EMILIA_WEB_OBJS) $(EMILIA_WEB_BIN)
+ifeq ($(INSTRUMENT), 1)
+  CXXFLAGS := $(CXXFLAGS) $(CXXFLAGS_INSTRUMENT)
+endif
+
+# -lstdc++fs is included by default on MacOS and cannot be specified on the \
+	command line.
+UNAME_S := $(shell uname -s)
+ifneq ($(UNAME_S), Darwin)
+	LDLIBS := $(LDLIBS) -lstdc++fs
+endif
+
+# Keep intermediate and output files.
+.SECONDARY: $(PROJECT_OBJS) $(PROJECT_BIN)
 
 # Mark .PHONY for rules to avoid compiling files named the same as rules.
 
-# Compile without running.
-.PHONY: $(BIN_NAME)
-$(BIN_NAME): $(VERSION_BUILD_INCLUDE) $(EMILIA_WEB_BIN)
-
-# Run.
+# Build and run.
 .PHONY: run
-run: $(BIN_NAME)
-	@cd $(BIN_DIR) && ./$(BIN_NAME)
+run: $(PROJECT_NAME)
+	@cd $(BIN_DIR) && ./$(PROJECT_NAME)
 
-# Compile without incrementing build.
-.PHONY: noinc
-noinc: $(EMILIA_WEB_BIN)
+# Build without running. Proxy for project name.
+.PHONY: build
+build: $(PROJECT_NAME)
 
-# Rules for emilia-web binaries and objects.
-$(BIN_DIR)%: $(OBJ_DIR)%.o $(EMILIA_WEB_OBJS)
-	@mkdir -p $(@D)
-	$(CXX) $(CXXFLAGS) $< $(LDLIBS) -o $@
-$(OBJ_DIR)%.o: $(SRC_DIR)%.cpp $(EMILIA_WEB_INCLUDES) $(RAIN_INCLUDES)
-	@mkdir -p $(@D)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-# Delete compile-time files.
+# Delete intermediate files.
 .PHONY: clean
 clean:
 	@rm -rf $(OBJ_DIR) $(BIN_DIR)
 
+# Rule for BIN_NAME just redirects to the bin itself.
+# Enable second expansion for some fancy pattern matching later.
+.SECONDEXPANSION:
+$(PROJECT_NAME): $(VERSION_BUILD_INCLUDE) $(BIN_DIR)$$@
+
+# Static rules to nest one directory deep inside ../obj.
+# Link rule.
+$(PROJECT_BIN): $(BIN_DIR)% : $(PROJECT_OBJS)
+	@mkdir -p $(@D)
+	$(CXX) $^ $(LDLIBS) -o $@
+
+# Compile rule. Stem % matches TEST_NAME/TEST_NAME, in which / is replaced \
+	with a space and the last word is extracted for the cpp file name.
+$(PROJECT_OBJS): $(OBJ_DIR)%.o : $(SRC_DIR)$$(lastword $$(subst /, ,$$*)).cpp \
+	$(PROJECT_INCLUDES) $(RAIN_INCLUDES)
+	@mkdir -p $(@D)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
 # Increment build number.
-$(VERSION_BUILD_INCLUDE): $(EMILIA_WEB_INCLUDES) $(EMILIA_WEB_SRCS) $(RAIN_INCLUDES)
+$(VERSION_BUILD_INCLUDE): $(PROJECT_INCLUDES) $(RAIN_INCLUDES) $(PROJECT_SRCS)
 	@read line < $(VERSION_BUILD_INCLUDE); \
 	TOKENS=($$line); \
-	VERSION_BUILD=$$(($${TOKENS[2]} + 1)); \
-	echo -e "$${TOKENS[0]} $${TOKENS[1]} $$VERSION_BUILD\c" > \
+	RAIN_VERSION_BUILD=$$(($${TOKENS[2]} + 1)); \
+	echo -e "$${TOKENS[0]} $${TOKENS[1]} $$RAIN_VERSION_BUILD\c" > \
 		$(VERSION_BUILD_INCLUDE); \
-	echo build $$VERSION_BUILD
+	echo VERSION_BUILD: $$RAIN_VERSION_BUILD.

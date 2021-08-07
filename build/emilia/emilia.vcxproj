@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="debug|x64">
+      <Configuration>debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release|x64">
+      <Configuration>release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\emilia.cpp" />
+    <ClCompile Include="..\..\src\http.cpp" />
+    <ClCompile Include="..\..\src\smtp.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\build.hpp" />
+    <ClInclude Include="..\..\include\emilia.hpp" />
+    <ClInclude Include="..\..\include\http.hpp" />
+    <ClInclude Include="..\..\include\smtp.hpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{856692f7-75ec-4136-87db-4d0463bd330b}</ProjectGuid>
+    <RootNamespace>emilia</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)'=='debug'">
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)'=='release'">
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <!-- Imports Whole Program Optimization property sheet. -->
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\rain.props" />
+  </ImportGroup>
+  <!-- Configuration-specific properties. -->
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)'=='debug'">
+    <Import Project="..\rain-debug.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)'=='release'">
+    <Import Project="..\rain-release.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <!-- Project-specific property page. -->
+    <Import Project="..\emilia.props" />
+  </ImportGroup>
+  <!-- Empty group so that Visual Studio displays properties correctly. -->
+  <ItemDefinitionGroup>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>
