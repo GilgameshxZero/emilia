@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.0.1
+
+Changelog delayed to future version.
+
 ## 8.0.0
 
 Changelog delayed to future version.
