@@ -57,11 +57,6 @@ namespace Emilia::Smtp {
 	}
 	Worker::PreResponse Worker::onRcptMailbox(
 		Rain::Networking::Smtp::Mailbox const &mailbox) {
-		// robots@gilgamesh.cc is banned.
-		if (mailbox.name == "robots" && mailbox.domain == this->domain) {
-			return {StatusCode::REQUEST_NOT_TAKEN_MAILBOX_UNAVAILABLE_PERMANENT};
-		}
-
 		// If authenticated, can send to any address. Otherwise, can only send to
 		// the domain.
 		if (this->authenticated || mailbox.domain == this->domain) {
@@ -79,8 +74,8 @@ namespace Emilia::Smtp {
 		// Receive and save to a file, whose filename is constructed uniquely.
 		std::filesystem::path baseEnvelopePath;
 		while (true) {
-			time_t timeNow = time(nullptr);
-			tm timeData;
+			std::time_t timeNow = time(nullptr);
+			std::tm timeData;
 			Rain::Time::localtime_r(&timeNow, &timeData);
 			std::stringstream envelopeNameStream;
 			envelopeNameStream << "../data/emails/" << timeData.tm_year << "-"
@@ -107,6 +102,11 @@ namespace Emilia::Smtp {
 		for (Mailbox const &mailbox : this->rcptTo) {
 			std::multimap<std::chrono::steady_clock::time_point, Envelope>::iterator
 				it;
+			// Discard if sending to spamtrap.
+			if (mailbox.name == "canned-pork" && mailbox.domain == this->domain) {
+				continue;
+			}
+
 			{
 				std::lock_guard lck(this->outboxMtx);
 				it = this->outbox.emplace(
@@ -167,7 +167,13 @@ namespace Emilia::Smtp {
 		Duration sendOnceTimeoutDuration,
 		Rain::Networking::Smtp::Mailbox const &forwardTo,
 		std::string const &domain,
-		std::string const &sendAsPassword)
+		std::string const &sendAsPassword,
+		std::list<std::tuple<
+			std::chrono::system_clock::time_point,
+			bool,
+			Rain::Networking::Smtp::Mailbox,
+			Rain::Networking::Smtp::Mailbox>> *mailboxActivity,
+		std::mutex *mailboxActivityMtx)
 			: Interface(
 					maxThreads,
 					// Relay worker construction arguments.
@@ -179,8 +185,9 @@ namespace Emilia::Smtp {
 				forwardTo(forwardTo),
 				domain(domain),
 				sendAsPassword(sendAsPassword),
-				
-				outboxClosed(false) {
+				outboxClosed(false),
+				mailboxActivity(*mailboxActivity),
+				mailboxActivityMtx(*mailboxActivityMtx) {
 		this->outboxThread = std::thread([this]() {
 			// Attempt remaining envelopes in the outbox every hour or so. Envelopes
 			// will be ready to be retried every hour.
@@ -201,10 +208,18 @@ namespace Emilia::Smtp {
 					}
 
 					// If the Envelope has been retried too many times, give up.
-					if (it->second.cAttempts > (1_zu << 5)) {
+					if (it->second.cAttempts > 24) {
 						std::cerr << "Exceeded maximum retries: " << it->second.from
 											<< " > " << it->second.to << "\n : " << it->second.file
 											<< std::endl;
+						{
+							std::lock_guard lck(this->mailboxActivityMtx);
+							this->mailboxActivity.emplace_back(
+								std::chrono::system_clock::now(),
+								false,
+								it->second.from,
+								it->second.to);
+						}
 						std::lock_guard lck(this->outboxMtx);
 						this->outbox.erase(it++);
 						continue;
@@ -232,7 +247,8 @@ namespace Emilia::Smtp {
 							StatusCode::REQUEST_COMPLETED) {
 							return true;
 						}
-						client << Request{Command::MAIL, "FROM:<server@" + domain + ">"};
+						client << Request{
+							Command::MAIL, "FROM:<postmaster@" + domain + ">"};
 						if (
 							client.recvResponse().statusCode !=
 							StatusCode::REQUEST_COMPLETED) {
@@ -288,10 +304,22 @@ namespace Emilia::Smtp {
 						// Consume exceptions.
 					}
 
-					std::lock_guard lck(this->outboxMtx);
+					std::lock_guard mailboxLck(this->mailboxActivityMtx);
+					std::lock_guard outboxLck(this->outboxMtx);
 					if (!successfullySent) {
 						this->outbox.emplace(std::chrono::steady_clock::now(), it->second)
 							->second.cAttempts++;
+						this->mailboxActivity.emplace_back(
+							std::chrono::system_clock::now(),
+							false,
+							it->second.from,
+							it->second.to);
+					} else {
+						this->mailboxActivity.emplace_back(
+							std::chrono::system_clock::now(),
+							true,
+							it->second.from,
+							it->second.to);
 					}
 					this->outbox.erase(it++);
 				}

@@ -83,6 +83,13 @@ namespace Emilia::Smtp {
 		std::condition_variable outboxEv;
 		std::thread outboxThread;
 
+		std::list<std::tuple<
+			std::chrono::system_clock::time_point,
+			bool,
+			Rain::Networking::Smtp::Mailbox,
+			Rain::Networking::Smtp::Mailbox>> &mailboxActivity;
+		std::mutex &mailboxActivityMtx;
+
 		public:
 		Server(
 			std::size_t = 1024,
@@ -94,7 +101,13 @@ namespace Emilia::Smtp {
 			Duration = std::chrono::seconds(60),
 			Rain::Networking::Smtp::Mailbox const & = {},
 			std::string const & = "gilgamesh.cc",
-			std::string const & = "");
+			std::string const & = "",
+			std::list<std::tuple<
+				std::chrono::system_clock::time_point,
+				bool,
+				Rain::Networking::Smtp::Mailbox,
+				Rain::Networking::Smtp::Mailbox>> * = nullptr,
+			std::mutex * = nullptr);
 		Server(Server const &) = delete;
 		Server &operator=(Server const &) = delete;
 		virtual ~Server();

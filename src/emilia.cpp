@@ -53,14 +53,31 @@ int main(int argc, char const *const argv[]) {
 		return 0;
 	}
 
+	// Servers synchronize on this for recent mail activity.
+	std::list<std::tuple<
+		std::chrono::system_clock::time_point,
+		bool,
+		Rain::Networking::Smtp::Mailbox,
+		Rain::Networking::Smtp::Mailbox>>
+		mailboxActivity;
+	std::mutex mailboxActivityMtx;
+
 	// Launch both servers.
-	Emilia::Http::Server httpServer(256);
+	Emilia::Http::Server httpServer(
+		1024,
+		Rain::Networking::Specification::ProtocolFamily::INET6,
+		1_zu << 10,
+		1_zu << 10,
+		60s,
+		60s,
+		&mailboxActivity,
+		&mailboxActivityMtx);
 	httpServer.serve({"", httpPort});
 	std::cout << "HTTP server listening on " << httpServer.getTargetHost()
 						<< "..." << std::endl;
 
 	Emilia::Smtp::Server smtpServer(
-		256,
+		1024,
 		Rain::Networking::Specification::ProtocolFamily::INET,
 		1_zu << 10,
 		1_zu << 10,
@@ -68,7 +85,9 @@ int main(int argc, char const *const argv[]) {
 		60s,
 		forwardTo,
 		domain,
-		sendAsPassword);
+		sendAsPassword,
+		&mailboxActivity,
+		&mailboxActivityMtx);
 	smtpServer.serve({"", smtpPort});
 	std::cout << "SMTP server listening on " << smtpServer.getTargetHost()
 						<< "..." << std::endl;
