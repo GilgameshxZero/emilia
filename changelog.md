@@ -1,12 +1,16 @@
 # Changelog
 
+## 8.0.2
+
+Changelog omitted temporarily.
+
 ## 8.0.1
 
-Changelog delayed to future version.
+Changelog omitted temporarily.
 
 ## 8.0.0
 
-Changelog delayed to future version.
+Changelog omitted temporarily.
 
 ## 7.1.10
 
