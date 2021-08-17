@@ -26,7 +26,7 @@ PROJECT_OBJS := $(addprefix $(OBJ_DIR)$(PROJECT_NAME)/, \
 PROJECT_BIN := $(BIN_DIR)$(PROJECT_NAME)
 
 # Flags for build. Debug by default.
-CXX := g++
+CXX ?= clang++
 CXXFLAGS := -I$(INCLUDE_DIR) -I$(RAIN_INCLUDE_DIR) -std=c++17 -m64 -pthread \
 	-Wall -Wextra -D_CONSOLE
 CXXFLAGS_DEBUG := -D_DEBUG -g -O0

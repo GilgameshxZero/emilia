@@ -1,5 +1,11 @@
 # Changelog
 
+## 8.1.2
+
+Update `build/makefile` to use `clang++` by default and not overwrite `CXX` environment variable.
+Reset default ports to `0`.
+Previous design redirects don’t use HTTPS anymore.
+
 ## 8.1.1
 
 Update to `rain 7.1.1`. Future updates to the underlying `rain` will not be so immediate. This introduces no changes to `emilia`.
