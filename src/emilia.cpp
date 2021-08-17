@@ -18,7 +18,7 @@ int main(int argc, char const *argv[]) {
 	// Parse command line options.
 	Emilia::State state;
 	state.node = "gilgamesh.cc";
-	std::string httpPort = "80", smtpPort = "25", smtpForwardStr = "";
+	std::string httpPort = "0", smtpPort = "0", smtpForwardStr = "";
 	bool showHelp = false;
 
 	Rain::String::CommandLineParser parser;
