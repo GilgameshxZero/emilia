@@ -1,0 +1,215 @@
+<html>
+
+<head>
+  <style>
+    .planet-content>form {
+      width: 100%;
+      display: flex;
+      flex-flow: column nowrap;
+    }
+
+    .planet-content>form>input {
+      min-width: 100px;
+      max-width: 100%;
+      width: 100px;
+      margin: auto;
+    }
+
+    .planet-content>form>button {
+      margin: 20px auto 0;
+
+      transition: opacity var(--transition-time), border-color var(--transition-time);
+    }
+
+    .planet-content>form>button.disabled {
+      opacity: 0;
+      cursor: initial;
+    }
+
+    .planet-content>form>span {
+      margin: auto;
+      height: 0;
+
+      overflow: hidden;
+    }
+
+  </style>
+
+  <script type="text/javascript">
+    //for the text scramble effect, from https://codepen.io/soulwire/pen/mErPAK
+    class TextScramble {
+      constructor(el) {
+        this.el = el;
+        this.chars = `!<>-_\\/[]{}—=+*^?#________`;
+        this.update = this.update.bind(this);
+      }
+      setText(newText) {
+        const oldText = this.el.innerText;
+        const length = Math.max(oldText.length, newText.length);
+        const promise = new Promise((resolve) => this.resolve = resolve);
+        this.queue = [];
+        for (let i = 0; i < length; i++) {
+          const from = oldText[i] || ``;
+          const to = newText[i] || ``;
+          const start = Math.floor(Math.random() * 10);
+          const end = start + Math.floor(Math.random() * 10);
+          this.queue.push({ from, to, start, end });
+        }
+        cancelAnimationFrame(this.frameRequest)
+        this.frame = 0;
+        this.update();
+        return promise;
+      }
+      update() {
+        let output = ``;
+        let complete = 0;
+        for (let i = 0, n = this.queue.length; i < n; i++) {
+          let { from, to, start, end, char } = this.queue[i]
+          if (this.frame >= end) {
+            complete++;
+            output += to;
+          } else if (this.frame >= start) {
+            if (!char || Math.random() < 0.28) {
+              char = this.randomChar();
+              this.queue[i].char = char;
+            }
+            output += `<span class="dud">${char}</span>`;
+          } else {
+            output += from;
+          }
+        }
+        this.el.innerHTML = output;
+        if (complete === this.queue.length) {
+          this.resolve();
+        } else {
+          this.frameRequest = requestAnimationFrame(this.update);
+          this.frame++;
+        }
+      }
+      randomChar() {
+        return this.chars[Math.floor(Math.random() * this.chars.length)];
+      }
+    }
+
+    handleInputInput = state => {
+      return event => {
+        const value = event.target.value;
+
+        //adjust width of input
+        state.props.span.textContent = value;
+        state.props.input.style.width = `${state.props.span.clientWidth + 40}px`;
+
+        //based on value, enable or disable button
+        state.isButtonReady = false;
+        if (state.props.emailRegex.test(value)) {
+          state.intervalId = setInterval(state.props.animateButton, state.props.animateInterval);
+          state.props.button.classList.remove(`disabled`);
+          //also change whether the button says subscribe or unsubscribe based on mlist status
+          const checkStatus = () => {
+            if (state.xhr) state.xhr.abort();
+            state.xhr = new XMLHttpRequest();
+            state.xhr.open(`GET`, `newsletter/check/${value}`, true);
+            state.xhr.onreadystatechange = () => {
+              if (state.xhr.readyState !== 4) return;
+              if (state.xhr.status !== 200) return;
+              else {
+                clearInterval(state.intervalId);
+                state.props.buttonFX.setText(state.xhr.responseText === "subscribed" ?
+                  "unsubscribe" : "subscribe");
+                state.isButtonReady = true;
+                state.xhr = null;
+              }
+            };
+            state.xhr.send();
+          };
+          checkStatus();
+        } else state.props.button.classList.add(`disabled`);
+      }
+    };
+
+    //needed to stop handling wasd in host
+    handleInputKeyPress = state => {
+      return event => {
+        event.stopPropagation();
+      };
+    };
+
+    handleFormSubmit = state => {
+      return event => {
+        if (state.isButtonReady) {
+          const newText = state.props.button.textContent === "subscribe" ?
+            "unsubscribe" : "subscribe";
+          const xhr = new XMLHttpRequest();
+          xhr.open(`GET`, `newsletter/toggle/${state.props.input.value}`, true);
+          xhr.onreadystatechange = () => {
+            if (xhr.readyState !== 4) return;
+            if (xhr.status !== 200) state.props.buttonFX.setText("try again");
+            else {
+              clearInterval(state.intervalId);
+              state.isButtonReady = true;
+              state.props.buttonFX.setText(newText);
+            }
+          };
+          xhr.send();
+          state.intervalId = setInterval(state.props.animateButton, state.props.animateInterval);
+          state.isButtonReady = false;
+        }
+
+        event.preventDefault();
+        return false;
+      };
+    };
+
+    //start of executed code when planet loads
+    onPlanetContentLoad = () => {
+      const state = {
+        xhr: null, //null, or the current XHR
+        isButtonReady: false, //true if form is ready to be submitted
+        intervalId: null,
+      };
+      const props = {
+        input: document.querySelector(`.planet-content>form>input`),
+        span: document.querySelector(`.planet-content>form>span`),
+        button: document.querySelector(`.planet-content>form>button`),
+        form: document.querySelector(`.planet-content>form`),
+        emailRegex: /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i,
+        recheckTimeout: 1000,
+        animateInterval: 100,
+      };
+      props.buttonFX = new TextScramble(props.button);
+      props.animateButton = () => { //animate button if not ready
+        if (!state.isButtonReady) state.props.buttonFX.setText(`subscribe`);
+      };
+      state.props = props;
+
+      state.props.input.addEventListener(`input`, handleInputInput(state));
+      state.props.input.addEventListener(`keypress`, handleInputKeyPress(state));
+      state.props.form.addEventListener(`submit`, handleFormSubmit(state));
+    };
+    onPlanetContentLoad();
+  </script>
+</head>
+
+<body>
+  <div class="meta">
+    <div class="label">
+      <span style="padding-bottom: 8%;">@</span>
+    </div>
+    <div class="subplanets"></div>
+  </div>
+  <div class="planet-content">
+    <p class="center">
+      <span class="larger burning">FOLLOW</span><br>
+      bi-annual life updates<br>
+    </p>
+    <p>
+      <form>
+        <input class="center no-focus" type="email" placeholder="email">
+        <span class="measure"></span>
+        <button class="disabled" type="submit">subscribe</button>
+      </form>
+    </p>
+  </div>
+</body>
+
+</html>

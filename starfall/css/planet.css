@@ -1,0 +1,126 @@
+/*Everything related to the icon and planet content, which is not markdown.*/
+
+.planet>.inner>.label {
+  z-index: 1;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  font-size: 200%;
+}
+
+.planet>.inner>.label>span {
+  margin: auto;
+}
+
+.planet>.inner>.label>img {
+  margin: auto;
+}
+
+/*Planet content*/
+
+.planet-content {
+  margin: 3vmin auto 5vmin;
+  width: 100%;
+  max-width: 1500px;
+
+  font-size: 100%;
+}
+
+.planet-content.images-480px img {
+  max-width: 100%;
+}
+
+@media (min-width: 480px) {
+  .planet-content.images-480px img {
+    max-width: 480px;
+  }
+}
+
+.planet-content.images-768px img {
+  max-width: 100%;
+}
+
+@media (min-width: 768px) {
+  .planet-content.images-768px img {
+    max-width: 768px;
+  }
+}
+
+.planet-content.images-1024px img {
+  max-width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .planet-content.images-1024px img {
+    max-width: 1024px;
+  }
+}
+
+.planet-content .center {
+  text-align: center;
+  justify-content: center;
+}
+
+.planet-content .left {
+  text-align: left;
+}
+
+.planet-content .right {
+  text-align: right;
+}
+
+.planet-content .large {
+  font-size: 125%;
+}
+
+.planet-content .larger {
+  font-size: 165%;
+}
+
+.planet-content h1 {
+  text-align: center;
+}
+
+.planet-content h2 {
+  text-align: center;
+}
+
+.planet-content input {
+  padding: 10px;
+
+  font-family: inherit;
+  font-size: inherit;
+  background-color: inherit;
+  color: inherit;
+  border: none;
+  border-bottom: 2px solid var(--medium);
+  border-radius: 0;
+
+  transition: border-color var(--transition-time);
+}
+
+.planet-content input:focus {
+  border-color: var(--burning);
+}
+
+.planet-content button {
+  padding: 10px 15px;
+  position: relative;
+
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background-color: transparent;
+  border: 2px solid var(--medium);
+  border-top: none;
+  border-bottom: none;
+
+  cursor: pointer;
+  transition: border-color var(--transition-time);
+}
+
+.planet-content button:hover {
+  border-color: var(--burning);
+}

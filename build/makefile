@@ -31,8 +31,9 @@ CXXFLAGS := -I$(INCLUDE_DIR) -I$(RAIN_INCLUDE_DIR) -std=c++17 -m64 -pthread \
 	-Wall -Wextra -D_CONSOLE
 CXXFLAGS_DEBUG := -D_DEBUG -g -O0
 CXXFLAGS_RELEASE := -DNDEBUG -Ofast
-CXXFLAGS_INSTRUMENT := -fsanitize=address,undefined,leak
+CXXFLAGS_INSTRUMENT :=
 LDLIBS := -pthread -lresolv
+LDLIBS_INSTRUMENT := -fsanitize=address,undefined,leak
 
 # Default to DEBUG builds. Check if RELEASE=1 is set.
 ifeq ($(RELEASE), 1)
@@ -43,6 +44,7 @@ endif
 
 ifeq ($(INSTRUMENT), 1)
   CXXFLAGS := $(CXXFLAGS) $(CXXFLAGS_INSTRUMENT)
+	LDLIBS := $(LDLIBS) $(LDLIBS_INSTRUMENT)
 endif
 
 # -lstdc++fs is included by default on MacOS and cannot be specified on the \

@@ -1,0 +1,575 @@
+<html>
+
+<head></head>
+
+<body>
+  <div class="meta">
+    <div class="label">
+      <span>1</span>
+    </div>
+    <div class="subplanets"></div>
+  </div>
+  <div class="planet-content images-768px markdown">
+    <h1 id="predictive-text-rnns-and-n-grams-for-mit-confessions"><a
+        href="https://www.facebook.com/mitconfessionssimulator">Predictive Text RNNs and n-grams for MIT Confessions</a>
+    </h1>
+    <p>Jun. 29, 2018</p>
+    <ul>
+      <li><a href="#predictive-text-rnns-and-n-grams-for-mit-confessions">Predictive Text RNNs and n-grams for MIT
+          Confessions</a>
+        <ul>
+          <li><a href="#overview">Overview</a></li>
+          <li><a href="#data">Data</a>
+            <ul>
+              <li><a href="#sources">Sources</a></li>
+              <li><a href="#acquisition-scraping">Acquisition (Scraping)</a></li>
+              <li><a href="#cleaning--preparation">Cleaning &amp; Preparation</a></li>
+            </ul>
+          </li>
+          <li><a href="#char-rnn">Char-RNN</a>
+            <ul>
+              <li><a href="#basics">Basics</a>
+                <ul>
+                  <li><a href="#training-validation-and-test-data">Training, Validation, and Test Data</a></li>
+                </ul>
+              </li>
+              <li><a href="#temperature">Temperature</a></li>
+              <li><a href="#sampling">Sampling</a></li>
+            </ul>
+          </li>
+          <li><a href="#first-model-2x256-lstm">First Model: 2x256 LSTM</a>
+            <ul>
+              <li><a href="#layers">Layers</a></li>
+              <li><a href="#other-specs">Other Specs</a></li>
+              <li><a href="#final-model">Final Model</a></li>
+              <li><a href="#thoughts">Thoughts</a></li>
+            </ul>
+          </li>
+          <li><a href="#second-model-1x512-lstm">Second Model: 1x512 LSTM</a>
+            <ul>
+              <li><a href="#layers-1">Layers</a></li>
+              <li><a href="#other-specs-1">Other Specs</a></li>
+              <li><a href="#final-model-1">Final Model</a></li>
+              <li><a href="#thoughts-1">Thoughts</a></li>
+            </ul>
+          </li>
+          <li><a href="#third-model-2x512-gru">Third Model: 2x512 GRU</a>
+            <ul>
+              <li><a href="#layers-2">Layers</a></li>
+              <li><a href="#other-specs-2">Other Specs</a></li>
+              <li><a href="#final-model-2">Final Model</a></li>
+              <li><a href="#thoughts-2">Thoughts</a></li>
+            </ul>
+          </li>
+          <li><a href="#char-n-gram">Char-N-Gram</a>
+            <ul>
+              <li><a href="#samples">Samples</a></li>
+            </ul>
+          </li>
+          <li><a href="#deployment">Deployment</a></li>
+          <li><a href="#final-thoughts">Final Thoughts</a></li>
+        </ul>
+      </li>
+    </ul>
+    <p>There are few things more human than language. Inspired by Karpathy’s famous <a
+        href="http://karpathy.github.io/2015/05/21/rnn-effectiveness/">RNN Post</a> and my recent acquisition of a
+      high-end GPU, I decided that it would be a good time to gain some hands-on RNN experience myself.</p>
+    <h2 id="overview">Overview</h2>
+    <p>In this project, we will be training predictive languages model following the MIT Confessions Facebook pages. The
+      model should be able to generate unlimited confessions posts given an initial seed sequence of text. In addition
+      to a character-level RNN model (<code>char-RNN</code>), I also trained a char-based n-gram model (henceforth
+      referred to as <code>char-n-gram</code>) which I will also contrast with the <code>char-RNN</code>.</p>
+    <p>In this post, I will focus on practical technicalities regarding the models rather than the mathematical
+      background. There exist numerous resources which cover the latter.</p>
+    <h2 id="data">Data</h2>
+    <h3 id="sources">Sources</h3>
+    <p>Any ML project begins with data acquisition. Namely, there are three such pages:</p>
+    <ul>
+      <li><a href="https://www.facebook.com/beaverconfessions/">MIT Confessions</a> (henceforth referred to as
+        <code>mit</code>)</li>
+      <li><a href="https://www.facebook.com/timelybeaverconfessions/">MIT Timely Confessions</a> (henceforth referred to
+        as <code>timely</code>)</li>
+      <li><a href="https://www.facebook.com/MITSummerConfessions/">MIT Summer Confessions</a> (henceforth referred to as
+        <code>summer</code>)</li>
+    </ul>
+    <p>At one point in time, I did consider using confessions pages from other colleges - however, while this would
+      allow us more datapoints, the increased diversity would surely make training the model more difficult. Moreover, I
+      would lose anything which made MIT Confessions unique.</p>
+    <p>A brief look at our sources nets us some important observations:</p>
+    <ul>
+      <li><code>mit</code> has the most posts, then <code>timely</code>, then <code>summer</code>.</li>
+      <li>Each has differing levels of current activity.</li>
+      <li>There are varying amounts of non-confession announcements mixed in on each page.</li>
+    </ul>
+    <h3 id="acquisition-scraping">Acquisition (Scraping)</h3>
+    <p>I am not familiar with Facebook’s Graph API, and my latest interactions with it have proven difficult. As data
+      acquisition will not be a common process, using Selenium here was likely a good choice. Selenium offers the
+      benefits of a very low learning curve, as well as visualization of the scraping process. However, I still
+      encountered a few problems at this step, which I solved over a few iterations:</p>
+    <ul>
+      <li>
+        <p><strong>Infinite scroll</strong>: Facebook pages don’t load all their posts at one time, but rather (mostly)
+          chronologically. In order to reach the oldest posts, one must scroll down pretty far. Selenium doesn’t have an
+          easily accessible “wait for scroll to load” function, while a constant sleep duration would crash if there
+          were connectivity hiccups and cause the process to be unnecessarily slow otherwise. Here’s what I did:</p>
+        <ul>
+          <li>Scrape posts as I scroll the page, and delete the post element once scraped: This prevents Chrome
+            slowdowns from a very large DOM in memory.</li>
+          <li>The DOM id <code>www_pages_reaction_see_more_unitwww_pages_posts</code> only appears when there’s more
+            posts to load. So, scroll down while this id exists.</li>
+        </ul>
+      </li>
+      <li>
+        <p><strong>Long posts</strong>: Moderately long posts are initially collapsed under a <code>See More</code>
+          link. There are many attributes to each post which contain the post text, but most of them insert a
+          <code>...</code> at the place of the <code>See More</code> link into the raw post text. The trick here is to
+          first click the <code>See More</code> link (css selector <code>a.see_more_link</code>) and then scrape the
+          <code>outerText</code> attribute of all <code>p</code> children of the post element, which avoids the
+          <code>...</code> problem.</p>
+      </li>
+      <li>
+        <p><strong>Extremely long posts</strong>: These posts don’t have a <code>See More</code> link but rather a
+          <code>Continue Reading</code> link, which would open a new tab with the full post. I decided to disregard
+          these posts, since they were few and far in-between.</p>
+        <p><img src="assets/create/mit-confessions-simulator/long-post.png" alt="long-post"></p>
+        <p>What a pain (to scrape).</p>
+      </li>
+      <li>
+        <p><strong>Non-text posts</strong>: Since we’re working with characters here, simply discarding these posts was
+          fine.</p>
+      </li>
+    </ul>
+    <p>As a side, I also scraped the time at which posts were made from the css selector <code>abbr._5ptz</code>. You
+      can find the raw scraped data, in JSON, <a href="assets/create/mit-confessions-simulator/fetch.zip">here</a>.</p>
+    <h3 id="cleaning--preparation">Cleaning &amp; Preparation</h3>
+    <p><img src="assets/create/mit-confessions-simulator/psa.png" alt="psa"></p>
+    <p>Anything without a confession number is trash. For this project, at least…</p>
+    <p>In preparation for training, I made a few design choices:</p>
+    <ul>
+      <li><strong>Confession numbers not removed</strong>: Not too impactful in the long run; perhaps even beneficial to
+        RNN training, considering that strings like <code>#1000</code> are strong indicators of a post beginning (beyond
+        the special character to be added at post ends).
+        <ul>
+          <li><strong>char-n-gram</strong>: Confession numbers were removed for this model, as they would most
+            definitely make the model less robust.</li>
+        </ul>
+      </li>
+      <li><strong>Uppercase letters converted to lowercase</strong>: I’m fairly certain this makes both the
+        <code>char-RNN</code> and the <code>char-n-gram</code> easier to train, since it reduces the alphabet size.
+        However, on the flip side, capitals are usually strongly favored after periods, so the char-RNN might learn</li>
+      <li><strong>Charset restricted to this regex</strong>: <code>[a-z \n\'\.,?!0-9@#&lt;&gt;/:;\-\"()]</code>. Again,
+        this restricts the alphabet and would make the models easier to train.</li>
+    </ul>
+    <p>The flipside of the latter two design choices above is that they restrict the alphabet of generated samples. In
+      my case, this wasn’t top priority to capture the intricacies of MIT Confessions language.</p>
+    <p>In order to have the model be able to write new posts, it is necessary for the model to be able to recognize post
+      ends. Thus, I concatenated all cleaned posts into one large string to serve as the training data, each post being
+      separated by a <code>\0</code> (NULL) character. Post order was randomized. <a
+        href="assets/create/mit-confessions-simulator/data-mit-all-full.txt">This</a> is the concatenated file of posts
+      with the confession number, and <a href="assets/create/mit-confessions-simulator/data-mit-all-nr.txt">this</a> is
+      without. These strings served as training and validation data for both the <code>char-RNN</code> and the
+      <code>char-n-gram</code>.</p>
+    <p>Data from all three sources combined totalled just over 1MB.</p>
+    <p><img src="assets/create/mit-confessions-simulator/kevin-comment.png" alt="kevin-comment"></p>
+    <p>My friend Kevin comments on the project :(</p>
+    <h2 id="char-rnn">Char-RNN</h2>
+    <h3 id="basics">Basics</h3>
+    <ul>
+      <li><strong>Hardware</strong>
+        <ul>
+          <li>CPU: Intel Core i7-7600U</li>
+          <li>GPU: Nvidia GeForce GTX 1080 Ti (external; Akitio Node; TB3 w/ 2 PCIe lanes)
+            <ul>
+              <li>eGPU bandwidth did not appear to be a bottleneck; raising batch sizes (under memory limits) still
+                resulted in faster epoch training times.</li>
+            </ul>
+          </li>
+          <li>Memory: 16GB</li>
+        </ul>
+      </li>
+      <li><strong>Framework</strong>: Keras, Sequential Model</li>
+    </ul>
+    <h4 id="training-validation-and-test-data">Training, Validation, and Test Data</h4>
+    <p>Given the input dimension (henceforth referred to as <code>sequence length</code>) of the network, datapoints
+      were generated by sliding a window of length <code>sequence length + 1</code> over the input string from the last
+      section, with the <code>sequence length</code> prefix serving as input and the final character in the window
+      serving as the label.</p>
+    <p>None of the models used test datasets, as is customary of RNNs.</p>
+    <p>The first two models did not use validation sets; however, the third model repurposed <code>10%</code> of the
+      training data as validation. The validation data was chosen randomly from all the training datapoints. In
+      hindsight, this would not prevent overfitting very well, as most of the training data inputs would overlap in some
+      way with the validation data inputs due to the nature of the sliding window method of datapoint generation.</p>
+    <p>The first model was trained on data on earlier scraping &amp; cleaning iterations, which had a smaller alphabet
+      and confessions number removed from post beginnings.</p>
+    <h3 id="temperature">Temperature</h3>
+    <p><a
+        href="https://cs.stackexchange.com/questions/79241/what-is-temperature-in-lstm-and-neural-networks-generally">Temperature</a>
+      is implemented as a <code>Lambda</code> layer before the final <code>softmax</code> layer during sampling, which
+      condenses or expands the distribution of pre-softmax activations. Lower temperatures lead to more consistent, less
+      creative samples, and higher temperatures lead to a more confident model and more experimental samples.</p>
+    <p>Temperature was not implemented during sampling for the first model.</p>
+    <h3 id="sampling">Sampling</h3>
+    <p>Samples require a seed sequence of a specified length. Seeds were chosen as random contiguous sequences of the
+      training data for all three models. Each time a new character is generated, it is appended to the original seed,
+      the oldest character of the seed removed, and the seed fed back into the RNN for the next character.</p>
+    <p>Each <code>char-RNN</code> model outputs a distribution of probabilities for each of the 55 characters in our
+      alphabet as its prediction for the next character. The first model originally used <code>argmax</code> on this
+      distribution to predict the next character, which resulted in very repetitive patters. Sampling in later
+      iterations of the first model and later models simply picked from the distribution itself
+      (<code>np.random.choice</code>) which results in more realistic samples.</p>
+    <h2 id="first-model-2x256-lstm">First Model: 2x256 LSTM</h2>
+    <p>This model was trained with an earlier iteration of data cleaning, with a smaller alphabet and without confession
+      number prefixes.</p>
+    <h3 id="layers">Layers</h3>
+    <ol>
+      <li>LSTM: 256</li>
+      <li>Dropout: 0.2</li>
+      <li>LSTM: 256</li>
+      <li>Dropout: 0.2</li>
+      <li>Softmax</li>
+    </ol>
+    <p>Largely based on <a
+        href="https://machinelearningmastery.com/text-generation-lstm-recurrent-neural-networks-python-keras/">this</a>
+      post.</p>
+    <h3 id="other-specs">Other Specs</h3>
+    <ul>
+      <li><strong>Optimizer</strong>: <code>adam</code> (<code>lr</code> = 0.001)</li>
+      <li><strong>Loss</strong>: <code>categorical_crossentropy</code></li>
+      <li><strong>Input sequence length</strong>: 50
+        <ul>
+          <li>This is both the length of the seed text for sampling as well as the input dimension into the network.
+          </li>
+        </ul>
+      </li>
+      <li><strong>Batch size</strong>: 64
+        <ul>
+          <li>Small batch sizes slowed down training when compared to later models. However, smaller batch sizes are
+            less prone to overfitting while large batch sizes might lead loss to converge at a higher value than the
+            true minimum.</li>
+        </ul>
+      </li>
+      <li><strong>Validation</strong>: None</li>
+    </ul>
+    <h3 id="final-model">Final Model</h3>
+    <ul>
+      <li><strong>Weights</strong>: <a href="assets/create/mit-confessions-simulator/first-model-weights.hdf5">.hdf5</a>
+      </li>
+      <li><strong>Loss</strong>: 1.530 training, N/A validation
+        <ul>
+          <li>Loss plateaued around after epoch 40 - it appeared that we had reached convergence.</li>
+        </ul>
+      </li>
+      <li><strong>Epochs</strong>: 43 out of 50 planned</li>
+      <li><strong>Samples</strong>
+        <ul>
+          <li><a href="assets/create/mit-confessions-simulator/first-model-sample-10000.txt">10000 characters sampling
+              from the output distribution</a></li>
+          <li><a href="assets/create/mit-confessions-simulator/first-model-sample-10000-argmax.txt">10000 characters
+              with <code>argmax</code> on the output distribution</a></li>
+          <li>Posts are delimited with <code>\n----------------\n</code> for easy visual cues (instead of a
+            <code>\0</code> character)</li>
+          <li>The first model was trained on data with a slightly smaller alphabet than later models and no confession
+            numbers in posts (hence the lack thereof in samples).</li>
+        </ul>
+      </li>
+    </ul>
+    <h3 id="thoughts">Thoughts</h3>
+    <p><img src="assets/create/mit-confessions-simulator/course-6.png" alt=""></p>
+    <p>A distinctly MIT flavor.</p>
+    <p>Samples generated from this first model were largely repetitive due to the lack of temperature and using
+      <code>argmax</code> during sampling. However, this does not mitigate the concern that loss plateaued at a high
+      value. Given the small batch size and the high loss, I should have realized this was an indicator that the network
+      was not big enough. Instead, I stupidly made the network more shallow instead for the second model.</p>
+    <p>Here’s a <em>sample</em> of the final <code>argmax</code> model’s samples:</p>
+    <blockquote>
+      <p>the same oriniog that is the same of the students<br>
+        that i was a lot of the sime in the sime in the sime in the sime in the sime in the sime in the sime in<br>
+        the sime in the sime in the sime in the sime in the<br>
+        sime in the sime in the sime in the sime in the sime in the sime in the sime in the sime in the sime in<br>
+        the sime in the sime in the sime in the sime in the<br>
+        sime in the sime in the sime in the sime in the sime</p>
+    </blockquote>
+    <p>You can imagine how the rest look. When I fixed the <code>argmax</code> problem, samples became much better:</p>
+    <blockquote>
+      <p>howrd everyone i couldere i keep hnuosabled for eri’s phosopgte or hoe down for people. is got it soorpr not
+        j’m mit iust anyone lats from inpsitiese and i<br>
+        slng that and mey ard all! to trasenlac that sam bre me mayba and has les me eorng dla. to won could nedf an
+        aslowing adout to agfresabze where i pnly fuck<br>
+        tp get intoxarf mikh tieer in.</p>
+      <hr>
+      <p>lymeroliiise event<br>
+        eisier atadoed to she gaprie inttende of it and you happen. j had srch a fresh criviced was is provicegc in tec
+        waserinns of how the beceb im loot soot</p>
+      <hr>
+      <p>all that there years are jislu. i want to tuak off uhis weats. baf that i jnow that miw means the eyyreied
+        people could inttead it to gigrres someone to tp<br>
+        bef, but you’se beeo in sa! lit lasieur teams of shoutoi of this ostglng ciefeent and rou. danlct and mos lore
+        ciange hnw to and beeot shyatid lore aftween b lpgean on confessions oues</p>
+    </blockquote>
+    <p>Okay, I guess ‘better’ is relative. At least some words are legible here, and there is some sentence structure.
+    </p>
+    <p>Don’t worry, samples get better with the incorporation of temperature in later models.</p>
+    <p><img src="assets/create/mit-confessions-simulator/seals.png" alt="seals"></p>
+    <p>Not sure where the seals came from…</p>
+    <h2 id="second-model-1x512-lstm">Second Model: 1x512 LSTM</h2>
+    <h3 id="layers-1">Layers</h3>
+    <ol>
+      <li>LSTM: 512</li>
+      <li>Dropout: 0.4</li>
+      <li>Softmax</li>
+    </ol>
+    <p>I thought perhaps the high loss was due to the 2-layer network being too difficult to train, so for the second
+      model, I (mistakenly) reduced the network to just one layer.</p>
+    <p>I don’t believe dropout affects loss minima, but only the time required to reach it. In smaller models with just
+      <code>summer</code> data, it seemed like a dropout of 0.4 resulted in the fastest loss convergences.</p>
+    <h3 id="other-specs-1">Other Specs</h3>
+    <ul>
+      <li><strong>Optimizer</strong>: <code>adam</code> (<code>lr</code> = 0.001, <code>lr</code> = 0.00001 after epoch
+        18)
+        <ul>
+          <li>Loss plateaued at ~1.814 around epoch 18. Learning rates too high might lead to loss convergence at a
+            value higher than the true minima, which learning rates too low will still converge to the true minima but
+            slower. Since loss was already plateauing, I decided to lower the learning rate in case we were not
+            approaching the true minima. In hindsight, this was the right move.</li>
+        </ul>
+      </li>
+      <li><strong>Loss</strong>: <code>categorical_crossentropy</code></li>
+      <li><strong>Input sequence length</strong>: 150
+        <ul>
+          <li>Input sequence length was increased from the last model mainly because Karpathy’s RNN mentioned using a
+            sequence length of 100, and 150 would not hurt the potential of the model but only training speed. Moreover,
+            larger sequence lengths (network input dimensions) would utilize GPU parallel processing better, and would
+            not slow training down by that much in this case.</li>
+        </ul>
+      </li>
+      <li><strong>Batch size</strong>: 256
+        <ul>
+          <li>Batch size was increased to speed up training at the risk of overfitting. Batch sizes larger than 256 did
+            not offer significant speedups to training.</li>
+        </ul>
+      </li>
+      <li><strong>Validation</strong>: 5% of training datapoints
+        <ul>
+          <li>It should have been helpful to split the training data into training and validation data, especially to
+            prevent overfitting with the larger batch size.</li>
+        </ul>
+      </li>
+    </ul>
+    <h3 id="final-model-1">Final Model</h3>
+    <ul>
+      <li><strong>Weights</strong>: <a
+          href="assets/create/mit-confessions-simulator/second-model-weights.hdf5">.hdf5</a></li>
+      <li><strong>Loss</strong>: 1.681 training, 1.570 validation
+        <ul>
+          <li>The lower validation loss might be a result of the high correlation between training and validation data
+            along with the inherent randomness.</li>
+        </ul>
+      </li>
+      <li><strong>Epochs</strong>: 22 out of 100 planned</li>
+      <li><strong>Samples</strong>: Unavailable
+        <ul>
+          <li>Samples aren’t very interesting here with respect to the two other models. You could always generate them
+            yourself with the weights provided.</li>
+        </ul>
+      </li>
+    </ul>
+    <h3 id="thoughts-1">Thoughts</h3>
+    <p><img src="assets/create/mit-confessions-simulator/model-training.png" alt="model-training"></p>
+    <p>Shhh, the model is training!</p>
+    <p>Unfortunately, loss seemed to converge at a higher number for this model than the last. Samples generated were
+      significantly better, however, with the incorporation of temperature and choosing from the output distribution. I
+      found <code>0.35</code> to be a solid temperature choice for the final iteration of this model.</p>
+    <h2 id="third-model-2x512-gru">Third Model: 2x512 GRU</h2>
+    <p>Feeling a bit stumped after the last model, I gave my friend <strong>Tony</strong> a call and he offered me a few
+      hyperparameter suggestions for this third model regarding network architecture, GRUs, batch normalization, and
+      learning rates for Adam.</p>
+    <h3 id="layers-2">Layers</h3>
+    <ol>
+      <li>GRU: 512</li>
+      <li>BatchNorm</li>
+      <li>Dropout: 0.4</li>
+      <li>GRU: 512</li>
+      <li>BatchNorm</li>
+      <li>Dropout: 0.4</li>
+      <li>Softmax</li>
+    </ol>
+    <p>It’s commonly assumed that batch normalization is a low-cost way to prevent internal covariate shift; however,
+      recent research suggests otherwise. Regardless, batch normalization is considered non-harmful and usually helpful.
+    </p>
+    <p>I am not familiar with the mathematics behind GRUs; however, research suggests that they do not lower the
+      potential of a network compared to LSTMs while being much faster to train. This was indeed the case, as this
+      two-layer network trained just as fast as the one-layer network from the second model.</p>
+    <h3 id="other-specs-2">Other Specs</h3>
+    <ul>
+      <li><strong>Optimizer</strong>: <code>adam</code> (<code>lr</code> = 0.0003 (<a
+          href="https://twitter.com/karpathy/status/801621764144971776?lang=en">Karpathy constant</a>))
+        <ul>
+          <li>Seems like <code>3e-4</code> is the commonly used learning rate for <code>adam</code> as opposed to the
+            original paper’s suggestion of <code>0.001</code>.</li>
+        </ul>
+      </li>
+      <li><strong>Loss</strong>: <code>categorical_crossentropy</code></li>
+      <li><strong>Input sequence length</strong>: 100
+        <ul>
+          <li>Lowered from previous model to speed up training; impact is probably negligible.</li>
+        </ul>
+      </li>
+      <li><strong>Batch size</strong>: 256</li>
+      <li><strong>Validation</strong>: 10% of training datapoints
+        <ul>
+          <li>Due to the correlation between training and validation datapoints, validation loss probably was not a very
+            good indicator of overfitting. However, some validation is better than none.</li>
+        </ul>
+      </li>
+    </ul>
+    <h3 id="final-model-2">Final Model</h3>
+    <ul>
+      <li><strong>Weights</strong>: <a href="assets/create/mit-confessions-simulator/third-model-weights.hdf5">.hdf5</a>
+      </li>
+      <li><strong>Loss</strong>: 1.426 training, 1.364 validation
+        <ul>
+          <li>Loss was nearing convergence, but likely still had a bit to go. Unfortunately, validation loss was not
+            following, suggesting an overfitted model. However, sampling suggests otherwise. I should have kept on
+            training, but I ran out of patience.</li>
+        </ul>
+      </li>
+      <li><strong>Epochs</strong>: 46 out of 100 planned</li>
+      <li><strong>Samples</strong>
+        <ul>
+          <li><a href="assets/create/mit-confessions-simulator/third-model-sample-10000-0.15.txt">10000 characters at
+              <code>temperature = 0.15</code></a></li>
+          <li><a href="assets/create/mit-confessions-simulator/third-model-sample-10000-0.35.txt">10000 characters at
+              <code>temperature = 0.35</code></a></li>
+          <li><a href="assets/create/mit-confessions-simulator/third-model-sample-10000-0.80.txt">10000 characters at
+              <code>temperature = 0.80</code></a></li>
+          <li>Again, <code>\n----------------\n</code> was used to delimit posts rather than <code>\0</code>.</li>
+          <li>As expected, lower temperatures result in much better spelling than higher temperatures.</li>
+          <li>Sampling speed isn’t great, partially because it isn’t a parallel operation (this not suited for the GPU)
+            and my CPU isn’t top-tier.</li>
+        </ul>
+      </li>
+    </ul>
+    <p><img src="assets/create/mit-confessions-simulator/loss-epochs.png" alt="loss-epochs"></p>
+    <p>Praying for loss to continue decreasing…</p>
+    <h3 id="thoughts-2">Thoughts</h3>
+    <p>With the right temperature, generated text quality seemed to be on par with Karpathy’s models. I think, even if I
+      trained for more epochs, I wouldn’t see too significant of a rise in quality. Tony’s suggestions were very helpful
+      in knocking down loss to this level.</p>
+    <p>Unfortunately, even at this point, generated text still fairly unconvincing compared to text from the
+      <code>char-n-gram</code>, which we will go over later.</p>
+    <p>Here’s some samples at <code>temperature = 0.15</code>:</p>
+    <blockquote>
+      <p>#13678 i’m a great minute of my best friends and i’m so much to be any and i am an ackint of my friends, i’m
+        sorry that i’m so friends.</p>
+      <hr>
+      <p>#2355 i’m so many of my friends and i’m a great person who have a course 6. the best of the most people<br>
+        who want to be and i don’t know what you don’t know<br>
+        what i’m so much and i’m so much and i know i’m so much from my friends who want to be able to be any other
+        people who have to mean i’m so because i’m sure<br>
+        i was any groups and i want to get any other people<br>
+        who don’t know why i’m so many things and i’m so much from the best because i’m so better and i’m not any and i
+        don’t know what to do the fuck up and i don’t know what i’m so confused to get anything and i’m<br>
+        so from the world.</p>
+      <hr>
+      <p>#13668 i’m so friends and i want to be able to be able to be able to make me and i’m so graduating that<br>
+        i’m just a better from any makes me and i’m so better and i’m not me.</p>
+    </blockquote>
+    <p>Lot’s of simple, correctly spelled words. Sentences are pretty runny, which is likely completely caused by the
+      low temperature. Here’s some samples from <code>temperature = 0.35</code>, which is currently in deployment:</p>
+    <blockquote>
+      <p>#6329 i get to still have to get to get the professor to leave the like my best friend. i’m so friends and they
+        will be at me and i haven’t go out of my friends.</p>
+      <hr>
+      <p>#9223 i’m a great confessions and i wish i got the problem and i was the really because i don’t know how to be
+        meaning in the best one of the police that you’re not being an anyone seriously when i don’t know what i’m just
+        care and i can’t help them and i can’t help the fuck my best friends, i don’t know what i was any of my friends.
+      </p>
+      <hr>
+      <p>#1467 i feel like i’m a lot of the life and i’m just too great the fuck on the grades of the whole problem.</p>
+    </blockquote>
+    <p>There’s more variety at this temperature, and most words are spelled correctly. I’d say this is on par with
+      Karpathy’s Paul Graham generator:</p>
+    <p><img src="assets/create/mit-confessions-simulator/paul-graham.png" alt="paul-graham"></p>
+    <p>Here’s <code>temperature = 0.80</code>:</p>
+    <blockquote>
+      <p>#14696 hel! not is io the got window is at mong respect her and two and republiter?</p>
+      <hr>
+      <p>#9237 @l ase the foroground from sexual the first part year who can cester to have to cuy me wolen.</p>
+      <hr>
+      <p>#1314 i like goristealy, a weeked in my person. when you nade the best any all let those girls.</p>
+      <hr>
+      <p>#11462 you know most their junior since if i could have angry harder like this and im a general person who i
+        feel and anyone like kooking me</p>
+    </blockquote>
+    <p>As expected.</p>
+    <h2 id="char-n-gram">Char-N-Gram</h2>
+    <p>Directly implemented from <a href="http://nbviewer.jupyter.org/gist/yoavg/d76121dfde2618422139">this</a> post, in
+      which they refer to the model as a “Maximum Likelihood Language Model”. The math is pretty straightforward.</p>
+    <p>The primary hyperparameter of this model is the input sequence length. A larger <code>sequence length</code>
+      gives more convincing but less creative generated text (similar to an overtrained RNN). In deployment,
+      <code>sequence length = 15</code> currently, but I am considering tuning this down in the near future.</p>
+    <p>Since the <code>char-n-gram</code> was trained with data without the confession number, a random confession
+      number in <code>[1, 15000]</code> was prepended to generated posts for deployment.</p>
+    <h3 id="samples">Samples</h3>
+    <ul>
+      <li><a href="assets/create/mit-confessions-simulator/char-n-gram-10000-5.txt">10000 characters at
+          <code>sequence length = 5</code></a></li>
+      <li><a href="assets/create/mit-confessions-simulator/char-n-gram-10000-10.txt">10000 characters at
+          <code>sequence length = 10</code></a></li>
+      <li><a href="assets/create/mit-confessions-simulator/char-n-gram-10000-15.txt">10000 characters at
+          <code>sequence length = 15</code></a></li>
+    </ul>
+    <p>Here’s some samples from <code>sequence length = 10</code>:</p>
+    <blockquote>
+      <p>#7582 turns out almost everyone can smell the roses<br>
+        type. my family would ever think to myself…</p>
+      <hr>
+      <p>#12110 would you automatically makes me uncomfortable and relax, and not the only one :(</p>
+      <hr>
+      <p>#12539 honestly answered, no, this is about your lack of boy friend. so a friendly and stuff. but then i decide
+        to go to the consulate officer, only that in my case it was important to be course 14, 17, 24 topics); is there
+        anything i did before, but it’s an icosahedron, not a dodecahedron.</p>
+      <hr>
+      <p>#10836 i want to attend your showcase/concert/w.e (and especially one–you’ve said some pretty misogynistic
+        sexual encounters we had. i’ll get much harder to be a competition to the class of 2018, get these rings
+        delivered in ganja style!</p>
+    </blockquote>
+    <h2 id="deployment">Deployment</h2>
+    <p>I chose <code>temperature = 0.35</code> for the <code>char-rnn</code> model and <code>sequence length = 15</code>
+      for the <code>char-n-gram</code> model for deployment.</p>
+    <p>Sampling from either model is computationally cheap, so I have generated around 1.2MB of text in total from the
+      two models, at a ratio of around 1/3 <code>char-rnn</code> posts and 2/3 <code>char-n-gram</code> posts. Posts
+      will be posted to a Facebook page at a rate of 1 post/hr. While Graph API would be preferred here, it turns out
+      that acquiring a suitable long-term API key is non-trivial and requires approval. So, we use Selenium instead
+      (again…).</p>
+    <p><img src="assets/create/mit-confessions-simulator/selenium-python.png" alt="selenium-python"></p>
+    <p>The true savior of the project.</p>
+    <p>The <code>char-n-gram</code> model has a tendency to replicate previous confessions posts with longer
+      <code>sequence length</code>s. Generated posts which were the same (except the confession number, of course) as
+      training posts were discarded.</p>
+    <p>The page is live at <a href="https://www.facebook.com/mitconfessionssimulator/">MIT Confessions Simulator</a>.
+      The pre-generated posts should last around 6 months at this pace.</p>
+    <h2 id="final-thoughts">Final Thoughts</h2>
+    <p><a href="https://github.com/GilgameshxZero/mit-confessions-bot">Github repo w/ source code</a>. Some code was
+      taken from <a
+        href="https://machinelearningmastery.com/text-generation-lstm-recurrent-neural-networks-python-keras/">this
+        post</a>.</p>
+    <p>Generating convincing predictive text is deceptively difficult. Unfortunately, the <code>char-RNN</code> didn’t
+      perform too well compared to the <code>char-n-gram</code> here. Given more data, perhaps, we could hit an even
+      lower loss with the RNN. However, that still is no replacement for the wit captured by the
+      <code>char-n-gram</code> model, which would also perform much better with more data.</p>
+    <p>Another option would be to have used word-based rather than char-based models. However, I did not have the time
+      to look into this.</p>
+    <p><code>argmax</code> vs. sampling from the output distribution and temperature turned out to be hugely important.
+      My concern is with <a
+        href="https://chunml.github.io/ChunML.github.io/project/Creating-Text-Generator-Using-Recurrent-Neural-Network/">blog
+        posts such as this one</a>, which clearly uses <code>argmax</code> but still generates non-repetitive samples.
+      I’m no RNN master, but those results look fishy to me:</p>
+    <p><img src="assets/create/mit-confessions-simulator/trung-post.png" alt="trung-post"></p>
+    <p>Given, Trung’s network is reasonably bigger than mine - but I don’t think that would offset the effect of having
+      <code>argmax</code> to create such variety in samples.</p>
+    <p>Well, now it’s finally time to jump on the RL &amp; adversarial bandwagons I guess.</p>
+  </div>
+</body>
+
+</html>

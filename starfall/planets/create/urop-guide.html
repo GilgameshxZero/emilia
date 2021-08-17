@@ -1,0 +1,88 @@
+<html>
+
+<head></head>
+
+<body>
+  <div class="meta">
+    <div class="label">
+      <span>3</span>
+    </div>
+  </div>
+  <div class="planet-content images-768px markdown">
+    <h1><a href="http://urop.guide">urop.guide</a></h1>
+    <p>Jul. 17, 2019</p>
+    <p>Originally envisioned by <a href="https://stella-yang.com">Stella Yang</a> as a hackathon project, <a
+        href="http://urop.guide">urop.guide</a> presents advertised research opportunities at MIT (UROPs) in a much
+      friendlier format than at the <a
+        href="http://uaap.mit.edu/research-exploration/urop/apply/urop-advertised-opportunities">original website</a>
+      presented by the MIT UROP department.</p>
+    <p><img src="assets/create/urop-guide/urop-guide.png" alt="screenshot of urop.guide">
+      <em>urop.guide</em></p>
+    <p>Below, I will briefly present my perspective on the design challenges and choices made throughout the process.
+      Stella also has a short post on her website <a href="https://stella-yang.com/projects/uropguide.html">about
+        urop.guide</a>.</p>
+    <hr>
+    <p>Research opportunities for undergraduates at MIT are denoted by UROPs and have been traditionally advertised on
+      MIT's in-house website.</p>
+    <p><img src="assets/create/urop-guide/mit-original.png" alt="mit urops">
+      <em>MIT's original UROP website</em></p>
+    <p>Each UROP consists of several fields for date posted, schoolyear term, department, faculty, etc. There are
+      upwards of several hundreds of advertisements on this website, presented, flat, in a long list.</p>
+    <p>Our first iteration of <strong>urop.guide</strong> spun out of HackMIT with two other collaborators, <a
+        href="http://www.alisaono.coffee/">Alisa Ono</a> and Angela Cai.</p>
+    <p><img src="assets/create/urop-guide/old-urop-guide.png" alt="screenshot of first version">
+      <em>The first iteration, hosted at uroplistings.guide</em></p>
+    <p>Built natively with Bootstrap and DataTables, this first iteration showed 8 UROPs per page, collapsed under their
+      identifying information until clicked, at which point they would expand to show the full content. While the
+      structure of the data naturally fits into a table instead of a flat list like MIT would have it, the table-based
+      presentation only complicated user interactions with the page by introducing clicks beyond just scrolling. The
+      ultimate hint that this was the wrong design choice came in the form of the instruction &quot;<em>Click on a
+        listing to view its description</em>&quot;, presented in the third line in the website.</p>
+    <p>In an attempt to move away from the tedious scrolling of the original website, we also made the decision to limit
+      the number of UROPs present on each page, opting to append a page navigator at the bottom of the page instead.
+      However, in hindsight, neither page-based navigation nor something feed-like such as MIT's original website is
+      good design. UROPs are inherently advertisements, postings which hold only sparse appeal to those who browse them.
+      To present these advertisements, in order, across multiple pages or in a long feed is akin to Amazon presenting
+      its products in order of listed date only. If I were looking to buy a GPU, I'd have to scroll across countless
+      pages or listings before finding anything remotely relevant.</p>
+    <hr>
+    <p>Modern browsers' search functionality was the traditional way most users of MIT's UROPs page navigated the flat
+      list. We tried, in the first iteration, to incorporate our own search bar into <strong>urop.guide</strong>, which
+      expanded upon the browser's search by not only highlighting relevant UROPs but also hiding the irrelevant
+      advertisements. I still believe this <em>filtering</em> capability was the right direction; however, the first
+      iteration delivered on this in a nuanced way by incorporating not one search bar, but three, partially as a
+      limitation of DataTables. For the new <strong>urop.guide</strong>, we combined search functionality to search
+      across all relevant fields of the UROPs and maintained our stance on <em>filtering</em>.</p>
+    <p><img src="assets/create/urop-guide/urop-guide.png" alt="screenshot of urop.guide">
+      <em>The same picture, but notice how we're filtering by &quot;inference&quot; now.</em></p>
+    <p>Returning to the feed-style presentation removes one level of complexity from navigation. While our list is still
+      mostly flat like MIT's, it's presented with two columns per advertisement, grouping related information together
+      visually. Expanding on the idea of <em>filtering</em> search, commonly seen on Amazon or Ebay who presents similar
+      content, we added term filters as well as capability to denote and selectively browse favorites, akin to the idea
+      of a &quot;shopping cart&quot;.</p>
+    <hr>
+    <p>A formal design audit of the current iteration has yet to be conducted, but I can see from an glance some aspects
+      which could benefit from more thought:</p>
+    <ul>
+      <li>Rounded corners should have more clarity - in fact, only user-interactable elements should have rounded
+        corners, to distinguish themselves from the UROPs, whose current rounded corners present visual confusion around
+        whether they're clickable or not.</li>
+      <li>It might be beneficial to remove borders if we can replace them with proper spacing.</li>
+      <li>The star icon still feels awkwardly-positioned in the listings.</li>
+      <li>Font size in the search bar is to small.</li>
+      <li>The extra space on the sides of the listings is potentially wasted real-estate.</li>
+      <li>More data analytics could help build better search/filtering functions.</li>
+      <li>Needs to scroll back to the top to utilize filtering capabilities - unsure of whether this is the right design
+        choice.</li>
+      <li>Click-based expansion might not actually be that bad, as long as it doesn't disturb visual information flow of
+        other advertisements too much.</li>
+    </ul>
+    <hr>
+    <p><strong>urop.guide</strong> is hosted by a fileserver on AWS. The data is scraped automatically at an interval
+      from MIT's official website by a Python-based scraper built by Stella. The current iteration is written in native
+      JS. <a href="https://github.com/stella-yang/urop-website">Repository</a>.</p>
+    <p>Thanks for reading!</p>
+  </div>
+</body>
+
+</html>

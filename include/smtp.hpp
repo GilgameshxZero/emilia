@@ -1,121 +1,125 @@
 // Public interfaces for smtp.cpp.
 #pragma once
 
+#include "state.hpp"
+
 #include <rain.hpp>
 
 #include <map>
 
 namespace Emilia::Smtp {
-	// A single envelope represents a fromMailbox, a toMailbox, and email data
-	// stored as a filename. Once the envelope is sent, the email data may be
-	// removed.
-	class Envelope {
-		public:
-		Rain::Networking::Smtp::Mailbox from, to;
-		std::filesystem::path file;
-
-		// Number of times the envelope has been attempted to be sent.
-		std::size_t cAttempts;
-	};
-
-	class Worker final : public Rain::Networking::Smtp::WorkerInterface<
-												 Rain::Networking::Smtp::Socket> {
+	class Worker : public Rain::Networking::Smtp::Worker<
+									 Rain::Networking::Smtp::Request,
+									 Rain::Networking::Smtp::Response,
+									 1 << 10,
+									 1 << 10,
+									 15000,
+									 15000,
+									 Rain::Networking::Ipv6FamilyInterface,
+									 Rain::Networking::StreamTypeInterface,
+									 Rain::Networking::TcpProtocolInterface,
+									 Rain::Networking::NoLingerSocketOption> {
 		private:
-		Rain::Networking::Smtp::Mailbox const &forwardTo;
-		std::string const &domain, &sendAsPassword;
+		using SuperWorker = Rain::Networking::Smtp::Worker<
+			Rain::Networking::Smtp::Request,
+			Rain::Networking::Smtp::Response,
+			1 << 10,
+			1 << 10,
+			15000,
+			15000,
+			Rain::Networking::Ipv6FamilyInterface,
+			Rain::Networking::StreamTypeInterface,
+			Rain::Networking::TcpProtocolInterface,
+			Rain::Networking::NoLingerSocketOption>;
 
-		std::multimap<std::chrono::steady_clock::time_point, Envelope> &outbox;
-		std::mutex &outboxMtx;
-		std::condition_variable &outboxEv;
-
-		bool authenticated;
+		State &state;
+		bool authenticated = false;
 
 		public:
-		Worker(
-			Rain::Networking::Resolve::AddressInfo const &,
-			Rain::Networking::Socket &&,
-			std::size_t = std::size_t(1) << 10,
-			std::size_t = std::size_t(1) << 10,
-			Duration = std::chrono::seconds(60),
-			Duration = std::chrono::seconds(60),
-			Rain::Networking::Smtp::Mailbox const * = nullptr,
-			std::string const * = nullptr,
-			std::string const * = nullptr,
-			std::multimap<std::chrono::steady_clock::time_point, Envelope> * =
-				nullptr,
-			std::mutex * = nullptr,
-			std::condition_variable * = nullptr);
-		Worker(Worker const &) = delete;
-		Worker &operator=(Worker const &) = delete;
+		Worker(NativeSocket, SocketInterface *, State &);
+
+		using SuperWorker::send;
+		using SuperWorker::recv;
+		virtual void send(Response &) override;
+		virtual Request &recv(Request &) override;
 
 		private:
 		virtual bool onInitialResponse() override;
-		virtual PreResponse onHelo(Request &) override;
-		virtual PreResponse onMailMailbox(
-			Rain::Networking::Smtp::Mailbox const &) override;
-		virtual PreResponse onRcptMailbox(
-			Rain::Networking::Smtp::Mailbox const &) override;
-		virtual PreResponse onDataStream(std::istream &) override;
-		virtual PreResponse onRset(Request &) override;
-		virtual PreResponse onAuthLogin(std::string const &, std::string const &)
+		virtual ResponseAction onHelo(Request &) override;
+		virtual ResponseAction onMailMailbox(Mailbox const &) override;
+		virtual ResponseAction onRcptMailbox(Mailbox const &) override;
+		virtual ResponseAction onDataStream(std::istream &) override;
+		virtual ResponseAction onRset(Request &) override;
+		virtual ResponseAction onAuthLogin(std::string const &, std::string const &)
 			override;
-
-		virtual void streamOutImpl(Tag<Interface>, Response &) override;
-		virtual void streamInImpl(Tag<Interface>, Request &) override;
 	};
 
-	class Server final
-			: public Rain::Networking::Smtp::
-					ServerInterface<Rain::Networking::Smtp::Socket, Worker> {
+	class Server : public Rain::Networking::Smtp::Server<
+									 Worker,
+									 Rain::Networking::Ipv6FamilyInterface,
+									 Rain::Networking::StreamTypeInterface,
+									 Rain::Networking::TcpProtocolInterface,
+									 Rain::Networking::DualStackSocketOption,
+									 Rain::Networking::NoLingerSocketOption> {
 		private:
-		friend Worker;
+		using SuperServer = Rain::Networking::Smtp::Server<
+			Worker,
+			Rain::Networking::Ipv6FamilyInterface,
+			Rain::Networking::StreamTypeInterface,
+			Rain::Networking::TcpProtocolInterface,
+			Rain::Networking::DualStackSocketOption,
+			Rain::Networking::NoLingerSocketOption>;
 
-		Rain::Networking::Smtp::Mailbox const forwardTo;
-		std::string const domain, sendAsPassword;
+		State &state;
 
-		// Emails are queued onto the Server by Workers. When the outbox is
-		// modified, a condition variable is triggered, and the Server attempts to
-		// send some emails from the outbox. Envelopes are order by their previous
-		// attempt time.
-		std::multimap<std::chrono::steady_clock::time_point, Envelope> outbox;
-		bool outboxClosed;
-		std::mutex outboxMtx;
-		std::condition_variable outboxEv;
-		std::thread outboxThread;
-
-		std::list<std::tuple<
-			std::chrono::system_clock::time_point,
-			bool,
-			Rain::Networking::Smtp::Mailbox,
-			Rain::Networking::Smtp::Mailbox>> &mailboxActivity;
-		std::mutex &mailboxActivityMtx;
+		// Manages the outbox.
+		std::thread sender;
+		bool closed = false;
 
 		public:
-		Server(
-			std::size_t = 1024,
-			Rain::Networking::Specification::ProtocolFamily =
-				Rain::Networking::Specification::ProtocolFamily::INET6,
-			std::size_t = std::size_t(1) << 10,
-			std::size_t = std::size_t(1) << 10,
-			Duration = std::chrono::seconds(60),
-			Duration = std::chrono::seconds(60),
-			Rain::Networking::Smtp::Mailbox const & = {},
-			std::string const & = "gilgamesh.cc",
-			std::string const & = "",
-			std::list<std::tuple<
-				std::chrono::system_clock::time_point,
-				bool,
-				Rain::Networking::Smtp::Mailbox,
-				Rain::Networking::Smtp::Mailbox>> * = nullptr,
-			std::mutex * = nullptr);
-		Server(Server const &) = delete;
-		Server &operator=(Server const &) = delete;
+		Server(State &, Host const &);
 		virtual ~Server();
 
 		private:
-		virtual std::unique_ptr<Worker> workerFactory(
-			std::shared_ptr<std::pair<
-				Rain::Networking::Socket,
-				Rain::Networking::Resolve::AddressInfo>> acceptRes) override;
+		virtual Worker makeWorker(NativeSocket, SocketInterface *) override;
+	};
+
+	class Client : public Rain::Networking::Smtp::Client<
+									 Rain::Networking::Smtp::Request,
+									 Rain::Networking::Smtp::Response,
+									 1 << 10,
+									 1 << 10,
+									 15000,
+									 15000,
+									 Rain::Networking::Ipv4FamilyInterface,
+									 Rain::Networking::StreamTypeInterface,
+									 Rain::Networking::TcpProtocolInterface,
+									 Rain::Networking::NoLingerSocketOption> {
+		private:
+		using SuperClient = Rain::Networking::Smtp::Client<
+			Rain::Networking::Smtp::Request,
+			Rain::Networking::Smtp::Response,
+			1 << 10,
+			1 << 10,
+			15000,
+			15000,
+			Rain::Networking::Ipv4FamilyInterface,
+			Rain::Networking::StreamTypeInterface,
+			Rain::Networking::TcpProtocolInterface,
+			Rain::Networking::NoLingerSocketOption>;
+
+		using SuperClient::SuperClient;
+
+		State &state;
+
+		public:
+		Client(
+			State &,
+			std::vector<std::pair<std::size_t, std::string>> const &);
+
+		using SuperClient::send;
+		using SuperClient::recv;
+		virtual void send(Request &) override;
+		virtual Response &recv(Response &) override;
 	};
 }

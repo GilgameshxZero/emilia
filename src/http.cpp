@@ -4,128 +4,222 @@
 #include <emilia.hpp>
 
 namespace Emilia::Http {
-	using namespace Rain::Literal;
-	using namespace Rain::Networking::Http;
-
 	Worker::Worker(
-		Rain::Networking::Resolve::AddressInfo const &addressInfo,
-		Rain::Networking::Socket &&socket,
-		std::size_t recvBufferLen,
-		std::size_t sendBufferLen,
-		Duration maxRecvIdleDuration,
-		Duration sendOnceTimeoutDuration,
-		std::list<std::tuple<
-			std::chrono::system_clock::time_point,
-			bool,
-			Rain::Networking::Smtp::Mailbox,
-			Rain::Networking::Smtp::Mailbox>> *mailboxActivity,
-		std::mutex *mailboxActivityMtx)
-			: Interface(
-					addressInfo,
-					std::move(socket),
-					recvBufferLen,
-					sendBufferLen,
-					maxRecvIdleDuration,
-					sendOnceTimeoutDuration),
-				mailboxActivity(*mailboxActivity),
-				mailboxActivityMtx(*mailboxActivityMtx) {}
-
-	std::optional<Worker::PreResponse> Worker::chainMatchTargetImpl(
-		Tag<Interface>,
-		Request &req) {
-		std::smatch match;
-		if (std::regex_match(req.target, match, ".*"_re)) {
-			return this->getAll(req, match);
+		NativeSocket nativeSocket,
+		SocketInterface *interrupter,
+		State &state)
+			: SuperWorker(nativeSocket, interrupter), state(state) {}
+	Worker::ResponseAction Worker::staticFile(
+		std::filesystem::path const &root,
+		std::string const &target) {
+		std::filesystem::path path(root / target);
+		if (!std::filesystem::exists(path)) {
+			return {{StatusCode::NOT_FOUND}};
 		}
-		return {};
-	}
-
-	Worker::PreResponse Worker::getAll(Request &req, std::smatch const &) {
-		std::stringstream body;
-		body << "emilia " << EMILIA_VERSION_MAJOR << "." << EMILIA_VERSION_MINOR
-				 << "." << EMILIA_VERSION_REVISION << "." << EMILIA_VERSION_BUILD
-				 << " / rain " << RAIN_VERSION_MAJOR << "." << RAIN_VERSION_MINOR << "."
-				 << RAIN_VERSION_REVISION << "." << RAIN_VERSION_BUILD << "\n"
-				 << "\n"
-				 << "Welcome, "
-				 << Rain::Networking::Resolve::getNumericHost(
-							this->addressInfo.address, this->addressInfo.addressLen)
-				 << ".\n"
-				 << "This website is under construction. Please visit later.\n"
-				 << "You may reach me at any RFC3696-valid local-part under this "
-						"domain, except for canned-pork@gilgamesh.cc.\n"
-				 << "\n"
-				 << "Some links:\n"
-				 << "* https://3therflux.bandcamp.com/album/prismaticism\n"
-				 << "* https://www.pixiv.net/en/artworks/91277456\n"
-				 << "* https://twitter.com/DEMONDICEkaren\n"
-				 << "* https://www.youtube.com/watch?v=k_hUdZJNzkU\n"
-				 << "* https://github.com/GilgameshxZero/rain\n"
-				 << "\n"
-				 << "Your request and headers:\n"
-				 << req.method << " " << req.target << " HTTP/" << req.version << "\n"
-				 << req.headers << "\n"
-				 << "SMTP activity since server restart:\n";
-
-		for (auto it = this->mailboxActivity.rbegin();
-				 it != this->mailboxActivity.rend();
-				 it++) {
-			std::time_t time = std::chrono::system_clock::to_time_t(std::get<0>(*it));
-			std::tm timeData;
-			Rain::Time::localtime_r(&time, &timeData);
-			Rain::Networking::Smtp::Mailbox &from(std::get<2>(*it)),
-				&to(std::get<3>(*it));
-			body << std::put_time(&timeData, "%F %T %z") << " | "
-					 << (std::get<1>(*it) ? "Success" : "Failure") << " | "
-					 << std::string(from.name.length(), '.') << "@" << from.domain
-					 << " > " << std::string(to.name.length(), '.') << "@" << to.domain
-					 << "\n";
+		path = std::filesystem::canonical(path);
+		if (std::filesystem::is_directory(path)) {
+			path /= "index.html";
+		}
+		if (!Rain::Filesystem::isSubpath(path, root)) {
+			return {{StatusCode::NOT_FOUND}};
 		}
 
+		bool inCache;
+		{
+			std::shared_lock<std::shared_mutex> lck(this->state.fileCacheMtx);
+			inCache = this->state.fileCache.find(path) != this->state.fileCache.end();
+		}
+
+		// The cache may be updated before this point, but it is fine if we
+		// overwrite it.
+		if (!inCache) {
+			std::unique_lock<std::shared_mutex> lck(this->state.fileCacheMtx);
+			std::ifstream file(path, std::ios::binary);
+
+			// No need to over-reserve.
+			auto &it = this->state.fileCache[path];
+			it.assign(
+				(std::istreambuf_iterator<char>(file)),
+				(std::istreambuf_iterator<char>()));
+			it.shrink_to_fit();
+		}
+
+		std::shared_lock<std::shared_mutex> lck(this->state.fileCacheMtx);
 		return {
-			StatusCode::OK,
-			{},
-			{body.str()},
-			"Why are you looking here?",
-			req.version};
+			{StatusCode::OK,
+			 {{{"Content-Type", MediaType(path.extension().string())},
+				 // One week cache.
+				 {"Cache-Control", "public, max-age=604800, immutable"}}},
+			 this->state.fileCache[path]}};
+	}
+	Worker::ResponseAction Worker::reqStatus(Request &req, std::smatch const &) {
+		std::time_t time =
+			std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+		std::tm timeData;
+		Rain::Time::localtime_r(&time, &timeData);
+
+		std::stringstream ss;
+		{
+			std::shared_lock lck(this->state.fileCacheMtx);
+			ss << this->state.signature << '\n'
+				 << "Build: " << (Rain::Platform::isDebug() ? "Debug" : "Release")
+				 << ". Platform: " << Rain::Platform::getPlatform() << ".\n"
+				 << '\n'
+				 << "Hello world, " << this->peerHost() << ". I am " << this->host()
+				 << ".\n"
+				 << "Server time:  " << std::put_time(&timeData, "%F %T %z") << ".\n"
+				 << "Server start: "
+				 << std::put_time(&this->state.processBegin, "%F %T %z") << ".\n"
+				 << '\n'
+				 << "HTTP threads/workers: " << this->state.httpServer->threads()
+				 << " / " << this->state.httpServer->workers() << ".\n"
+				 << "SMTP threads/workers: " << this->state.smtpServer->threads()
+				 << " / " << this->state.smtpServer->workers() << ".\n"
+				 << "Cached statics: " << this->state.fileCache.size() << ".\n"
+				 << '\n'
+				 << "Your request:\n"
+				 << req.method << ' ' << req.target << ' ' << req.version << '\n'
+				 << req.headers << '\n';
+		}
+
+		std::size_t bodyLen = 0;
+		char buffer[1 << 10];
+		while (req.body.read(buffer, sizeof(buffer))) {
+			bodyLen += req.body.gcount();
+		}
+		bodyLen += req.body.gcount();
+		ss << "Your request body has length " << bodyLen << ".\n\n";
+
+		{
+			std::shared_lock lck(this->state.outboxMtx);
+			ss << "Mailbox activity (" << this->state.outbox.size() << "): \n";
+			for (auto const &it : this->state.outbox) {
+				std::time_t time =
+					std::chrono::system_clock::to_time_t(it.attemptSystemTime);
+				std::tm timeData;
+				Rain::Time::localtime_r(&time, &timeData);
+				ss << std::put_time(&timeData, "%F %T %z") << " | ";
+				switch (it.status) {
+					case Envelope::Status::PENDING:
+						ss << "PENDING";
+						break;
+					case Envelope::Status::RETRIED:
+						ss << "RETRIED";
+						break;
+					case Envelope::Status::FAILURE:
+						ss << "FAILURE";
+						break;
+					case Envelope::Status::SUCCESS:
+						ss << "SUCCESS";
+						break;
+				}
+				ss << " | " << std::string(it.from.name.length(), '.') << '@'
+					 << it.from.domain << " > " << std::string(it.to.name.length(), '.')
+					 << '@' << it.to.domain << '\n';
+			}
+		}
+
+		ss.seekg(0, std::ios::end);
+		std::size_t ssLen = ss.tellg();
+		ss.seekg(0, std::ios::beg);
+		return {
+			{StatusCode::OK,
+			 {{{"Content-Type", "text/plain"},
+				 {"Content-Length", std::to_string(ssLen)}}},
+			 std::move(*ss.rdbuf())}};
+	}
+	Worker::ResponseAction Worker::reqHyperspace(
+		Request &,
+		std::smatch const &match) {
+		static std::filesystem::path const root(
+			std::filesystem::canonical("../hyperspace"));
+		return this->staticFile(root, match[1].str());
+	}
+	Worker::ResponseAction Worker::reqHyperpanel(
+		Request &,
+		std::smatch const &match) {
+		static std::filesystem::path const root(
+			std::filesystem::canonical("../hyperpanel"));
+		return this->staticFile(root, match[1].str());
+	}
+	Worker::ResponseAction Worker::reqPastel(
+		Request &,
+		std::smatch const &match) {
+		static std::filesystem::path const root(
+			std::filesystem::canonical("../pastel"));
+		return this->staticFile(root, match[1].str());
+	}
+	Worker::ResponseAction Worker::reqStarfall(
+		Request &,
+		std::smatch const &match) {
+		static std::filesystem::path const root(
+			std::filesystem::canonical("../starfall"));
+		return this->staticFile(root, match[1].str());
+	}
+	Worker::ResponseAction Worker::reqEutopia(
+		Request &,
+		std::smatch const &match) {
+		static std::filesystem::path const root(
+			std::filesystem::canonical("../eutopia"));
+		return this->staticFile(root, match[1].str());
+	}
+	std::vector<Worker::RequestFilter> Worker::filters() {
+		return {
+			{"status." + this->state.node + "(:.*)?",
+			 "/",
+			 {Method::GET, Method::POST},
+			 &Worker::reqStatus},
+			{"hyperspace." + this->state.node + "(:.*)?",
+			 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
+			 {Method::GET},
+			 &Worker::reqHyperspace},
+			{"hyperpanel." + this->state.node + "(:.*)?",
+			 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
+			 {Method::GET},
+			 &Worker::reqHyperpanel},
+			{"pastel." + this->state.node + "(:.*)?",
+			 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
+			 {Method::GET},
+			 &Worker::reqPastel},
+			{"starfall." + this->state.node + "(:.*)?",
+			 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
+			 {Method::GET},
+			 &Worker::reqStarfall},
+			{"(eutopia.)?" + this->state.node + "(:.*)?",
+			 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
+			 {Method::GET},
+			 &Worker::reqEutopia}};
+	}
+	void Worker::send(Response &res) {
+		// Postprocess to add server signature.
+		res.headers.server(this->state.signature);
+		if (this->state.echo) {
+			// Body is omitted since it can only be transmitted once!
+			std::cout << "HTTP to " << this->peerHost() << ":\n"
+								<< "HTTP/" << res.version << ' ' << res.statusCode << ' '
+								<< res.reasonPhrase << '\n'
+								<< res.headers << std::endl;
+		}
+		SuperWorker::send(res);
+	}
+	Worker::Request &Worker::recv(Request &req) {
+		SuperWorker::recv(req);
+		if (this->state.echo) {
+			// Body is omitted since it can only be transmitted once!
+			std::cout << "HTTP from " << this->peerHost() << ":\n"
+								<< req.method << ' ' << req.target << " HTTP/" << req.version
+								<< '\n'
+								<< req.headers << std::endl;
+		}
+		return req;
 	}
 
-	Server::Server(
-		std::size_t maxThreads,
-		Rain::Networking::Specification::ProtocolFamily pf,
-		std::size_t recvBufferLen,
-		std::size_t sendBufferLen,
-		Duration maxRecvIdleDuration,
-		Duration sendOnceTimeoutDuration,
-		std::list<std::tuple<
-			std::chrono::system_clock::time_point,
-			bool,
-			Rain::Networking::Smtp::Mailbox,
-			Rain::Networking::Smtp::Mailbox>> *mailboxActivity,
-		std::mutex *mailboxActivityMtx)
-			: Interface(
-					maxThreads,
-					// Relay worker construction arguments.
-					pf,
-					recvBufferLen,
-					sendBufferLen,
-					maxRecvIdleDuration,
-					sendOnceTimeoutDuration),
-				mailboxActivity(*mailboxActivity),
-				mailboxActivityMtx(*mailboxActivityMtx) {}
-
-	std::unique_ptr<Worker> Server::workerFactory(
-		std::shared_ptr<std::pair<
-			Rain::Networking::Socket,
-			Rain::Networking::Resolve::AddressInfo>> acceptRes) {
-		return std::make_unique<Worker>(
-			acceptRes->second,
-			std::move(acceptRes->first),
-			this->recvBufferLen,
-			this->sendBufferLen,
-			this->maxRecvIdleDuration,
-			this->sendOnceTimeoutDuration,
-			&this->mailboxActivity,
-			&this->mailboxActivityMtx);
-	};
+	Server::Server(State &state, Host const &host)
+			: SuperServer(host), state(state) {}
+	Server::~Server() { this->destruct(); }
+	Worker Server::makeWorker(
+		NativeSocket nativeSocket,
+		SocketInterface *interrupter) {
+		return {nativeSocket, interrupter, this->state};
+	}
 }

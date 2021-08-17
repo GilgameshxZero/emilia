@@ -1,0 +1,182 @@
+.markdown {
+  line-height: 1.75;
+}
+
+.serif {
+  font-family: Garamond, serif;
+
+  line-height: 1.25;
+}
+
+li::marker {
+  color: var(--medium);
+}
+
+p {
+  padding-bottom: 0;
+  margin-bottom: -0.3em;
+
+  word-wrap: break-word;
+}
+
+a {
+  color: var(--light);
+  text-decoration: none;
+
+  background-color: transparent;
+  border-bottom: 2px solid transparent;
+  transition: border-color var(--transition-time), color var(--transition-time);
+}
+
+a:hover {
+  border-color: var(--light);
+}
+
+pre>code {
+  padding: 8px 12px;
+  width: calc(100% - 25.6px);
+}
+
+code {
+  word-wrap: break-word;
+  display: inline-block;
+  max-width: 100%;
+  white-space: pre-wrap;
+
+  font-family: 'Roboto Mono', monospace;
+  font-size: 85%;
+
+  background-color: var(--code);
+  border: 1px solid var(--code);
+  border-radius: 2px;
+  color: inherit;
+  font-weight: 300;
+  line-height: inherit;
+
+  padding: 0 5px;
+}
+
+h1 {
+  border-bottom: 2px solid var(--medium);
+  margin-bottom: 0.3em;
+  padding-bottom: 0.1em;
+}
+
+h1+p {
+  margin-top: 0;
+  padding-top: 0;
+  text-align: center;
+}
+
+h2 {
+  margin: 0.85em auto 0;
+  padding-top: 0;
+  padding-bottom: 0;
+
+  max-width: 80%;
+
+  color: var(--medium);
+  border-bottom: 2px solid var(--medium);
+}
+
+h3 {
+  padding-top: 0;
+  margin-top: 1.25em;
+  padding-bottom: 0;
+  margin-bottom: -0.7em;
+
+  color: var(--medium);
+}
+
+hr {
+  max-width: 60%;
+  margin: 40px auto;
+
+  border: 1px dashed var(--medium);
+  border-left: none;
+  border-right: none;
+}
+
+table {
+  max-width: 100%;
+  margin: 0 auto;
+
+  font-size: 100%;
+  color: white;
+  border-collapse: collapse;
+  border-style: hidden;
+  line-height: inherit;
+}
+
+table thead {
+  font-size: 125%;
+}
+
+table td {
+  padding: 10px;
+}
+
+table th {
+  padding: 10px;
+  border: 2px solid var(--medium);
+  border-left: none;
+  border-right: none;
+}
+
+table tr:nth-child(odd) td {
+  background-color: transparent
+}
+
+table tr:nth-child(even) td {
+  background-color: var(--code);
+}
+
+blockquote {
+  border-left: 4px solid var(--medium);
+  padding-left: 20px;
+  font-style: italic;
+  margin: 30px 0;
+}
+
+img {
+  margin: 20px auto;
+  display: block;
+
+  max-width: 100%;
+}
+
+img+br {
+  display: none;
+}
+
+img+br+em,
+img+em {
+  display: block;
+  margin: -10px auto 20px;
+
+  text-align: center;
+}
+
+.square-wrapper {
+  display: inline-block;
+  position: relative;
+}
+
+.square-wrapper:after {
+  padding-top: 100%;
+
+  display: block;
+
+  content: '';
+}
+
+.square-pic {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+
+  /*stretches image into the parent div which it should fit*/
+  width: 100%;
+}

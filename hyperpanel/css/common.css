@@ -1,0 +1,72 @@
+:root {
+	--panel-cols: 1;
+}
+
+@media (min-width: 600px) {
+	:root {
+		--panel-cols: 2;
+	}
+}
+
+.panel {
+	padding: 5%;
+
+	width: calc(100% / var(--panel-cols) - 10%);
+}
+
+.noselect {
+	-webkit-touch-callout: none; /* iOS Safari */
+		-webkit-user-select: none; /* Safari */
+			-khtml-user-select: none; /* Konqueror HTML */
+				-moz-user-select: none; /* Firefox */
+					-ms-user-select: none; /* Internet Explorer/Edge */
+						user-select: none; /* Non-prefixed version, currently
+												supported by Chrome and Opera */
+}
+
+a {
+	color: white;
+}
+
+.image {
+	border-radius: 5px;
+	overflow: hidden;
+}
+
+.left {
+	float: left;
+
+	margin-right: 15px;
+	margin-bottom: 15px;
+}
+
+.right {
+	float: right;
+
+	margin-left: 15px;
+	margin-bottom: 15px;
+}
+
+.square-wrapper {
+	display: inline-block;
+	position: relative;
+}
+
+.square-wrapper:after {
+	padding-top: 100%;
+
+	display: block;
+
+	content: '';
+}
+
+.square-pic {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	left: 0;
+
+	/*stretches image into the parent div which it should fit*/
+	width: 100%;
+}

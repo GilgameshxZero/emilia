@@ -12,14 +12,18 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\emilia.cpp" />
+    <ClCompile Include="..\..\src\envelope.cpp" />
     <ClCompile Include="..\..\src\http.cpp" />
     <ClCompile Include="..\..\src\smtp.cpp" />
+    <ClCompile Include="..\..\src\state.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\build.hpp" />
     <ClInclude Include="..\..\include\emilia.hpp" />
+    <ClInclude Include="..\..\include\envelope.hpp" />
     <ClInclude Include="..\..\include\http.hpp" />
     <ClInclude Include="..\..\include\smtp.hpp" />
+    <ClInclude Include="..\..\include\state.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
