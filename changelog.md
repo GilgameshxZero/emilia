@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.1.1
+
+Update to `rain 7.1.1`. Future updates to the underlying `rain` will not be so immediate. This introduces no changes to `emilia`.
+
 ## 8.1.0 “Eutopia”
 
 This update brings all the new changes from `rain 7.0` and `7.1` in addition to re-incorporating all previous major redesigns and setting up for a future redesign by wiping the main site. Repositories `emilia-mail` and `emilia-tan` consisting of the SMTP server and front-end for the HTTP server have been merged into this repository, and `rain` is now configured as a submodule. The umbrella repository of `emilia` is retired and this repository is to take on the name `emilia` from now on.
