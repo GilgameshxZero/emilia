@@ -1,16 +1,33 @@
 # Changelog
 
+## 8.1.0 “Eutopia”
+
+This update brings all the new changes from `rain 7.0` and `7.1` in addition to re-incorporating all previous major redesigns and setting up for a future redesign by wiping the main site. Repositories `emilia-mail` and `emilia-tan` consisting of the SMTP server and front-end for the HTTP server have been merged into this repository, and `rain` is now configured as a submodule. The umbrella repository of `emilia` is retired and this repository is to take on the name `emilia` from now on.
+
+Four previous major designs have been incorporated into the HTTP server:
+
+* `hyperspace`, from version `2.1.2` (since version `1.0.0` and prior) at commit `1614dd58128dc673c97c11e2f26ced9f8c74d65f`.
+* `hyperpanel` (named retroactively), from version `3.1.3` at commit `836ba69190ef2dc4813ff1f0404cfcaf01b2c36d`.
+* `pastel`, from version `4.0.0` at commit `b40b81d75e9730aa8ba7a17688a8a6ab5c302a7e` from the retired `emilia-tan`.
+* `starfall`, from version `5.0.8` (through version `7.1.10`) at commit `25252431fc5510d04d9a58f74c76e1cb7ce7a974` from the retired `emilia-tan`.
+
+These past designs are served as subdomains at their respective names.
+
+In addition, the current design-in-progress, is served at the optional subdomain `eutopia`. The subdomain `status` is reserved for plain server information. Since the SMTP and HTTP servers are now combined into one process, information from the SMTP server will also be shown on the status page.
+
+Additional command-line commands as well as runtime commands have been implemented to fine-tune the operation of the servers. Shared mutexes are utilized for thread-safety on mostly-read objects. A data consistency/database object is in development for future versions, once the `eutopia` redesign is finalized through the revisions on subversion `8.1`.
+
 ## 8.0.2
 
-Changelog omitted temporarily.
+SMTP mailbox activity is now accessible via the status page.
 
 ## 8.0.1
 
-Changelog omitted temporarily.
+Fix a major bug where server accept threads would busy-wait once the initial accept timeout expired.
 
 ## 8.0.0
 
-Changelog omitted temporarily.
+Incorporated both HTTP and SMTP servers together as well as the “Emancipation” `rain 7.0` release updates.
 
 ## 7.1.10
 

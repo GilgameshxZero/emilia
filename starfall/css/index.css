@@ -1,0 +1,439 @@
+.meta {
+	display: none;
+}
+
+.templates {
+	display: none;
+}
+
+.burning {
+	color: var(--burning);
+}
+
+html {
+	overflow-y: auto;
+	-webkit-text-size-adjust: 100%;
+}
+
+body {
+	margin: 0;
+	position: relative;
+
+	background-color: black;
+	color: white;
+	font-family: 'Montserrat', Helvetica, sans-serif;
+	font-size: calc(1vmin + 12px);
+	line-height: 1.75;
+}
+
+body.mobile>.main {
+	overflow-y: scroll;
+}
+
+body.mobile>.scrollbar {
+	display: none;
+}
+
+.entrance {
+	z-index: 1;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	overflow: hidden;
+
+	pointer-events: none;
+}
+
+.entrance>* {
+	position: absolute;
+	width: 100%;
+	height: 50%;
+	transition: top var(--entrance-transition), bottom var(--entrance-transition);
+	background-color: black;
+
+	display: flex;
+	flex-flow: column nowrap;
+}
+
+.entrance>.top {
+	top: 0;
+}
+
+.entrance>.bottom {
+	bottom: 0;
+}
+
+.entrance>*>.text {
+	width: 100%;
+	flex: 1 0 0;
+
+	display: flex;
+	justify-content: center;
+}
+
+.entrance>.top>.text {
+	align-items: flex-end;
+}
+
+.entrance>.bottom>.text {
+	align-items: flex-start;
+}
+
+.entrance>*>.text>span {
+	margin: 5px 0;
+
+	font-size: 350%;
+}
+
+.entrance>*>.edge {
+	display: flex;
+	flex: 0 0 1vh;
+	width: 100%;
+
+	background-color: var(--dark);
+}
+
+.entrance>*>.edge>.bar {
+	width: 0;
+	margin: 0 auto;
+
+	transition: width 0.15s;
+	background-color: var(--medium);
+}
+
+.main {
+	z-index: 0;
+	width: 100%;
+	height: 100%;
+	position: relative;
+
+	display: flex;
+	flex-flow: row nowrap;
+	background-color: transparent;
+
+	overflow: hidden;
+	-webkit-overflow-scrolling: touch;
+}
+
+.main>.inner {
+	margin: auto auto;
+	flex: 1 0 0;
+	height: 100%;
+	max-width: 100%;
+	max-height: 175vw;
+
+	display: flex;
+	flex-flow: column nowrap;
+}
+
+.main>.inner>.orbit {
+	position: relative;
+	flex: 0 0 calc(20vmin + 120px + 6.5%);
+	width: 100%;
+	max-width: 125vh;
+	margin: 0 auto;
+
+	display: flex;
+}
+
+.main>.inner>.orbit>.inner {
+	position: relative;
+	width: calc(90% - var(--hex-width));
+	height: calc(20vmin + 120px - var(--hex-width));
+	margin: calc(0.25 * var(--hex-width) + 5%) auto auto;
+}
+
+.main>.inner>.orbit>.inner>.return {
+	z-index: 1;
+	position: absolute;
+	top: calc(50% - 0.5 * var(--hex-width));
+	left: calc(50% - 0.5 * var(--hex-width));
+	width: var(--hex-width);
+	height: var(--hex-width);
+
+	opacity: 0;
+	transition: opacity var(--transition-time);
+	animation: spin-reverse 0.6s linear infinite;
+}
+
+.main>.inner>.orbit>.inner>.return.enabled {
+	opacity: 1;
+
+	cursor: pointer;
+}
+
+.main>.inner>.orbit>.inner>.return>.hexagon {
+	width: 100%;
+	height: 100%;
+}
+
+.main>.inner>.orbit>.inner>.return>.hexagon.border {
+	position: absolute;
+
+	color: var(--burning);
+}
+
+.main>.inner>.orbit>.inner>.return>.hexagon.inner {
+	position: absolute;
+
+	transform: scale(0.9);
+	opacity: 1;
+	color: var(--dark);
+}
+
+@keyframes spin-reverse {
+	0% {
+		transform: scale(0.75) rotate(90deg);
+	}
+
+	100% {
+		transform: scale(0.75) rotate(30deg);
+	}
+}
+
+.main>.inner>.core {
+	flex: 1 0 0;
+	width: calc(100% - 15vmin);
+	margin: auto;
+
+	opacity: 1;
+
+	transition: opacity var(--transition-time);
+}
+
+.main>.inner>.core.invisible {
+	opacity: 0;
+}
+
+.scrollbar {
+	position: absolute;
+	right: 0;
+	top: 0;
+	height: 100%;
+	width: 10px;
+}
+
+.scrollbar>.inner {
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+
+.scrollbar>.inner>.bar {
+	position: absolute;
+	left: 0;
+	width: 100%;
+
+	opacity: 0;
+	background-color: var(--medium);
+	transition: opacity var(--transition-time), height var(--transition-time), background-color var(--transition-time);
+}
+
+.scrollbar>.inner>.bar.visible {
+	opacity: 1;
+}
+
+.scrollbar>.inner>.bar.held {
+	opacity: 1;
+	background-color: var(--burning);
+}
+
+.scrollbar>.inner>.bar:hover {
+	background-color: var(--burning);
+}
+
+.background {
+	z-index: -1;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+
+	overflow: hidden;
+	background-color: transparent;
+}
+
+.background>.hexagon-positioner {
+	position: absolute;
+	width: calc(0.25 * var(--hex-width));
+	height: calc(0.25 * var(--hex-width));
+
+	animation: bg-hex-position linear;
+}
+
+.background>.hexagon-positioner>.hexagon-wrapper {
+	position: relative;
+	width: 100%;
+	height: 100%;
+
+	animation: bg-hex-wrapper linear infinite;
+}
+
+.background>.hexagon-positioner>.hexagon-wrapper>.hexagon {
+	position: relative;
+	width: 100%;
+	height: 100%;
+
+	animation: bg-hex linear infinite;
+	color: var(--dark);
+	opacity: 0.75;
+}
+
+@keyframes bg-hex-position {
+	0% {
+		top: calc(-1 * var(--hex-width));
+	}
+
+	100% {
+		top: calc(100% + var(--hex-width));
+	}
+}
+
+@keyframes bg-hex-wrapper {
+	0% {
+		transform: rotate(0deg);
+	}
+
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes bg-hex {
+	0% {
+		transform: scaleX(1);
+	}
+
+	50% {
+		transform: scaleX(-1);
+	}
+
+	100% {
+		transform: scaleX(1);
+	}
+}
+
+/*Common classes*/
+
+.hexagon {
+	text-align: center;
+	position: relative;
+	display: inline-block;
+}
+
+.hexagon-inner {
+	height: 100%;
+	width: calc(100% * 0.57735);
+	display: inline-block;
+
+	background-color: currentColor;
+}
+
+.hexagon-inner:before {
+	position: absolute;
+	top: 0;
+	right: calc((100% / 2) - ((100% * 0.57735) / 2));
+	background-color: inherit;
+	height: inherit;
+	width: inherit;
+	content: '';
+	transform: rotateZ(60deg);
+}
+
+.hexagon-inner:after {
+	position: absolute;
+	top: 0;
+	right: calc((100% / 2) - ((100% * 0.57735) / 2));
+	background-color: inherit;
+	height: inherit;
+	width: inherit;
+	content: '';
+	transform: rotateZ(-60deg);
+}
+
+.planet {
+	position: absolute;
+	width: var(--hex-width);
+	height: var(--hex-width);
+	top: calc(50% - 0.5 * var(--hex-width));
+	left: calc(50% - 0.5 * var(--hex-width));
+	transform: scale(0.75);
+
+	transition: top var(--transition-time) var(--orbit-transition), left var(--transition-time) var(--orbit-transition), transform var(--transition-time) var(--orbit-transition);
+
+	cursor: pointer;
+}
+
+.planet.highlight {
+	cursor: initial;
+}
+
+.planet.highlight.spinning {
+	cursor: pointer;
+}
+
+.planet>.inner {
+	width: 100%;
+	height: 100%;
+}
+
+.planet>.inner>.index {
+	display: none;
+}
+
+.planet>.inner>.hexagon-wrapper {
+	z-index: 0;
+	position: absolute;
+
+	top: 0;
+	left: 0;
+	width: var(--hex-width);
+	height: var(--hex-width);
+
+	transform: rotate(30deg);
+}
+
+.planet.spinning>.inner>.hexagon-wrapper {
+	animation: spin 0.6s linear infinite;
+}
+
+.planet>.inner>.hexagon-wrapper>.hexagon {
+	position: absolute;
+	width: var(--hex-width);
+	height: var(--hex-width);
+
+	color: var(--medium);
+	transition: color var(--transition-time);
+}
+
+.planet>.inner>.hexagon-wrapper>.hexagon.inner {
+	transform: scale(0.9);
+	color: var(--dark);
+	opacity: 1;
+
+	transition: opacity var(--transition-time);
+}
+
+.planet.highlight>.inner>.hexagon-wrapper>.hexagon.inner {
+	opacity: 0;
+}
+
+.planet.spinning>.inner>.hexagon-wrapper>.hexagon.border {
+	color: var(--burning);
+}
+
+.planet.spinning>.inner>.hexagon-wrapper>.hexagon.inner {
+	color: var(--dark);
+	opacity: 1;
+}
+
+@keyframes spin {
+	0% {
+		transform: rotate(30deg);
+	}
+
+	100% {
+		transform: rotate(90deg);
+	}
+}

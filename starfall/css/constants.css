@@ -1,0 +1,19 @@
+:root {
+  --hue: 265;
+  --sat: 50%;
+  --burning-hue: 295;
+
+  --light: hsl(var(--hue), var(--sat), 85%);
+  --medium: hsl(var(--hue), var(--sat), 50%);
+  --dark: hsl(var(--hue), var(--sat), 15%);
+  --dark-transparent: hsla(var(--hue), var(--sat), 15%, 0.5);
+
+  --burning: hsl(var(--burning-hue), 100%, 70%);
+  --code: hsla(0, 0%, 25%, 0.5);
+
+  --hex-width: calc(3vmin + 49px);
+  --entrance-transition: 0.75s;
+  --transition-time: 0.35s;
+
+  --orbit-transition: ease;
+}

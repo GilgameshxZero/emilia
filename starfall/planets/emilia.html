@@ -1,0 +1,71 @@
+<html>
+
+<head>
+  <style>
+    .planet-content .info {
+      display: flex;
+      flex-flow: row nowrap;
+    }
+
+    .planet-content .info>div {
+      flex: 1 0 0;
+    }
+
+  </style>
+  <script>
+    getEmiliaInfo = (script, callback) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open(`GET`, script, true);
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState !== 4) return;
+        if (xhr.status !== 200) return;
+        else callback(xhr.responseText);
+      };
+      xhr.send();
+    }
+
+    onPlanetContentLoad = () => {
+      const versionAttribute = `data-emilia-version`;
+      const body = document.querySelector(`body`);
+      const version = body.getAttribute(versionAttribute);
+
+      const versionNode = document.querySelector(`.planet-content .version`);
+      if (version) {
+        versionNode.textContent = version;
+      } else {
+        getEmiliaInfo(`/version`, response => {
+          versionNode.textContent = response;
+          body.setAttribute(versionAttribute, response);
+        });
+      }
+    }
+    onPlanetContentLoad();
+  </script>
+</head>
+
+<body>
+  <div class="meta">
+    <div class="label">
+      <span>.</span>
+    </div>
+    <div class="subplanets"></div>
+  </div>
+  <div class="planet-content">
+    <p class="center">
+      <span class="larger burning">EMILIA</span><br>
+    <div class="info center">
+      <a class="version" href="https://github.com/gilgameshxzero/emilia">————</a>
+    </div>
+    <br>
+    <div class="center">
+      HTTP & SMTP server in WinAPI C++<br>
+      self-hosted and tunneled via <a href="https://github.com/GilgameshxZero/http-mux">HTTP-MUX</a> on EC2<br>
+      UI/UX designed & built from scratch<br>
+      <br>
+      based on <a href="https://myanimelist.net/character/118737/Emilia">EMILIA from RE: ZERO</a><br>
+    </div>
+    </p>
+  </div>
+</body>
+
+</html>

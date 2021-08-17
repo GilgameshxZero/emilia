@@ -1,0 +1,143 @@
+<link rel="stylesheet" href="css/home.css" />
+
+<div id="home-main-inner">
+	<div id="home-gilgamesh" class="panel color-1">
+		<h1>
+			I'm Gilgamesh
+		</h1>
+		<h4>
+			And this is my website.
+		</h4>
+		<p>
+			<a href="http://waifu.emilia-tan.com">Who is Emilia?</a><br>
+		</p>
+		<p class="right">
+			<span id="home-gilgamesh-lastmod">Updated </span><br>
+			<span id="home-gilgamesh-version">Emilia v</span><br>
+			<span id="home-gilgamesh-ip">IP: </span><br>
+			<span>Theme: <i>Pastel</i></span>
+		</p>
+	</div>
+	<div id="home-intro" class="panel color-2">
+		<p>
+			<span id="home-intro-pic-wrapper" class="image left square-wrapper">
+				<img id="home-intro-pic" class="square-pic" src="img/profile-pic.jpg">
+			</span>
+			My name is Yang! Some people know me by Gilbert or Gilgamesh. I'm a sophomore studying mathematics (18) at
+			MIT. Here's my <a href="resume-2019-01-17.pdf">resume</a>.<br>
+			<br>
+			In the past, I competed in USACO &amp; USAMO, interned at Lucid Software, and founded a
+			trading startup with some friends before quitting. Currently, I'm taking classes at MIT, and will intern at
+			Microsoft over IAP and Scale API over next summer (summer 2019).<br>
+			<br>
+		</p>
+	</div>
+	<div id="home-mlist" class="panel color-3">
+		<h2>
+			Join my mailing list!
+		</h2>
+		<p>
+			You'll receive an <a href="./#mailing-list" onclick="window.location.reload(true);">email update</a> from me
+			every
+			few months about what I've been doing!
+		</p>
+		<form action="#" onsubmit="return mListFormSubmit(this);">
+			<input type="email" name="home-mlist-form-email" class="nofocus" placeholder="email@domain.com"><br>
+			<input type="submit" onclick="lastMListSubmitButton=this.name;" name="add" value="Subscribe"
+				class="nofocus">
+			<input type="submit" onclick="lastMListSubmitButton=this.name;" name="remove" value="Unsubscribe"
+				class="nofocus">
+		</form>
+		<p id="home-mlist-form-response"></p>
+	</div>
+	<div id="home-social" class="panel color-4">
+		<a class="social-panel" href="mailto:gil@emilia-tan.com">
+			<span class="square-wrapper social-panel-inner">
+				<img class="square-pic" src="img/email-fav.png">
+			</span>
+		</a>
+		<a class="social-panel" href="https://www.facebook.com/GilgameshxZero">
+			<span class="square-wrapper social-panel-inner">
+				<img class="square-pic" src="img/fb-fav.png">
+			</span>
+		</a>
+		<a class="social-panel" href="img/wechat.jpg">
+			<span class="square-wrapper social-panel-inner">
+				<img class="square-pic" src="img/wechat-fav.png">
+			</span>
+		</a>
+		<a class="social-panel" href="https://www.linkedin.com/in/yang-gilbert-yan-31b43885/">
+			<span class="square-wrapper social-panel-inner">
+				<img class="square-pic" src="img/linkedin-fav.ico">
+			</span>
+		</a>
+		<a class="social-panel" href="http://codeforces.com/profile/GILGAMESH">
+			<span class="square-wrapper social-panel-inner">
+				<img class="square-pic" src="img/cf-fav.png">
+			</span>
+		</a>
+		<a class="social-panel" href="https://github.com/GilgameshxZero">
+			<span class="square-wrapper social-panel-inner">
+				<img class="square-pic" src="img/github-fav.png">
+			</span>
+		</a>
+		<a class="social-panel" href="https://myanimelist.net/profile/gilgameshxzero">
+			<span class="square-wrapper social-panel-inner">
+				<img class="square-pic" src="img/mal-fav.jpg">
+			</span>
+		</a>
+		<a class="social-panel" href="https://www.quora.com/profile/Yang-Yan-2">
+			<span class="square-wrapper social-panel-inner">
+				<img class="square-pic" src="img/quora-fav.png">
+			</span>
+		</a>
+	</div>
+	<div id="home-email" class="panel color-5">
+		<h2>
+			Email spoofing
+		</h2>
+		<p>
+			Want to send an email from someone else's address? Well, use the form below. Though, no guarantees it
+			doesn't end up in spam.
+		</p>
+		<form action="#" onsubmit="return emailFormSubmit(this);">
+			<input type="text" id="home-email-from-name" placeholder="From name" class="nofocus">
+			<input type="email" id="home-email-from" placeholder="from@domain.com" class="nofocus"><br>
+			<input type="text" id="home-email-to-name" placeholder="To name" class="nofocus">
+			<input type="email" id="home-email-to" placeholder="to@domain.com" class="nofocus"><br>
+			<input type="text" id="home-email-subject" placeholder="Subject" class="nofocus">
+			<input type="submit" value="Submit" class="nofocus"><br>
+			<textarea type="body" id="home-email-data" class="nofocus noscrollbar"></textarea><br>
+		</form>
+		<p id="home-email-form-response"></p>
+	</div>
+	<div id="home-projects" class="panel color-6">
+		<h2>
+			Projects & servers
+		</h2>
+		<h3>
+			Emilia
+		</h3>
+		<p>
+			Emilia is also a custom C++ HTTP & SMTP server built from scratch in WinAPI. Please check out the <a
+				href="https://github.com/GilgameshxZero/emilia">repository</a>!
+			<br>
+			The favicon is taken from this <a
+				href="https://www.pixiv.net/member_illust.php?mode=medium&illust_id=57433145">image</a>.
+		</p>
+		<audio id="home-projects-audio"></audio>
+		<h3>Minecraft</h3>
+		<p>
+			There's a Minecraft (1.12.2) server running on Emilia! The URL is <u>minecraft.emilia-tan.com</u>.
+		</p>
+		<h3>Terraria</h3>
+		<p>
+			There's also a Terraria server on Emilia! The URL is <u>terraria.emilia-tan.com</u>.
+		</p>
+		<h3>Prototype</h3>
+		<p>
+			"Why is it called 'Prototype'? What is it prototyping?" - You, probably.<br>
+			<u id="home-projects-random">Click me to play a random song!</u>
+		</p>
+	</div>
+</div>

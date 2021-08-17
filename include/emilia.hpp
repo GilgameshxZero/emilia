@@ -3,7 +3,7 @@
 
 // Versioning.
 #define EMILIA_VERSION_MAJOR 8
-#define EMILIA_VERSION_MINOR 0
-#define EMILIA_VERSION_REVISION 2
+#define EMILIA_VERSION_MINOR 1
+#define EMILIA_VERSION_REVISION 0
 
-#include <build.hpp>
+#include "build.hpp"

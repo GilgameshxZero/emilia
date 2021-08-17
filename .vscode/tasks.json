@@ -29,11 +29,12 @@
 		"group": { "kind": "build", "isDefault": true },
 
 		"command": "make",
-		"args": ["build"],
+		"args": ["-j8", "build"],
 		"problemMatcher": ["$gcc"],
 
 		"windows": {
 			"command": "build",
+			"args": [],
 			"problemMatcher": ["$msCompile"]
 		}
 	}, {
@@ -47,7 +48,7 @@
 		"group": "build",
 
 		"command": "make",
-		"args": ["build", "RELEASE=1"],
+		"args": ["-j8", "build", "RELEASE=1"],
 		"problemMatcher": ["$gcc"],
 
 		"windows": {

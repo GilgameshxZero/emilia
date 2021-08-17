@@ -1,80 +1,82 @@
 // Public interfaces for http.cpp.
 #pragma once
 
+#include "state.hpp"
+
 #include <rain.hpp>
 
 namespace Emilia::Http {
-	class Worker final : public Rain::Networking::Http::WorkerInterface<
-												 Rain::Networking::Http::Socket> {
+	class Worker : public Rain::Networking::Http::Worker<
+									 Rain::Networking::Http::Request,
+									 Rain::Networking::Http::Response,
+									 1 << 10,
+									 1 << 10,
+									 15000,
+									 15000,
+									 Rain::Networking::Ipv6FamilyInterface,
+									 Rain::Networking::StreamTypeInterface,
+									 Rain::Networking::TcpProtocolInterface,
+									 Rain::Networking::NoLingerSocketOption> {
 		private:
-		std::list<std::tuple<
-			std::chrono::system_clock::time_point,
-			bool,
-			Rain::Networking::Smtp::Mailbox,
-			Rain::Networking::Smtp::Mailbox>> &mailboxActivity;
-		std::mutex &mailboxActivityMtx;
+		using SuperWorker = Rain::Networking::Http::Worker<
+			Rain::Networking::Http::Request,
+			Rain::Networking::Http::Response,
+			1 << 10,
+			1 << 10,
+			15000,
+			15000,
+			Rain::Networking::Ipv6FamilyInterface,
+			Rain::Networking::StreamTypeInterface,
+			Rain::Networking::TcpProtocolInterface,
+			Rain::Networking::NoLingerSocketOption>;
+
+		State &state;
+
+		// Load from cache or load from filesystem.
+		ResponseAction staticFile(
+			std::filesystem::path const &,
+			std::string const &);
+
+		ResponseAction reqStatus(Request &, std::smatch const &);
+		ResponseAction reqHyperspace(Request &, std::smatch const &);
+		ResponseAction reqHyperpanel(Request &, std::smatch const &);
+		ResponseAction reqPastel(Request &, std::smatch const &);
+		ResponseAction reqStarfall(Request &, std::smatch const &);
+		ResponseAction reqEutopia(Request &, std::smatch const &);
+		virtual std::vector<RequestFilter> filters() override;
 
 		public:
-		Worker(
-			Rain::Networking::Resolve::AddressInfo const &,
-			Rain::Networking::Socket &&,
-			std::size_t = std::size_t(1) << 10,
-			std::size_t = std::size_t(1) << 10,
-			Duration = std::chrono::seconds(60),
-			Duration = std::chrono::seconds(60),
-			std::list<std::tuple<
-				std::chrono::system_clock::time_point,
-				bool,
-				Rain::Networking::Smtp::Mailbox,
-				Rain::Networking::Smtp::Mailbox>> * = nullptr,
-			std::mutex * = nullptr);
-		Worker(Worker const &) = delete;
-		Worker &operator=(Worker const &) = delete;
+		Worker(NativeSocket, SocketInterface *, State &);
 
-		private:
-		// Extend target match chain.
-		virtual std::optional<PreResponse> chainMatchTargetImpl(
-			Tag<Interface>,
-			Request &) final override;
-
-		// Target match handlers.
-		PreResponse getAll(Request &, std::smatch const &);
+		using SuperWorker::send;
+		using SuperWorker::recv;
+		virtual void send(Response &) override;
+		virtual Request &recv(Request &) override;
 	};
 
-	class Server : public Rain::Networking::Http::
-									 ServerInterface<Rain::Networking::Http::Socket, Worker> {
-		friend Worker;
-
+	class Server : public Rain::Networking::Http::Server<
+									 Worker,
+									 Rain::Networking::Ipv6FamilyInterface,
+									 Rain::Networking::StreamTypeInterface,
+									 Rain::Networking::TcpProtocolInterface,
+									 Rain::Networking::DualStackSocketOption,
+									 Rain::Networking::NoLingerSocketOption> {
 		private:
-		std::list<std::tuple<
-			std::chrono::system_clock::time_point,
-			bool,
-			Rain::Networking::Smtp::Mailbox,
-			Rain::Networking::Smtp::Mailbox>> &mailboxActivity;
-		std::mutex &mailboxActivityMtx;
+		using SuperServer = Rain::Networking::Http::Server<
+			Worker,
+			Rain::Networking::Ipv6FamilyInterface,
+			Rain::Networking::StreamTypeInterface,
+			Rain::Networking::TcpProtocolInterface,
+			Rain::Networking::DualStackSocketOption,
+			Rain::Networking::NoLingerSocketOption>;
+
+		State &state;
 
 		public:
-		Server(
-			std::size_t = 1024,
-			Rain::Networking::Specification::ProtocolFamily =
-				Rain::Networking::Specification::ProtocolFamily::INET6,
-			std::size_t = std::size_t(1) << 10,
-			std::size_t = std::size_t(1) << 10,
-			Duration = std::chrono::seconds(60),
-			Duration = std::chrono::seconds(60),
-			std::list<std::tuple<
-				std::chrono::system_clock::time_point,
-				bool,
-				Rain::Networking::Smtp::Mailbox,
-				Rain::Networking::Smtp::Mailbox>> * = nullptr,
-			std::mutex * = nullptr);
-		Server(Server const &) = delete;
-		Server &operator=(Server const &) = delete;
+		Server(State &, Host const &);
+		virtual ~Server();
 
 		private:
-		virtual std::unique_ptr<Worker> workerFactory(
-			std::shared_ptr<std::pair<
-				Rain::Networking::Socket,
-				Rain::Networking::Resolve::AddressInfo>> acceptRes) override;
+		virtual Worker makeWorker(NativeSocket, SocketInterface *) override;
 	};
 }

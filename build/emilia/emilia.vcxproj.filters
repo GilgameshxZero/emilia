@@ -18,6 +18,12 @@
     <ClCompile Include="..\..\src\smtp.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\state.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\envelope.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\build.hpp">
@@ -30,6 +36,12 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\smtp.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\state.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\envelope.hpp">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
