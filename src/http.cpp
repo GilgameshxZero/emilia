@@ -53,6 +53,8 @@ namespace Emilia::Http {
 			 this->state.fileCache[path]}};
 	}
 	Worker::ResponseAction Worker::reqStatus(Request &req, std::smatch const &) {
+		using namespace Rain::Literal;
+
 		std::time_t time =
 			std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 		std::tm timeData;
@@ -94,6 +96,10 @@ namespace Emilia::Http {
 			std::shared_lock lck(this->state.outboxMtx);
 			ss << "Mailbox activity (" << this->state.outbox.size() << "): \n";
 			for (auto const &it : this->state.outbox) {
+				// Show only outbox from last 3 days.
+				if (it.attemptTime < std::chrono::steady_clock::now() - 72h) {
+					break;
+				}
 				std::time_t time =
 					std::chrono::system_clock::to_time_t(it.attemptSystemTime);
 				std::tm timeData;
@@ -166,29 +172,35 @@ namespace Emilia::Http {
 	std::vector<Worker::RequestFilter> Worker::filters() {
 		return {
 			{"status." + this->state.node + "(:.*)?",
-			 "/",
+			 "/.*",
 			 {Method::GET, Method::POST},
 			 &Worker::reqStatus},
-			{"hyperspace." + this->state.node + "(:.*)?",
-			 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
-			 {Method::GET},
-			 &Worker::reqHyperspace},
-			{"hyperpanel." + this->state.node + "(:.*)?",
-			 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
-			 {Method::GET},
-			 &Worker::reqHyperpanel},
-			{"pastel." + this->state.node + "(:.*)?",
-			 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
-			 {Method::GET},
-			 &Worker::reqPastel},
-			{"starfall." + this->state.node + "(:.*)?",
-			 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
-			 {Method::GET},
-			 &Worker::reqStarfall},
-			{"(eutopia.)?" + this->state.node + "(:.*)?",
-			 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
-			 {Method::GET},
-			 &Worker::reqEutopia}};
+				{"hyperspace." + this->state.node + "(:.*)?",
+				 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
+				 {Method::GET},
+				 &Worker::reqHyperspace},
+				{"hyperpanel." + this->state.node + "(:.*)?",
+				 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
+				 {Method::GET},
+				 &Worker::reqHyperpanel},
+				{"pastel." + this->state.node + "(:.*)?",
+				 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
+				 {Method::GET},
+				 &Worker::reqPastel},
+				{"starfall." + this->state.node + "(:.*)?",
+				 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
+				 {Method::GET},
+				 &Worker::reqStarfall},
+#ifdef RAIN_PLATFORM_NDEBUG
+				{"(eutopia.)?" + this->state.node + "(:.*)?",
+#else
+			{
+				".*",
+#endif
+				 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
+				 {Method::GET},
+				 &Worker::reqEutopia}
+		};
 	}
 	void Worker::send(Response &res) {
 		// Postprocess to add server signature.

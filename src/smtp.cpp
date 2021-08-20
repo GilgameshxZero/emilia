@@ -141,7 +141,7 @@ namespace Emilia::Smtp {
 				// Just in case of throw.
 				Rain::Error::consumeThrowable(
 					[this]() {
-						static auto const retryWait = 1h;
+						static auto const retryWait = 4h;
 						std::vector<Envelope> toAttempt;
 						{
 							std::unique_lock lck(this->state.outboxMtx);
@@ -170,10 +170,11 @@ namespace Emilia::Smtp {
 
 						// All attempted envelopes should be PENDING.
 						for (auto &it : toAttempt) {
-							if (it.attempt == 24) {
+							if (it.attempt == 8) {
 								std::cerr << "Exceeded maximum retries: " << it.from << " > "
 													<< it.to << "\n : " << it.data << std::endl;
 								it.status = Envelope::Status::FAILURE;
+								continue;
 							}
 
 							// Attempt to send the envelope. Returns an empty optional, or the
