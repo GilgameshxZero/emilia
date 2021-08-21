@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.1.4
+
+Begin redesign on “erlija-past” theme.
+
 ## 8.1.3
 
 Lower outbox retry attempts to 8. Increase default retry time to 4h. Fix outbox retry failure detection. Only display emails from the last 72 hours on the status page. On debug builds, allow any host header to match eutopia filter.

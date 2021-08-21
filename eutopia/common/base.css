@@ -1,0 +1,555 @@
+@import url("https://fonts.googleapis.com/css?family=Dancing+Script|Montserrat");
+
+:root {
+	--paragraph-spacing: 2em;
+	--paragraph-indent: 0ch;
+	--line-height: 1.5;
+	--hr-content: "❄";
+}
+
+/* Optional classes. */
+.no-display {
+	display: none !important;
+}
+
+.no-select {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.no-focus {
+	outline-style: none;
+	box-shadow: none;
+	border-color: transparent;
+}
+
+.no-scrollbar {
+	-ms-overflow-style: none;
+	overflow: -moz-scrollbars-none;
+	scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+	display: none;
+}
+
+.align-left {
+	text-align: left;
+}
+
+.align-center {
+	text-align: center;
+}
+
+.align-right {
+	text-align: right;
+}
+
+.no-indent {
+	text-indent: 0;
+}
+
+.next-page-break {
+	clear: both;
+	break-after: always;
+	page-break-after: always;
+}
+
+/* Fonts. */
+.serif,
+.garamond {
+	font-family: "EB Garamond", Georgia, serif;
+}
+
+.times-new-roman {
+	font-family: "Times New Roman", Times, serif;
+}
+
+.system-sans-serif {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.monospace,
+.consolas {
+	font-family: Consolas, monospace;
+	font-size: 0.9em;
+}
+
+.courier-new {
+	font-family: "Courier New", Courier, monospace;
+	font-size: 0.9em;
+}
+
+.script,
+.dancing-script {
+	font-family: "Dancing Script";
+}
+
+.sans-serif,
+.montserrat {
+	font-family: Montserrat;
+	font-size: 0.9em;
+}
+
+body {
+	--blockquote-background-color: rgba(127, 127, 127, 0.1);
+	--blockquote-border-color: rgba(0, 122, 204, 0.5);
+	--list-marker-color: rgb(0, 122, 204);
+}
+
+/* If the OS has a preferred color scheme, use that to generate colors. Only overwrite it if we are in the webview preview. */
+@media (prefers-color-scheme: light) {
+	body {
+		--foreground-color: rgb(0, 0, 0);
+		--background-color: rgb(255, 255, 255);
+		--textlink-foreground-color: rgb(0, 106, 177);
+		--pre-background-color: rgba(220, 220, 220, 0.4);
+		--border-color: rgba(0, 0, 0, 0.18);
+		--code-color: rgb(163, 21, 21);
+	}
+}
+
+@media (prefers-color-scheme: dark) {
+	body {
+		--foreground-color: rgb(212, 212, 212);
+		--background-color: rgb(30, 30, 30);
+		--textlink-foreground-color: rgb(55, 148, 255);
+		--pre-background-color: rgba(10, 10, 10, 0.4);
+		--border-color: rgba(255, 255, 255, 0.18);
+		--code-color: rgb(215, 186, 125);
+	}
+}
+
+/* html/body defaults. */
+html {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	position: relative;
+	overflow-x: hidden;
+	margin: 0 auto;
+	padding: 1em 2em;
+	max-width: min(calc(100% - 4em), 70ch);
+
+	font-family: "EB Garamond", Georgia, serif;
+	font-size: 1.2rem;
+	line-height: var(--line-height);
+	color: var(--foreground-color);
+	background-color: var(--background-color);
+}
+
+/* Printing. In printing, switch everything to light theme. */
+@media print {
+	@page {
+		margin: 1in;
+	}
+
+	body {
+		margin: 0;
+		padding: 0;
+		max-width: none;
+
+		font-size: 12pt;
+	}
+}
+
+p {
+	margin: calc(var(--paragraph-spacing) / 2) 0;
+
+	text-indent: var(--paragraph-indent);
+	word-wrap: break-word;
+}
+
+.next-flow-root+* {
+	display: flow-root;
+}
+
+a {
+	color: var(--textlink-foreground-color);
+	word-wrap: break-word;
+}
+
+a:focus {
+	outline-style: none;
+	box-shadow: none;
+	border-color: transparent;
+}
+
+pre {
+	max-width: 90%;
+	margin: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 0.5) auto;
+
+	background-color: var(--pre-background-color);
+}
+
+code {
+	white-space: pre-wrap;
+	font-family: Consolas, monaco, monospace;
+	font-size: 0.8em;
+	text-indent: 0;
+	font-weight: 300;
+	line-height: inherit;
+	color: var(--code-color);
+	word-wrap: break-word;
+}
+
+pre code {
+	color: var(--foreground-color);
+	tab-size: 2ch;
+}
+
+pre:not(.hljs),
+pre.hljs code>div {
+	padding: calc(var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1));
+}
+
+code>code {
+	font-size: 1em;
+}
+
+h1,
+h2 {
+	font-weight: normal;
+}
+
+h1 {
+	margin: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 1) 0 calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 0.5);
+	padding-bottom: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 0.5);
+	clear: both;
+
+	border-bottom: 0.05em solid var(--border-color);
+	font-size: 1.7em;
+}
+
+.next-subtitled+h1 {
+	margin-bottom: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * -0.1);
+	padding-bottom: 0;
+
+	border: none;
+}
+
+.next-subtitled+h1+p {
+	--paragraph-indent: 0ch;
+
+	margin-bottom: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 0.7);
+	padding-bottom: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 0.4);
+
+	border-bottom: 0.1em solid var(--border-color);
+	text-indent: var(--paragraph-indent);
+}
+
+h2 {
+	margin: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 1) 0 calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 0.5);
+	padding-bottom: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 0.2);
+	width: 80%;
+	clear: both;
+
+	border-bottom: 0.05em solid var(--border-color);
+}
+
+.next-subtitled+h2 {
+	margin-bottom: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * -0.3);
+	padding-bottom: 0;
+
+	border: none;
+}
+
+.next-subtitled+h2+p {
+	--paragraph-indent: 0ch;
+
+	margin-bottom: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 0.5);
+	padding-bottom: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 0.3);
+	width: 80%;
+	clear: both;
+
+	border-bottom: 0.1em solid var(--border-color);
+	text-indent: var(--paragraph-indent);
+}
+
+h3 {
+	margin: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 0.3) 0;
+
+	font-weight: bolder;
+}
+
+h4 {
+	margin: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 0.3) 0;
+
+	font-weight: bolder;
+}
+
+h5 {
+	margin: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 0.3) 0;
+
+	font-weight: bolder;
+}
+
+h6 {
+	margin: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 0.3) 0;
+
+	font-weight: bolder;
+}
+
+hr {
+	/* Customize by adjusting line-height and height to avoid page-break with 0-height element.*/
+	margin: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 1) auto;
+	height: 1em;
+
+	border: none;
+	text-align: center;
+	line-height: 1;
+}
+
+hr:after {
+	position: relative;
+	content: var(--hr-content);
+}
+
+.next-revert+hr {
+	margin: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 1.5) calc(25% / 2);
+	height: 0;
+
+	border-top: 0.1em solid var(--border-color);
+	break-inside: avoid;
+	page-break-inside: avoid;
+}
+
+.next-revert+hr:after {
+	content: none;
+}
+
+table {
+	display: block;
+	margin: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 1) auto;
+	max-width: 90%;
+
+	font-size: 1em;
+	border-style: hidden;
+	line-height: inherit;
+	border-collapse: collapse;
+	overflow: auto;
+
+	break-inside: avoid;
+	page-break-inside: avoid;
+}
+
+table thead {
+	font-size: 1.1em;
+}
+
+table tr {
+	border: none;
+}
+
+table td {
+	padding: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 1);
+
+	border: none;
+}
+
+table>tbody>tr+tr>td {
+	border: none;
+}
+
+table th {
+	padding: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 0.5);
+
+	border: none;
+	border-bottom: 0.1em solid var(--border-color);
+}
+
+table tr td {
+	padding: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 0.4);
+}
+
+table tr:nth-child(odd) td {
+	background-color: transparent;
+}
+
+table tr:nth-child(even) td {
+	background-color: var(--blockquote-background-color);
+}
+
+blockquote {
+	--paragraph-indent: 0;
+
+	padding: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 0.7) calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 1.4);
+	margin: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 0.7) 0;
+
+	border-left: 0.25em solid var(--blockquote-border-color);
+	background-color: var(--blockquote-background-color);
+	text-indent: var(--paragraph-indent);
+}
+
+blockquote cite {
+	display: block;
+	text-align: right;
+	font-style: normal;
+}
+
+img,
+svg {
+	display: block;
+	max-width: 90%;
+	max-height: 30em;
+	margin: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 1.5) auto;
+
+	break-inside: avoid;
+	page-break-inside: avoid;
+}
+
+img[src*="#large"],
+svg[src*="#large"] {
+	width: 90%;
+}
+
+img[src*="#medium"],
+svg[src*="#medium"] {
+	width: 60%;
+}
+
+img[src*="#small"],
+svg[src*="#small"] {
+	width: 30%;
+}
+
+img[src*="#unbounded-height"],
+svg[src*="#unbounded-height"] {
+	max-height: none;
+}
+
+img+br,
+svg+br {
+	display: none;
+}
+
+img+em,
+img+br+em,
+svg+em,
+svg+br+em {
+	--paragraph-indent: 0ch;
+
+	display: flow-root;
+	max-width: 90%;
+	margin: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * -1.3) auto calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 1);
+
+	text-align: center;
+	font-style: normal;
+	text-indent: var(--paragraph-indent);
+}
+
+iframe {
+	display: block;
+	margin: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 1.5) auto;
+	max-width: 90%;
+
+	border: none;
+}
+
+div.aspect.ratio-16-9 {
+	position: relative;
+	width: 100%;
+	height: 0;
+	padding-top: calc(90% / 16 * 9 + (1em * (var(--line-height) - 1)) * 3);
+}
+
+.aspect>iframe {
+	position: absolute;
+	max-width: none;
+	margin: 0;
+	top: calc((1em * (var(--line-height) - 1)) * 1.5);
+	left: 5%;
+	width: 90%;
+	height: calc(100% - (1em * (var(--line-height) - 1)) * 3);
+}
+
+audio {
+	display: block;
+	margin: auto;
+	max-width: 90%;
+
+	outline-style: none;
+	box-shadow: none;
+	border-color: transparent;
+}
+
+.katex {
+	font-size: 0.9em;
+}
+
+.katex img,
+.katex svg {
+	margin: auto;
+}
+
+details {
+	margin: calc(var(--paragraph-spacing) / 2) 0;
+	margin-left: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 1.4);
+}
+
+summary {
+	margin-left: calc((var(--paragraph-spacing) / -2 - 1em * (var(--line-height) - 1)) * 1.4);
+
+	cursor: pointer;
+	text-decoration: underline;
+	outline-style: none;
+	box-shadow: none;
+	border-color: transparent;
+}
+
+summary::marker,
+summary::-webkit-details-marker {
+	color: var(--list-marker-color);
+}
+
+aside {
+	width: calc(50% - 0.5em - (var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 2.8);
+	padding: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 0.7);
+	margin: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 0.7);
+
+	background-color: var(--blockquote-background-color);
+}
+
+aside:nth-of-type(odd) {
+	margin-right: 0;
+	margin-left: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 1.4);
+	float: right;
+	clear: right;
+	border-left: 0.25em solid var(--blockquote-border-color);
+}
+
+aside:nth-of-type(even) {
+	margin-left: 0;
+	margin-right: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 1.4);
+	float: left;
+	clear: left;
+	border-right: 0.25em solid var(--blockquote-border-color);
+}
+
+aside.pullquote {
+	--paragraph-indent: 0ch;
+
+	width: auto;
+	margin: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 0.7);
+	padding: calc((var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 1.4);
+	font-size: 1.5em;
+	text-align: center;
+	float: none;
+	clear: both;
+
+	border-top: 0.125em solid var(--blockquote-border-color);
+	border-bottom: 0.125em solid var(--blockquote-border-color);
+	border-left: none;
+	border-right: none;
+}
+
+ol li::marker,
+ul li::marker {
+	color: var(--list-marker-color);
+}
