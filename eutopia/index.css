@@ -1,16 +1,85 @@
-@import "common/fonts.css";
-
-html {
+html,
+body {
 	width: 100%;
 	height: 100%;
 	margin: 0;
 	padding: 0;
 }
 
+html {
+	background-color: black;
+}
+
 body {
-	/* position: relative; */
-	overflow-x: hidden;
+	overflow: hidden;
+
+	opacity: 1;
+	transition: opacity 1s;
+}
+
+body[pre-load] {
+	opacity: 0;
+}
+
+body > :not(eutopia-sunset) {
+	opacity: 0;
+	transition: opacity 1s;
+}
+
+body[active] > :not(eutopia-sunset) {
+	opacity: 1;
+}
+
+[name="waiting-room"] {
+	position: absolute;
+	left: 0;
+	top: 0;
 	width: 100%;
 	height: 100%;
-	margin: 0;
+	opacity: 0;
+}
+
+/* Splash takes extra time to transition out. */
+body > eutopia-splash {
+	transition: opacity 2s;
+}
+
+/* Scrollbar for all components. */
+::-webkit-scrollbar {
+	width: 0.8rem;
+	display: block;
+	position: absolute;
+	right: 0;
+	top: 0;
+	bottom: 0;
+}
+
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	background: #0000002f;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: #00000063;
+	cursor: pointer;
+}
+
+/* Printing options on essays cannot be set in a ShadowRoot. */
+@media print {
+	@page {
+		margin: 1in;
+	}
+
+	:host,
+	body {
+		width: auto;
+		max-width: none;
+		margin: 0;
+		padding: 0;
+
+		font-size: 12pt;
+	}
 }

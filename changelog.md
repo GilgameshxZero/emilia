@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.1.5
+
+Mostly finish work on “erlija-past”. Still some `.gif` to `.webm` re-encodes to do, and some cleaning up.
+
 ## 8.1.4
 
 Begin redesign on “erlija-past” theme.

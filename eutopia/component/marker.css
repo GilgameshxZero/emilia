@@ -1,0 +1,32 @@
+@import "../common/color.css";
+
+:host {
+	display: flex;
+	flex-flow: column nowrap;
+	font-family: Tangerine;
+	font-weight: bold;
+	margin: 1.5em 0 1.5em auto;
+
+	color: var(--color-bushes);
+	text-align: right;
+	font-size: 1.2em;
+	cursor: pointer;
+	transition: color 1s;
+	user-select: none;
+}
+
+:host(:hover) {
+	color: var(--color-ribbon);
+}
+
+:host > * {
+	margin: 0 0 0 auto;
+}
+
+:host > h1 {
+	text-shadow: 0.1em 0.1em 0.1em #00000040;
+}
+
+:host > span {
+	font-size: 1.6em;
+}

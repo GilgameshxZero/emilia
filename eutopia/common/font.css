@@ -1,0 +1,6 @@
+/* Fonts are base-64 encoded to allow for synchronous loading. Includes Tangerine and EB Garamond variations. */
+@import "font/tangerine-bold.css";
+@import "font/eb-garamond.css";
+@import "font/eb-garamond-italic.css";
+@import "font/eb-garamond-bold.css";
+@import "font/eb-garamond-bold-italic.css";
