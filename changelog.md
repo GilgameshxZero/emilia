@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.1.6
+
+Modify favicon to sunflower. Still need to custom draw a sunflower icon. Remove some unnecessary CSS.
+
 ## 8.1.5
 
 Mostly finish work on “erlija-past”. Still some `.gif` to `.webm` re-encodes to do, and some cleaning up.
