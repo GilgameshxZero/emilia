@@ -1,0 +1,44 @@
+@import "../common/color.css";
+
+:host {
+	--progress: 0;
+
+	position: absolute;
+	overflow: hidden;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+
+	z-index: -1;
+}
+
+div {
+	position: relative;
+	left: -150vh;
+	top: 0;
+	width: calc(100% + 400vh);
+	height: 2400%;
+
+	background: conic-gradient(
+		from 0deg at 0% 50%,
+		black 0deg,
+		var(--color-starfall) 36deg,
+		var(--color-past) 48deg,
+		var(--color-tears) 60deg,
+		var(--color-airships) 72deg,
+		var(--color-plains) 84deg,
+		var(--color-plains) 90deg,
+		black 360deg
+	);
+	transition: top 2s, left 2s;
+}
+
+:host([scene="map"]) > div {
+	top: -1050%;
+}
+
+:host([scene="essay"]) > div {
+	left: -400vh;
+	top: calc(-800% - var(--progress) * 300%);
+}

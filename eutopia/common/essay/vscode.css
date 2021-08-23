@@ -1,0 +1,383 @@
+/* Override behavior for VSCode webview previews. */
+body[data-vscode-theme-name] {
+	--foreground-color: var(--vscode-editor-foreground);
+	--background-color: var(--vscode-editor-background);
+	--textlink-foreground-color: var(--vscode-textLink-foreground);
+	--blockquote-background-color: var(--vscode-textBlockQuote-background);
+	--blockquote-border-color: var(--vscode-textBlockQuote-border);
+	--pre-background-color: var(--vscode-textCodeBlock-background);
+}
+
+body[data-vscode-theme-name].vscode-light {
+	--border-color: rgba(0, 0, 0, 0.18);
+	--code-color: rgb(162, 21, 21);
+}
+
+body[data-vscode-theme-name].vscode-dark {
+	--border-color: rgba(255, 255, 255, 0.18);
+	--code-color: rgb(215, 186, 125);
+}
+
+/* More selector specificity needed here. */
+body[data-vscode-theme-name].vscode-light table th,
+body[data-vscode-theme-name].vscode-dark table th {
+	padding: calc(
+		(var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1)) * 0.5
+	);
+
+	border: none;
+	border-bottom: 0.1em solid var(--border-color);
+}
+
+body[data-vscode-theme-name].vscode-light a,
+body[data-vscode-theme-name].vscode-dark a {
+	outline-style: none;
+	box-shadow: none;
+	border-color: transparent;
+}
+
+/* From `highlight.css`. Minaly we wish to adapt the CSS definitions with the same light/dark differentiation used previously. So, set the colors based on prefers-color-scheme first, and then set them based on VSCode theme type. */
+.hljs-keyword,
+.hljs-literal,
+.hljs-symbol,
+.hljs-name {
+	color: #569cd6;
+}
+
+.hljs-link {
+	color: #569cd6;
+	text-decoration: underline;
+}
+
+.hljs-built_in,
+.hljs-type {
+	color: #4ec9b0;
+}
+
+.hljs-number,
+.hljs-class {
+	color: #b8d7a3;
+}
+
+.hljs-string,
+.hljs-meta-string {
+	color: #d69d85;
+}
+
+.hljs-regexp,
+.hljs-template-tag {
+	color: #9a5334;
+}
+
+.hljs-subst,
+.hljs-function,
+.hljs-title,
+.hljs-params,
+.hljs-formula {
+	color: #dcdcdc;
+}
+
+.hljs-comment,
+.hljs-quote {
+	color: #57a64a;
+	font-style: italic;
+}
+
+.hljs-doctag {
+	color: #608b4e;
+}
+
+.hljs-meta,
+.hljs-meta-keyword,
+.hljs-tag {
+	color: #9b9b9b;
+}
+
+.hljs-variable,
+.hljs-template-variable {
+	color: #bd63c5;
+}
+
+.hljs-attr,
+.hljs-attribute,
+.hljs-builtin-name {
+	color: #9cdcfe;
+}
+
+.hljs-section {
+	color: gold;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+
+/*.hljs-code {
+	font-family:'Monospace';
+}*/
+
+.hljs-bullet,
+.hljs-selector-tag,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+	color: #d7ba7d;
+}
+
+.hljs-addition {
+	background-color: var(
+		--vscode-diffEditor-insertedTextBackground,
+		rgba(155, 185, 85, 0.2)
+	);
+	color: rgb(155, 185, 85);
+	display: inline-block;
+	width: 100%;
+}
+
+.hljs-deletion {
+	background: var(
+		--vscode-diffEditor-removedTextBackground,
+		rgba(255, 0, 0, 0.2)
+	);
+	color: rgb(255, 0, 0);
+	display: inline-block;
+	width: 100%;
+}
+
+@media (prefers-color-scheme: light) {
+	.hljs-function,
+	.hljs-params {
+		color: inherit;
+	}
+
+	.hljs-comment,
+	.hljs-quote,
+	.hljs-variable {
+		color: #008000;
+	}
+
+	.hljs-keyword,
+	.hljs-selector-tag,
+	.hljs-built_in,
+	.hljs-name,
+	.hljs-tag {
+		color: #00f;
+	}
+
+	.hljs-string,
+	.hljs-title,
+	.hljs-section,
+	.hljs-attribute,
+	.hljs-literal,
+	.hljs-template-tag,
+	.hljs-template-variable,
+	.hljs-type {
+		color: #a31515;
+	}
+
+	.hljs-selector-attr,
+	.hljs-selector-pseudo,
+	.hljs-meta {
+		color: #2b91af;
+	}
+
+	.hljs-doctag {
+		color: #808080;
+	}
+
+	.hljs-attr {
+		color: #f00;
+	}
+
+	.hljs-symbol,
+	.hljs-bullet,
+	.hljs-link {
+		color: #00b0e8;
+	}
+
+	.hljs-emphasis {
+		font-style: italic;
+	}
+
+	.hljs-strong {
+		font-weight: bold;
+	}
+}
+
+/* Second override. */
+body[data-vscode-theme-name] .hljs-keyword,
+body[data-vscode-theme-name] .hljs-literal,
+body[data-vscode-theme-name] .hljs-symbol,
+body[data-vscode-theme-name] .hljs-name {
+	color: #569cd6;
+}
+
+body[data-vscode-theme-name] .hljs-link {
+	color: #569cd6;
+	text-decoration: underline;
+}
+
+body[data-vscode-theme-name] .hljs-built_in,
+body[data-vscode-theme-name] .hljs-type {
+	color: #4ec9b0;
+}
+
+body[data-vscode-theme-name] .hljs-number,
+body[data-vscode-theme-name] .hljs-class {
+	color: #b8d7a3;
+}
+
+body[data-vscode-theme-name] .hljs-string,
+body[data-vscode-theme-name] .hljs-meta-string {
+	color: #d69d85;
+}
+
+body[data-vscode-theme-name] .hljs-regexp,
+body[data-vscode-theme-name] .hljs-template-tag {
+	color: #9a5334;
+}
+
+body[data-vscode-theme-name] .hljs-subst,
+body[data-vscode-theme-name] .hljs-function,
+body[data-vscode-theme-name] .hljs-title,
+body[data-vscode-theme-name] .hljs-params,
+body[data-vscode-theme-name] .hljs-formula {
+	color: #dcdcdc;
+}
+
+body[data-vscode-theme-name] .hljs-comment,
+body[data-vscode-theme-name] .hljs-quote {
+	color: #57a64a;
+	font-style: italic;
+}
+
+body[data-vscode-theme-name] .hljs-doctag {
+	color: #608b4e;
+}
+
+body[data-vscode-theme-name] .hljs-meta,
+body[data-vscode-theme-name] .hljs-meta-keyword,
+body[data-vscode-theme-name] .hljs-tag {
+	color: #9b9b9b;
+}
+
+body[data-vscode-theme-name] .hljs-variable,
+body[data-vscode-theme-name] .hljs-template-variable {
+	color: #bd63c5;
+}
+
+body[data-vscode-theme-name] .hljs-attr,
+body[data-vscode-theme-name] .hljs-attribute,
+body[data-vscode-theme-name] .hljs-builtin-name {
+	color: #9cdcfe;
+}
+
+body[data-vscode-theme-name] .hljs-section {
+	color: gold;
+}
+
+body[data-vscode-theme-name] .hljs-emphasis {
+	font-style: italic;
+}
+
+body[data-vscode-theme-name] .hljs-strong {
+	font-weight: bold;
+}
+
+body[data-vscode-theme-name] .hljs-bullet,
+body[data-vscode-theme-name] .hljs-selector-tag,
+body[data-vscode-theme-name] .hljs-selector-id,
+body[data-vscode-theme-name] .hljs-selector-class,
+body[data-vscode-theme-name] .hljs-selector-attr,
+body[data-vscode-theme-name] .hljs-selector-pseudo {
+	color: #d7ba7d;
+}
+
+body[data-vscode-theme-name] .hljs-addition {
+	background-color: var(
+		--vscode-diffEditor-insertedTextBackground,
+		rgba(155, 185, 85, 0.2)
+	);
+	color: rgb(155, 185, 85);
+	display: inline-block;
+	width: 100%;
+}
+
+body[data-vscode-theme-name] .hljs-deletion {
+	background: var(
+		--vscode-diffEditor-removedTextBackground,
+		rgba(255, 0, 0, 0.2)
+	);
+	color: rgb(255, 0, 0);
+	display: inline-block;
+	width: 100%;
+}
+
+body[data-vscode-theme-name].vscode-light .hljs-function,
+body[data-vscode-theme-name].vscode-light .hljs-params {
+	color: inherit;
+}
+
+body[data-vscode-theme-name].vscode-light .hljs-comment,
+body[data-vscode-theme-name].vscode-light .hljs-quote,
+body[data-vscode-theme-name].vscode-light .hljs-variable {
+	color: #008000;
+}
+
+body[data-vscode-theme-name].vscode-light .hljs-keyword,
+body[data-vscode-theme-name].vscode-light .hljs-selector-tag,
+body[data-vscode-theme-name].vscode-light .hljs-built_in,
+body[data-vscode-theme-name].vscode-light .hljs-name,
+body[data-vscode-theme-name].vscode-light .hljs-tag {
+	color: #00f;
+}
+
+body[data-vscode-theme-name].vscode-light .hljs-string,
+body[data-vscode-theme-name].vscode-light .hljs-title,
+body[data-vscode-theme-name].vscode-light .hljs-section,
+body[data-vscode-theme-name].vscode-light .hljs-attribute,
+body[data-vscode-theme-name].vscode-light .hljs-literal,
+body[data-vscode-theme-name].vscode-light .hljs-template-tag,
+body[data-vscode-theme-name].vscode-light .hljs-template-variable,
+body[data-vscode-theme-name].vscode-light .hljs-type {
+	color: #a31515;
+}
+
+body[data-vscode-theme-name].vscode-light .hljs-selector-attr,
+body[data-vscode-theme-name].vscode-light .hljs-selector-pseudo,
+body[data-vscode-theme-name].vscode-light .hljs-meta {
+	color: #2b91af;
+}
+
+body[data-vscode-theme-name].vscode-light .hljs-doctag {
+	color: #808080;
+}
+
+body[data-vscode-theme-name].vscode-light .hljs-attr {
+	color: #f00;
+}
+
+body[data-vscode-theme-name].vscode-light .hljs-symbol,
+body[data-vscode-theme-name].vscode-light .hljs-bullet,
+body[data-vscode-theme-name].vscode-light .hljs-link {
+	color: #00b0e8;
+}
+
+body[data-vscode-theme-name].vscode-light .hljs-emphasis {
+	font-style: italic;
+}
+
+body[data-vscode-theme-name].vscode-light .hljs-strong {
+	font-weight: bold;
+}
+
+/* Special padding for pre elements based on --paragraph-spacing and --line-height. */
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: calc(var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1));
+}

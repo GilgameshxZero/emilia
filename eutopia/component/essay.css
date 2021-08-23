@@ -1,0 +1,44 @@
+@import "../common/essay.css";
+
+:host {
+	/* Override of essay.css variables. */
+
+	/* Override of light/dark-dependent variables. */
+	--background-color: transparent;
+
+	/* Curried from styles defined in essay.css. */
+	height: calc(100% - 4em);
+	overflow-y: scroll;
+
+	--mask-image-value: linear-gradient(
+			to bottom,
+			transparent 0,
+			black 2em,
+			black calc(100% - 2em),
+			transparent 100%
+		),
+		linear-gradient(
+			to right,
+			black 0,
+			black 3em,
+			transparent 3em,
+			transparent calc(100% - 3em),
+			black calc(100% - 3em),
+			black 100%
+		);
+	-webkit-mask-image: var(--mask-image-value);
+	mask-image: var(--mask-image-value);
+}
+
+/* Print options for this ShadowRoot. */
+@media print {
+	:host {
+		background-color: white;
+
+		height: auto;
+	}
+
+	eutopia-sunflower {
+		display: none;
+	}
+}
