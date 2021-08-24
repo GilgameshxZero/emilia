@@ -27,7 +27,7 @@ and tables:
 | forme    | forme has no name         |
 | and now  | a demonstration of images |
 
-![](test.md-assets/2021-08-24-14-16-53.png)
+![](test.md-assets/2021-08-24-14-16-53.jpg)
 *This should not be italicized, but styled as a caption.*
 
 ### Smaller titles
