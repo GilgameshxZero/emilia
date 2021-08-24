@@ -49,7 +49,8 @@ namespace Emilia::Http {
 			{StatusCode::OK,
 			 {{{"Content-Type", MediaType(path.extension().string())},
 				 // ~17 minute cache.
-				 {"Cache-Control", "max-age=1024"}}},
+				 {"Cache-Control", "max-age=1024"},
+				 {"Access-Control-Allow-Origin", "*"}}},
 			 this->state.fileCache[path]}};
 	}
 	Worker::ResponseAction Worker::reqStatus(Request &req, std::smatch const &) {
