@@ -23,7 +23,7 @@
 }
 
 :host > * {
-	margin: 0 0 0 auto;
+	margin: 0;
 }
 
 :host > span {

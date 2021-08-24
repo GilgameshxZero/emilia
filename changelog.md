@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.1.8
+
+Add right border to map.
+
 ## 8.1.7
 
 Added inset shadow to a lot of elements to remove “floaty” feeling. Cache control only cahces for ~17 minutes by default instead of 1 week.
