@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.1.13
+
+Allow cross-origin requests from any domain for static files to allow external use of `essay.css`.
+
 ## 8.1.12
 
 Add markdown test page. Modify some VSCode extension syntax highlight colors. Fix KaTeX rendering. Rename assets folders with `.md`. Allow forcing of light/dark in `essay.css`.
