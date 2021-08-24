@@ -26,8 +26,11 @@
 	mask-image: var(--mask-image-value);
 }
 
-div {
+:host > div {
 	display: flex;
 	flex-flow: column-reverse nowrap;
 	min-height: 100%;
+	padding-right: 2em;
+
+	border-right: 0.2em solid #00000020;
 }
