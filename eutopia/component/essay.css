@@ -7,7 +7,9 @@
 	--background-color: transparent;
 
 	/* Curried from styles defined in essay.css. */
+	width: calc(100% - 2em);
 	height: calc(100% - 4em);
+	padding: 2em max(1em, 50% - 35ch);
 	overflow-y: scroll;
 
 	--mask-image-value: linear-gradient(
@@ -20,14 +22,21 @@
 		linear-gradient(
 			to right,
 			black 0,
-			black 3em,
-			transparent 3em,
-			transparent calc(100% - 3em),
-			black calc(100% - 3em),
+			black 2em,
+			transparent 2em,
+			transparent calc(100% - 2em),
+			black calc(100% - 2em),
 			black 100%
 		);
 	-webkit-mask-image: var(--mask-image-value);
 	mask-image: var(--mask-image-value);
+}
+
+article {
+	padding: 1em 2em;
+
+	background-color: #00000010;
+	box-shadow: inset 0 0 0.4em #00000030;
 }
 
 /* Print options for this ShadowRoot. */

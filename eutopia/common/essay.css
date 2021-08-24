@@ -49,10 +49,10 @@ html {
 :host,
 body {
 	display: block;
-	width: calc(100% - 6em);
+	width: calc(100% - 4em);
 	max-width: 70ch;
 	margin: 0;
-	padding: 2em max(3em, 50% - 35ch);
+	padding: 2em max(2em, 50% - 35ch);
 	overflow-x: hidden;
 
 	font-family: "EB Garamond", Georgia, serif;

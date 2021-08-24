@@ -12,7 +12,9 @@ component(
 		// Transition out map scene into essay scene.
 		sceneOut() {
 			document.body.removeAttribute(`active`);
-			document.querySelector(`eutopia-sunset`).setAttribute(`scene`, `essay`);
+			const sunset = document.querySelector(`eutopia-sunset`);
+			sunset.setAttribute(`scene`, `essay`);
+			sunset.style.removeProperty(`--progress`);
 			const essay = document.createElement(`eutopia-essay`);
 			document.body.appendChild(essay);
 			essay.setEssay(this.getAttribute(`name`));

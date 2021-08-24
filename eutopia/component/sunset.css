@@ -15,9 +15,9 @@
 
 div {
 	position: relative;
-	left: -150vh;
+	left: -200vh;
 	top: 0;
-	width: calc(100% + 400vh);
+	width: calc(100% + 500vh);
 	height: 2400%;
 
 	background: conic-gradient(
@@ -35,10 +35,10 @@ div {
 }
 
 :host([scene="map"]) > div {
-	top: -1050%;
+	top: calc(-1050% - var(--progress) * 50%);
 }
 
 :host([scene="essay"]) > div {
-	left: -400vh;
+	left: -500vh;
 	top: calc(-800% - var(--progress) * 300%);
 }

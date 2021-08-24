@@ -50,12 +50,11 @@ body > eutopia-splash {
 }
 
 ::-webkit-scrollbar-thumb {
-	background: #0000002f;
+	background: #00000020;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-	background: #00000063;
-	cursor: pointer;
+	background: #00000040;
 }
 
 /* Printing options on essays cannot be set in a ShadowRoot. */

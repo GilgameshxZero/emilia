@@ -1,9 +1,9 @@
 :host {
 	display: block;
 	height: calc(100% - 4em);
-	width: calc(100% - 6em);
+	width: calc(100% - 4em);
 	max-width: 70ch;
-	padding: 2em max(3em, 50% - 35ch);
+	padding: 2em max(2em, 50% - 35ch);
 	overflow-y: scroll;
 
 	--mask-image-value: linear-gradient(
@@ -16,10 +16,10 @@
 		linear-gradient(
 			to right,
 			black 0,
-			black 3em,
-			transparent 3em,
-			transparent calc(100% - 3em),
-			black calc(100% - 3em),
+			black 2em,
+			transparent 2em,
+			transparent calc(100% - 2em),
+			black calc(100% - 2em),
 			black 100%
 		);
 	-webkit-mask-image: var(--mask-image-value);

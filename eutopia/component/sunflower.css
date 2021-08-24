@@ -1,11 +1,12 @@
 :host {
 	display: block;
 	margin: 0 auto;
+	padding: 1em;
 	width: 3rem;
 	height: 3rem;
 
 	cursor: pointer;
-	opacity: 0.2;
+	opacity: 0.4;
 	transition: opacity 1s;
 	z-index: 1;
 	user-select: none;
