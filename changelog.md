@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.1.11
+
+Subset font pages and reduce their size from around 3MB to around 300KB total. Re-encode `emilia` essay assets.
+
 ## 8.1.10
 
 Fix essay side margin alphas.
