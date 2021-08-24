@@ -22,10 +22,10 @@
 		linear-gradient(
 			to right,
 			black 0,
-			black 2em,
-			transparent 2em,
-			transparent calc(100% - 2em),
-			black calc(100% - 2em),
+			black 1em,
+			transparent 1em,
+			transparent calc(100% - 1em),
+			black calc(100% - 1em),
 			black 100%
 		);
 	-webkit-mask-image: var(--mask-image-value);
