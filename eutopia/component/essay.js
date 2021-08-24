@@ -50,9 +50,10 @@ component(
 						.content.cloneNode(true);
 
 					// Replace relative links.
+					console.log(clone.querySelectorAll(`img`));
 					[`src`, `href`].forEach((attribute) => {
 						clone
-							.querySelectorAll(`[${attribute}^="${this.essayName}-assets"]`)
+							.querySelectorAll(`[${attribute}^="${this.essayName}.md-assets"]`)
 							.forEach((element) => {
 								element.setAttribute(
 									attribute,

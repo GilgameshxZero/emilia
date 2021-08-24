@@ -41,11 +41,11 @@ I am not familiar with Facebook's Graph API, and my latest interactions with it 
 * **Extremely long posts**: These posts don't have a `See More` link but rather a `Continue Reading` link, which would open a new tab with the full post. I decided to disregard these posts, since they were few and far in-between.
 * **Non-text posts**: Since we're working with characters here, simply discarding these posts was fine.
 
-As a side, I also scraped the time at which posts were made from the css selector `abbr._5ptz`. You can find the raw scraped data, in JSON, [here](mit-confessions-simulator-assets/data-raw.zip).
+As a side, I also scraped the time at which posts were made from the css selector `abbr._5ptz`. You can find the raw scraped data, in JSON, [here](mit-confessions-simulator.md-assets/data-raw.zip).
 
 ### Cleaning & Preparation
 
-![](mit-confessions-simulator-assets/psa.png)
+![](mit-confessions-simulator.md-assets/psa.png)
 *Anything without a confession number is trash. For this project, at least...*
 
 In preparation for training, I made a few design choices:
@@ -57,11 +57,11 @@ In preparation for training, I made a few design choices:
 
 The flipside of the latter two design choices above is that they restrict the alphabet of generated samples. In my case, this wasn't top priority to capture the intricacies of MIT Confessions language.
 
-In order to have the model be able to write new posts, it is necessary for the model to be able to recognize post ends. Thus, I concatenated all cleaned posts into one large string to serve as the training data, each post being separated by a `\0` (NULL) character. Post order was randomized. [This](mit-confessions-simulator-assets/data-concat.zip) is the concatenated file of posts with the confession number, which was postprocessed to remove the confessions number in each post. These strings served as training and validation data for both the `char-RNN` and the `char-n-gram`.
+In order to have the model be able to write new posts, it is necessary for the model to be able to recognize post ends. Thus, I concatenated all cleaned posts into one large string to serve as the training data, each post being separated by a `\0` (NULL) character. Post order was randomized. [This](mit-confessions-simulator.md-assets/data-concat.zip) is the concatenated file of posts with the confession number, which was postprocessed to remove the confessions number in each post. These strings served as training and validation data for both the `char-RNN` and the `char-n-gram`.
 
 Data from all three sources combined totalled just over 1MB.
 
-![](mit-confessions-simulator-assets/kevin-comment.png)
+![](mit-confessions-simulator.md-assets/kevin-comment.png)
 *My friend Kevin comments on the project :(*
 
 ## Char-RNN
@@ -127,14 +127,14 @@ Largely based on [this](https://machinelearningmastery.com/text-generation-lstm-
 	* Loss plateaued around after epoch 40 - it appeared that we had reached convergence.
 * **Epochs**: 43 out of 50 planned
 * **Samples**
-	* [10000 characters sampling from the output distribution](mit-confessions-simulator-assets/first-model-sample-10000.txt)
-	* [10000 characters with `argmax` on the output distribution](mit-confessions-simulator-assets/first-model-sample-10000-argmax.txt)
+	* [10000 characters sampling from the output distribution](mit-confessions-simulator.md-assets/first-model-sample-10000.txt)
+	* [10000 characters with `argmax` on the output distribution](mit-confessions-simulator.md-assets/first-model-sample-10000-argmax.txt)
 	* Posts are delimited with `\n----------------\n` for easy visual cues (instead of a `\0` character)
 	* The first model was trained on data with a slightly smaller alphabet than later models and no confession numbers in posts (hence the lack thereof in samples).
 
 ### Thoughts
 
-![](mit-confessions-simulator-assets/course-6.png)
+![](mit-confessions-simulator.md-assets/course-6.png)
 *A distinctly MIT flavor.*
 
 Samples generated from this first model were largely repetitive due to the lack of temperature and using `argmax` during sampling. However, this does not mitigate the concern that loss plateaued at a high value. Given the small batch size and the high loss, I should have realized this was an indicator that the network was not big enough. Instead, I stupidly made the network more shallow instead for the second model.
@@ -163,7 +163,7 @@ Okay, I guess \'better\' is relative. At least some words are legible here, and 
 
 Don't worry, samples get better with the incorporation of temperature in later models.
 
-![](mit-confessions-simulator-assets/seals.png)
+![](mit-confessions-simulator.md-assets/seals.png)
 *Not sure where the seals came from...*
 
 ## Second Model: 1x512 LSTM
@@ -200,7 +200,7 @@ I don't believe dropout affects loss minima, but only the time required to reach
 
 ### Thoughts
 
-![](mit-confessions-simulator-assets/model-training.png)
+![](mit-confessions-simulator.md-assets/model-training.png)
 *Shhh, the model is training!*
 
 Unfortunately, loss seemed to converge at a higher number for this model than the last. Samples generated were significantly better, however, with the incorporation of temperature and choosing from the output distribution. I found `0.35` to be a solid temperature choice for the final iteration of this model.
@@ -240,14 +240,14 @@ I am not familiar with the mathematics behind GRUs; however, research suggests t
 	* Loss was nearing convergence, but likely still had a bit to go. Unfortunately, validation loss was not following, suggesting an overfitted model. However, sampling suggests otherwise. I should have kept on training, but I ran out of patience.
 * **Epochs**: 46 out of 100 planned
 * **Samples**
-	* [10000 characters at `temperature = 0.15`](mit-confessions-simulator-assets/third-model-sample-10000-0.15.txt)
-	* [10000 characters at `temperature = 0.35`](mit-confessions-simulator-assets/third-model-sample-10000-0.35.txt)
-	* [10000 characters at `temperature = 0.80`](mit-confessions-simulator-assets/third-model-sample-10000-0.80.txt)
+	* [10000 characters at `temperature = 0.15`](mit-confessions-simulator.md-assets/third-model-sample-10000-0.15.txt)
+	* [10000 characters at `temperature = 0.35`](mit-confessions-simulator.md-assets/third-model-sample-10000-0.35.txt)
+	* [10000 characters at `temperature = 0.80`](mit-confessions-simulator.md-assets/third-model-sample-10000-0.80.txt)
 	* Again, `\n----------------\n` was used to delimit posts rather than `\0`.
 	* As expected, lower temperatures result in much better spelling than higher temperatures.
 	* Sampling speed isn't great, partially because it isn't a parallel operation (this not suited for the GPU) and my CPU isn't top-tier.
 
-![](mit-confessions-simulator-assets/loss-epochs.png)
+![](mit-confessions-simulator.md-assets/loss-epochs.png)
 *Praying for loss to continue decreasing...*
 
 ### Thoughts
@@ -280,7 +280,7 @@ Lot's of simple, correctly spelled words. Sentences are pretty runny, which is l
 
 There's more variety at this temperature, and most words are spelled correctly. I'd say this is on par with Karpathy's Paul Graham generator:
 
-![](mit-confessions-simulator-assets/paul-graham.png)
+![](mit-confessions-simulator.md-assets/paul-graham.png)
 
 Here's `temperature = 0.80`:
 
@@ -304,9 +304,9 @@ Since the `char-n-gram` was trained with data without the confession number, a r
 
 ### Samples
 
-* [10000 characters at `sequence length = 5`](mit-confessions-simulator-assets/char-n-gram-10000-5.txt)
-* [10000 characters at `sequence length = 10`](mit-confessions-simulator-assets/char-n-gram-10000-10.txt)
-* [10000 characters at `sequence length = 15`](mit-confessions-simulator-assets/char-n-gram-10000-15.txt)
+* [10000 characters at `sequence length = 5`](mit-confessions-simulator.md-assets/char-n-gram-10000-5.txt)
+* [10000 characters at `sequence length = 10`](mit-confessions-simulator.md-assets/char-n-gram-10000-10.txt)
+* [10000 characters at `sequence length = 15`](mit-confessions-simulator.md-assets/char-n-gram-10000-15.txt)
 
 Here's some samples from `sequence length = 10`:
 > #7582 turns out almost everyone can smell the roses
@@ -338,7 +338,7 @@ Another option would be to have used word-based rather than char-based models. H
 
 `argmax` vs. sampling from the output distribution and temperature turned out to be hugely important. My concern is with [blog posts such as this one](https://chunml.github.io/ChunML.github.io/project/Creating-Text-Generator-Using-Recurrent-Neural-Network/), which clearly uses `argmax` but still generates non-repetitive samples. I'm no RNN master, but those results look fishy to me:
 
-![](mit-confessions-simulator-assets/trung-post.png)
+![](mit-confessions-simulator.md-assets/trung-post.png)
 
 Given, Trung's network is reasonably bigger than mine - but I don't think that would offset the effect of having `argmax` to create such variety in samples.
 

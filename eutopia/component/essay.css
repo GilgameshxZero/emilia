@@ -1,10 +1,18 @@
+@import "../common/color.css";
 @import "../common/essay.css";
+
+/* Force light theme. */
+@import "../common/essay/force.light.css";
 
 :host {
 	/* Override of essay.css variables. */
+	--blockquote-background-color: #00000010;
+	--blockquote-border-color: #b54c2e80;
+	--list-marker-color: var(--color-ribbon);
 
 	/* Override of light/dark-dependent variables. */
 	--background-color: transparent;
+	--pre-background-color: #00000010;
 
 	/* Curried from styles defined in essay.css. */
 	width: calc(100% - 2em);
@@ -42,12 +50,18 @@ article {
 /* Print options for this ShadowRoot. */
 @media print {
 	:host {
-		background-color: white;
-
+		width: auto;
 		height: auto;
+		padding: initial;
 	}
 
 	eutopia-sunflower {
 		display: none;
+	}
+
+	article {
+		padding: 0;
+
+		box-shadow: none;
 	}
 }

@@ -51,6 +51,9 @@
 p {
 	margin: calc(var(--paragraph-spacing) / 2) 0;
 
+	/* Allows long KaTeX lines to scroll. */
+	overflow-x: auto;
+
 	text-indent: var(--paragraph-indent);
 	word-wrap: break-word;
 }
@@ -440,16 +443,6 @@ audio {
 	border-color: transparent;
 }
 
-.katex {
-	font-size: 0.9em;
-}
-
-.katex img,
-.katex svg,
-.katex video[autoplay][loop][muted] {
-	margin: auto;
-}
-
 details {
 	margin: calc(var(--paragraph-spacing) / 2) 0;
 	margin-left: calc(
@@ -533,4 +526,16 @@ aside.pullquote {
 ol li::marker,
 ul li::marker {
 	color: var(--list-marker-color);
+}
+
+/* Additional katex options not specified in VSCode. */
+.katex {
+	font-size: 0.9em;
+}
+
+/* TODO: Why is this needed? */
+.katex img,
+.katex svg,
+.katex video[autoplay][loop][muted] {
+	margin: auto;
 }
