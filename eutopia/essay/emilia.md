@@ -10,7 +10,7 @@ Join me on a brief tour of the history of `Emilia`, from conception to discovery
 
 This also includes a tour of the evolution of the Rain library, an abstraction layer I've built over the years as necessary.
 
-<video src="emilia-assets/emilia.webm" autoplay loop muted></video>
+<video src="emilia.md-assets/emilia.webm" autoplay loop muted></video>
 *A smiling Emilia (not the webserver).*
 
 ## Early Years with C++
@@ -25,7 +25,7 @@ You run a lemonade stand and sell infected food to customers until you kill the 
 
  It's like taking the worst parts of running an *actual* lemon stand and the Pandemic game and putting them together. Here's a short GIF of the game.
 
-<video src="emilia-assets/infection.webm" autoplay loop muted></video>
+<video src="emilia.md-assets/infection.webm" autoplay loop muted></video>
 *Me losing $11 selling very expensive, non-infected, lemonade. Not really worth it.*
 
 Infection used multithreading to constantly evaluate the world-state and either print it or present menu options for selling lemonade. Multithreading and blocking on `cin` with `getch` for menu selection was non-trivial to implement. Perhaps most annoying was the time spent printing to `cout`, which would cause the console to flicker for a short second (visible in the GIF above) while the new world-state was displayed.
@@ -36,7 +36,7 @@ There's two ways of solving the flickering problem. One: use `system(clear)`. Ho
 
 The first complete WinAPI GUI application I coded was called `TurboWord`. `TurboWord` was a flashcard application, which would organize vocabulary into sets and decks of flashcards, which could be edited and viewed and reviewed.
 
-<video src="emilia-assets/turboword.webm" autoplay loop muted></video>
+<video src="emilia.md-assets/turboword.webm" autoplay loop muted></video>
 *Example use of `TurboWord` with a pre-established library of flashcards.*
 
 Looks simple, right? Well, it turns out that WinAPI doesn't give you much to work with. A lot of the behavior you may think obvious I had to implement myself.
@@ -53,7 +53,7 @@ Looks simple, right? Well, it turns out that WinAPI doesn't give you much to wor
 
 It was a big task to complete `TurboWord`. My next GUI project, `Coder`, was never finished. `Coder` was an application to encode and decode with compression and encryption algorithms.
 
-<video src="emilia-assets/coder.webm" autoplay loop muted></video>
+<video src="emilia.md-assets/coder.webm" autoplay loop muted></video>
 *Example use of `Coder`.*
 
 A you can imagine, all the components in `Coder` also had to be custom styled. To give an idea of what that means, here's the inside of the redraw function for the rectangle buttons from `TurboWord`. This redraw reads the state of the button and redraws it accordingly. It is called on any state change, which happens on mouse events. Most of the work of the code is in setting up all the drawing objects and registering with the WinAPI, and so very little is the actual drawing logic.
@@ -123,7 +123,7 @@ One of these had to be defined for every distinct component in the applications 
 
 Knowing that moving forward with GUIs was a very tedious option, I looked to the other cool things I could do with programming. Viruses are pretty cool too. Here's my first attempt of a keylogger.
 
-<video src="emilia-assets/keylogger.webm" autoplay loop muted></video>
+<video src="emilia.md-assets/keylogger.webm" autoplay loop muted></video>
 *Demonstration of the keylogger, which saves its log to a local file `hi.txt`.*
 
 I've attached a snippet of the beginning of the low-level keyboard hook function code below.
@@ -199,7 +199,7 @@ Eventually, I gave up on ever being able to send an email with my C++ code. Sure
 
 One of the most influential things to come out of the GUI exploration was `RainLibrary0`. The Rain libraries are a series of libraries that build an abstraction layer atop the WinAPI, which makes coding future applications much easier. The development of Emilia parallels the development of the Rain libraries.
 
-Here's a summary of `RainLibrary0`, the first iteration, which was used in `Coder` and `TurboWord`. You can download it [here](emilia-assets/RainLibrary0.zip).
+Here's a summary of `RainLibrary0`, the first iteration, which was used in `Coder` and `TurboWord`. You can download it [here](emilia.md-assets/RainLibrary0.zip).
 
 ```
 02/17/14  19:46             5,805 Button.cpp
@@ -222,7 +222,7 @@ Here's a summary of `RainLibrary0`, the first iteration, which was used in `Code
 
 Two years later, my father and I were playing 军旗, known as Luzhanqi in the states. It's a two-player game, like chess. However, playing 军旗 often requires a third person: the judge. This is because each player's pieces are not revealed to the other player. So when there is a conflict between pieces, there must be a judge to look at both pieces and resolve the conflict. If a player acted as the judge, he would gain unfair information about the other player's pieces.
 
-![](emilia-assets/junqi.jpg)
+![](emilia.md-assets/junqi.jpg)
 *A nice wooden board for 军旗. A given player cannot see the opponent's pieces.*
 
 Being an only child, the requirement of a judge meant that every game of 军旗 would need to engage the entire family. This meant that often, because one of my parents were busy, we were unable to play. How great would it be if a computer could serve as the judge, so that even if my mother were busy, my father and I could still play? This would require us to sit at different computers so we couldn't see each others' pieces, but we would also need to communicate to each other about the moves we were making. Surely there would be a better way to communicate moves without yelling to each other and inputting the opponent's moves ourselves? I remember distinctly that my father pushing me, saying that as a programmer, I should be able to figure it out. Well, here I am, dad, writing this tech post.
@@ -286,7 +286,7 @@ EndWSA ();
 
 It's not much, but it turns out game logic is difficult to write. And what if the other player was able to inject packages pretending to be my application to make illegal moves? I'd have to check that, and design a way to deal with that, and deal with inconsistent network connections, and find out how I would connect to external IPs instead of internal...
 
-<video src="emilia-assets/junqi.webm" autoplay loop muted></video>
+<video src="emilia.md-assets/junqi.webm" autoplay loop muted></video>
 *Connecting the client to the server, and having the server send messages to the client.*
 
 However, this 军旗 application was a major step forward for me. This is the first time I was able to set up communications between two computers on the network (albeit, local). But I knew nothing about the big, vast IP network out there and how to communicate with it. Neither did I have the motivation to do so, when a browser would work just fine. It took me another three years to take my first step onto the web.
@@ -338,11 +338,11 @@ The development of the 军旗 application, among other things, led to the develo
 01/01/17  23:04             3,853 WSA2Utility.h
 ```
 
-As you can see, there's a lot more files here. There are many more files for basic GUI controls, as well as a flurry of files dealing with WSA. Here's the [download](emilia-assets/RainLibrary1.zip).
+As you can see, there's a lot more files here. There are many more files for basic GUI controls, as well as a flurry of files dealing with WSA. Here's the [download](emilia.md-assets/RainLibrary1.zip).
 
 ## The Pixiv Breakthrough
 
-![](emilia-assets/pixiv.jpg)
+![](emilia.md-assets/pixiv.jpg)
 *The website found at <https://www.pixiv.net/member_illust.php?mode=medium&illust_id=72190967>.*
 
 Pixiv is a Japanese website for artists to share their work. It attracts mainly artists who draw anime-style art. Most anime images that you can find online can likely have their source traced back to Pixiv, one way or another. So if I were trying to find the most beautiful anime-style pictures, then starting at Pixiv would be a good bet.
@@ -357,7 +357,7 @@ Unfortunately, Pixiv has since changed its API, and my code no longer works, so 
 
 This was also the year that I interned at my first company, Lucid Software. There, I learned to debug webapps using the Chrome debugger. One of the techniques for debugging is looking at the Network tab, which would show all the requests that the browser would send to the webserver and the responses as well, including the headers. If the browser could send these requests, could I also send these requests, and even automate all the clicking on Pixiv's website?
 
-![](emilia-assets/pixiv-network.jpg)
+![](emilia.md-assets/pixiv-network.jpg)
 *Chrome's Network tab, showing the headers of both the request and response for the main page above.*
 
 It was also at this internship that I learned to use Selenium, a library to control web browsers through code. While Selenium would have definitely been the easier way to go for this scraping project, it didn't feel *clean*. It loaded too much unnecessary stuff in the background, and couldn't control multiple tabs at once, and would display an ugly browser in the background to process the images (I didn't know about `headless` mode back then). Doing it in C++, I could fully customize what I wanted and didn't want, and how it was shown to me and how it was stored. I suppose this is probably the point of no return, where I abandoned the thought of using pre-built libraries to browse the web but instead to code it all from scratch. In hindsight, I wish I had given the other option more consideration. But reinventing the wheel turned out okay, I think.
@@ -584,7 +584,7 @@ END
 
 As mentioned, the resource file here imports the version information and saves it in a block into the generated EXE. Here's what it looks like:
 
-![](emilia-assets/pixivbot-version.jpg)
+![](emilia.md-assets/pixivbot-version.jpg)
 *Version information visible in the built EXE.*
 
 I learned to optimize this routine later on, but automatic build versioning would stay with Emilia moving forward.
@@ -620,7 +620,7 @@ The `1.1.3` version of `PixivBot` once again iterated on the Rain library. Earli
 03/04/18  08:15             1,165 RainWSA2Utility.h
 ```
 
-`RainLibrary2` moves away from the older GUI routines and focuses on console routines. The GUI routines were not up-to-date with my newest programming philosophies and not commonly used, so they were not incorporated into future Rain libraries. [Here's the download](emilia-assets/RainLibrary2.zip).
+`RainLibrary2` moves away from the older GUI routines and focuses on console routines. The GUI routines were not up-to-date with my newest programming philosophies and not commonly used, so they were not incorporated into future Rain libraries. [Here's the download](emilia.md-assets/RainLibrary2.zip).
 
 ## Monochrome 2 & 3
 
@@ -795,7 +795,7 @@ At the same time, I registered the domain name `emilia-tan.com`, pointed it to m
 
 This is also the landmark when the name `Emilia` became used. At this point, however, the webserver was still called `Monochrome2`. Below is a GIF showing the webserver in action.
 
-<video src="emilia-assets/mono-2.webm" autoplay loop muted></video>
+<video src="emilia.md-assets/mono-2.webm" autoplay loop muted></video>
 *Start the webserver, and refresh the page a few times to see an in-memory counter increase.*
 
 One of the most annoying problems at this stage in the history was the fact that my home IP was dynamic, and I would have to log onto GoDaddy every once in a while to update the DNS of `emilia-tan.com` to point back to my new home IP. Eventually, I solved this problem my hosting Emilia on a static IP AWS EC2 instance.
@@ -1129,7 +1129,7 @@ The beginning of the code handles special processing for `POST requests`, which 
 
 For all that work, the front-end didn't look that different. It was only that this time, I could edit the webpage as an HTML instead of C++. And it's much more adaptable. The GIF below showcases `Monochrome3`.
 
-<video src="emilia-assets/mono-3.webm" autoplay loop muted></video>
+<video src="emilia.md-assets/mono-3.webm" autoplay loop muted></video>
 *Example use of `Monochrome3`. The webpage still displays `Monochrome2`, for some reason.*
 
 It's pretty impressive that the server itself worked. Perhaps most impressive, however, was the ability to support CGI scripts.
@@ -1142,14 +1142,14 @@ You can see this process of piping in the data and piping out the data to the br
 
 One of the first things I built was a directory browser called `FileExplorer` through several CGI scripts for uploading, deleting, and nagivating, allowing me to modify the files on my server back-end remotely! This meant that if I had something I wished to share with friends, I could simply upload it to my webserver, and give them a link to that!
 
-<video src="emilia-assets/mono-3-cgi.webm" autoplay loop muted></video>
+<video src="emilia.md-assets/mono-3-cgi.webm" autoplay loop muted></video>
 *Showcase of the directory browser `FileExplorer.exe`, which allows the browser to see files outside of the server root and modify them.*
 
 `FileExplorer` is as unsafe as unsafe can get. By putting `FileExplorer` on my website, I allow anyone who knows about it to change anything with my server machine directly. But, if the server is running on my local machine, it's also a good way to access the files I want remotely.
 
 An interesting detail you may be able to observe is in the URL for the `FileExplorer`, which takes a path script as a hex string starting with `A`, since many path names contain characters incompatible with URI accessors in the URL.
 
-<video src="emilia-assets/emilia-2.webm" autoplay loop muted></video>
+<video src="emilia.md-assets/emilia-2.webm" autoplay loop muted></video>
 *Another smiling Emilia (also not the webserver).*
 
 ## File Transfer: EmiliaBackup
@@ -1383,7 +1383,7 @@ It was trivial to setup listening on port 25, the unencrypted SMTP port, having 
 
 1. I didn't set an MX record on the DNS for my local IP. In fact, there is no way to setup DNS on an IP. Thus, I had to point `emilia-tan.com`'s MX record to my local IP instead, and send emails to `@emilia-tan.com`. Or, I could point the A record to my local IP, and point the MX record to `@`.
    
-   ![](emilia-assets/godaddy-dns.jpg)
+   ![](emilia.md-assets/godaddy-dns.jpg)
    *`emilia-tan.com`'s DNS record today.*
 
 2. The ISP was blocking incoming connections to port 25. It turns out that most modern ISPs blocking incoming connections to port 25 due to the immense amount of spam circulating through email these days. I did not want to spend the time to talk to the ISP to convince them to open up port 25 for my home internet connection, so I was not able to do anything about this problem at this point.
@@ -1392,7 +1392,7 @@ It was trivial to setup listening on port 25, the unencrypted SMTP port, having 
 
 I was not able to solve the second problem until I started at MIT in late 2017. MIT's ISP does not block incoming connections on port 25. After trying my email listening again, finding on Google to setup my MX record, and opening up all ports on my local firewall, success! This was almost as exciting as receiving a response from Pixiv. Finally, I had Google knocking on my door!
 
-![](emilia-assets/first-smtp.jpg)
+![](emilia.md-assets/first-smtp.jpg)
 *The first ever SMTP request I ever saw, on a port 25 listener on my local machine, sent from Google's SMTP server.*
 
 On the left I have setup code to mimic a simple SMTP server, sending back skeleton responses to prompt the remote SMTP server to send more data. Instead of dealing with the data, it'll simply print out the data to the console, which is on the right. The first few lines after `Client IP: 209.85.217.194` (that's Google's SMTP IP address, by the way) are from the SMTP server. The lines after that are of the actual email, with headers in the MIME format and the body right below that after the boundary.
@@ -1405,7 +1405,7 @@ Once I knew how to receive requests, the rest was simple. I would probe around w
 
 At the beginning of my first year at MIT, I also decided that the website, along with the new SMTP server, was worth keeping online at all times. Instead of running it locally so that it would only be online when my computer was active and the application was running, I registered my first ever AWS account and setup and EC2 instance and hosted it there. Luckily, AWS did not block incoming SMTP connections, but they did limit outgoing port 25 connections. It took a while to figure out, but I eventually petitioned for the limit to be removed. At this point, my webserver was always available, and there were no downsides to having it on EC2 instead of my local machine, save for one: deployment routines for updates were complicated.
 
-![](emilia-assets/hyperspace.jpg)
+![](emilia.md-assets/hyperspace.jpg)
 *It was also around this time that I decided that a plaintext website wasn't enough, and transitioned to using the Hyperspace template with the fileserver. Unfortunately I have not saved the actual website from then.*
 
 In the beginning, I synced code changes to my EC2 instance by setting up Selective Sync in Dropbox, so that any changes I made on my local machine would be almost immediately reflected on my remote EC2 instance. The solution was not very good, because sometimes I would modify files or logs on my local machine while they would also be updated on the instance, and it would get confusing very fast.
@@ -1532,13 +1532,13 @@ The penultimate iteration of the Rain library, `RainLibrary3`, is summarized bel
 05/23/18  08:19             1,130 RainWSA2Utility.h
 ```
 
-`RainLibrary3`'s development also paralleled the continuing development of `Monochrome3`, which at this point, was called `Emilia` already. [Download](emilia-assets/RainLibrary3).
+`RainLibrary3`'s development also paralleled the continuing development of `Monochrome3`, which at this point, was called `Emilia` already. [Download](emilia.md-assets/RainLibrary3).
 
 ## Modern-Day Emilia
 
 All of the history brings us to the current iteration of Emilia, the 5.4.4.1891 server. First, let's take a look at the front-end, which now has a [real home](https://github.com/GilgameshxZero/emilia-tan-com) as a repository.
 
-![](emilia-assets/emilia-home.jpg)
+![](emilia.md-assets/emilia-home.jpg)
 *The current front-end landing page.*
 
 I moved away from the Hyperspace theme to a custom theme during the summer of 2018, using the same color palette as Hyperspace. However, it seemed a bit heavy, so the most recent redesign uses much more faded colors, but also a more colorful layout, to display the website. Scrollbars are hidden, and there is no page navigation; all the menu nagivation is implemented with XHR. The website is very responsive to size adjustments, and scrolling and sizing work well on mobile as well as opposed to during the summer. Most of the mobile sizing adjustments are performed through media queries.
@@ -1591,11 +1591,11 @@ The current iteration of the Rain library abandons the numerical numbering syste
 11/25/18  15:05               213 windows-lam-include.h
 ```
 
-`rain-aeternum` has unified coding & naming style, multithreading-safe functions, and the current functions used in `Emilia`. It is also pretty backwards-compatible with `RainLibrary3`. [Download](emilia-assets/rain-aeternum.zip).
+`rain-aeternum` has unified coding & naming style, multithreading-safe functions, and the current functions used in `Emilia`. It is also pretty backwards-compatible with `RainLibrary3`. [Download](emilia.md-assets/rain-aeternum.zip).
 
 For reference, here's an overview of the classes defined in `rain-aeternum`. We'll talk about some of them later.
 
-![](emilia-assets/rain-classes.jpg)
+![](emilia.md-assets/rain-classes.jpg)
 *Overview of `rain-aternum` classes.*
 
 ### Winsock & Listening
@@ -1853,7 +1853,7 @@ int main(int argc, char *argv[]) {
 
 CGI scripts are fairly lightweight, even though they're implemented in C++.
 
-<video src="emilia-assets/cgi-emails.webm" autoplay loop muted></video>
+<video src="emilia.md-assets/cgi-emails.webm" autoplay loop muted></video>
 *Showcasing the calling and response of the CGI script on click of the `Submit` button on the homepage.*
 
 ### Configuration
@@ -1936,7 +1936,7 @@ HTTP Client connected from 194.147.32.109. Total: 7.
 
 An abbreviated version of the log is output to the console. Below is a GIF demonstrating this in action.
 
-<video src="emilia-assets/console-output.webm" autoplay loop muted></video>
+<video src="emilia.md-assets/console-output.webm" autoplay loop muted></video>
 
 The corresponding class in `rain-aeternum` is `LogStream`, which also has options to capture logs from `cout`, `cin`, `cerr`, and sockets.
 
@@ -2016,12 +2016,12 @@ I actually wrote this one myself! Batch is hard...
 
 Here's how a typical deployment might look like, with the `sync` command.
 
-<video src="emilia-assets/sync.webm" autoplay loop muted></video>
+<video src="emilia.md-assets/sync.webm" autoplay loop muted></video>
 *Running the `sync` command. The remote server does not need to restart since we don't write to any locked files.*
 
 ## Final Thoughts
 
-<video src="emilia-assets/emilia-3.webm" autoplay loop muted></video>
+<video src="emilia.md-assets/emilia-3.webm" autoplay loop muted></video>
 *Yet another smiling Emilia (again, not the webserver).*
 
 It's taken a very long time to learn everything I needed to know to make `Emilia` what it is today over the course of an entire eight years through experimentation. I'm sure I could have learned a fraction of what I know now by reading up on the protocols, but frankly, that would have been much less fun. Looking back, I treasure all the breakthroughs and discoveries I made while implementing `Emilia`. Now, with the server how it is, updates to it are generally quality-of-life updates and not too critical. The most exciting thing going forward would likely be the flexibility provided to me through the CGI scripts and exploiting that to make some cool web services. I'm wrestling with ideas of a music radio and a database service right now.

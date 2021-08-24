@@ -6,7 +6,7 @@ Jul. 17, 2019
 
 Originally envisioned by [Stella Yang](https://stella-yang.com) as a hackathon project, [urop.guide](http://urop.guide) presents advertised research opportunities at MIT (UROPs) in a much friendlier format than at the [original website](http://uaap.mit.edu/research-exploration/urop/apply/urop-advertised-opportunities) presented by the MIT UROP department.
 
-![](urop-guide-assets/urop-guide.png)
+![](urop-guide.md-assets/urop-guide.png)
 *urop.guide*
 
 Below, I will briefly present my perspective on the design challenges and choices made throughout the process. Stella also has a short post on her website [about urop.guide](https://stella-yang.com/projects/uropguide.html).
@@ -15,14 +15,14 @@ Below, I will briefly present my perspective on the design challenges and choice
 
 Research opportunities for undergraduates at MIT are denoted by UROPs and have been traditionally advertised on MIT's in-house website.
 
-![](urop-guide-assets/mit-original.png)
+![](urop-guide.md-assets/mit-original.png)
 *MIT's original UROP website*
 
 Each UROP consists of several fields for date posted, schoolyear term, department, faculty, etc. There are upwards of several hundreds of advertisements on this website, presented, flat, in a long list.
 
 Our first iteration of **urop.guide** spun out of HackMIT with two other collaborators, [Alisa Ono](http://www.alisaono.coffee/) and Angela Cai.
 
-![](urop-guide-assets/old-urop-guide.png)
+![](urop-guide.md-assets/old-urop-guide.png)
 *The first iteration, hosted at uroplistings.guide*
 
 Built natively with Bootstrap and DataTables, this first iteration showed 8 UROPs per page, collapsed under their identifying information until clicked, at which point they would expand to show the full content. While the structure of the data naturally fits into a table instead of a flat list like MIT would have it, the table-based presentation only complicated user interactions with the page by introducing clicks beyond just scrolling. The ultimate hint that this was the wrong design choice came in the form of the instruction "*Click on a listing to view its description*", presented in the third line in the website.
@@ -33,7 +33,7 @@ In an attempt to move away from the tedious scrolling of the original website, w
 
 Modern browsers' search functionality was the traditional way most users of MIT's UROPs page navigated the flat list. We tried, in the first iteration, to incorporate our own search bar into **urop.guide**, which expanded upon the browser's search by not only highlighting relevant UROPs but also hiding the irrelevant advertisements. I still believe this *filtering* capability was the right direction; however, the first iteration delivered on this in a nuanced way by incorporating not one search bar, but three, partially as a limitation of DataTables. For the new **urop.guide**, we combined search functionality to search across all relevant fields of the UROPs and maintained our stance on *filtering*.
 
-![](urop-guide-assets/urop-guide.png)
+![](urop-guide.md-assets/urop-guide.png)
 *The same picture, but notice how we're filtering by "inference" now.*
 
 Returning to the feed-style presentation removes one level of complexity from navigation. While our list is still mostly flat like MIT's, it's presented with two columns per advertisement, grouping related information together visually. Expanding on the idea of *filtering* search, commonly seen on Amazon or Ebay who presents similar content, we added term filters as well as capability to denote and selectively browse favorites, akin to the idea of a "shopping cart".

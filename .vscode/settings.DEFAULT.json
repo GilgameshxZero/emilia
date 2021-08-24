@@ -19,5 +19,14 @@
 		/* Mirrors file association of settings.json. */
 		"settings.DEFAULT.json": "jsonc",
 		"*.vstemplate": "xml"
-	}
+	},
+
+	// Manually include styles imported in essay.css since relative paths do not work.
+	"markdown.styles": [
+		"eutopia/common/font.css",
+		"eutopia/common/essay/katex.css",
+		"eutopia/common/essay/markdown.css",
+		"eutopia/common/essay/vscode.css",
+		"eutopia/common/essay.css"
+	]
 }

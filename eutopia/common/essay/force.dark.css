@@ -1,0 +1,90 @@
+/* The force CSS pages allow forcing light/dark theme regardless of preference when included after essay.css. Usually not used in VSCode webview preview, but in-browser with set light/dark theme. */
+:root,
+:host {
+	--foreground-color: rgb(212, 212, 212);
+	--background-color: rgb(30, 30, 30);
+	--textlink-foreground-color: rgb(55, 148, 255);
+	--pre-background-color: rgba(10, 10, 10, 0.4);
+	--border-color: rgba(255, 255, 255, 0.18);
+	--code-color: rgb(215, 186, 125);
+}
+
+.hljs-function,
+.hljs-params {
+	color: #dcdcdc;
+}
+
+.hljs-comment,
+.hljs-quote {
+	color: #57a64a;
+}
+.hljs-variable {
+	color: #bd63c5;
+}
+
+.hljs-keyword {
+	color: #569cd6;
+}
+.hljs-selector-tag {
+	color: #d7ba7d;
+}
+.hljs-built_in {
+	color: #4ec9b0;
+}
+.hljs-name {
+	color: #569cd6;
+}
+.hljs-tag {
+	color: #9b9b9b;
+}
+
+.hljs-string {
+	color: #d69d85;
+}
+.hljs-title {
+	color: #dcdcdc;
+}
+.hljs-section {
+	color: gold;
+}
+.hljs-attribute {
+	color: #9cdcfe;
+}
+.hljs-literal {
+	color: #569cd6;
+}
+.hljs-template-tag {
+	color: #9a5334;
+}
+.hljs-template-variable {
+	color: #bd63c5;
+}
+.hljs-type {
+	color: #4ec9b0;
+}
+
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+	color: #d7ba7d;
+}
+.hljs-meta {
+	color: #9b9b9b;
+}
+
+.hljs-doctag {
+	color: #608b4e;
+}
+
+.hljs-attr {
+	color: #9cdcfe;
+}
+
+.hljs-symbol {
+	color: #569cd6;
+}
+.hljs-bullet {
+	color: #d7ba7d;
+}
+.hljs-link {
+	color: #569cd6;
+}

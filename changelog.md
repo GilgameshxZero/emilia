@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.1.12
+
+Add markdown test page. Modify some VSCode extension syntax highlight colors. Fix KaTeX rendering. Rename assets folders with `.md`. Allow forcing of light/dark in `essay.css`.
+
 ## 8.1.11
 
 Subset font pages and reduce their size from around 3MB to around 300KB total. Re-encode `emilia` essay assets.

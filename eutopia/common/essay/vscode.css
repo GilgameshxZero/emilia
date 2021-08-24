@@ -1,4 +1,7 @@
 /* Override behavior for VSCode webview previews. */
+/* https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css */
+/* https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css */
+/* Some colors are custom-defined and overwritten. */
 body[data-vscode-theme-name] {
 	--foreground-color: var(--vscode-editor-foreground);
 	--background-color: var(--vscode-editor-background);
@@ -56,12 +59,14 @@ body[data-vscode-theme-name].vscode-dark a {
 
 .hljs-number,
 .hljs-class {
-	color: #b8d7a3;
+	/* color: #b8d7a3; */
+	color: #376a2f;
 }
 
 .hljs-string,
 .hljs-meta-string {
-	color: #d69d85;
+	/* color: #d69d85; */
+	color: #733d26;
 }
 
 .hljs-regexp,
@@ -90,7 +95,8 @@ body[data-vscode-theme-name].vscode-dark a {
 .hljs-meta,
 .hljs-meta-keyword,
 .hljs-tag {
-	color: #9b9b9b;
+	/* color: #9b9b9b; */
+	color: #4d4d4d;
 }
 
 .hljs-variable,
@@ -199,14 +205,6 @@ body[data-vscode-theme-name].vscode-dark a {
 	.hljs-link {
 		color: #00b0e8;
 	}
-
-	.hljs-emphasis {
-		font-style: italic;
-	}
-
-	.hljs-strong {
-		font-weight: bold;
-	}
 }
 
 /* Second override. */
@@ -229,12 +227,14 @@ body[data-vscode-theme-name] .hljs-type {
 
 body[data-vscode-theme-name] .hljs-number,
 body[data-vscode-theme-name] .hljs-class {
-	color: #b8d7a3;
+	/* color: #b8d7a3; */
+	color: #376a2f;
 }
 
 body[data-vscode-theme-name] .hljs-string,
 body[data-vscode-theme-name] .hljs-meta-string {
-	color: #d69d85;
+	/* color: #d69d85; */
+	color: #733d26;
 }
 
 body[data-vscode-theme-name] .hljs-regexp,
@@ -263,7 +263,8 @@ body[data-vscode-theme-name] .hljs-doctag {
 body[data-vscode-theme-name] .hljs-meta,
 body[data-vscode-theme-name] .hljs-meta-keyword,
 body[data-vscode-theme-name] .hljs-tag {
-	color: #9b9b9b;
+	/* color: #9b9b9b; */
+	color: #4d4d4d;
 }
 
 body[data-vscode-theme-name] .hljs-variable,
@@ -279,14 +280,6 @@ body[data-vscode-theme-name] .hljs-builtin-name {
 
 body[data-vscode-theme-name] .hljs-section {
 	color: gold;
-}
-
-body[data-vscode-theme-name] .hljs-emphasis {
-	font-style: italic;
-}
-
-body[data-vscode-theme-name] .hljs-strong {
-	font-weight: bold;
 }
 
 body[data-vscode-theme-name] .hljs-bullet,
@@ -368,16 +361,17 @@ body[data-vscode-theme-name].vscode-light .hljs-link {
 	color: #00b0e8;
 }
 
-body[data-vscode-theme-name].vscode-light .hljs-emphasis {
-	font-style: italic;
-}
-
-body[data-vscode-theme-name].vscode-light .hljs-strong {
-	font-weight: bold;
-}
-
 /* Special padding for pre elements based on --paragraph-spacing and --line-height. */
 pre:not(.hljs),
 pre.hljs code > div {
 	padding: calc(var(--paragraph-spacing) / 2 + 1em * (var(--line-height) - 1));
+}
+
+/* Task list CSS from VSCode extension. */
+.task-list-item {
+	list-style-type: none;
+}
+.task-list-item-checkbox {
+	margin-left: -20px;
+	vertical-align: middle;
 }

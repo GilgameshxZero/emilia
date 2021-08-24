@@ -1,4 +1,6 @@
-/* Shared CSS page for general VSCode-generated Markdown HTML. */
+/* Shared CSS page for general VSCode-generated Markdown HTML. Forms a complete package without need for any additional CSS or JS. */
+@import "font.css";
+@import "essay/katex.css";
 @import "essay/markdown.css";
 @import "essay/vscode.css";
 

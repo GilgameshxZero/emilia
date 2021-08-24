@@ -39,12 +39,8 @@ body > eutopia-splash {
 
 /* Scrollbar for all components. */
 ::-webkit-scrollbar {
-	display: block;
-	position: absolute;
 	width: 0.8rem;
-	right: 0;
-	top: 0;
-	bottom: 0;
+	height: 0.8rem;
 }
 
 ::-webkit-scrollbar-track {
