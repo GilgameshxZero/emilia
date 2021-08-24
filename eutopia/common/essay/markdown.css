@@ -337,7 +337,8 @@ blockquote cite {
 }
 
 img,
-svg {
+svg,
+video[autoplay][loop][muted] {
 	display: block;
 	max-width: 90%;
 	max-height: 30em;
@@ -351,34 +352,41 @@ svg {
 }
 
 img[src*="#large"],
-svg[src*="#large"] {
+svg[src*="#large"],
+video[autoplay][loop][muted][src*="#large"] {
 	width: 90%;
 }
 
 img[src*="#medium"],
-svg[src*="#medium"] {
+svg[src*="#medium"],
+video[autoplay][loop][muted][src*="#medium"] {
 	width: 60%;
 }
 
 img[src*="#small"],
-svg[src*="#small"] {
+svg[src*="#small"],
+video[autoplay][loop][muted][src*="#small"] {
 	width: 30%;
 }
 
 img[src*="#unbounded-height"],
-svg[src*="#unbounded-height"] {
+svg[src*="#unbounded-height"],
+video[autoplay][loop][muted][src*="#unbounded-height"] {
 	max-height: none;
 }
 
 img + br,
-svg + br {
+svg + br,
+video[autoplay][loop][muted] + br {
 	display: none;
 }
 
 img + em,
 img + br + em,
 svg + em,
-svg + br + em {
+svg + br + em,
+video[autoplay][loop][muted] + em,
+video[autoplay][loop][muted] + br + em {
 	--paragraph-indent: 0ch;
 
 	display: flow-root;
@@ -437,7 +445,8 @@ audio {
 }
 
 .katex img,
-.katex svg {
+.katex svg,
+.katex video[autoplay][loop][muted] {
 	margin: auto;
 }
 
