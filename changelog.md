@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.1.10
+
+Fix essay side margin alphas.
+
 ## 8.1.9
 
 Change poem (again).
