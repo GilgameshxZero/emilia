@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.1.14
+
+Reduce size of PNG on test essay.
+
 ## 8.1.13
 
 Allow cross-origin requests from any domain for static files to allow external use of `essay.css`.
