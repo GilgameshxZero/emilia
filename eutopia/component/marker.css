@@ -5,26 +5,25 @@
 	flex-flow: column nowrap;
 	font-family: Tangerine;
 	font-weight: bold;
-	margin: 1.5em 0 1.5em auto;
+	margin: 0.5em 0 0.5em auto;
+	padding: 1em;
 
+	background-color: #00000010;
+	box-shadow: inset 0 0 0.4em #00000030;
 	color: var(--color-bushes);
 	text-align: right;
 	font-size: 1.2em;
 	cursor: pointer;
-	transition: color 1s;
+	transition: color 1s, background-color 1s;
 	user-select: none;
 }
 
 :host(:hover) {
-	color: var(--color-ribbon);
+	background-color: #00000020;
 }
 
 :host > * {
 	margin: 0 0 0 auto;
-}
-
-:host > h1 {
-	text-shadow: 0.1em 0.1em 0.1em #00000040;
 }
 
 :host > span {

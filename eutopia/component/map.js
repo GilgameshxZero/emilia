@@ -8,6 +8,7 @@ component(
 	class extends HTMLElement {
 		constructor() {
 			super();
+			this.onscroll = document.querySelector(`eutopia-sunset`).onProgress;
 		}
 
 		// Transitions in map scene; transition out by markers.
