@@ -1,28 +1,31 @@
 /* Debug configurations for VSCode in-vitro debugging. See tasks.json for more build options. */
 {
 	"version": "0.2.0",
-	"configurations": [{
-		"name": "windows-debug-x64",
-		"type": "cppvsdbg",
-		"request": "launch",
-		"program": "${workspaceFolder}\\bin\\emilia.exe",
-		"args": [],
-		"stopAtEntry": false,
-		"cwd": "${workspaceFolder}\\bin",
-		"console": "integratedTerminal",
-		"preLaunchTask": "build-debug-x64",
-	}, {
-		"name": "posix-debug-x64",
-		"type": "cppdbg",
-		"request": "launch",
-		"program": "${workspaceFolder}/bin/emilia",
-		"args": [],
-		"stopAtEntry": false,
-		"cwd": "${workspaceFolder}/bin",
-		"console": "integratedTerminal",
-		"preLaunchTask": "build-debug-x64",
+	"configurations": [
+		{
+			"name": "windows-debug-x64",
+			"type": "cppvsdbg",
+			"request": "launch",
+			"program": "${workspaceFolder}\\bin\\emilia.exe",
+			"args": [],
+			"stopAtEntry": false,
+			"cwd": "${workspaceFolder}\\bin",
+			"console": "integratedTerminal",
+			"preLaunchTask": "build-debug-x64"
+		},
+		{
+			"name": "posix-debug-x64",
+			"type": "cppdbg",
+			"request": "launch",
+			"program": "${workspaceFolder}/bin/emilia",
+			"args": [],
+			"stopAtEntry": false,
+			"cwd": "${workspaceFolder}/bin",
+			"console": "integratedTerminal",
+			"preLaunchTask": "build-debug-x64",
 
-		"MIMode": "gdb",
-		"osx": { "MIMode": "lldb" }
-	}]
+			"MIMode": "gdb",
+			"osx": { "MIMode": "lldb" }
+		}
+	]
 }

@@ -48,21 +48,17 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\rain.props" />
+    <Import Project="..\..\rain\build\rain.props" />
   </ImportGroup>
-  <!-- Configuration-specific properties. -->
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)'=='debug'">
-    <Import Project="..\rain-debug.props" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)'=='release'">
-    <Import Project="..\rain-release.props" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets">
-    <!-- Project-specific property page. -->
-    <Import Project="..\emilia.props" />
-  </ImportGroup>
-  <!-- Empty group so that Visual Studio displays properties correctly. -->
+  <!-- All rain projects share the rain.props file, but the include directories and subsystem defines may differ. -->
+  <PropertyGroup>
+    <IncludePath>$(SolutionDir)..\include\;$(SolutionDir)..\rain\include\;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup>
+    <!-- _CONSOLE should be used for rain projects on the console, but will not be used for rain tests, since some tests are not SUBSYSTEM CONSOLE. -->
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>

@@ -59,24 +59,20 @@ endif
 
 # Mark .PHONY for rules to avoid compiling files named the same as rules.
 
+# Rule for BIN_NAME just redirects to the bin itself.
+# Enable second expansion for some fancy pattern matching later.
+.SECONDEXPANSION:
+$(PROJECT_NAME): $(VERSION_BUILD_INCLUDE) $(BIN_DIR)$$@
+
 # Build and run.
 .PHONY: run
 run: $(PROJECT_NAME)
 	@cd $(BIN_DIR) && ./$(PROJECT_NAME)
 
-# Build without running. Proxy for project name.
-.PHONY: build
-build: $(PROJECT_NAME)
-
 # Delete intermediate files.
 .PHONY: clean
 clean:
 	@rm -rf $(OBJ_DIR) $(BIN_DIR)
-
-# Rule for BIN_NAME just redirects to the bin itself.
-# Enable second expansion for some fancy pattern matching later.
-.SECONDEXPANSION:
-$(PROJECT_NAME): $(VERSION_BUILD_INCLUDE) $(BIN_DIR)$$@
 
 # Static rules to nest one directory deep inside ../obj.
 # Link rule.
@@ -95,7 +91,7 @@ $(PROJECT_OBJS): $(OBJ_DIR)%.o : $(SRC_DIR)$$(lastword $$(subst /, ,$$*)).cpp \
 $(VERSION_BUILD_INCLUDE): $(PROJECT_INCLUDES) $(RAIN_INCLUDES) $(PROJECT_SRCS)
 	@read line < $(VERSION_BUILD_INCLUDE); \
 	TOKENS=($$line); \
-	RAIN_VERSION_BUILD=$$(($${TOKENS[2]} + 1)); \
-	echo -e "$${TOKENS[0]} $${TOKENS[1]} $$RAIN_VERSION_BUILD\c" > \
+	VERSION_BUILD=$$(($${TOKENS[2]} + 1)); \
+	echo "$${TOKENS[0]} $${TOKENS[1]} $$VERSION_BUILD" > \
 		$(VERSION_BUILD_INCLUDE); \
-	echo VERSION_BUILD: $$RAIN_VERSION_BUILD.
+	echo VERSION_BUILD: $$VERSION_BUILD.
