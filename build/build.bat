@@ -28,7 +28,7 @@ IF NOT EXIST ..\obj\%PROJECT_NAME%\ (
 @REM Increment build version number.
 CALL increment-version-build
 
-SET "COMPILE_OP_COMMON=/I../include/ /I../rain/include/ /std:c++17 /D _CONSOLE /Fa..\obj\%PROJECT_NAME%\ /Fd..\obj\%PROJECT_NAME%\%PROJECT_NAME%.pdb /Fo..\obj\%PROJECT_NAME%\ /Fp..\obj\%PROJECT_NAME%\%PROJECT_NAME%.pch /fp:fast /MP /permissive- /Zc:wchar_t /Zc:forScope /Zc:inline /GS /W3 /WX- /wd4250 /sdl /diagnostics:column /Zf /EHsc /Gm- /nologo"
+SET "COMPILE_OP_COMMON=/I../include/ /I../rain/include/ /std:c++17 /Fa..\obj\%PROJECT_NAME%\ /Fd..\obj\%PROJECT_NAME%\%PROJECT_NAME%.pdb /Fo..\obj\%PROJECT_NAME%\ /Fp..\obj\%PROJECT_NAME%\%PROJECT_NAME%.pch /fp:fast /MP /permissive- /Zc:wchar_t /Zc:forScope /Zc:inline /GS /W3 /WX- /wd4250 /sdl /diagnostics:column /Zf /EHsc /Gm- /nologo"
 SET "COMPILE_OP_DEBUG=/D _DEBUG /MDd /Od /RTC1 /JMC /ZI"
 SET "COMPILE_OP_RELEASE=/D NDEBUG /MT /O2 /Oi /GL /Gy /Zi"
 SET "COMPILE_FILES=..\src\*.cpp"

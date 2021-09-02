@@ -1,6 +1,3 @@
 {
-	"recommendations": [
-		"ms-vscode.cpptools",
-		"yzhang.markdown-all-in-one"
-	]
+	"recommendations": ["ms-vscode.cpptools", "yzhang.markdown-all-in-one"]
 }

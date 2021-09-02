@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.1.15
+
+Default automation shell configuration to CMD on Windows. Update to latest rain with better Windows support. Update build procedure to match accordingly.
+
 ## 8.1.14
 
 Reduce size of PNG on test essay.
