@@ -17,7 +17,7 @@
 	/* Curried from styles defined in essay.css. */
 	width: calc(100% - 2em);
 	height: calc(100% - 4em);
-	padding: 2em max(1em, 50% - 35ch);
+	padding: 2em max(1em, 50% - 40ch);
 	overflow-y: scroll;
 
 	--mask-image-value: linear-gradient(

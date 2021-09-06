@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.1.18
+
+Update essay max-width to `80ch` including paddings.
+
 ## 8.1.17
 
 Up font-size for script in `essay.css`. Update VSCode build procedures for new `makefile`.
