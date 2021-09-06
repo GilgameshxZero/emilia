@@ -82,7 +82,7 @@ body {
 
 	.next-page-break {
 		clear: both;
-		break-after: always;
+		break-after: page;
 		page-break-after: always;
 	}
 }

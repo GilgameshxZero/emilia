@@ -96,6 +96,7 @@ code {
 
 pre code {
 	color: var(--foreground-color);
+	-moz-tab-size: 2ch;
 	tab-size: 2ch;
 }
 

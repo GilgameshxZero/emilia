@@ -50,7 +50,6 @@ component(
 						.content.cloneNode(true);
 
 					// Replace relative links.
-					console.log(clone.querySelectorAll(`img`));
 					[`src`, `href`].forEach((attribute) => {
 						clone
 							.querySelectorAll(`[${attribute}^="${this.essayName}.md-assets"]`)
@@ -63,16 +62,19 @@ component(
 					});
 
 					this.shadowRoot.querySelector(`article`).appendChild(clone);
-					sunflowers.forEach((sunflower) => {
-						sunflower.setTransition(`map`, this);
-					});
-					document.body.setAttribute(`active`, ``);
-
 					window.history.pushState(
 						null,
 						``,
 						`${window.location.pathname}?scene=essay&essay=${this.essayName}`
 					);
+
+					// Display the essay as soon as fonts are loaded!
+					document.fonts.ready.then(() => {
+						sunflowers.forEach((sunflower) => {
+							sunflower.setTransition(`map`, this);
+						});
+						document.body.setAttribute(`active`, ``);
+					});
 				});
 			});
 		}

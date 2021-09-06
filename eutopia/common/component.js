@@ -31,12 +31,15 @@ export default function component(
 						const onLoadResource = () => {
 							pending--;
 							if (pending === 0) {
-								// Component instance ready!
-								resolve(this);
+								// Component instance ready (as soon as available fonts are loaded)!
+								document.fonts.ready.then(() => {
+									resolve(this);
+								});
 							}
 						};
 
 						// Add event listeners before loading is triggered by adding clone to the DOM.
+						// TODO: Fails if no links or scripts in the component.
 						clone.querySelectorAll(`link`).forEach((link) => {
 							// Only links with href can be loaded.
 							if (link.hasAttribute(`href`)) {

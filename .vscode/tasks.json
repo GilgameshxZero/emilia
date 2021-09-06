@@ -59,6 +59,19 @@
 				"args": ["release"],
 				"problemMatcher": ["$msCompile"]
 			}
+		},
+		{
+			/* Build the open essay HTML from VSCode Markdown HTML to essay HTML. */
+			"type": "shell",
+			"label": "build-essay",
+			"options": { "cwd": "${workspaceFolder}/build" },
+			"presentation": {
+				"clear": true
+			},
+			"group": "build",
+
+			"command": "sh",
+			"args": ["build-essay.sh", "${file}"]
 		}
 	]
 }

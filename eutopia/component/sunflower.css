@@ -9,6 +9,8 @@
 	opacity: 0.4;
 	transition: opacity 1s;
 	z-index: 1;
+	-webkit-user-select: none;
+	-ms-user-select: none;
 	user-select: none;
 }
 

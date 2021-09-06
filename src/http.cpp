@@ -172,36 +172,33 @@ namespace Emilia::Http {
 	}
 	std::vector<Worker::RequestFilter> Worker::filters() {
 		return {
-			{"status." + this->state.node + "(:.*)?",
-			 "/.*",
+			{"status\\." + this->state.node + "(:.*)?",
+			 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
 			 {Method::GET, Method::POST},
 			 &Worker::reqStatus},
-				{"hyperspace." + this->state.node + "(:.*)?",
-				 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
-				 {Method::GET},
-				 &Worker::reqHyperspace},
-				{"hyperpanel." + this->state.node + "(:.*)?",
-				 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
-				 {Method::GET},
-				 &Worker::reqHyperpanel},
-				{"pastel." + this->state.node + "(:.*)?",
-				 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
-				 {Method::GET},
-				 &Worker::reqPastel},
-				{"starfall." + this->state.node + "(:.*)?",
-				 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
-				 {Method::GET},
-				 &Worker::reqStarfall},
-#ifdef RAIN_PLATFORM_NDEBUG
-				{"(eutopia.)?" + this->state.node + "(:.*)?",
-#else
-			{
-				".*",
-#endif
-				 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
-				 {Method::GET},
-				 &Worker::reqEutopia}
-		};
+			{"hyperspace\\." + this->state.node + "(:.*)?",
+			 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
+			 {Method::GET},
+			 &Worker::reqHyperspace},
+			{"hyperpanel\\." + this->state.node + "(:.*)?",
+			 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
+			 {Method::GET},
+			 &Worker::reqHyperpanel},
+			{"pastel\\." + this->state.node + "(:.*)?",
+			 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
+			 {Method::GET},
+			 &Worker::reqPastel},
+			{"starfall\\." + this->state.node + "(:.*)?",
+			 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
+			 {Method::GET},
+			 &Worker::reqStarfall},
+			// eutopia.gilgamesh.cc, gilgamesh.cc, localhost, 127.0.0.1, or ::1. Refer
+			// to <https://en.cppreference.com/w/cpp/regex/ecmascript>.
+			{"(?:(eutopia\\.)?" + this->state.node +
+				 "|localhost|127\\.0\\.0\\.1|::1)(:.*)?",
+			 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
+			 {Method::GET},
+			 &Worker::reqEutopia}};
 	}
 	void Worker::send(Response &res) {
 		// Postprocess to add server signature.
