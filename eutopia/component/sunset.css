@@ -15,7 +15,7 @@
 
 div {
 	position: relative;
-	left: -200vh;
+	left: 0;
 	top: 0;
 	width: calc(100% + 500vh);
 	height: 2400%;
@@ -35,6 +35,7 @@ div {
 }
 
 :host([scene="map"]) > div {
+	left:-200vh;
 	top: calc(-1050% - var(--progress) * 50%);
 }
 

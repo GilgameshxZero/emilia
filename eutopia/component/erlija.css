@@ -1,9 +1,7 @@
 @import "../common/color.css";
 
 :host {
-	display: flex;
-	flex-flow: column nowrap;
-	justify-content: center;
+	display: block;
 	height: calc(100% - 4em);
 	width: calc(100% - 4em);
 	max-width: 70ch;
@@ -13,7 +11,6 @@
 	color: var(--color-clouds);
 	font-family: "EB Garamond", Georgia, serif;
 	font-size: 1.2em;
-	text-align: center;
 
 	--mask-image-value: linear-gradient(
 			to bottom,
@@ -41,4 +38,13 @@ eutopia-sunflower {
 
 a {
 	color: var(--color-airships);
+}
+
+section[name="credits"] {
+	text-align: center;
+}
+
+section[name="lore"] > p[name="quote-from"] {
+	text-align: right;
+	font-style: italic;
 }

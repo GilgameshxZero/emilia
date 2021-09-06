@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
-	<head></head>
+	<head>
+		<meta charset="utf-8" />
+	</head>
 	<body>
 		<template>
 			<div class="next-subtitled"></div>
@@ -134,7 +136,8 @@
 			<p>
 				As a side, I also scraped the time at which posts were made from the css
 				selector <code>abbr._5ptz</code>. You can find the raw scraped data, in
-				JSON, <a href="mit-confessions-simulator.md-assets/data-raw.zip">here</a>.
+				JSON,
+				<a href="mit-confessions-simulator.md-assets/data-raw.zip">here</a>.
 			</p>
 			<h3 id="cleaning--preparation">Cleaning &amp; Preparation</h3>
 			<p>
@@ -183,8 +186,8 @@
 				all cleaned posts into one large string to serve as the training data,
 				each post being separated by a <code>\0</code> (NULL) character. Post
 				order was randomized.
-				<a href="mit-confessions-simulator.md-assets/data-concat.zip">This</a> is
-				the concatenated file of posts with the confession number, which was
+				<a href="mit-confessions-simulator.md-assets/data-concat.zip">This</a>
+				is the concatenated file of posts with the confession number, which was
 				postprocessed to remove the confessions number in each post. These
 				strings served as training and validation data for both the
 				<code>char-RNN</code> and the <code>char-n-gram</code>.
@@ -370,7 +373,10 @@
 			</ul>
 			<h3 id="thoughts">Thoughts</h3>
 			<p>
-				<img src="mit-confessions-simulator.md-assets/course-6.png" alt="" /><br />
+				<img
+					src="mit-confessions-simulator.md-assets/course-6.png"
+					alt=""
+				/><br />
 				<em>A distinctly MIT flavor.</em>
 			</p>
 			<p>

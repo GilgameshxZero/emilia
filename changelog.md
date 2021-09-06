@@ -1,5 +1,12 @@
 # Changelog
 
+## 8.1.16
+
+* Components and essay now wait for font to load before scene in.
+* Add essay build task in VSCode to easily convert Markdown-generated HTML into essay HTML.
+* More semantic CSS.
+* Redirect localhost aliases to eutopia.
+
 ## 8.1.15
 
 Default automation shell configuration to CMD on Windows. Update to latest rain with better Windows support. Update build procedure to match accordingly.
