@@ -31,7 +31,7 @@
 			"group": { "kind": "build", "isDefault": true },
 
 			"command": "make",
-			"args": ["-j8", "build"],
+			"args": ["-j8"],
 			"problemMatcher": ["$gcc"],
 
 			"windows": {
@@ -51,7 +51,7 @@
 			"group": "build",
 
 			"command": "make",
-			"args": ["-j8", "build", "RELEASE=1"],
+			"args": ["-j8", "RELEASE=1"],
 			"problemMatcher": ["$gcc"],
 
 			"windows": {
