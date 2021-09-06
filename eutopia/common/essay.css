@@ -52,9 +52,9 @@ html {
 body {
 	display: block;
 	width: calc(100% - 4em);
-	max-width: 70ch;
+	max-width: 80ch;
 	margin: 0;
-	padding: 2em max(2em, 50% - 35ch);
+	padding: 2em max(2em, 50% - 40ch);
 	overflow-x: hidden;
 
 	font-family: "EB Garamond", Georgia, serif;

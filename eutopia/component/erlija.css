@@ -4,8 +4,8 @@
 	display: block;
 	height: calc(100% - 4em);
 	width: calc(100% - 4em);
-	max-width: 70ch;
-	padding: 2em max(2em, 50% - 35ch);
+	max-width: 80ch;
+	padding: 2em max(2em, 50% - 40ch);
 	overflow-y: scroll;
 
 	color: var(--color-clouds);
