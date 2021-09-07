@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.1.20
+
+Implement hash-location for essays & a functioning back button, and fix the content-type for `.webm`.
+
 ## 8.1.19
 
 Update lore.

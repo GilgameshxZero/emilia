@@ -7,7 +7,6 @@ component(
 		constructor() {
 			super();
 			this.onclick = () => {
-				console.log();
 				document.body.removeAttribute(`active`);
 				const sunset = document.querySelector(`eutopia-sunset`);
 				sunset.style.removeProperty(`--progress`);
