@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.1.19
+
+Update lore.
+
 ## 8.1.18
 
 Update essay max-width to `80ch` including paddings.
