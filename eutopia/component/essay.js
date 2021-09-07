@@ -62,10 +62,17 @@ component(
 					});
 
 					this.shadowRoot.querySelector(`article`).appendChild(clone);
+
+					// Process and jump to any ID fragment.
+					// TODO: Is this the right place to process this?
+					const fragment = window.location.hash;
+					if (fragment.length > 0) {
+						this.shadowRoot.querySelector(fragment).scrollIntoView();
+					}
 					window.history.pushState(
 						null,
 						``,
-						`${window.location.pathname}?scene=essay&essay=${this.essayName}`
+						`${window.location.pathname}?scene=essay&essay=${this.essayName}${fragment}`
 					);
 
 					// Display the essay as soon as fonts are loaded!
