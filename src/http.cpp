@@ -95,7 +95,9 @@ namespace Emilia::Http {
 
 		{
 			std::shared_lock lck(this->state.outboxMtx);
-			ss << "Mailbox activity (" << this->state.outbox.size() << "): \n";
+			ss << "Mailbox activity in the past 72 hours ("
+				 << this->state.outbox.size()
+				 << " activities total over server lifetime): \n";
 			for (auto const &it : this->state.outbox) {
 				// Show only outbox from last 3 days.
 				if (it.attemptTime < std::chrono::steady_clock::now() - 72h) {
@@ -121,8 +123,8 @@ namespace Emilia::Http {
 						break;
 				}
 				ss << " | " << std::string(it.from.name.length(), '.') << '@'
-					 << it.from.domain << " > " << std::string(it.to.name.length(), '.')
-					 << '@' << it.to.domain << '\n';
+					 << it.from.host << " > " << std::string(it.to.name.length(), '.')
+					 << '@' << it.to.host << '\n';
 			}
 		}
 
@@ -172,29 +174,29 @@ namespace Emilia::Http {
 	}
 	std::vector<Worker::RequestFilter> Worker::filters() {
 		return {
-			{"status\\." + this->state.node + "(:.*)?",
+			{"status\\." + this->state.host.node + "(:.*)?",
 			 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
 			 {Method::GET, Method::POST},
 			 &Worker::reqStatus},
-			{"hyperspace\\." + this->state.node + "(:.*)?",
+			{"hyperspace\\." + this->state.host.node + "(:.*)?",
 			 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
 			 {Method::GET},
 			 &Worker::reqHyperspace},
-			{"hyperpanel\\." + this->state.node + "(:.*)?",
+			{"hyperpanel\\." + this->state.host.node + "(:.*)?",
 			 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
 			 {Method::GET},
 			 &Worker::reqHyperpanel},
-			{"pastel\\." + this->state.node + "(:.*)?",
+			{"pastel\\." + this->state.host.node + "(:.*)?",
 			 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
 			 {Method::GET},
 			 &Worker::reqPastel},
-			{"starfall\\." + this->state.node + "(:.*)?",
+			{"starfall\\." + this->state.host.node + "(:.*)?",
 			 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
 			 {Method::GET},
 			 &Worker::reqStarfall},
 			// eutopia.gilgamesh.cc, gilgamesh.cc, localhost, 127.0.0.1, or ::1. Refer
 			// to <https://en.cppreference.com/w/cpp/regex/ecmascript>.
-			{"(?:(eutopia\\.)?" + this->state.node +
+			{"(?:(eutopia\\.)?" + this->state.host.node +
 				 "|localhost|127\\.0\\.0\\.1|::1)(:.*)?",
 			 "/([^\\?#]*)(\\?[^#]*)?(#.*)?",
 			 {Method::GET},

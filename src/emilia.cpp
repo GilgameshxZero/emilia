@@ -17,14 +17,14 @@ int main(int argc, char const *argv[]) {
 
 	// Parse command line options.
 	Emilia::State state;
-	state.node = "gilgamesh.cc";
+	state.host = "gilgamesh.cc";
 	std::string httpPort = "0", smtpPort = "0", smtpForwardStr = "";
 	bool showHelp = false;
 
 	Rain::String::CommandLineParser parser;
 	parser.addParser("help", showHelp);
 	parser.addParser("h", showHelp);
-	parser.addParser("domain", state.node);
+	parser.addParser("domain", state.host.node);
 	parser.addParser("http-port", httpPort);
 	parser.addParser("smtp-port", smtpPort);
 	parser.addParser("smtp-forward", smtpForwardStr);
@@ -48,7 +48,8 @@ int main(int argc, char const *argv[]) {
 			<< "--smtp-port (\"0\"): Alter the listening port of the SMTP server.\n"
 			<< "--smtp-forward (\"\"): If specified, forwards all received emails to "
 				 "listed address.\n"
-			<< "--domain (\"gilgamesh.cc\"): Configured domain for SMTP server.\n"
+			<< "--domain (\"gilgamesh.cc\"): Configured domain for SMTP server and "
+				 "HTTP endpoints.\n"
 			<< "--smtp-password (\"\"): If specified, enables authenticated "
 				 "clients to send from domain.\n"
 			<< std::endl;

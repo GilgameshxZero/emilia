@@ -12,6 +12,7 @@
 
 	/* Override of light/dark-dependent variables. */
 	--background-color: transparent;
+	--textlink-foreground-color: var(--color-ribbon);
 	--pre-background-color: #00000010;
 
 	/* Curried from styles defined in essay.css. */

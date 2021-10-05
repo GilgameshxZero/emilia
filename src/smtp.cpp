@@ -14,12 +14,13 @@ namespace Emilia::Smtp {
 		return false;
 	}
 	Worker::ResponseAction Worker::onHelo(Request &) {
-		return {{StatusCode::REQUEST_COMPLETED, {this->state.node, "AUTH LOGIN"}}};
+		return {
+			{StatusCode::REQUEST_COMPLETED, {this->state.host.node, "AUTH LOGIN"}}};
 	}
 	Worker::ResponseAction Worker::onMailMailbox(Mailbox const &mailbox) {
 		// If authenticated, allow from any mailbox. Otherwise, limit against
 		// domain mailboxes.
-		if (this->authenticated || mailbox.domain != this->state.node) {
+		if (this->authenticated || mailbox.host != this->state.host) {
 			return SuperWorker::onMailMailbox(mailbox);
 		}
 		return {{StatusCode::AUTHENTICATION_REQUIRED}};
@@ -27,7 +28,7 @@ namespace Emilia::Smtp {
 	Worker::ResponseAction Worker::onRcptMailbox(Mailbox const &mailbox) {
 		// If authenticated, can send to any address. Otherwise, can only send to
 		// the domain.
-		if (this->authenticated || mailbox.domain == this->state.node) {
+		if (this->authenticated || mailbox.host == this->state.host) {
 			return SuperWorker::onRcptMailbox(mailbox);
 		}
 		return {{StatusCode::AUTHENTICATION_REQUIRED}};
@@ -37,7 +38,7 @@ namespace Emilia::Smtp {
 		// those are only non-empty if valid parameters have been given.
 		if (
 			this->state.smtpForward.name.empty() ||
-			this->state.smtpForward.domain.empty()) {
+			this->state.smtpForward.host.node.empty()) {
 			return {
 				{StatusCode::TRANSACTION_FAILED, {{"No forwarding configured."}}}};
 		}
@@ -185,21 +186,20 @@ namespace Emilia::Smtp {
 								// Translate to/from. Mails are always from postmaster@node. If
 								// the to mailbox is @node, then it is instead redirected to the
 								// smtpForward. Otherwise, it remains the same.
-								static Mailbox const from("postmaster", this->state.node);
+								static Mailbox const from("postmaster", this->state.host);
 								Mailbox to(
-									envelope.to.domain == this->state.node
-										? this->state.smtpForward
-										: envelope.to);
+									envelope.to.host == this->state.host ? this->state.smtpForward
+																											 : envelope.to);
 
 								Client client(
-									this->state, Rain::Networking::getMxRecords(to.domain));
+									this->state, Rain::Networking::getMxRecords(to.host));
 								{
 									auto res = client.recv();
 									if (res.statusCode != StatusCode::SERVICE_READY) {
 										return res;
 									}
 								}
-								client.send({Command::HELO, this->state.node});
+								client.send({Command::HELO, this->state.host.node});
 								{
 									auto res = client.recv();
 									if (res.statusCode != StatusCode::REQUEST_COMPLETED) {
