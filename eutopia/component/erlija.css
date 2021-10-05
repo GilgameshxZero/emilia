@@ -46,5 +46,4 @@ section[name="credits"] {
 
 section[name="lore"] > p[name="quote-from"] {
 	text-align: right;
-	font-style: italic;
 }
