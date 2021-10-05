@@ -13,8 +13,8 @@ namespace Emilia {
 		// Version information.
 		std::string signature;
 
-		// Domain name for HTTP and SMTP.
-		std::string node;
+		// Domain name for HTTP and SMTP. Port should be unspecified.
+		Rain::Networking::Host host;
 
 		// Process start timepoint.
 		std::tm processBegin;

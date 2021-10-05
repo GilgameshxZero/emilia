@@ -2,20 +2,20 @@
 
 ## Todo
 
-* Uncaught exception for SMTP QUIT command, sometimes.
-  
-  ```
-	SMTP to ::ffff:40.107.220.112:26977:
-	250 Requested mail action okay, completed
-	SMTP from Rain::Networking, 107: Transport endpoint is not connected
-	Consumed exception at ../rain/include/rain/networking/http/../req-res/worker.hpp:83.
-	```
 * Invalid status code while receiving SMTP from `mg2.substack.com` causes only two lines of DATA to be received.
   
 	```
 	Failed **************************************@mg2.substack.com > ****@gilgamesh.cc.
 	Rain::Networking::Smtp::Response, 1: Invalid status code.
 	```
+
+	This is likely due to an aborted connection causing status code parsing to fail.
+
+## 8.1.22
+
+* Case-insensitive SMTP domain matching. HTTP host matching is still case-sensitive by default and dependent on specified regex, which is specified from the `domain` command-line parameter.
+* Silent reveal for select VSCode tasks.
+* Darker color for essay links.
 
 ## 8.1.21
 
