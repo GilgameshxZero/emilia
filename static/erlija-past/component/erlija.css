@@ -44,6 +44,6 @@ section[name="credits"] {
 	text-align: center;
 }
 
-section[name="lore"] > p[name="quote-from"] {
-	text-align: right;
+section[name="lore"] {
+	text-align: left;
 }
