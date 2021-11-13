@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.2.1
+
+* Update lore.
+
 ## 8.2.0
 
 * Remove legacy frontends.
