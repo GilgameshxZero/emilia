@@ -1,9 +1,0 @@
-.list-selector-panel {
-    min-height: 250px;
-}
-
-@media (max-width: 700px) {
-	.list-selector-panel {
-        min-height: 40px;
-    }
-}

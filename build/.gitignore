@@ -1,1 +1,0 @@
-vcvarsall.bat

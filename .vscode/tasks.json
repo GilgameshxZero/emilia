@@ -6,65 +6,46 @@
 			"type": "shell",
 			"label": "clean",
 			"options": { "cwd": "${workspaceFolder}/build" },
-			"presentation": {
-				"clear": true,
-				"reveal": "silent"
-			},
+			"presentation": { "clear": true, "reveal": "silent" },
 
 			"command": "make",
 			"args": ["clean"],
 
-			"windows": {
-				"command": "RMDIR",
-				"args": ["/Q", "/S", "..\\bin", "..\\obj"]
-			}
+			"windows": { "command": "nmake" }
 		},
 		{
-			/* Build the open file (must be within test/) in debug mode. */
+			/* Build the project in debug mode. */
 			"type": "shell",
 			"label": "build-debug-x64",
 			"options": { "cwd": "${workspaceFolder}/build" },
-			"presentation": {
-				"clear": true
-			},
+			"presentation": { "clear": true },
 
 			/* Default build task. */
 			"group": { "kind": "build", "isDefault": true },
 
-			"command": "make",
-			"args": ["-j8"],
+			"command": "make -j8",
 			"problemMatcher": ["$gcc"],
 
-			"windows": {
-				"command": "build",
-				"args": [],
-				"problemMatcher": ["$msCompile"]
-			}
+			"windows": { "command": "nmake", "problemMatcher": ["$msCompile"] }
 		},
 		{
-			/* Build the open file (must be within test/) in release mode. */
+			/* Build the project in release mode. */
 			"type": "shell",
 			"label": "build-release-x64",
 			"options": { "cwd": "${workspaceFolder}/build" },
-			"presentation": {
-				"clear": true
-			},
+			"presentation": { "clear": true },
 			"group": "build",
 
-			"command": "make",
-			"args": ["-j8", "RELEASE=1"],
+			"command": "make -j8",
+			"args": ["BUILD=1"],
 			"problemMatcher": ["$gcc"],
 
-			"windows": {
-				"command": "build",
-				"args": ["release"],
-				"problemMatcher": ["$msCompile"]
-			}
+			"windows": { "command": "nmake", "problemMatcher": ["$msCompile"] }
 		},
 		{
 			/* Build the open essay HTML from VSCode Markdown HTML to essay HTML. */
 			"type": "shell",
-			"label": "build-essay",
+			"label": "prepare-essay",
 			"options": { "cwd": "${workspaceFolder}/build" },
 			"presentation": {
 				"clear": true,
@@ -73,7 +54,7 @@
 			"group": "build",
 
 			"command": "sh",
-			"args": ["build-essay.sh", "${file}"]
+			"args": ["prepare-essay.sh", "${file}"]
 		}
 	]
 }

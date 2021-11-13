@@ -7,20 +7,36 @@ namespace Emilia::Smtp {
 	Worker::Worker(
 		NativeSocket nativeSocket,
 		SocketInterface *interrupter,
-		State &state)
-			: SuperWorker(nativeSocket, interrupter), state(state) {}
+		Server &server)
+			: SuperWorker(nativeSocket, interrupter), server(server) {}
 	bool Worker::onInitialResponse() {
-		this->send({StatusCode::SERVICE_READY, {{this->state.signature}}});
+		this->send(
+			{StatusCode::SERVICE_READY,
+			 {{"emilia " STRINGIFY(EMILIA_VERSION_MAJOR) "." STRINGIFY(EMILIA_VERSION_MINOR) "." STRINGIFY(EMILIA_VERSION_REVISION) "." STRINGIFY(EMILIA_VERSION_BUILD) " / rain " STRINGIFY(
+				 RAIN_VERSION_MAJOR) "." STRINGIFY(RAIN_VERSION_MINOR) "." STRINGIFY(RAIN_VERSION_REVISION) "." STRINGIFY(RAIN_VERSION_BUILD)}}});
 		return false;
 	}
+	void Worker::send(Response &res) {
+		if (this->server.echo) {
+			std::cout << "SMTP to " << this->peerHost() << ":\n" << res << std::endl;
+		}
+		SuperWorker::send(res);
+	}
+	Worker::Request &Worker::recv(Request &req) {
+		SuperWorker::recv(req);
+		if (this->server.echo) {
+			std::cout << "SMTP from " << this->peerHost() << ":\n"
+								<< req << std::endl;
+		}
+		return req;
+	}
 	Worker::ResponseAction Worker::onHelo(Request &) {
-		return {
-			{StatusCode::REQUEST_COMPLETED, {this->state.host.node, "AUTH LOGIN"}}};
+		return {{StatusCode::REQUEST_COMPLETED, {"gilgamesh.cc", "AUTH LOGIN"}}};
 	}
 	Worker::ResponseAction Worker::onMailMailbox(Mailbox const &mailbox) {
 		// If authenticated, allow from any mailbox. Otherwise, limit against
 		// domain mailboxes.
-		if (this->authenticated || mailbox.host != this->state.host) {
+		if (this->authenticated || mailbox.host != "gilgamesh.cc") {
 			return SuperWorker::onMailMailbox(mailbox);
 		}
 		return {{StatusCode::AUTHENTICATION_REQUIRED}};
@@ -28,7 +44,7 @@ namespace Emilia::Smtp {
 	Worker::ResponseAction Worker::onRcptMailbox(Mailbox const &mailbox) {
 		// If authenticated, can send to any address. Otherwise, can only send to
 		// the domain.
-		if (this->authenticated || mailbox.host == this->state.host) {
+		if (this->authenticated || mailbox.host == "gilgamesh.cc") {
 			return SuperWorker::onRcptMailbox(mailbox);
 		}
 		return {{StatusCode::AUTHENTICATION_REQUIRED}};
@@ -37,8 +53,8 @@ namespace Emilia::Smtp {
 		// This function is only called when mailFrom/rcptTo are non-empty, and
 		// those are only non-empty if valid parameters have been given.
 		if (
-			this->state.smtpForward.name.empty() ||
-			this->state.smtpForward.host.node.empty()) {
+			this->server.smtpForward.name.empty() ||
+			this->server.smtpForward.host.node.empty()) {
 			return {
 				{StatusCode::TRANSACTION_FAILED, {{"No forwarding configured."}}}};
 		}
@@ -50,7 +66,7 @@ namespace Emilia::Smtp {
 			std::tm timeData;
 			Rain::Time::localtime_r(&timeNow, &timeData);
 			std::stringstream dataPathStream;
-			dataPathStream << "../data/" << timeData.tm_year << "-" << timeData.tm_mon
+			dataPathStream << "../smtp/" << timeData.tm_year << "-" << timeData.tm_mon
 										 << "-" << timeData.tm_mday << "-" << timeData.tm_hour
 										 << "-" << timeData.tm_min << "-" << timeData.tm_sec << "-"
 										 << Rain::String::Base64::encode(this->mailFrom.value())
@@ -78,8 +94,8 @@ namespace Emilia::Smtp {
 			std::filesystem::copy(dataPath, envelopeDataPath);
 
 			// Emplace new envelope.
-			std::unique_lock lck(this->state.outboxMtx);
-			this->state.outbox.emplace(
+			std::unique_lock lck(this->server.outboxMtx);
+			this->server.outbox.emplace(
 				Envelope::Status::PENDING,
 				0,
 				std::chrono::steady_clock::now(),
@@ -90,7 +106,7 @@ namespace Emilia::Smtp {
 
 		// Trigger outbox send and delete original email file.
 		std::filesystem::remove(dataPath);
-		this->state.outboxEv.notify_one();
+		this->server.outboxEv.notify_one();
 
 		return {{StatusCode::REQUEST_COMPLETED}};
 	}
@@ -102,36 +118,48 @@ namespace Emilia::Smtp {
 	Worker::ResponseAction Worker::onAuthLogin(
 		std::string const &username,
 		std::string const &password) {
-		if (this->state.echo) {
+		if (this->server.echo) {
 			std::cout << "AUTH LOGIN from " << this->peerHost() << ": " << username
 								<< " : " << password << std::endl;
 		}
 		// Any username is valid, but the password has to match.
 		if (
-			!this->state.smtpPassword.empty() &&
-			this->state.smtpPassword == password) {
+			!this->server.smtpPassword.empty() &&
+			this->server.smtpPassword == password) {
 			this->authenticated = true;
 			return {{StatusCode::AUTHENTICATION_SUCCEEDED}};
 		}
 		return {{StatusCode::AUTHENTICATION_INVALID}};
 	}
-	void Worker::send(Response &res) {
-		if (this->state.echo) {
-			std::cout << "SMTP to " << this->peerHost() << ":\n" << res << std::endl;
+
+	Client::Client(
+		std::vector<std::pair<std::size_t, std::string>> const &mxRecords,
+		Server &server)
+			: SuperClient(mxRecords, 25), server(server) {}
+	void Client::send(Request &req) {
+		if (this->server.echo) {
+			std::cout << "SMTP to " << this->peerHost() << ":\n" << req << std::endl;
 		}
-		SuperWorker::send(res);
+		SuperClient::send(req);
 	}
-	Worker::Request &Worker::recv(Request &req) {
-		SuperWorker::recv(req);
-		if (this->state.echo) {
+	Client::Response &Client::recv(Response &res) {
+		SuperClient::recv(res);
+		if (this->server.echo) {
 			std::cout << "SMTP from " << this->peerHost() << ":\n"
-								<< req << std::endl;
+								<< res << std::endl;
 		}
-		return req;
+		return res;
 	}
 
-	Server::Server(State &state, Host const &host)
-			: SuperServer(host), state(state) {
+	Server::Server(
+		Host const &host,
+		std::atomic_bool const &echo,
+		Rain::Networking::Smtp::Mailbox const &smtpForward,
+		std::string const &smtpPassword)
+			: SuperServer(host),
+				echo(echo),
+				smtpForward(smtpForward),
+				smtpPassword(smtpPassword) {
 		// The sender attempts to send envelopes in the outbox.
 		this->sender = std::thread([this]() {
 			using namespace Rain::Literal;
@@ -145,16 +173,15 @@ namespace Emilia::Smtp {
 						static auto const retryWait = 4h;
 						std::vector<Envelope> toAttempt;
 						{
-							std::unique_lock lck(this->state.outboxMtx);
-							this->state.outboxEv.wait_for(lck, retryWait);
+							std::unique_lock lck(this->outboxMtx);
+							this->outboxEv.wait_for(lck, retryWait);
 							if (this->closed) {
 								return;
 							}
 
 							// We have exclusive lock. Move down all the envelopes we want to
 							// send.
-							for (auto it = this->state.outbox.begin();
-									 it != this->state.outbox.end();) {
+							for (auto it = this->outbox.begin(); it != this->outbox.end();) {
 								if (it->status != Envelope::Status::PENDING) {
 									break;
 								}
@@ -163,7 +190,7 @@ namespace Emilia::Smtp {
 									continue;
 								}
 								toAttempt.emplace_back(*it);
-								it = this->state.outbox.erase(it);
+								it = this->outbox.erase(it);
 							}
 
 							// Done with exclusive lock; we will add any envelopes back later.
@@ -186,20 +213,19 @@ namespace Emilia::Smtp {
 								// Translate to/from. Mails are always from postmaster@node. If
 								// the to mailbox is @node, then it is instead redirected to the
 								// smtpForward. Otherwise, it remains the same.
-								static Mailbox const from("postmaster", this->state.host);
+								static Mailbox const from("postmaster", "gilgamesh.cc");
 								Mailbox to(
-									envelope.to.host == this->state.host ? this->state.smtpForward
-																											 : envelope.to);
+									envelope.to.host == Host("gilgamesh.cc") ? this->smtpForward
+																													 : envelope.to);
 
-								Client client(
-									this->state, Rain::Networking::getMxRecords(to.host));
+								Client client(Rain::Networking::getMxRecords(to.host), *this);
 								{
 									auto res = client.recv();
 									if (res.statusCode != StatusCode::SERVICE_READY) {
 										return res;
 									}
 								}
-								client.send({Command::HELO, this->state.host.node});
+								client.send({Command::HELO, "gilgamesh.cc"});
 								{
 									auto res = client.recv();
 									if (res.statusCode != StatusCode::REQUEST_COMPLETED) {
@@ -286,12 +312,12 @@ namespace Emilia::Smtp {
 						// None of them should be PENDING anymore. For those marked as
 						// RETRIED, insert a PENDING envelope in addition. For those marked
 						// as success, delete the data file.
-						std::unique_lock lck(this->state.outboxMtx);
+						std::unique_lock lck(this->outboxMtx);
 						for (auto &it : toAttempt) {
 							if (it.status == Envelope::Status::SUCCESS) {
 								std::filesystem::remove(it.data);
 							} else if (it.status == Envelope::Status::RETRIED) {
-								this->state.outbox.emplace(
+								this->outbox.emplace(
 									Envelope::Status::PENDING,
 									it.attempt + 1,
 									std::chrono::steady_clock::now() + retryWait,
@@ -300,7 +326,7 @@ namespace Emilia::Smtp {
 									it.data);
 							}
 							// No additional action needed for FAILURE envelopes.
-							this->state.outbox.emplace(it);
+							this->outbox.emplace(it);
 						}
 					},
 					RAIN_ERROR_LOCATION)();
@@ -309,32 +335,13 @@ namespace Emilia::Smtp {
 	}
 	Server::~Server() {
 		this->closed = true;
-		this->state.outboxEv.notify_one();
+		this->outboxEv.notify_one();
 		this->sender.join();
 		this->destruct();
 	}
 	Worker Server::makeWorker(
 		NativeSocket nativeSocket,
 		SocketInterface *interrupter) {
-		return {nativeSocket, interrupter, this->state};
-	}
-
-	Client::Client(
-		State &state,
-		std::vector<std::pair<std::size_t, std::string>> const &mxRecords)
-			: SuperClient(mxRecords, 25), state(state) {}
-	void Client::send(Request &req) {
-		if (this->state.echo) {
-			std::cout << "SMTP to " << this->peerHost() << ":\n" << req << std::endl;
-		}
-		SuperClient::send(req);
-	}
-	Client::Response &Client::recv(Response &res) {
-		SuperClient::recv(res);
-		if (this->state.echo) {
-			std::cout << "SMTP from " << this->peerHost() << ":\n"
-								<< res << std::endl;
-		}
-		return res;
+		return {nativeSocket, interrupter, *this};
 	}
 }

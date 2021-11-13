@@ -1,15 +1,11 @@
 # Changelog
 
-## Todo
+## 8.2.0
 
-* Invalid status code while receiving SMTP from `mg2.substack.com` causes only two lines of DATA to be received.
-  
-	```
-	Failed **************************************@mg2.substack.com > ****@gilgamesh.cc.
-	Rain::Networking::Smtp::Response, 1: Invalid status code.
-	```
-
-	This is likely due to an aborted connection causing status code parsing to fail.
+* Remove legacy frontends.
+* Update `rain` to latest.
+* Refactor build routine into unified system-independent makefile.
+* Build theme-switching frontend framework.
 
 ## 8.1.22
 
