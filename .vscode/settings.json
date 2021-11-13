@@ -1,0 +1,28 @@
+/* Recommended settings for VSCode. Copy and customize to `settings.json`. */
+{
+	"debug.console.closeOnEnd": false,
+	"editor.rulers": [80, 120],
+	"editor.insertSpaces": false,
+	"editor.tabSize": 2,
+	"files.insertFinalNewline": true,
+	"files.eol": "\n",
+
+	"terminal.integrated.automationShell.windows": "C:\\Windows\\System32\\cmd.exe",
+
+	"C_Cpp.default.includePath": ["include/", "rain/include/"],
+	"C_Cpp.default.cppStandard": "c++17",
+	"C_Cpp.autoAddFileAssociations": false,
+
+	"[cpp]": {
+		"editor.defaultFormatter": "ms-vscode.cpptools",
+		"editor.wordWrap": "on"
+	},
+
+	"files.associations": {
+		"settings.DEFAULT.json": "jsonc",
+		"*.vstemplate": "xml"
+	},
+
+	// May need to manually include style pages for in-browser VSCode previews to work.
+	"markdown.styles": ["./static/common/essay.css"]
+}

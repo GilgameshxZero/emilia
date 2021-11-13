@@ -1,0 +1,68 @@
+@import "../common/color.css";
+@import "../common/essay.css";
+
+/* Force light theme. */
+@import "../common/essay/force.light.css";
+
+:host {
+	/* Override of essay.css variables. */
+	--blockquote-background-color: #ffffff20;
+	--blockquote-border-color: #b54c2e80;
+	--list-marker-color: var(--color-ribbon);
+
+	/* Override of light/dark-dependent variables. */
+	--background-color: transparent;
+	--textlink-foreground-color: var(--color-ribbon);
+	--pre-background-color: #ffffff20;
+
+	/* Curried from styles defined in essay.css. */
+	width: calc(100% - 2em);
+	height: calc(100% - 4em);
+	padding: 2em max(1em, 50% - 40ch);
+	overflow-y: scroll;
+
+	--mask-image-value: linear-gradient(
+			to bottom,
+			transparent 0,
+			black 2em,
+			black calc(100% - 2em),
+			transparent 100%
+		),
+		linear-gradient(
+			to right,
+			black 0,
+			black 1em,
+			transparent 1em,
+			transparent calc(100% - 1em),
+			black calc(100% - 1em),
+			black 100%
+		);
+	-webkit-mask-image: var(--mask-image-value);
+	mask-image: var(--mask-image-value);
+}
+
+article {
+	padding: 1em 2em;
+
+	background-color: #00000010;
+	box-shadow: inset 0 0 0.4em #00000030;
+}
+
+/* Print options for this ShadowRoot. */
+@media print {
+	:host {
+		width: auto;
+		height: auto;
+		padding: initial;
+	}
+
+	eutopia-sunflower {
+		display: none;
+	}
+
+	article {
+		padding: 0;
+
+		box-shadow: none;
+	}
+}

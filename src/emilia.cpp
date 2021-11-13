@@ -2,33 +2,28 @@
 
 #include <http.hpp>
 #include <smtp.hpp>
-#include <state.hpp>
 
 #include <rain.hpp>
 
 int main(int argc, char const *argv[]) {
-	std::stringstream signature;
-	signature << "emilia " << EMILIA_VERSION_MAJOR << "." << EMILIA_VERSION_MINOR
+	std::srand(static_cast<unsigned int>(time(nullptr)));
+	std::cout << "emilia " << EMILIA_VERSION_MAJOR << "." << EMILIA_VERSION_MINOR
 						<< "." << EMILIA_VERSION_REVISION << "." << EMILIA_VERSION_BUILD
 						<< " / rain " << RAIN_VERSION_MAJOR << "." << RAIN_VERSION_MINOR
-						<< "." << RAIN_VERSION_REVISION << "." << RAIN_VERSION_BUILD;
-	std::cout << signature.str() << std::endl;
-	std::srand(static_cast<unsigned int>(time(nullptr)));
+						<< "." << RAIN_VERSION_REVISION << "." << RAIN_VERSION_BUILD
+						<< std::endl;
 
 	// Parse command line options.
-	Emilia::State state;
-	state.host = "gilgamesh.cc";
-	std::string httpPort = "0", smtpPort = "0", smtpForwardStr = "";
-	bool showHelp = false;
+	std::string httpPort{"0"}, smtpPort{"0"}, smtpForwardStr, smtpPassword;
+	bool showHelp{false};
 
 	Rain::String::CommandLineParser parser;
 	parser.addParser("help", showHelp);
 	parser.addParser("h", showHelp);
-	parser.addParser("domain", state.host.node);
 	parser.addParser("http-port", httpPort);
 	parser.addParser("smtp-port", smtpPort);
 	parser.addParser("smtp-forward", smtpForwardStr);
-	parser.addParser("smtp-password", state.smtpPassword);
+	parser.addParser("smtp-password", smtpPassword);
 	try {
 		parser.parse(argc - 1, argv + 1);
 	} catch (...) {
@@ -37,10 +32,8 @@ int main(int argc, char const *argv[]) {
 			<< std::endl;
 		return -1;
 	}
-	state.smtpForward = smtpForwardStr;
-
-	// Show help if prompted.
 	if (showHelp) {
+		// Show help if prompted.
 		std::cout
 			<< "Command-line options (default specified in parenthesis):\n"
 			<< "--help, -h (off): Display this help message and exit.\n"
@@ -48,25 +41,34 @@ int main(int argc, char const *argv[]) {
 			<< "--smtp-port (\"0\"): Alter the listening port of the SMTP server.\n"
 			<< "--smtp-forward (\"\"): If specified, forwards all received emails to "
 				 "listed address.\n"
-			<< "--domain (\"gilgamesh.cc\"): Configured domain for SMTP server and "
-				 "HTTP endpoints.\n"
 			<< "--smtp-password (\"\"): If specified, enables authenticated "
 				 "clients to send from domain.\n"
 			<< std::endl;
 		return 0;
 	}
 
-	state.signature = signature.str();
-	std::time_t time =
-		std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-	Rain::Time::localtime_r(&time, &state.processBegin);
+	// Shared state.
+	Rain::Networking::Smtp::Mailbox smtpForward(smtpForwardStr);
+	std::atomic_bool echo{false};
+	std::time_t time{
+		std::chrono::system_clock::to_time_t(std::chrono::system_clock::now())};
+	std::tm processBegin;
+	Rain::Time::localtime_r(&time, &processBegin);
 
-	// Launch both servers.
-	state.httpServer.reset(new Emilia::Http::Server(state, {"", httpPort}));
-	std::cout << "HTTP server listening on " << state.httpServer->host() << "..."
+	// Launch both servers. HTTP server requires SMTP server state.
+	auto newSmtpServer = [&]() {
+		return new Emilia::Smtp::Server(
+			{"", smtpPort}, echo, smtpForward, smtpPassword);
+	};
+	std::unique_ptr<Emilia::Smtp::Server> smtpServer(newSmtpServer());
+	std::cout << "SMTP server listening on " << smtpServer->host() << "..."
 						<< std::endl;
-	state.smtpServer.reset(new Emilia::Smtp::Server(state, {"", smtpPort}));
-	std::cout << "SMTP server listening on " << state.smtpServer->host() << "..."
+	auto newHttpServer = [&]() {
+		return new Emilia::Http::Server(
+			{"", httpPort}, processBegin, smtpServer, echo);
+	};
+	std::unique_ptr<Emilia::Http::Server> httpServer(newHttpServer());
+	std::cout << "HTTP server listening on " << httpServer->host() << "..."
 						<< std::endl;
 
 	// Parse commands.
@@ -80,13 +82,12 @@ int main(int argc, char const *argv[]) {
 				<< "Command options:\n"
 				<< "help: Display this help message.\n"
 				<< "exit: Attempt graceful shutdown and exit.\n"
-				<< "stop http: Graceful shutdown HTTP server.\n"
 				<< "stop smtp: Graceful shutdown SMTP server.\n"
-				<< "start http: If HTTP server stopped, start it.\n"
+				<< "stop http: Graceful shutdown HTTP server.\n"
 				<< "start smtp: If SMTP server stopped, start it.\n"
-				<< "modify http: Modify HTTP server port. Restart required.\n"
+				<< "start http: If HTTP server stopped, start it.\n"
 				<< "modify smtp: Modify SMTP server port. Restart required.\n"
-				<< "clear cache: Clear HTTP static file cache.\n"
+				<< "modify http: Modify HTTP server port. Restart required.\n"
 				<< "clear outbox: Clear non-PENDING outbox history.\n"
 				<< "modify forward: Modify SMTP forwarding address.\n"
 				<< "modify password: Modify SMTP authentication password.\n"
@@ -95,76 +96,72 @@ int main(int argc, char const *argv[]) {
 				<< std::endl;
 		} else if (command == "exit") {
 			break;
-		} else if (command == "stop http") {
-			state.httpServer.reset();
-			std::cout << "Stopped." << std::endl;
 		} else if (command == "stop smtp") {
-			state.smtpServer.reset();
+			smtpServer.reset();
 			std::cout << "Stopped." << std::endl;
-		} else if (command == "start http") {
-			if (state.httpServer) {
-				std::cout << "HTTP server already listening on "
-									<< state.httpServer->host() << '.' << std::endl;
-			} else {
-				Rain::Error::consumeThrowable(
-					[&state, &httpPort]() {
-						state.httpServer.reset(
-							new Emilia::Http::Server(state, {"", httpPort}));
-						std::cout << "HTTP server listening on " << state.httpServer->host()
-											<< "..." << std::endl;
-					},
-					RAIN_ERROR_LOCATION)();
-			}
+		} else if (command == "stop http") {
+			httpServer.reset();
+			std::cout << "Stopped." << std::endl;
 		} else if (command == "start smtp") {
-			if (state.smtpServer) {
-				std::cout << "SMTP server already listening on "
-									<< state.smtpServer->host() << '.' << std::endl;
+			if (smtpServer) {
+				std::cout << "SMTP server already listening on " << smtpServer->host()
+									<< '.' << std::endl;
 			} else {
 				Rain::Error::consumeThrowable(
-					[&state, &smtpPort]() {
-						state.smtpServer.reset(
-							new Emilia::Smtp::Server(state, {"", smtpPort}));
-						std::cout << "SMTP server listening on " << state.smtpServer->host()
+					[&]() {
+						smtpServer.reset(newSmtpServer());
+						std::cout << "SMTP server listening on " << smtpServer->host()
 											<< "..." << std::endl;
 					},
 					RAIN_ERROR_LOCATION)();
 			}
-		} else if (command == "modify http") {
-			std::cout << "Modified HTTP port: ";
-			std::getline(std::cin, httpPort);
-			std::cout << "Modified." << std::endl;
+		} else if (command == "start http") {
+			if (httpServer) {
+				std::cout << "HTTP server already listening on " << httpServer->host()
+									<< '.' << std::endl;
+			} else {
+				Rain::Error::consumeThrowable(
+					[&]() {
+						httpServer.reset(newHttpServer());
+						std::cout << "HTTP server listening on " << httpServer->host()
+											<< "..." << std::endl;
+					},
+					RAIN_ERROR_LOCATION)();
+			}
 		} else if (command == "modify smtp") {
 			std::cout << "Modified SMTP port: ";
 			std::getline(std::cin, smtpPort);
 			std::cout << "Modified." << std::endl;
-		} else if (command == "clear cache") {
-			std::unique_lock lck(state.fileCacheMtx);
-			state.fileCache.clear();
-			std::cout << "Cleared." << std::endl;
+		} else if (command == "modify http") {
+			std::cout << "Modified HTTP port: ";
+			std::getline(std::cin, httpPort);
+			std::cout << "Modified." << std::endl;
 		} else if (command == "clear outbox") {
-			std::unique_lock lck(state.outboxMtx);
-			std::cout << state.outbox.size() << " total in outbox." << std::endl;
-			for (auto it = state.outbox.begin(); it != state.outbox.end();) {
+			std::unique_lock lck(smtpServer->outboxMtx);
+			std::cout << smtpServer->outbox.size() << " total in outbox."
+								<< std::endl;
+			for (auto it = smtpServer->outbox.begin();
+					 it != smtpServer->outbox.end();) {
 				if (it->status == Emilia::Envelope::Status::PENDING) {
 					it++;
 					continue;
 				}
-				it = state.outbox.erase(it);
+				it = smtpServer->outbox.erase(it);
 			}
-			std::cout << state.outbox.size() << " remaining in outbox." << std::endl;
+			std::cout << smtpServer->outbox.size() << " remaining in outbox."
+								<< std::endl;
 		} else if (command == "modify forward") {
 			std::cout << "Modified SMTP forward: ";
 			std::getline(std::cin, smtpForwardStr);
-			state.smtpForward = smtpForwardStr;
+			smtpForward = smtpForwardStr;
 			std::cout << "Modified." << std::endl;
 		} else if (command == "modify password") {
 			std::cout << "Modified SMTP password: ";
-			std::getline(std::cin, state.smtpPassword);
+			std::getline(std::cin, smtpPassword);
 			std::cout << "Modified." << std::endl;
 		} else if (command == "toggle echo") {
-			state.echo = !state.echo;
-			std::cout << "Echo is " << (state.echo ? "on" : "off") << '.'
-								<< std::endl;
+			echo = !echo;
+			std::cout << "Echo is " << (echo ? "on" : "off") << '.' << std::endl;
 		} else {
 			std::cout << "Invalid command: " << command << '.' << std::endl;
 		}
@@ -173,8 +170,8 @@ int main(int argc, char const *argv[]) {
 	// Attempt graceful close.
 	std::cout << "Attempting graceful close of HTTP and SMTP servers..."
 						<< std::endl;
-	state.httpServer.reset();
-	state.smtpServer.reset();
+	httpServer.reset();
+	smtpServer.reset();
 	std::cout << "Gracefully closed HTTP and SMTP servers." << std::endl;
 
 	return 0;

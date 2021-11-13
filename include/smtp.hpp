@@ -1,13 +1,16 @@
 // Public interfaces for smtp.cpp.
 #pragma once
 
-#include "state.hpp"
-
 #include <rain.hpp>
 
+#include "envelope.hpp"
+
 #include <map>
+#include <shared_mutex>
 
 namespace Emilia::Smtp {
+	class Server;
+
 	class Worker : public Rain::Networking::Smtp::Worker<
 									 Rain::Networking::Smtp::Request,
 									 Rain::Networking::Smtp::Response,
@@ -32,11 +35,12 @@ namespace Emilia::Smtp {
 			Rain::Networking::TcpProtocolInterface,
 			Rain::Networking::NoLingerSocketOption>;
 
-		State &state;
 		bool authenticated = false;
 
+		Server &server;
+
 		public:
-		Worker(NativeSocket, SocketInterface *, State &);
+		Worker(NativeSocket, SocketInterface *, Server &);
 
 		using SuperWorker::send;
 		using SuperWorker::recv;
@@ -52,36 +56,6 @@ namespace Emilia::Smtp {
 		virtual ResponseAction onRset(Request &) override;
 		virtual ResponseAction onAuthLogin(std::string const &, std::string const &)
 			override;
-	};
-
-	class Server : public Rain::Networking::Smtp::Server<
-									 Worker,
-									 Rain::Networking::Ipv6FamilyInterface,
-									 Rain::Networking::StreamTypeInterface,
-									 Rain::Networking::TcpProtocolInterface,
-									 Rain::Networking::DualStackSocketOption,
-									 Rain::Networking::NoLingerSocketOption> {
-		private:
-		using SuperServer = Rain::Networking::Smtp::Server<
-			Worker,
-			Rain::Networking::Ipv6FamilyInterface,
-			Rain::Networking::StreamTypeInterface,
-			Rain::Networking::TcpProtocolInterface,
-			Rain::Networking::DualStackSocketOption,
-			Rain::Networking::NoLingerSocketOption>;
-
-		State &state;
-
-		// Manages the outbox.
-		std::thread sender;
-		bool closed = false;
-
-		public:
-		Server(State &, Host const &);
-		virtual ~Server();
-
-		private:
-		virtual Worker makeWorker(NativeSocket, SocketInterface *) override;
 	};
 
 	class Client : public Rain::Networking::Smtp::Client<
@@ -110,16 +84,65 @@ namespace Emilia::Smtp {
 
 		using SuperClient::SuperClient;
 
-		State &state;
+		Server &server;
 
 		public:
-		Client(
-			State &,
-			std::vector<std::pair<std::size_t, std::string>> const &);
+		Client(std::vector<std::pair<std::size_t, std::string>> const &, Server &);
 
 		using SuperClient::send;
 		using SuperClient::recv;
 		virtual void send(Request &) override;
 		virtual Response &recv(Response &) override;
+	};
+
+	class Server : public Rain::Networking::Smtp::Server<
+									 Worker,
+									 Rain::Networking::Ipv6FamilyInterface,
+									 Rain::Networking::StreamTypeInterface,
+									 Rain::Networking::TcpProtocolInterface,
+									 Rain::Networking::DualStackSocketOption,
+									 Rain::Networking::NoLingerSocketOption> {
+		// Allow state access.
+		friend Worker;
+		friend Client;
+
+		private:
+		using SuperServer = Rain::Networking::Smtp::Server<
+			Worker,
+			Rain::Networking::Ipv6FamilyInterface,
+			Rain::Networking::StreamTypeInterface,
+			Rain::Networking::TcpProtocolInterface,
+			Rain::Networking::DualStackSocketOption,
+			Rain::Networking::NoLingerSocketOption>;
+
+		// Incoming mail is stored in the outbox and sent periodically by a server
+		// thread. The key is the last time the mail was attempted, or min if never.
+		std::condition_variable_any outboxEv;
+
+		public:
+		// Allow public access from HTTP endpoint and main management.
+		std::shared_mutex outboxMtx;
+		std::set<Envelope> outbox;
+
+		private:
+		// Manages the outbox.
+		std::thread sender;
+		bool closed = false;
+
+		// Other state from constructor.
+		std::atomic_bool const &echo;
+		Rain::Networking::Smtp::Mailbox const &smtpForward;
+		std::string const &smtpPassword;
+
+		public:
+		Server(
+			Host const &,
+			std::atomic_bool const &,
+			Rain::Networking::Smtp::Mailbox const &,
+			std::string const &);
+		virtual ~Server();
+
+		private:
+		virtual Worker makeWorker(NativeSocket, SocketInterface *) override;
 	};
 }
