@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.2.2
+
+Added a poem.
+
 ## 8.2.1
 
 * Update lore.
