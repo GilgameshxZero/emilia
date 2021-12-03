@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.2.3
+
+Initial writeup for square frames.
+
 ## 8.2.2
 
 Added a poem.
