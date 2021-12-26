@@ -16,9 +16,6 @@ namespace Emilia {
 		std::size_t attempt;
 		std::chrono::steady_clock::time_point attemptTime;
 
-		// Stores the system_clock equivalent of attemptTime.
-		std::chrono::system_clock::time_point attemptSystemTime;
-
 		Rain::Networking::Smtp::Mailbox from, to;
 
 		// The file containing the email data; only those with status PENDING or

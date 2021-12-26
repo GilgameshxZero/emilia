@@ -89,6 +89,7 @@ int main(int argc, char const *argv[]) {
 				<< "modify smtp: Modify SMTP server port. Restart required.\n"
 				<< "modify http: Modify HTTP server port. Restart required.\n"
 				<< "clear outbox: Clear non-PENDING outbox history.\n"
+				<< "trigger outbox: Trigger a send of any ready PENDING envelopes.\n"
 				<< "modify forward: Modify SMTP forwarding address.\n"
 				<< "modify password: Modify SMTP authentication password.\n"
 				<< "toggle echo: Toggles echoing of all parsed requests/responses to "
@@ -150,6 +151,9 @@ int main(int argc, char const *argv[]) {
 			}
 			std::cout << smtpServer->outbox.size() << " remaining in outbox."
 								<< std::endl;
+		} else if (command == "trigger outbox") {
+			smtpServer->outboxEv.notify_one();
+			std::cout << "Triggered outbox send event." << std::endl;
 		} else if (command == "modify forward") {
 			std::cout << "Modified SMTP forward: ";
 			std::getline(std::cin, smtpForwardStr);

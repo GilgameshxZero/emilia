@@ -171,8 +171,10 @@ namespace Emilia::Http {
 				if (it.attemptTime < std::chrono::steady_clock::now() - 72h) {
 					break;
 				}
-				std::time_t time =
-					std::chrono::system_clock::to_time_t(it.attemptSystemTime);
+				std::time_t time = std::chrono::system_clock::to_time_t(
+					std::chrono::system_clock::now() +
+					std::chrono::duration_cast<std::chrono::system_clock::duration>(
+						it.attemptTime - std::chrono::steady_clock::now()));
 				std::tm timeData;
 				Rain::Time::localtime_r(&time, &timeData);
 				ss << std::put_time(&timeData, "%F %T %z") << " | ";

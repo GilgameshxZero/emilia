@@ -33,6 +33,11 @@ namespace Emilia::Smtp {
 	Worker::ResponseAction Worker::onHelo(Request &) {
 		return {{StatusCode::REQUEST_COMPLETED, {"gilgamesh.cc", "AUTH LOGIN"}}};
 	}
+	Worker::ResponseAction Worker::onEhlo(Request &) {
+		return {
+			{StatusCode::REQUEST_COMPLETED,
+			 {"gilgamesh.cc", "AUTH LOGIN", "8BITMIME", "SMTPUTF8"}}};
+	}
 	Worker::ResponseAction Worker::onMailMailbox(Mailbox const &mailbox) {
 		// If authenticated, allow from any mailbox. Otherwise, limit against
 		// domain mailboxes.
@@ -65,12 +70,14 @@ namespace Emilia::Smtp {
 			std::time_t timeNow = time(nullptr);
 			std::tm timeData;
 			Rain::Time::localtime_r(&timeNow, &timeData);
+			// Base64 is not filename-safe, so we replace '/' with '_' instead.
+			std::string fromB64{Rain::String::Base64::encode(this->mailFrom.value())};
+			std::replace(fromB64.begin(), fromB64.end(), '/', '_');
 			std::stringstream dataPathStream;
 			dataPathStream << "../smtp/" << timeData.tm_year << "-" << timeData.tm_mon
 										 << "-" << timeData.tm_mday << "-" << timeData.tm_hour
 										 << "-" << timeData.tm_min << "-" << timeData.tm_sec << "-"
-										 << Rain::String::Base64::encode(this->mailFrom.value())
-										 << "-" << std::rand();
+										 << fromB64 << "-" << std::rand();
 			dataPath = dataPathStream.str();
 			if (!std::filesystem::exists(dataPath)) {
 				break;
@@ -88,9 +95,10 @@ namespace Emilia::Smtp {
 		// Push the new envelopes to the outbox for the Server to send.
 		for (Mailbox const &rcptMailbox : this->rcptTo) {
 			// Envelope data is copied from the dataFile.
+			std::string toB64{Rain::String::Base64::encode(rcptMailbox)};
+			std::replace(toB64.begin(), toB64.end(), '/', '_');
 			std::filesystem::path envelopeDataPath(
-				dataPath.string() + "-" + Rain::String::Base64::encode(rcptMailbox) +
-				".email");
+				dataPath.string() + "-" + toB64 + ".email");
 			std::filesystem::copy(dataPath, envelopeDataPath);
 
 			// Emplace new envelope.
@@ -167,33 +175,44 @@ namespace Emilia::Smtp {
 			// Attempt remaining envelopes in the outbox every hour or so. Envelopes
 			// will be ready to be retried every hour.
 			while (!this->closed) {
-				// Just in case of throw.
+				// Log any throws.
 				Rain::Error::consumeThrowable(
 					[this]() {
 						static auto const retryWait = 4h;
 						std::vector<Envelope> toAttempt;
 						{
+							// This lambda should only be called while we have an exclusive
+							// lock on the outboxMtx.
+							auto const getAttemptEnvelopes = [this, &toAttempt]() {
+								// Assume we have exclusive lock. Move all envelopes we want to
+								// send from the outbox to toAttempt.
+								for (auto it = this->outbox.begin();
+										 it != this->outbox.end();) {
+									if (it->status != Envelope::Status::PENDING) {
+										break;
+									}
+									if (it->attemptTime > std::chrono::steady_clock::now()) {
+										it++;
+										continue;
+									}
+									toAttempt.emplace_back(*it);
+									it = this->outbox.erase(it);
+								}
+							};
+
+							// Wait on mutex only if no pending envelopes are ready yet.
 							std::unique_lock lck(this->outboxMtx);
-							this->outboxEv.wait_for(lck, retryWait);
-							if (this->closed) {
-								return;
+							getAttemptEnvelopes();
+							if (toAttempt.empty()) {
+								this->outboxEv.wait_for(lck, retryWait);
+								if (this->closed) {
+									return;
+								}
+								getAttemptEnvelopes();
 							}
 
-							// We have exclusive lock. Move down all the envelopes we want to
-							// send.
-							for (auto it = this->outbox.begin(); it != this->outbox.end();) {
-								if (it->status != Envelope::Status::PENDING) {
-									break;
-								}
-								if (it->attemptTime > std::chrono::steady_clock::now()) {
-									it++;
-									continue;
-								}
-								toAttempt.emplace_back(*it);
-								it = this->outbox.erase(it);
-							}
-
-							// Done with exclusive lock; we will add any envelopes back later.
+							// Done with exclusive lock; we will add these envelopes back
+							// later with an updated status.
 						}
 
 						// All attempted envelopes should be PENDING.
@@ -225,7 +244,7 @@ namespace Emilia::Smtp {
 										return res;
 									}
 								}
-								client.send({Command::HELO, "gilgamesh.cc"});
+								client.send({Command::EHLO, "gilgamesh.cc"});
 								{
 									auto res = client.recv();
 									if (res.statusCode != StatusCode::REQUEST_COMPLETED) {
@@ -299,7 +318,7 @@ namespace Emilia::Smtp {
 								sent = false;
 							}
 
-							// Mark envelope status.
+							// Update envelope status.
 							it.attemptTime = std::chrono::steady_clock::now();
 							if (sent) {
 								it.status = Envelope::Status::SUCCESS;
@@ -313,7 +332,7 @@ namespace Emilia::Smtp {
 						// RETRIED, insert a PENDING envelope in addition. For those marked
 						// as success, delete the data file.
 						std::unique_lock lck(this->outboxMtx);
-						for (auto &it : toAttempt) {
+						for (auto const &it : toAttempt) {
 							if (it.status == Envelope::Status::SUCCESS) {
 								std::filesystem::remove(it.data);
 							} else if (it.status == Envelope::Status::RETRIED) {

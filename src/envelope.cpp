@@ -11,16 +11,12 @@ namespace Emilia {
 			: status(status),
 				attempt(attempt),
 				attemptTime(attemptTime),
-				attemptSystemTime(
-					std::chrono::system_clock::now() +
-					std::chrono::duration_cast<std::chrono::system_clock::duration>(
-						attemptTime - std::chrono::steady_clock::now())),
 				from(from),
 				to(to),
 				data(data) {}
 	bool Envelope::operator<(Envelope const &other) const {
 		// PENDING envelopes are always sorted first. Everything else is sorted by
-		// lastAttempt. Stale envelopes are last.
+		// lastAttempt. Stale envelopes are sorted later in either case.
 		if (this->status == Status::PENDING && other.status != Status::PENDING) {
 			return true;
 		} else if (
