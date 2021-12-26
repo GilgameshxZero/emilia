@@ -164,13 +164,9 @@ namespace Emilia::Http {
 
 		{
 			std::shared_lock lck(this->server.smtpServer->outboxMtx);
-			ss << "Recent SMTP activity (from "
-				 << this->server.smtpServer->outbox.size() << " total): \n";
+			ss << "SMTP activity (" << this->server.smtpServer->outbox.size()
+				 << " total): \n";
 			for (auto const &it : this->server.smtpServer->outbox) {
-				// Show only outbox from last 3 days.
-				if (it.attemptTime < std::chrono::steady_clock::now() - 72h) {
-					break;
-				}
 				std::time_t time = std::chrono::system_clock::to_time_t(
 					std::chrono::system_clock::now() +
 					std::chrono::duration_cast<std::chrono::system_clock::duration>(

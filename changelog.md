@@ -5,6 +5,10 @@
 * SMTP server occasionally fails to terminate upon the `exit` command, and continues to accept additional SMTP connections.
 * Select emails from `ghost.exponentialview.com` and `mg2.substack.com` do not receive any Envelope data.
 
+## 8.2.7
+
+List all SMTP activity in `/status`.
+
 ## 8.2.6
 
 * Remove "competitive programming" from `erlija-past` map marker.
