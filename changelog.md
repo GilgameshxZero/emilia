@@ -5,6 +5,10 @@
 * SMTP server occasionally fails to terminate upon the `exit` command, and continues to accept additional SMTP connections.
 * Select emails from `ghost.exponentialview.com` and `mg2.substack.com` do not receive any Envelope data.
 
+## 8.2.6
+
+* Remove "competitive programming" from `erlija-past` map marker.
+
 ## 8.2.5
 
 * Increase server & client timeouts from 15 to 60 seconds, since some SMTP servers are slow to respond initially (e.g. `tormails.com`). This may solve the bug where select emails from `ghost.exponentialview.com` and `mg2.substack.com` do not receive any Envelope data, but is pending testing.
