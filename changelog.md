@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.2.4
+
+Updated rain to `7.1.19`. Modified square frames writeup to remove speculative algorithms.
+
 ## 8.2.3
 
 Initial writeup for square frames.
