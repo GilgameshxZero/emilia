@@ -1,4 +1,4 @@
-# Competitive Programming: Homochromatic Square Frames
+# Homochromatic Square Frames
 
 One of my favorite problems, originally heard in a Microsoft interview. There, an $O(N^4)$ solution was sufficient.
 
@@ -84,18 +84,4 @@ Finally, recall that segment tree range queries and point updates are both $O(\l
 
 ## $O(N^2\alpha(N))$ (for inverse-Ackermann function $\alpha$)
 
-Additional work can be optimized from the $O(N^2\ln N)$ approach by reconsidering the necessary sorts and segment trees in thresholding $X_{i+k,j+k}$ as desired. Recall the subproblem as follows:
-
-> On each diagonal $d$, for each upper-left corner $i,j$, we must find in the set $X_{i+k,j+k}$ of candidate bottom-right corners and derivative diangonal-wise lists $S_d$, $Y_d$ the index $e$ with maximum $Y_{d,e}$ where $S_{d,e}\geq -i$ and $Y_{d,e}\leq K_{i,j}$.
-
-Of course, we will no longer be able to sort $S_d$ for this approach. For this approach, assume that $S_d$ and likewise $Y_d$ are arranged in order from upper-left to bottom-right on the diagonal: that is, $S_{d,0}$ corresponds to the upper-most square on the diagonal. We perform an implicit sort by iterating through $e$ along the diagonal: upon considering a new $e$ corresponding to $i,j$, we place a *marker* on index $e+K_{i,j}$. At the time of seeing a marker for a previous $e'$, we know that all the $Y_{d,e}$ we have previously seen must definitely satisfy $Y_{d,e}\leq K_{i,j}$. It remains to satisfy the threshold condition and take a max over the $Y_{d,e}$. This marker-placing process takes $O(N^2)$ in total, as desired.
-
-For a given marker on index $e$ previously placed, let $E_{d,e}$ store the pair $i,j$ which originally placed the marker. Recall that this means that the cell $e$ and the cell $i,j$ form a boundary around all candidate squares to consider for the upper-left corner $i,j$, where we already know the top and left edges of each are completely black. The expression $-E_{d,e,0}$ then computes the lower-bound for $S_{d,e}$ which we consider for the max $Y_{d,e}$.
-
-Across the entire diagonal, the lower-bound thresholds to consider form a very complete set, beginning with $-i$ of the $i,j$ of the upper-left cell in the diagonal to $-i-k$ of $i+k,j+k$ of the bottom-right cell in the diagonal. Once a threshold $-i$ is processed with the processing of the marker $e$ whose expression $-E_{d,e,0}$ computes $-i$, it will never be encountered again. We can interpret the $S_{d,e}$ as being placed into $O(N)$ bins along each diagonal. Thresholding by $-i$ during marker processing simply asks for the max associated $Y_{d,e}$ along a postfix of the bins at the time of the marker processing. Observe that we will never query the same postfix twice. Similarly, each bin need only store the maximum $Y_{d,e}$ whose $S_{d,e}$ lands in the bin.
-
-We now make *skip pointers* between the $O(N)$ bins, where each skip pointer points to the not-less-negative threshold bin with the largest $Y_{d,e}$ (may be itself). Updating a bin (with a larger $Y_{d,e}$) will not modify its skip pointer; however, querying a bin for the largest $Y_{d,e}$ amongst its not-less-negative will afterwards set its skip pointer to point to the bin which contains the query answer. To perform a query, we simply follow the skip pointers until they loop to the same node; that means that we have found the largest $Y_{d,e}$ amongst this threshold (bin)’s not-less-negative threshold (bin)’s, as desired.
-
-This *skip pointer* approach is exactly the ask of the union-find/disjoint-set-union data structure (DSU) on $O(N)$ nodes. With path compression and union by rank, DSUs average $O(\alpha(N))$ per query and update. Thus, over $O(N)$ nodes per $O(N)$ diagonals, this forms the bottleneck of the approach at $O(N^2\alpha(N))$.
-
-
+WIP
