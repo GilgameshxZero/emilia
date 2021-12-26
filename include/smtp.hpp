@@ -16,8 +16,8 @@ namespace Emilia::Smtp {
 									 Rain::Networking::Smtp::Response,
 									 1 << 10,
 									 1 << 10,
-									 15000,
-									 15000,
+									 60000,
+									 60000,
 									 Rain::Networking::Ipv6FamilyInterface,
 									 Rain::Networking::StreamTypeInterface,
 									 Rain::Networking::TcpProtocolInterface,
@@ -28,8 +28,8 @@ namespace Emilia::Smtp {
 			Rain::Networking::Smtp::Response,
 			1 << 10,
 			1 << 10,
-			15000,
-			15000,
+			60000,
+			60000,
 			Rain::Networking::Ipv6FamilyInterface,
 			Rain::Networking::StreamTypeInterface,
 			Rain::Networking::TcpProtocolInterface,
@@ -50,6 +50,7 @@ namespace Emilia::Smtp {
 		private:
 		virtual bool onInitialResponse() override;
 		virtual ResponseAction onHelo(Request &) override;
+		virtual ResponseAction onEhlo(Request &) override;
 		virtual ResponseAction onMailMailbox(Mailbox const &) override;
 		virtual ResponseAction onRcptMailbox(Mailbox const &) override;
 		virtual ResponseAction onDataStream(std::istream &) override;
@@ -63,8 +64,8 @@ namespace Emilia::Smtp {
 									 Rain::Networking::Smtp::Response,
 									 1 << 10,
 									 1 << 10,
-									 15000,
-									 15000,
+									 60000,
+									 60000,
 									 Rain::Networking::Ipv4FamilyInterface,
 									 Rain::Networking::StreamTypeInterface,
 									 Rain::Networking::TcpProtocolInterface,
@@ -75,8 +76,8 @@ namespace Emilia::Smtp {
 			Rain::Networking::Smtp::Response,
 			1 << 10,
 			1 << 10,
-			15000,
-			15000,
+			60000,
+			60000,
 			Rain::Networking::Ipv4FamilyInterface,
 			Rain::Networking::StreamTypeInterface,
 			Rain::Networking::TcpProtocolInterface,
@@ -115,11 +116,11 @@ namespace Emilia::Smtp {
 			Rain::Networking::DualStackSocketOption,
 			Rain::Networking::NoLingerSocketOption>;
 
+		public:
 		// Incoming mail is stored in the outbox and sent periodically by a server
 		// thread. The key is the last time the mail was attempted, or min if never.
 		std::condition_variable_any outboxEv;
 
-		public:
 		// Allow public access from HTTP endpoint and main management.
 		std::shared_mutex outboxMtx;
 		std::set<Envelope> outbox;
@@ -127,7 +128,7 @@ namespace Emilia::Smtp {
 		private:
 		// Manages the outbox.
 		std::thread sender;
-		bool closed = false;
+		std::atomic_bool closed = false;
 
 		// Other state from constructor.
 		std::atomic_bool const &echo;

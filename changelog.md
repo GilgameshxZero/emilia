@@ -1,5 +1,18 @@
 # Changelog
 
+## Known issues
+
+* SMTP server occasionally fails to terminate upon the `exit` command, and continues to accept additional SMTP connections.
+* Select emails from `ghost.exponentialview.com` and `mg2.substack.com` do not receive any Envelope data.
+
+## 8.2.5
+
+* Increase server & client timeouts from 15 to 60 seconds, since some SMTP servers are slow to respond initially (e.g. `tormails.com`). This may solve the bug where select emails from `ghost.exponentialview.com` and `mg2.substack.com` do not receive any Envelope data, but is pending testing.
+* Remove incorrectly updated `attemptSystemTime` in `Envelope`, instead calculating the `system_clock::time_point` dynamically upon hitting the relevant HTTP endpoint. This solves the incorrect SMTP timestamp sorting order bug on the `/status` endpoint.
+* Check for sendable PENDING envelopes both before and after waiting on the `outboxEv` solving the bug of sometimes delaying sendable PENDING envelopes until the next trigger of `outboxEv`.
+* Switched SMTP client to `EHLO` and returned additional `8BITMIME` and `SMTPUTF8` extensions on receiving a `EHLO` in server. This allows support for Unicode/international mailboxes.
+* Use `_` instead of `/` while base-64 encoding from and to address for envelope data filenames to avoid invalid filenames containing `/`.
+
 ## 8.2.4
 
 Updated rain to `7.1.19`. Modified square frames writeup to remove speculative algorithms.
