@@ -74,7 +74,7 @@ namespace Emilia::Smtp {
 			std::string fromB64{Rain::String::Base64::encode(this->mailFrom.value())};
 			std::replace(fromB64.begin(), fromB64.end(), '/', '_');
 			std::stringstream dataPathStream;
-			dataPathStream << "../smtp/" << timeData.tm_year << "-" << timeData.tm_mon
+			dataPathStream << "/tmp/" << timeData.tm_year << "-" << timeData.tm_mon
 										 << "-" << timeData.tm_mday << "-" << timeData.tm_hour
 										 << "-" << timeData.tm_min << "-" << timeData.tm_sec << "-"
 										 << fromB64 << "-" << std::rand();

@@ -99,6 +99,14 @@ run: build
 clean:
 	@IF EXIST $(BIN_DIR) RD /Q /S $(BIN_DIR)
 	@IF EXIST $(OBJ_DIR) RD /Q /S $(OBJ_DIR)
+# Prepare HTML essays.
+essay:
+	@<<essay.bat
+@ECHO OFF
+FOR %%F IN ($(ROOT_DIR)static\essay\*.html) DO (
+	sed -E -i -z -e "s/<head>.*<body class=\"vscode-body vscode-light\">(.*)<\/body>/<head><meta charset=\"utf-8\"\/><\/head><body><template>\1<\/template><\/body>/g" %%F
+)
+<<NOKEEP
 # Increment version number.
 $(PROJECT_VERSION_INCLUDE): $(PROJECT_INCLUDES) $(PROJECT_SRC_DIR)$(SOURCES)
 	@increment.bat
@@ -194,6 +202,10 @@ run: build
 	@cd $(BIN_DIR) && ./$(PROJECT_BIN) $(ARGUMENTS)
 clean:
 	@rm -rf $(OBJ_DIR) $(BIN_DIR)
+essay:
+	@for f in ../static/essay/*.html; do\
+		sed -E -i -z -e "s/<head>.*<body class=\"vscode-body vscode-light\">(.*)<\/body>/<head><meta charset=\"utf-8\"\/><\/head><body><template>\1<\/template><\/body>/g" $$f;\
+	done
 # Increment version number.
 $(PROJECT_VERSION_INCLUDE): $(PROJECT_INCLUDES) $(PROJECT_SRC_DIR)$(SOURCES)
 	@read LINE < $(PROJECT_VERSION_INCLUDE);\
