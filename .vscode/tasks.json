@@ -45,7 +45,7 @@
 		{
 			/* Build the open essay HTML from VSCode Markdown HTML to essay HTML. */
 			"type": "shell",
-			"label": "prepare-essay",
+			"label": "essay",
 			"options": { "cwd": "${workspaceFolder}/build" },
 			"presentation": {
 				"clear": true,
@@ -53,8 +53,10 @@
 			},
 			"group": "build",
 
-			"command": "sh",
-			"args": ["prepare-essay.sh", "${file}"]
+			"command": "make",
+			"args": ["essay"],
+
+			"windows": { "command": "nmake" }
 		}
 	]
 }
