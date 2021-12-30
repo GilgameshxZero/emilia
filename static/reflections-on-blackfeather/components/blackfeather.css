@@ -47,3 +47,10 @@ article {
 	padding: 0 2em;
 	max-width: calc(4em + 80ch);
 }
+
+/* TODO: mobile hotfix. */
+@media screen and (max-width: 32em) {
+	emilia-neon {
+		width: 2em;
+	}
+}
