@@ -3,8 +3,12 @@
 ## Known issues
 
 * Frontend cache/storyworld/endpoint policy needs reworking.
-* SMTP server occasionally fails to terminate upon the `exit` command, and continues to accept additional SMTP connections.
 * Select emails from `ghost.exponentialview.com` and `mg2.substack.com` do not receive any Envelope data.
+* Some SMTP thread is busy-waiting, using 100% CPU as well as disabling graceful exit.
+
+## 8.3.1
+
+Enable linking to pages in `reflections-on-blackfeather`, as well as update `Makefile` to use `snapshots` instead of `essay`.
 
 ## 8.3.0
 

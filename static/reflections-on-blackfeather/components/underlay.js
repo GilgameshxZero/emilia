@@ -12,10 +12,12 @@ registerComponent(
 		}
 
 		toCoast() {
+			window.history.pushState(null, ``, `/`);
 			this.setAttribute(`location`, `coast`);
 		}
 
 		toBlackfeather(snapshotName) {
+			window.history.pushState(null, ``, `/snapshots/${snapshotName}`);
 			this.setAttribute(`location`, `blackfeather`);
 			this.shadowRoot
 				.querySelector(`emilia-blackfeather`)
@@ -23,6 +25,7 @@ registerComponent(
 		}
 
 		toArx() {
+			window.history.pushState(null, ``, `/storyworlds`);
 			this.setAttribute(`location`, `arx`);
 		}
 	}
