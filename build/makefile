@@ -103,7 +103,7 @@ clean:
 essay:
 	@<<essay.bat
 @ECHO OFF
-FOR %%F IN ($(ROOT_DIR)static\essay\*.html) DO (
+FOR %%F IN ($(ROOT_DIR)static\snapshots\*.html) DO (
 	sed -E -i -z -e "s/<head>.*<body class=\"vscode-body vscode-light\">(.*)<\/body>/<head><meta charset=\"utf-8\"\/><\/head><body><template>\1<\/template><\/body>/g" %%F
 )
 <<NOKEEP
@@ -203,7 +203,7 @@ run: build
 clean:
 	@rm -rf $(OBJ_DIR) $(BIN_DIR)
 essay:
-	@for f in ../static/essay/*.html; do\
+	@for f in ../static/snapshots/*.html; do\
 		sed -E -i -z -e "s/<head>.*<body class=\"vscode-body vscode-light\">(.*)<\/body>/<head><meta charset=\"utf-8\"\/><\/head><body><template>\1<\/template><\/body>/g" $$f;\
 	done
 # Increment version number.
