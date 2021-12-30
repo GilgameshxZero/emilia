@@ -1,0 +1,25 @@
+:root,
+:host {
+	--scrollbar-width: 0.8em;
+}
+
+::-webkit-scrollbar,
+:host::-webkit-scrollbar {
+	width: var(--scrollbar-width);
+	height: var(--scrollbar-width);
+}
+
+::-webkit-scrollbar-track,
+:host::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+::-webkit-scrollbar-thumb,
+:host::-webkit-scrollbar-thumb {
+	background: #ffffff20;
+}
+
+::-webkit-scrollbar-thumb:hover,
+:host::-webkit-scrollbar-thumb:hover {
+	background: #ffffff40;
+}

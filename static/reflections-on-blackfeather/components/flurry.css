@@ -1,0 +1,21 @@
+@import "../colors.css";
+
+:host {
+	position: absolute;
+	overflow: hidden;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+
+	z-index: -1;
+}
+
+/* In order to load emilia-feather, it must be attached to this shadowRoot. However, prior to loading its CSS, it will FOUC. So, we must prevent FOUC in an already-loaded CSS: here. */
+emilia-feather {
+	display: none;
+}
+
+emilia-feather[active] {
+	display: initial;
+}

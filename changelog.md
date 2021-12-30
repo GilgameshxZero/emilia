@@ -2,8 +2,15 @@
 
 ## Known issues
 
+* Frontend cache/storyworld/endpoint policy needs reworking.
 * SMTP server occasionally fails to terminate upon the `exit` command, and continues to accept additional SMTP connections.
 * Select emails from `ghost.exponentialview.com` and `mg2.substack.com` do not receive any Envelope data.
+
+## 8.3.0
+
+Added a new theme/storyworld `reflections-on-blackfeather` which is now the default dark storyworld. Revamped frontend themes to allow for theme switching and reasonable defaulting & forcing. Still WIP to make this system robust.
+
+Added documentation for backend enabling this in `http.hpp`.
 
 ## 8.2.8
 

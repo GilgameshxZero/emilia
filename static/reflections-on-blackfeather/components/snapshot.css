@@ -1,0 +1,12 @@
+@import "../colors.css";
+@import "../snapshot.css";
+
+/* Force dark theme. */
+@import "../snapshot.force.dark.css";
+
+:host {
+	--foreground-color: var(--color-clouds);
+	--background-color: transparent;
+	padding-right: max(2em, 100% - 80ch);
+	padding-left: 2em;
+}

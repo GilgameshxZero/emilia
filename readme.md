@@ -1,5 +1,5 @@
 # emilia
 
-HTTP, SMTP server, and additional design and static documents for the `emilia` webproject currently hosted at `gilgamesh.cc` and subdomains `static`, `starfall`, `pastel`, `hyperpanel`, and `hyperspace`.
-
-Utilizes the `rain` library and a very similar build procedure. For build and development instructions, please visit `rain/readme.md`.
+HTTP & SMTP backend and frontend for the `emilia` project.
+Hosted at `gilgamesh.cc`. Utilizes the `rain` library for backend.
+For further documentation, please visit `rain/readme.md`.
