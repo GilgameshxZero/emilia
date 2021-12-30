@@ -1,0 +1,38 @@
+@import "../colors.css";
+
+:host {
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: flex-end;
+	/* This lets the neon bar fill up all space on the flex cross-axis, even when text is wrapped. */
+	align-content: stretch;
+	margin: 2em 0;
+
+	user-select: none;
+}
+
+emilia-neon {
+	flex: 0 0 auto;
+	width: 5em;
+	height: auto;
+	--direction: 90deg;
+
+	cursor: pointer;
+}
+
+:host > span {
+	display: flex;
+	flex-flow: column nowrap;
+	text-align: right;
+	padding: 0.5em;
+
+	font-family: Tomorrow;
+	cursor: pointer;
+}
+
+h1 {
+	margin: 0 0 0.3em 0;
+
+	font-weight: normal;
+	font-size: 1.4em;
+}

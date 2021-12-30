@@ -1,4 +1,4 @@
-@import "common/font.css";
+@import "fonts.css";
 
 html,
 body {
@@ -16,25 +16,20 @@ body {
 	overflow: hidden;
 
 	opacity: 1;
-	transition: opacity 1s;
+	transition: opacity 0.5s;
 }
 
 body[pre-load] {
 	opacity: 0;
 }
 
-body > :not(eutopia-sunset) {
+body > :not(emilia-sunset) {
 	opacity: 0;
-	transition: opacity 1s;
+	transition: opacity 0.5s;
 }
 
-body[active] > :not(eutopia-sunset) {
+body[active] > :not(emilia-sunset) {
 	opacity: 1;
-}
-
-/* Splash takes extra time to transition out. */
-body > eutopia-splash {
-	transition: opacity 2s;
 }
 
 /* Scrollbar for all components. */
@@ -55,7 +50,7 @@ body > eutopia-splash {
 	background: #00000040;
 }
 
-/* Printing options on essays cannot be set in a ShadowRoot. */
+/* Printing options on snapshot cannot be set in a ShadowRoot. */
 @media print {
 	@page {
 		margin: 1in;

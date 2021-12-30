@@ -1,0 +1,88 @@
+/* Shared CSS page for general VSCode-generated Markdown HTML. Forms a complete package without need for any additional CSS or JS. */
+@import "snapshot.fonts.css";
+@import "snapshot.katex.css";
+@import "snapshot.markdown.css";
+@import "snapshot.vscode.css";
+
+/* Variables to be redefined for custom styling. */
+:root,
+:host {
+	--paragraph-spacing: 2em;
+	--paragraph-indent: 0ch;
+	--line-height: 1.5;
+	--hr-content: "❄";
+
+	/* Traditionally shared variables between light/dark mode. */
+	--blockquote-background-color: rgba(127, 127, 127, 0.1);
+	--blockquote-border-color: rgba(0, 122, 204, 0.5);
+	--list-marker-color: rgb(0, 122, 204);
+}
+
+/* Traditionally light/dark mode-dependent variables. Derived from in-preview colors. Overridden when in VSCode web preview. */
+@media (prefers-color-scheme: light) {
+	:root,
+	:host {
+		--foreground-color: rgb(0, 0, 0);
+		--background-color: rgb(255, 255, 255);
+		--textlink-foreground-color: rgb(0, 106, 177);
+		--pre-background-color: rgba(220, 220, 220, 0.4);
+		--border-color: rgba(0, 0, 0, 0.18);
+		--code-color: rgb(163, 21, 21);
+	}
+}
+
+@media (prefers-color-scheme: dark) {
+	:root,
+	:host {
+		--foreground-color: rgb(212, 212, 212);
+		--background-color: rgb(30, 30, 30);
+		--textlink-foreground-color: rgb(55, 148, 255);
+		--pre-background-color: rgba(10, 10, 10, 0.4);
+		--border-color: rgba(255, 255, 255, 0.18);
+		--code-color: rgb(215, 186, 125);
+	}
+}
+
+html {
+	margin: 0;
+	padding: 0;
+}
+
+:host,
+body {
+	display: block;
+	width: calc(100% - 4em);
+	max-width: 80ch;
+	margin: 0;
+	padding: 2em max(2em, 50% - 40ch);
+	overflow-x: hidden;
+
+	font-family: "EB Garamond", Georgia, serif;
+	font-size: 1.2em;
+	line-height: var(--line-height);
+	color: var(--foreground-color);
+	background-color: var(--background-color);
+}
+
+/* Printing. Preferred-color-scheme is automatically set to light. */
+@media print {
+	@page {
+		margin: 1in;
+	}
+
+	:host,
+	body {
+		width: auto;
+		max-width: none;
+		margin: 0;
+		padding: 0;
+
+		font-size: 12pt;
+	}
+
+	.next-page-break {
+		clear: both;
+		break-after: page;
+		page-break-after: always;
+	}
+}

@@ -1,0 +1,36 @@
+<!-- Catch-all index.html. Defaults storyworld via call to `/api/storyworlds/defaults/{darkness}`, then reloads the page. -->
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!-- Transparent favicon and empty title. -->
+		<link
+			rel="icon"
+			type="image/png"
+			href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
+		/>
+		<title>&#65279;</title>
+		<script>
+			fetch(
+				`api/storyworlds/defaults/${
+					window.matchMedia &&
+					window.matchMedia(`(prefers-color-scheme: dark)`).matches
+						? `dark`
+						: `light`
+				}`
+			)
+				.then((res) => {
+					return res.text();
+				})
+				.then((text) => {
+					// Session cookie.
+					document.cookie = `storyworld-defaulted=${text}; Path=/`;
+
+					// Refresh to go to real index.
+					window.location.reload();
+				});
+		</script>
+	</head>
+	<body></body>
+</html>

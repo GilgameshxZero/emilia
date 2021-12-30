@@ -1,0 +1,26 @@
+:host {
+	opacity: 30%;
+	position: absolute;
+	left: -3rem;
+	top: var(--travel-begin-top);
+	animation: travel var(--time-travel) linear 1;
+}
+
+@keyframes travel {
+	100% {
+		left: var(--travel-end-left);
+		top: 100%;
+	}
+}
+
+img {
+	width: 3rem;
+	height: 3rem;
+	animation: spin var(--time-spin) linear infinite;
+}
+
+@keyframes spin {
+	100% {
+		transform: rotate(calc(360deg * var(--spin-direction)));
+	}
+}

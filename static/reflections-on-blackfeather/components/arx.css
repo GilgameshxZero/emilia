@@ -1,0 +1,43 @@
+@import "../colors.css";
+@import "../scrollbar.css";
+
+:host {
+	display: flex;
+	position: absolute;
+	overflow: overlay;
+	left: 0;
+	top: 0;
+	width: 50%;
+	height: 50%;
+}
+
+article {
+	margin: auto;
+	max-width: 80ch;
+	padding: 2em;
+
+	text-align: center;
+	font-family: Tomorrow;
+}
+
+emilia-sunflower,
+emilia-storyworld-portal {
+	height: 3rem;
+	width: 3rem;
+	padding: 1em;
+	margin: 0;
+}
+
+emilia-neon {
+	width: 5em;
+	height: 4em;
+	--direction: 180deg;
+
+	position: absolute;
+	bottom: 0;
+	left: calc(50% - 2.5em);
+}
+
+a {
+	color: var(--color-cherry);
+}
