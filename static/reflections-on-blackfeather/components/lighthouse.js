@@ -10,17 +10,17 @@ registerComponent(
 
 		onComponentDOMContentLoaded() {
 			this.componentLoad.then(() => {
-				this.shadowRoot.addEventListener(`click`, () => {
+				this.addEventListener(`click`, () => {
 					document
 						.querySelector(`emilia-underlay`)
 						.toBlackfeather(this.getAttribute(`name`));
 				});
-				this.shadowRoot.addEventListener(`mouseover`, () => {
+				this.addEventListener(`mouseover`, () => {
 					this.shadowRoot
 						.querySelector(`emilia-neon`)
 						.setAttribute(`active`, ``);
 				});
-				this.shadowRoot.addEventListener(`mouseout`, () => {
+				this.addEventListener(`mouseout`, () => {
 					this.shadowRoot
 						.querySelector(`emilia-neon`)
 						.removeAttribute(`active`);

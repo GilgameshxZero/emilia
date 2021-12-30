@@ -16,8 +16,8 @@ div[name="bookmark"] {
 	left: calc(100% - 10em);
 	top: -2em;
 	width: calc(1.5 * max(100vh, 30vw) + 4em);
-	height: 0;
-	border: 0.8em solid var(--color-bookmark);
+	height: 1.6em;
+	background-color: var(--color-bookmark);
 	transform-origin: top left;
 	transform: rotate(45deg);
 }

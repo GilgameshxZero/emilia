@@ -7,6 +7,8 @@
 :host {
 	--foreground-color: var(--color-clouds);
 	--background-color: transparent;
+	/* TODO: this is a hotfix. */
+	--scrollbar-width: calc(0.8em / 1.2);
 	padding-right: max(2em, 100% - 80ch);
 	padding-left: 2em;
 }
