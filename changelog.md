@@ -6,6 +6,10 @@
 * Select emails from `ghost.exponentialview.com` and `mg2.substack.com` do not receive any Envelope data.
 * Some SMTP thread is busy-waiting, using 100% CPU as well as disabling graceful exit.
 
+## 8.3.4
+
+Animations hotfix on mobile.
+
 ## 8.3.3
 
 Small front-end changes.

@@ -29,3 +29,16 @@ window.addEventListener(
 	},
 	{ once: true }
 );
+
+// TODO: mobile hotfix for disabling pinch-to-zoom.
+document.addEventListener("gesturestart", function (e) {
+	e.preventDefault();
+});
+
+document.addEventListener("gesturechange", function (e) {
+	e.preventDefault();
+});
+
+document.addEventListener("gestureend", function (e) {
+	e.preventDefault();
+});

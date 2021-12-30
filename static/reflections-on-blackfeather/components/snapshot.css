@@ -12,6 +12,14 @@
 	--background-color: transparent;
 	--pre-background-color: var(--blockquote-background-color);
 
-	padding-right: max(2em, 100% - 80ch);
+	padding-right: max(2em, 100% - 80ch - 4em);
 	padding-left: 2em;
+}
+
+/* TODO: mobile hotfix. */
+@media screen and (max-width: 32em) {
+	:host {
+		padding-right: max(1em, 100% - 80ch - 2em);
+		padding-left: 1em;
+	}
 }
