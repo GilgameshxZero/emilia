@@ -6,6 +6,10 @@
 * Select emails from `ghost.exponentialview.com` and `mg2.substack.com` do not receive any Envelope data.
 * Some SMTP thread is busy-waiting, using 100% CPU as well as disabling graceful exit.
 
+## 8.3.8
+
+Fix small typos in `homoochromatic-square-perimeters`.
+
 ## 8.3.7
 
 Complete the writeup `homoochromatic-square-perimeters`.
