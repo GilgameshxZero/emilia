@@ -29,6 +29,11 @@ export function listSnapshots() {
 		{ name: "urop-guide", title: "urop.guide", date: "July 17, 2019" },
 		{ name: "2019-10-15", title: "Purpose", date: "October 15, 2019" },
 		{
+			name: "felysian-blackbird",
+			title: "Felysian Blackbird",
+			date: "April 12, 2021"
+		},
+		{
 			name: "see-it-wasnt-always-like-this",
 			title: "See, It Wasn’t Always Like This",
 			date: "November 29, 2021"

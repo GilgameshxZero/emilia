@@ -1,7 +1,5 @@
 # Homochromatic Square Frames
 
-One of my favorite problems, originally heard in a Microsoft interview. There, an $O(N^4)$ solution was sufficient.
-
 > Each cell in a $N$-by-$N$ grid $G$ is colored either black or white:
 > 
 > $$G_{i,j}=\begin{cases}
@@ -84,4 +82,4 @@ Finally, recall that segment tree range queries and point updates are both $O(\l
 
 ## $O(N^2\alpha(N))$ (for inverse-Ackermann function $\alpha$)
 
-WIP
+[work-in-progress]

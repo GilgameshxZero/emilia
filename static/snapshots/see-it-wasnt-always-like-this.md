@@ -1,8 +1,3 @@
-A poem written during poetry night.
-Let me know if you’re interested in joining!
-
----
-
 See, it wasn’t always like this.
 The enforcer of consistency, the mellow of stigma:
 thusly,
