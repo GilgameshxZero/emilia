@@ -6,7 +6,8 @@
 	justify-content: flex-end;
 	/* This lets the neon bar fill up all space on the flex cross-axis, even when text is wrapped. */
 	align-content: stretch;
-	margin: 2em 0;
+	margin: 2em 0 2em auto;
+	max-width: 60ch;
 
 	user-select: none;
 }
