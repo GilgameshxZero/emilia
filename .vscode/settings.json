@@ -24,6 +24,5 @@
 	},
 
 	// May need to manually include style pages for in-browser VSCode previews to work.
-	// "markdown.styles": ["./static/common/essay.css"]
-	"markdown.styles": ["http://gilgamesh.cc/snapshot.css"]
+	"markdown.styles": ["./static/snapshot.css"]
 }

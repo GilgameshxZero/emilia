@@ -39,8 +39,8 @@ export function listSnapshots() {
 			date: "November 29, 2021"
 		},
 		{
-			name: "homochromatic-square-frames",
-			title: "Homochromatic Square Frames",
+			name: "homochromatic-square-perimeters",
+			title: "Homochromatic Square Perimeters",
 			date: "Decemeber 3, 2021"
 		}
 	];
