@@ -11,10 +11,8 @@ registerComponent(
 				// Set storyworld cookie for 4 weeks.
 				document.cookie = `storyworld-selected=${this.getAttribute(
 					`storyworld`
-				)}; Max-Age=2419200`;
-				setTimeout(() => {
-					window.location.pathname = `/`;
-				}, 1000);
+				)}; Max-Age=2419200; Path=/`;
+				window.location.pathname = `/`;
 			};
 		}
 
