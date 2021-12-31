@@ -21,14 +21,12 @@ emilia-neon {
 }
 
 div[name="lighthouses"] {
-	/* Contents extend beneath scrollbar. */
-	overflow: overlay;
+	/* Contents extend beneath scrollbar. Overwrites scroll only in FF where overlay is not supported. */
+	overflow-y: scroll;
 	justify-content: end;
 	height: calc(100% - 8em);
 	width: calc(100% - 2em);
-	max-width: calc(80ch + 5em);
-	margin-left: auto;
-	padding: 6em 0 2em;
+	padding: 6em 0 2em 2em;
 
 	/* Fade-out overflow. Also (unintentionally) fades out the scrollbar. */
 	--mask-image-value: linear-gradient(

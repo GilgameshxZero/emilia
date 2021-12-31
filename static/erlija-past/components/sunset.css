@@ -15,7 +15,7 @@
 
 div {
 	position: relative;
-	left: 0%;
+	left: 0vh;
 	top: -800%;
 	width: calc(100% + 500vh);
 	height: 2400%;
