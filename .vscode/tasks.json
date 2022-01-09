@@ -41,22 +41,6 @@
 			"problemMatcher": ["$gcc"],
 
 			"windows": { "command": "nmake", "problemMatcher": ["$msCompile"] }
-		},
-		{
-			/* Build the open essay HTML from VSCode Markdown HTML to essay HTML. */
-			"type": "shell",
-			"label": "essay",
-			"options": { "cwd": "${workspaceFolder}/build" },
-			"presentation": {
-				"clear": true,
-				"reveal": "silent"
-			},
-			"group": "build",
-
-			"command": "make",
-			"args": ["essay"],
-
-			"windows": { "command": "nmake" }
 		}
 	]
 }

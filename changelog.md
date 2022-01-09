@@ -6,6 +6,10 @@
 * Select emails from `ghost.exponentialview.com` and `mg2.substack.com` do not receive any Envelope data.
 * Some SMTP thread is busy-waiting, using 100% CPU as well as disabling graceful exit.
 
+## 8.3.13
+
+Update `snapshots`; remove `snapshot` build routines from `emilia`.
+
 ## 8.3.12
 
 Add `snapshots` submodule.
