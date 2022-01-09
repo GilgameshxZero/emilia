@@ -1,3 +1,6 @@
 [submodule "rain"]
 	path = rain
 	url = ../rain.git
+[submodule "static/snapshots"]
+	path = static/snapshots
+	url = ../snapshots.git
