@@ -6,6 +6,11 @@
 * Select emails from `ghost.exponentialview.com` and `mg2.substack.com` do not receive any Envelope data.
 * Some SMTP thread is busy-waiting, using 100% CPU as well as disabling graceful exit.
 
+## 8.3.10
+
+* Forced paths now request the right API endpoint for default theme.
+* Using short default-noreferrer link in `homochromatic-square-perimeters` now.
+
 ## 8.3.9
 
 Small bugfix to storyworld selector cookie path.

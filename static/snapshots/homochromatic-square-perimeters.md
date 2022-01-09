@@ -9,7 +9,7 @@
 > 
 > Find the smallest non-negative integer $K$, such that there exists no square of cells in $G$, with side length $K'>K$, whose perimeter consists entirely of black cells.
 
-[Codeforces/Polygon practice problem](https://codeforces.com/group/UJKoBECsLu/contest/202364/problem/A).
+[Codeforces/Polygon practice problem](http://s.gilgamesh.cc/32).
 
 ## $O(N^3)$ via pre-computation
 
