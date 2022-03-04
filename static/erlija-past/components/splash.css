@@ -2,6 +2,7 @@
 
 :host {
 	display: flex;
+	flex-flow: column nowrap;
 	height: calc(100% - 4em);
 	width: calc(100% - 4em);
 	max-width: 80ch;
@@ -28,4 +29,14 @@ h2 {
 
 h2[visible] {
 	display: initial;
+}
+
+h3 {
+	white-space: pre;
+	opacity: 0;
+}
+
+h3[visible] {
+	opacity: 1;
+	transition: opacity 1s;
 }
