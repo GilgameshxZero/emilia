@@ -8,7 +8,7 @@ registerComponent(
 		// Called from index after load.
 		sceneIn() {
 			// Randomly select a splash text.
-			let texts = this.shadowRoot.querySelectorAll(`h2`);
+			const texts = this.shadowRoot.querySelectorAll(`h2`);
 			texts
 				.item(Math.floor(texts.length * Math.random()))
 				.setAttribute(`visible`, ``);
@@ -16,14 +16,19 @@ registerComponent(
 			document.body.setAttribute(`active`, ``);
 			document.querySelector(`emilia-sunset`).setAttribute(`scene`, `splash`);
 
-			// Clicks or keystrokes transition out the scene.
+			// Clicks, or keystrokes transition out the scene.
 			this.sceneOut = this.sceneOut.bind(this);
 			[`click`, `keydown`, `mousewheel`].forEach((event) => {
 				document.addEventListener(event, this.sceneOut);
 			});
+
+			// Add a prompt after 3 seconds.
+			this.showPrompt = this.showPrompt.bind(this);
+			this.showPromptTimeout = setTimeout(this.showPrompt, 2000);
 		}
 
 		sceneOut() {
+			clearTimeout(this.showPromptTimeout);
 			[`click`, `keydown`, `mousewheel`].forEach((event) => {
 				document.removeEventListener(event, this.sceneOut);
 			});
@@ -36,6 +41,10 @@ registerComponent(
 				document.body.removeChild(this);
 				newScene.sceneIn();
 			}, 500);
+		}
+
+		showPrompt() {
+			this.shadowRoot.querySelector(`h3`).setAttribute(`visible`, ``);
 		}
 	}
 );
