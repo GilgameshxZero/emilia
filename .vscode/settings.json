@@ -7,8 +7,6 @@
 	"files.insertFinalNewline": true,
 	"files.eol": "\n",
 
-	"terminal.integrated.automationShell.windows": "C:\\Windows\\System32\\cmd.exe",
-
 	"C_Cpp.default.includePath": ["include/", "rain/include/"],
 	"C_Cpp.default.cppStandard": "c++17",
 	"C_Cpp.autoAddFileAssociations": false,
