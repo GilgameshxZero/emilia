@@ -1,3 +1,21 @@
-:host {
-	display: inline-block;
+@import "../colors.css";
+@import "../fonts.css";
+
+:host > div {
+	display: flex;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	border-radius: 0.5em;
+
+	background-color: var(--storyworld-color-accent-1);
+}
+
+:host > div > div {
+	padding: 0.1em;
+	margin: auto;
+
+	font-family: var(--storyworld-font-title);
+	font-size: calc(var(--storyworld-font-size-title-base) * 10);
 }
