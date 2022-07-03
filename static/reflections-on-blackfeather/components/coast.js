@@ -1,5 +1,5 @@
-import { registerComponent } from "../components.js";
-import { listSnapshots } from "../snapshots.js";
+import { registerComponent } from "../component.js";
+import { listSnapshots } from "../snapshot.js";
 import "./neon.js";
 import "./lighthouse.js";
 

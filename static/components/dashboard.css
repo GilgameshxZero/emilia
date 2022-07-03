@@ -1,0 +1,17 @@
+@import "../colors.css";
+@import "../fonts.css";
+
+:host {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: calc(100% - 4em);
+	height: calc(100% - 4em);
+	margin: 0;
+	padding: 2em;
+
+	background-color: var(--storyworld-background-color);
+	color: var(--storyworld-color);
+
+	font-family: var(--storyworld-font-body);
+}

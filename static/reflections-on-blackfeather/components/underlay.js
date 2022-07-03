@@ -1,4 +1,4 @@
-import { registerComponent } from "../components.js";
+import { registerComponent } from "../component.js";
 import "./arx.js";
 import "./coast.js";
 import "./flurry.js";
@@ -7,10 +7,6 @@ import "./blackfeather.js";
 registerComponent(
 	`underlay`,
 	class extends HTMLElement {
-		constructor() {
-			super();
-		}
-
 		toCoast() {
 			window.history.pushState(null, ``, `/`);
 			this.setAttribute(`location`, `coast`);

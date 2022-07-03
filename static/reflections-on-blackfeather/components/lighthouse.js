@@ -1,13 +1,9 @@
-import { registerComponent } from "../components.js";
+import { registerComponent } from "../component.js";
 import "./neon.js";
 
 registerComponent(
 	`lighthouse`,
 	class extends HTMLElement {
-		constructor() {
-			super();
-		}
-
 		onComponentDOMContentLoaded() {
 			this.componentLoad.then(() => {
 				this.addEventListener(`click`, () => {

@@ -1,10 +1,11 @@
 # Changelog
 
-## Known issues
+## 8.4.0
 
-* Frontend cache/storyworld/endpoint policy needs reworking.
-* Select emails from `ghost.exponentialview.com` and `mg2.substack.com` do not receive any Envelope data.
-* Some SMTP thread is busy-waiting, using 100% CPU as well as disabling graceful exit.
+1. Reworked endpoint policy to allow for more straightforward cache policy.
+2. Updated to latest `rain`.
+3. Added `api/ping` endpoint and minimal `dashboard` user-facing endpoint.
+4. Should now reject SMTP emails which do not send any data.
 
 ## 8.3.15
 

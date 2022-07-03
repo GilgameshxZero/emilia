@@ -1,3 +1,8 @@
+:root, :host {
+	--storyworld-font-title: Tomorrow;
+	--storyworld-font-body: "EB Garamond";
+}
+
 /* Latin and latin-ext pages for EB Garamond regular/italic, regular/bold, as well as KaTeX pages. Includes Tomorrow regular regular from Google Fonts API.*/
 /* Mostly acquired via Google Fonts (e.g. https://fonts.googleapis.com/css?family=EB+Garamond) or the npm katex (e.g. https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/KaTeX_Main-Regular.woff2). */
 

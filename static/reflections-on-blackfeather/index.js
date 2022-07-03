@@ -1,10 +1,16 @@
 // When this script is executed, the pre-loader is already displayed.
+import { maybeLoadDashboard } from "./dashboard.js";
+import "./components/dashboard.js";
 import "./components/underlay.js";
 
 // This event is only fired when all non-deferred scripts and stylesheets on index.html have been loaded and executed, including imported scripts.
 window.addEventListener(
 	`load`,
 	() => {
+		if (maybeLoadDashboard()) {
+			return;
+		}
+
 		const underlay = document.querySelector(`emilia-underlay`);
 
 		let locationName;

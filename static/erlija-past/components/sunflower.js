@@ -1,4 +1,4 @@
-import { registerComponent } from "../components.js";
+import { registerComponent } from "../component.js";
 
 // Sunflowers transition between scenes.
 registerComponent(

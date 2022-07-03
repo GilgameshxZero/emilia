@@ -74,6 +74,7 @@ namespace Emilia::Smtp {
 			std::string fromB64{Rain::String::Base64::encode(this->mailFrom.value())};
 			std::replace(fromB64.begin(), fromB64.end(), '/', '_');
 			std::stringstream dataPathStream;
+			// TODO: Replace /tmp/ with a platform-dependent temporary directory.
 			dataPathStream << "/tmp/" << timeData.tm_year << "-" << timeData.tm_mon
 										 << "-" << timeData.tm_mday << "-" << timeData.tm_hour
 										 << "-" << timeData.tm_min << "-" << timeData.tm_sec << "-"
@@ -89,8 +90,17 @@ namespace Emilia::Smtp {
 		for (Mailbox const &mailbox : this->rcptTo) {
 			dataFile << " " << mailbox;
 		}
-		dataFile << "\r\n" << stream.rdbuf();
+		dataFile << "\r\n";
+
+		// If no data came through the connection, assume an error.
+		std::streampos beforeDataPos{dataFile.tellp()};
+		dataFile << stream.rdbuf();
+		std::streampos afterDataPos{dataFile.tellp()};
 		dataFile.close();
+		if (beforeDataPos == afterDataPos) {
+			std::filesystem::remove(dataPath);
+			return {{StatusCode::SYNTAX_ERROR_COMMAND}};
+		}
 
 		// Push the new envelopes to the outbox for the Server to send.
 		for (Mailbox const &rcptMailbox : this->rcptTo) {

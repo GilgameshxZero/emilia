@@ -12,24 +12,11 @@
 		/>
 		<title>&#65279;</title>
 		<script>
-			fetch(
-				`/api/storyworlds/defaults/${
-					window.matchMedia &&
-					window.matchMedia(`(prefers-color-scheme: dark)`).matches
-						? `dark`
-						: `light`
-				}`
-			)
-				.then((res) => {
-					return res.text();
-				})
-				.then((text) => {
-					// Session cookie.
-					document.cookie = `storyworld-defaulted=${text}; Path=/`;
+			// Session cookie.
+			document.cookie = `storyworld-defaulted=${window.matchMedia("(prefers-color-scheme: dark)").matches ? "reflections-on-blackfeather" : "erlija-past"}; Path=/`;
 
-					// Refresh to go to real index.
-					window.location.reload();
-				});
+			// Refresh to go to real index.
+			window.location.reload();
 		</script>
 	</head>
 	<body></body>

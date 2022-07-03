@@ -49,6 +49,8 @@ PROJECT_INCLUDE_DIR = $(ROOT_DIR)include^\
 PROJECT_VERSION_INCLUDE = $(PROJECT_INCLUDE_DIR)build.hpp
 # TODO: This macro should include all header files under PROJECT_INCLUDE_DIR.
 PROJECT_INCLUDES =
+# TODO: This macro should include all header files in Rain.
+RAIN_INCLUDES =
 
 COMPILER = cl /c
 COMPILER_FLAGS_INCLUDES = /I$(PROJECT_INCLUDE_DIR) /I$(ROOT_DIR)rain\include^\
@@ -100,7 +102,7 @@ clean:
 	@IF EXIST $(BIN_DIR) RD /Q /S $(BIN_DIR)
 	@IF EXIST $(OBJ_DIR) RD /Q /S $(OBJ_DIR)
 # Increment version number.
-$(PROJECT_VERSION_INCLUDE): $(PROJECT_INCLUDES) $(PROJECT_SRC_DIR)$(SOURCES)
+$(PROJECT_VERSION_INCLUDE): $(PROJECT_INCLUDES) $(PROJECT_SRC_DIR)$(SOURCES) $(RAIN_INCLUDES)
 	@increment.bat
 
 # Build target.
@@ -108,7 +110,7 @@ $(PROJECT_VERSION_INCLUDE): $(PROJECT_INCLUDES) $(PROJECT_SRC_DIR)$(SOURCES)
 DBLSUB_DEP_SRC_DIR_TO_OBJ_DIR = $(**:..\=..\obj\)
 # First compile all outdated files (with /MP), then link everything together.
 # TODO: Dependencies are parsed incorrectly once PROJECT_INCLUDES is set.
-$(PROJECT_BIN): $(PROJECT_SRC_DIR)$(SOURCES) $(PROJECT_INCLUDES)
+$(PROJECT_BIN): $(PROJECT_SRC_DIR)$(SOURCES) $(PROJECT_INCLUDES) $(RAIN_INCLUDES)
 	@IF NOT EXIST $(PROJECT_BIN_DIR) MD $(PROJECT_BIN_DIR)
 	@IF NOT EXIST $(PROJECT_OBJ_DIR) MD $(PROJECT_OBJ_DIR)
 	@$(COMPILER) $(COMPILER_FLAGS) $?
@@ -141,6 +143,7 @@ PROJECT_VERSION_INCLUDE := $(PROJECT_INCLUDE_DIR)build.hpp
 # All header files, except for the version file.
 PROJECT_INCLUDES := $(filter-out $(PROJECT_VERSION_INCLUDE), \
 	$(shell find $(PROJECT_INCLUDE_DIR) -name *.hpp))
+RAIN_INCLUDES := $(shell find $(ROOT_DIR)rain/include -name *.hpp)
 
 COMPILER ?= clang++
 COMPILER_FLAGS_INCLUDES := -I$(PROJECT_INCLUDE_DIR) -I$(ROOT_DIR)rain/include/
@@ -195,7 +198,7 @@ run: build
 clean:
 	@rm -rf $(OBJ_DIR) $(BIN_DIR)
 # Increment version number.
-$(PROJECT_VERSION_INCLUDE): $(PROJECT_INCLUDES) $(PROJECT_SRC_DIR)$(SOURCES)
+$(PROJECT_VERSION_INCLUDE): $(PROJECT_INCLUDES) $(PROJECT_SRC_DIR)$(SOURCES) $(RAIN_INCLUDES)
 	@read LINE < $(PROJECT_VERSION_INCLUDE);\
 	TOKENS=($$LINE);\
 	VERSION_BUILD=$$(($${TOKENS[2]} + 1));\
@@ -210,7 +213,7 @@ $(PROJECT_BIN): $(BIN_DIR)% : $(PROJECT_OBJS)
 	@$(LINKER) $(PROJECT_OBJS) $(LINKER_FLAGS) -o $@
 
 # Compile rule. Stem % matchines source file name.
-$(PROJECT_OBJS): $(OBJ_DIR)%.o : $(ROOT_DIR)$$*.cpp $(PROJECT_INCLUDES)
+$(PROJECT_OBJS): $(OBJ_DIR)%.o : $(ROOT_DIR)$$*.cpp $(PROJECT_INCLUDES) $(RAIN_INCLUDES)
 	@mkdir -p $(@D)
 	@echo $@
 	@$(COMPILER) $(COMPILER_FLAGS) -c $< -o $@

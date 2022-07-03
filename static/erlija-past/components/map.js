@@ -1,6 +1,6 @@
-import { registerComponent } from "../components.js";
+import { registerComponent } from "../component.js";
 import { updateUrlWithScene } from "../url.js";
-import { listSnapshots } from "../snapshots.js";
+import { listSnapshots } from "../snapshot.js";
 import "./marker.js";
 import "./sunflower.js";
 import "./erlija.js";
