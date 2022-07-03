@@ -9,4 +9,6 @@
 
 	--storyworld-background-color: black;
 	--storyworld-color: var(--color-clouds);
+	--storyworld-color-accent-1: var(--color-coast);
+	--storyworld-color-accent-1: var(--color-petals);
 }

@@ -5,13 +5,18 @@
 	position: absolute;
 	top: 0;
 	left: 0;
-	width: calc(100% - 4em);
-	height: calc(100% - 4em);
+	display: flex;
+	flex-flow: row wrap;
+	width: calc(100% - 2em);
+	height: calc(100% - 2em);
 	margin: 0;
-	padding: 2em;
+	padding: 1em;
 
 	background-color: var(--storyworld-background-color);
 	color: var(--storyworld-color);
+}
 
-	font-family: var(--storyworld-font-body);
+:host > emilia-ping {
+	flex: 1 1 0;
+	padding: 1em;
 }

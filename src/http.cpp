@@ -57,6 +57,11 @@ namespace Emilia::Http {
 			 "/api/status/?" + queryFragment,
 			 {Method::GET},
 			 &Worker::getApiStatus},
+			// Outbox JSON.
+			{hostRegex,
+			 "/api/outbox.json/?" + queryFragment,
+			 {Method::GET},
+			 &Worker::getApiOutboxJson},
 			// User-facing endpoints, which resolve to index.html under the current
 			// storyworld, or index.html in general.
 			{hostRegex,
@@ -160,6 +165,45 @@ namespace Emilia::Http {
 		return {
 			{StatusCode::OK,
 			 {{{"Content-Type", "text/plain"},
+				 {"Content-Length", std::to_string(ssLen)}}},
+			 std::move(*ss.rdbuf())}};
+	}
+	Worker::ResponseAction Worker::getApiOutboxJson(Request &, std::smatch const &) {
+		std::stringstream ss;
+		ss << "{\"outbox\": [";
+		for (auto const &it : this->server.smtpServer->outbox) {
+			std::time_t time = std::chrono::system_clock::to_time_t(
+				std::chrono::system_clock::now() +
+				std::chrono::duration_cast<std::chrono::system_clock::duration>(
+					it.attemptTime - std::chrono::steady_clock::now()));
+			std::tm timeData;
+			Rain::Time::localtime_r(&time, &timeData);
+			ss << "{\"time\":" << std::put_time(&timeData, "%F %T %z")
+				 << ",\"status\":";
+			switch (it.status) {
+				case Envelope::Status::PENDING:
+					ss << "PENDING";
+					break;
+				case Envelope::Status::RETRIED:
+					ss << "RETRIED";
+					break;
+				case Envelope::Status::FAILURE:
+					ss << "FAILURE";
+					break;
+				case Envelope::Status::SUCCESS:
+					ss << "SUCCESS";
+					break;
+			}
+			ss << ",\"from\":" << it.from.name << '@' << it.from.host << ",\"to\""
+				 << it.to.name << '@' << it.to.host << "},\n";
+		}
+		ss << "]}";
+		ss.seekg(0, std::ios::end);
+		std::size_t ssLen = static_cast<std::size_t>(ss.tellg());
+		ss.seekg(0, std::ios::beg);
+		return {
+			{StatusCode::OK,
+			 {{{"Content-Type", "application/json"},
 				 {"Content-Length", std::to_string(ssLen)}}},
 			 std::move(*ss.rdbuf())}};
 	}

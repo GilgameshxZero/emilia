@@ -1,5 +1,10 @@
 # Changelog
 
+## 8.4.1
+
+1. Prepare outbox endpoint.
+2. Formalize ping module.
+
 ## 8.4.0
 
 1. Reworked endpoint policy to allow for more straightforward cache policy.

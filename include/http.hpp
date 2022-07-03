@@ -96,6 +96,7 @@ namespace Emilia::Http {
 
 		ResponseAction getApiPing(Request &, std::smatch const &);
 		ResponseAction getApiStatus(Request &, std::smatch const &);
+		ResponseAction getApiOutboxJson(Request &, std::smatch const &);
 
 		// Responds with the storyworld-resolved or shared index.html.
 		ResponseAction getUserFacing(Request &, std::smatch const &);

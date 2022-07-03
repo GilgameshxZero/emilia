@@ -12,4 +12,6 @@
 
 	--storyworld-background-color: var(--color-clouds);
 	--storyworld-color: var(--color-starfall);
+	--storyworld-color-accent-1: var(--color-airships);
+	--storyworld-color-accent-2: var(--color-tears);
 }

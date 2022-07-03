@@ -1,6 +1,8 @@
 :root, :host {
 	--storyworld-font-title: Tangerine;
 	--storyworld-font-body: "EB Garamond";
+	--storyworld-font-size-title-base: 1.4em;
+	--storyworld-font-size-body-base: 1em;
 }
 
 /* Latin and latin-ext pages for Tangerine bold and EB Garamond regular/italic, regular/bold. */
