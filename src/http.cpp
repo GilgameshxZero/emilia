@@ -7,9 +7,8 @@
 #include <shared_mutex>
 
 namespace Emilia::Http {
-	std::vector<std::string> const Server::storyworlds = {
-		"erlija-past",
-		"reflections-on-blackfeather"};
+	std::string const Server::STATIC_ROOT{"../static"};
+	std::string const Server::HTTP_USERNAME{"gilgamesh"};
 
 	Worker::Worker(
 		NativeSocket nativeSocket,
@@ -39,50 +38,57 @@ namespace Emilia::Http {
 		}
 		return req;
 	}
-	std::vector<Worker::RequestFilter> Worker::filters() {
+	std::vector<Worker::RequestFilter> const &Worker::filters() {
 		// Hosts are gilgamesh.cc, localhost, 127.0.0.1, or ::1. Refer
 		// to <https://en.cppreference.com/w/cpp/regex/ecmascript>.
 		static std::string const hostRegex{
 			"(?:gilgamesh.cc|localhost|127\\.0\\.0\\.1|::1)(?::.*)?"},
 			queryFragment{"(?:\\?[^#]*)?(?:#.*)?"};
-
-		std::string storyworldsOr = this->server.storyworlds[0];
-		for (auto const &storyworld : this->server.storyworlds) {
-			storyworldsOr += "|" + storyworld;
-		}
-		return {
+		static std::string const storyworldsOrRegex{
+			"erlija-past|reflections-on-blackfeather"};
+		static std::vector<Worker::RequestFilter> const filters{
+			// Responds immediately with 200.
+			{hostRegex,
+			 "/api/ping/?" + queryFragment,
+			 {Method::GET},
+			 &Worker::getApiPing},
 			// Service status.
 			{hostRegex,
 			 "/api/status/?" + queryFragment,
 			 {Method::GET},
-			 &Worker::requestApiStatus},
-			// Themed storyworld defaults.
+			 &Worker::getApiStatus},
+			// User-facing endpoints, which resolve to index.html under the current
+			// storyworld, or index.html in general.
 			{hostRegex,
-			 "/api/storyworlds/defaults/(light|dark)",
+			 "/(storyworlds|snapshots/(?:[^\\?#\\.]+)|dashboard)?" + queryFragment,
 			 {Method::GET},
-			 &Worker::requestApiStoryworldsDefaults},
-			// General-agnostic and dependent public endpoints, which request
-			// index.html and may have a storyworld preference.
+			 &Worker::getUserFacing},
+			// Storyworld-specific endpoints, which may resolve to a shared static.
 			{hostRegex,
-			 "/(storyworlds|snapshots/(?:[^\\?#\\.]+))?" + queryFragment,
+			 "/(" + storyworldsOrRegex + ")/([^\\?#]*)" + queryFragment,
 			 {Method::GET},
-			 &Worker::requestDependentOrResolution},
-			// Force storyworld sessions. Must be updated with any new storyworld IDs.
-			{hostRegex,
-			 "/(?:" + storyworldsOr +
-				 ")(?:/(?:storyworlds|snapshots/(?:[^\\?#\\.]+))?)?" + queryFragment,
-			 {Method::GET},
-			 &Worker::requestForcedDependent},
-			// Endpoints for other statics without storyworld preference.
+			 &Worker::getStoryworldStatic},
+			// Shared statics, or 404.
 			{hostRegex,
 			 "/([^\\?#]*)" + queryFragment,
 			 {Method::GET},
-			 &Worker::requestSpecificOrStaticAgnostic}};
+			 &Worker::getSharedStatic}};
+
+		return filters;
 	}
-	Worker::ResponseAction Worker::requestApiStatus(
+	Worker::ResponseAction Worker::getApiPing(Request &, std::smatch const &) {
+		return {{StatusCode::OK}};
+	}
+	Worker::ResponseAction Worker::getApiStatus(
 		Request &req,
 		std::smatch const &) {
 		using namespace Rain::Literal;
+
+		if (this->maybeRejectAuthorization(req)) {
+			return {
+				{StatusCode::UNAUTHORIZED,
+				 {{{"Www-Authenticate", "Basic realm=\"api/status\""}}}}};
+		}
 
 		std::time_t time =
 			std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
@@ -143,9 +149,8 @@ namespace Emilia::Http {
 						ss << "SUCCESS";
 						break;
 				}
-				ss << " | " << std::string(it.from.name.length(), '.') << '@'
-					 << it.from.host << " > " << std::string(it.to.name.length(), '.')
-					 << '@' << it.to.host << '\n';
+				ss << " | " << it.from.name << '@' << it.from.host << " > "
+					 << it.to.name << '@' << it.to.host << '\n';
 			}
 		}
 
@@ -158,70 +163,66 @@ namespace Emilia::Http {
 				 {"Content-Length", std::to_string(ssLen)}}},
 			 std::move(*ss.rdbuf())}};
 	}
-	Worker::ResponseAction Worker::requestApiStoryworldsDefaults(
-		Request &,
-		std::smatch const &match) {
-		std::string storyworld{
-			match[1] == "light" ? "erlija-past" : "reflections-on-blackfeather"};
-		return {
-			{StatusCode::OK,
-			 {{{"Content-Type", "text/plain"},
-				 {"Content-Length", std::to_string(storyworld.length())}}},
-			 storyworld}};
-	}
-	Worker::ResponseAction Worker::requestDependentOrResolution(
+	Worker::ResponseAction Worker::getUserFacing(
 		Request &req,
 		std::smatch const &match) {
-		// If a storyworld cookie is set, respond with the index page for that
-		// storyworld. Then, check if the path has a preferred storyworld.
-		// Otherwise, return with the catch-all index.
-		auto storyworld = this->resolveStoryworld(req, match[1]);
-		auto file = this->resolveStoryworldPath("/index.html", storyworld.first);
-		if (!file) {
-			// Should not occur as long as index.html exists for all storyworlds and
-			// catch-all.
-			return {{StatusCode::NOT_FOUND}};
+		if (match[1] == "dashboard" && this->maybeRejectAuthorization(req)) {
+			return {
+				{StatusCode::UNAUTHORIZED,
+				 {{{"Www-Authenticate", "Basic realm=\"dashboard\""}}}}};
 		}
-		auto response = this->requestStatic(file.value());
-		if (storyworld.second) {
-			// Set preferred storyworld if determined that way. The cookie lasts for
-			// the entire session.
-			response.response->headers.setCookie(
-				{{"storyworld-preferred",
-					{storyworld.first.value(), {{"Path", "/"}}}}});
-		}
+
+		// Respond with a storyworld index or the shared index, if SRP failed.
+		auto file =
+			this->resolveStoryworldPath(this->resolveStoryworld(req), "/index.html");
+		auto response = this->getStatic(file.value());
+		response.response.value().headers["Cache-Control"] = "no-store";
 		return response;
 	}
-	std::pair<std::optional<std::string>, bool> Worker::resolveStoryworld(
-		Request &req,
-		std::string const &path) {
+	Worker::ResponseAction Worker::getStoryworldStatic(
+		Request &,
+		std::smatch const &match) {
+		auto file = this->resolveStoryworldPath(match[1], match[2]);
+		if (!file) {
+			return {{StatusCode::NOT_FOUND}};
+		}
+		return this->getStatic(file.value());
+	}
+	Worker::ResponseAction Worker::getSharedStatic(
+		Request &,
+		std::smatch const &match) {
+		auto file = this->resolveStoryworldPath("", match[1]);
+		if (!file) {
+			return {{StatusCode::NOT_FOUND}};
+		}
+		return this->getStatic(file.value());
+	}
+	bool Worker::maybeRejectAuthorization(Request &req) {
+		static std::string targetCredentials{
+			Rain::Networking::Http::Header::Authorization::encodeBasicCredentials(
+				Server::HTTP_USERNAME, this->server.httpPassword)};
+
+		auto authorization = req.headers.authorization();
+		return !(
+			Rain::String::toLower(authorization.scheme) == "basic" &&
+			authorization.parameters["credentials"] == targetCredentials);
+	}
+	std::string Worker::resolveStoryworld(Request &req) {
 		auto cookie = req.headers.cookie();
 		auto it = cookie.find("storyworld-selected");
 		if (it != cookie.end()) {
-			return {it->second, false};
-		}
-		static std::unordered_map<std::string, std::string> const preferences{
-			{"snapshots/see-it-wasnt-always-like-this", "erlija-past"}};
-		auto preference = preferences.find(path);
-		if (preference != preferences.end()) {
-			return {preference->second, true};
-		}
-		it = cookie.find("storyworld-preferred");
-		if (it != cookie.end()) {
-			return {it->second, false};
+			return it->second;
 		}
 		it = cookie.find("storyworld-defaulted");
 		if (it != cookie.end()) {
-			return {it->second, false};
+			return it->second;
 		}
-		return {{}, false};
+		return {};
 	}
 	std::optional<std::filesystem::path> Worker::resolveStoryworldPath(
-		std::string const &path,
-		std::optional<std::string> const &storyworld) {
-		static std::string const staticRoot{"../static"};
-
-		// path does not begin with / and may or may not end with a trailing /.
+		std::string const &storyworld,
+		std::string const &target) {
+		// target does not begin with / and may or may not end with a trailing /.
 		//
 		// First attempt to resolve the path at ../static/{storyworld}/{path}, then
 		// ../static/{path}.
@@ -233,22 +234,21 @@ namespace Emilia::Http {
 			}
 			path = std::filesystem::canonical(path);
 			// All files under "../static" are fair game.
-			if (!Rain::Filesystem::isSubpath(path, staticRoot)) {
+			if (!Rain::Filesystem::isSubpath(path, Server::STATIC_ROOT)) {
 				return {};
 			}
 			return {path};
 		};
-		if (storyworld) {
+		if (!storyworld.empty()) {
 			std::optional<std::filesystem::path> result =
-				resolvePath(staticRoot + "/" + storyworld.value() + "/" + path);
+				resolvePath(Server::STATIC_ROOT + "/" + storyworld + "/" + target);
 			if (result) {
 				return result;
 			}
 		}
-		return resolvePath(staticRoot + "/" + path);
+		return resolvePath(Server::STATIC_ROOT + "/" + target);
 	}
-	Worker::ResponseAction Worker::requestStatic(
-		std::filesystem::path const &path) {
+	Worker::ResponseAction Worker::getStatic(std::filesystem::path const &path) {
 		std::ifstream file(path, std::ios::binary);
 		std::string bytes;
 		bytes.assign(
@@ -258,57 +258,26 @@ namespace Emilia::Http {
 		return {
 			{StatusCode::OK,
 			 {{{"Content-Type", MediaType(path.extension().string())},
-				 // No cache by default.
-				 {"Cache-Control", "no-store"},
+				 // Cached by default.
+				 {"Cache-Control", "Max-Age=3600"},
 				 {"Access-Control-Allow-Origin", "*"}}},
 			 std::move(bytes)}};
-	}
-	Worker::ResponseAction Worker::requestForcedDependent(
-		Request &,
-		std::smatch const &) {
-		auto file = this->resolveStoryworldPath("/forced.html", {});
-		if (!file) {
-			return {{StatusCode::NOT_FOUND}};
-		}
-		return this->requestStatic(file.value());
-	}
-	Worker::ResponseAction Worker::requestSpecificOrStaticAgnostic(
-		Request &req,
-		std::smatch const &match) {
-		auto storyworld = this->resolveStoryworld(req, match[1]);
-		auto file = this->resolveStoryworldPath(match[1], storyworld.first);
-		if (!file) {
-			return {{StatusCode::NOT_FOUND}};
-		}
-		auto response = this->requestStatic(file.value());
-
-		// Only select files are cached.
-		// TODO: Implement a more robust policy.
-		static std::set<std::string> const noCache{
-			"index.html",
-			"index.css",
-			"index.js",
-			"colors.css",
-			"fonts.css",
-			"components/snapshot.html",
-			"components/snapshot.css",
-			"components/snapshot.js"};
-		if (noCache.find(match[1]) == noCache.end()) {
-			response.response.value().headers["Cache-Control"] = "Max-Age=3600";
-		}
-		return response;
 	}
 
 	Server::Server(
 		Host const &host,
+		std::string const &httpPassword,
 		std::tm const &processBegin,
 		std::unique_ptr<Emilia::Smtp::Server> &smtpServer,
 		std::atomic_bool const &echo)
 			: SuperServer(host),
+				httpPassword(httpPassword),
 				processBegin(processBegin),
 				smtpServer(smtpServer),
 				echo(echo) {}
-	Server::~Server() { this->destruct(); }
+	Server::~Server() {
+		this->destruct();
+	}
 	Worker Server::makeWorker(
 		NativeSocket nativeSocket,
 		SocketInterface *interrupter) {

@@ -6,7 +6,7 @@
 
 	cursor: pointer;
 	opacity: 0.4;
-	transition: opacity 1s;
+	transition: opacity var(--transition-time);
 	z-index: 1;
 	-webkit-user-select: none;
 	-ms-user-select: none;

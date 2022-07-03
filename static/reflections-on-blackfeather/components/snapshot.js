@@ -1,4 +1,4 @@
-import { prependRelativePaths, registerComponent } from "../components.js";
+import { prependRelativePaths, registerComponent } from "../component.js";
 
 registerComponent(
 	`snapshot`,

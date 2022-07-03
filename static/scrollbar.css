@@ -1,6 +1,7 @@
 :root,
 :host {
 	--scrollbar-width: 0.8em;
+	--scrollbar-rgb: 255, 255, 255;
 }
 
 ::-webkit-scrollbar,
@@ -16,10 +17,10 @@
 
 ::-webkit-scrollbar-thumb,
 :host::-webkit-scrollbar-thumb {
-	background: #ffffff20;
+	background: rgba(var(--scrollbar-rgb), 0.125);
 }
 
 ::-webkit-scrollbar-thumb:hover,
 :host::-webkit-scrollbar-thumb:hover {
-	background: #ffffff40;
+	background: rgba(var(--scrollbar-rgb), 0.25);
 }

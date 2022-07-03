@@ -1,4 +1,4 @@
-import { registerComponent } from "../components.js";
+import { registerComponent } from "../component.js";
 import { updateUrlWithScene } from "../url.js";
 import "./sunflower.js";
 import "./storyworld-portal.js";

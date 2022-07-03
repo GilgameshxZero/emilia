@@ -6,4 +6,7 @@
 	--color-coast: #3f73e780;
 	--color-bookmark: #e1bde480;
 	--color-cherry: #e1bde4;
+
+	--storyworld-background-color: black;
+	--storyworld-color: var(--color-clouds);
 }

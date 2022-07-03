@@ -1,5 +1,7 @@
 // When this script is executed, the pre-loader is already displayed.
 import { createSceneFromUrl } from "./url.js";
+import { maybeLoadDashboard } from "./dashboard.js";
+import "./components/dashboard.js";
 import "./components/sunset.js";
 import "./components/splash.js";
 
@@ -7,6 +9,10 @@ import "./components/splash.js";
 window.addEventListener(
 	`load`,
 	() => {
+		if (maybeLoadDashboard()) {
+			return;
+		}
+
 		// Wait for all immediately accessible components to load.
 		const splash = document.querySelector(`emilia-splash`);
 		Promise.all([

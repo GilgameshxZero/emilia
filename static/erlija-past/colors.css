@@ -9,4 +9,7 @@
 	--color-clouds: #fffada;
 	--color-bushes: #311701;
 	--color-ribbon: #b54c2e;
+
+	--storyworld-background-color: var(--color-clouds);
+	--storyworld-color: var(--color-starfall);
 }

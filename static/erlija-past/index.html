@@ -2,7 +2,7 @@
 <html lang="en-US">
 	<head>
 		<meta charset="utf-8" />
-		<base href="/" />
+		<base href="/erlija-past/" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="icon" type="image/png" href="sunflower.png" />
 
@@ -10,7 +10,7 @@
 		<link rel="stylesheet" href="index.css" />
 		<title>—erlija past—</title>
 
-		<!-- Fonts must not be loaded by shadowRoots. They are deferred to enable pre-loader to display ASAP. -->
+		<!-- A bug in Chromium causes shadow roots to fail to load fonts: <https://stackoverflow.com/questions/62129243/external-font-does-not-load-when-link-is-loaded-from-inside-the-shadowdom>. We load them here instead. They are deferred to enable pre-loader to display ASAP. -->
 		<script type="module" src="index.js" defer></script>
 	</head>
 	<body pre-load>

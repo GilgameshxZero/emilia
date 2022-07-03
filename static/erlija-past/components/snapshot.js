@@ -1,14 +1,10 @@
-import { prependRelativePaths, registerComponent } from "../components.js";
+import { prependRelativePaths, registerComponent } from "../component.js";
 import { updateUrlWithScene } from "../url.js";
 import "./sunflower.js";
 
 registerComponent(
 	`snapshot`,
 	class extends HTMLElement {
-		constructor() {
-			super();
-		}
-
 		// Begins fetching of essay; must be called before sceneIn.
 		loadSnapshot(name) {
 			this.snapshotName = name;

@@ -1,3 +1,3 @@
-import { registerComponent } from "../components.js";
+import { registerComponent } from "../component.js";
 
 registerComponent(`neon`);

@@ -1,14 +1,10 @@
-import { registerComponent } from "../components.js";
+import { registerComponent } from "../component.js";
 import "./storyworld-portal.js";
 import "./neon.js";
 
 registerComponent(
 	`arx`,
 	class extends HTMLElement {
-		constructor() {
-			super();
-		}
-
 		onComponentDOMContentLoaded() {
 			this.componentLoad.then(() => {
 				this.shadowRoot

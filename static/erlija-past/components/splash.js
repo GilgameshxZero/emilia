@@ -1,4 +1,4 @@
-import { registerComponent } from "../components.js";
+import { registerComponent } from "../component.js";
 import { createSceneFromUrl } from "../url.js";
 import "./map.js";
 
