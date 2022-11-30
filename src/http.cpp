@@ -7,7 +7,7 @@
 #include <shared_mutex>
 
 namespace Emilia::Http {
-	std::string const Server::STATIC_ROOT{"../static"};
+	std::string const Server::STATIC_ROOT{"../echidna"};
 	std::string const Server::HTTP_USERNAME{"gilgamesh"};
 
 	Worker::Worker(
@@ -268,17 +268,16 @@ namespace Emilia::Http {
 		std::string const &target) {
 		// target does not begin with / and may or may not end with a trailing /.
 		//
-		// First attempt to resolve the path at ../static/{storyworld}/{path}, then
-		// ../static/{path}.
+		// First attempt to resolve the path at STATIC_ROOT/{storyworld}/{path}, then
+		// STATIC_ROOT/{path}.
 		static auto const resolvePath =
 			[](std::string const &pathStr) -> std::optional<std::filesystem::path> {
 			std::filesystem::path path{pathStr};
 			if (!std::filesystem::exists(path)) {
 				return {};
 			}
-			path = std::filesystem::canonical(path);
-			// All files under "../static" are fair game.
-			if (!Rain::Filesystem::isSubpath(path, Server::STATIC_ROOT)) {
+			// All files under STATIC_ROOT are fair game. Allow symlinks by only comparing absolute paths.
+			if (!Rain::Filesystem::isSubpath(path, Server::STATIC_ROOT, false)) {
 				return {};
 			}
 			return {path};

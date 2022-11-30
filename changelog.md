@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.4.2
+
+1. Temporarily de-init all submodules in preparation for submodule re-org.
+
 ## 8.4.1
 
 1. Prepare outbox endpoint.
