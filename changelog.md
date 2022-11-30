@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.4.3
+
+1. Re-add `rain` and `echidna` submodule. Next update, these two directories will be added to the `.gitignore` to enable local symlinking.
+
 ## 8.4.2
 
 1. Temporarily de-init all submodules in preparation for submodule re-org.
