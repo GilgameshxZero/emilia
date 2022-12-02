@@ -1,3 +1,7 @@
+# Allows symlinking submodules locally.
+echidna/
+rain/
+
 **/.vs/
 **/bin/
 **/obj/
