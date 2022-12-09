@@ -1,5 +1,10 @@
 # Changelog
 
+## 8.4.5
+
+1. Remove submodules from `gitignore`.
+2. Rebase `echidna` on a new history without large blobs.
+
 ## 8.4.4
 
 1. Add both submodules to the `.gitignore`.
