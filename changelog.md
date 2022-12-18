@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.4.7
+
+1. Fix compilation error.
+
 ## 8.4.6
 
 1. Fix `api/outbox.json` to output actual JSON.

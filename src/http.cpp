@@ -173,7 +173,7 @@ namespace Emilia::Http {
 		std::smatch const &) {
 		std::stringstream ss;
 		ss << "{\"outbox\": [";
-		auto &it{this->server.smtpServer->outbox.begin()};
+		auto it{this->server.smtpServer->outbox.begin()};
 		auto streamEnvelope{[&ss, &it]() {
 			std::time_t time = std::chrono::system_clock::to_time_t(
 				std::chrono::system_clock::now() +
