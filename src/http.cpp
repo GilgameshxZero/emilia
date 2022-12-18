@@ -65,7 +65,7 @@ namespace Emilia::Http {
 			// User-facing endpoints, which resolve to index.html under the current
 			// storyworld, or index.html in general.
 			{hostRegex,
-			 "/(storyworlds|snapshots/(?:[^\\?#\\.]+)|dashboard)?" + queryFragment,
+			 "/(dashboard|snapshots/(?:[^\\?#\\.]+)|storyworlds)?" + queryFragment,
 			 {Method::GET},
 			 &Worker::getUserFacing},
 			// Storyworld-specific endpoints, which may resolve to a shared static.
@@ -168,19 +168,22 @@ namespace Emilia::Http {
 				 {"Content-Length", std::to_string(ssLen)}}},
 			 std::move(*ss.rdbuf())}};
 	}
-	Worker::ResponseAction Worker::getApiOutboxJson(Request &, std::smatch const &) {
+	Worker::ResponseAction Worker::getApiOutboxJson(
+		Request &,
+		std::smatch const &) {
 		std::stringstream ss;
 		ss << "{\"outbox\": [";
-		for (auto const &it : this->server.smtpServer->outbox) {
+		auto &it{this->server.smtpServer->outbox.begin()};
+		auto streamEnvelope{[&ss, &it]() {
 			std::time_t time = std::chrono::system_clock::to_time_t(
 				std::chrono::system_clock::now() +
 				std::chrono::duration_cast<std::chrono::system_clock::duration>(
-					it.attemptTime - std::chrono::steady_clock::now()));
+					it->attemptTime - std::chrono::steady_clock::now()));
 			std::tm timeData;
 			Rain::Time::localtime_r(&time, &timeData);
-			ss << "{\"time\":" << std::put_time(&timeData, "%F %T %z")
-				 << ",\"status\":";
-			switch (it.status) {
+			ss << "{\"time\": \"" << std::put_time(&timeData, "%F %T %z")
+				 << "\", \"status\": \"";
+			switch (it->status) {
 				case Envelope::Status::PENDING:
 					ss << "PENDING";
 					break;
@@ -194,8 +197,16 @@ namespace Emilia::Http {
 					ss << "SUCCESS";
 					break;
 			}
-			ss << ",\"from\":" << it.from.name << '@' << it.from.host << ",\"to\""
-				 << it.to.name << '@' << it.to.host << "},\n";
+			ss << "\", \"from\": \"" << it->from.name << '@' << it->from.host
+				 << "\", \"to\": \"" << it->to.name << '@' << it->to.host << "\"}";
+		}};
+		if (it != this->server.smtpServer->outbox.end()) {
+			streamEnvelope();
+			it++;
+		}
+		for (; it != this->server.smtpServer->outbox.end(); it++) {
+			ss << ",\n";
+			streamEnvelope();
 		}
 		ss << "]}";
 		ss.seekg(0, std::ios::end);
@@ -268,15 +279,16 @@ namespace Emilia::Http {
 		std::string const &target) {
 		// target does not begin with / and may or may not end with a trailing /.
 		//
-		// First attempt to resolve the path at STATIC_ROOT/{storyworld}/{path}, then
-		// STATIC_ROOT/{path}.
+		// First attempt to resolve the path at STATIC_ROOT/{storyworld}/{path},
+		// then STATIC_ROOT/{path}.
 		static auto const resolvePath =
 			[](std::string const &pathStr) -> std::optional<std::filesystem::path> {
 			std::filesystem::path path{pathStr};
 			if (!std::filesystem::exists(path)) {
 				return {};
 			}
-			// All files under STATIC_ROOT are fair game. Allow symlinks by only comparing absolute paths.
+			// All files under STATIC_ROOT are fair game. Allow symlinks by only
+			// comparing absolute paths.
 			if (!Rain::Filesystem::isSubpath(path, Server::STATIC_ROOT, false)) {
 				return {};
 			}

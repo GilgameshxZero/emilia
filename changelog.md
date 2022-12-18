@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.4.6
+
+1. Fix `api/outbox.json` to output actual JSON.
+
 ## 8.4.5
 
 1. Remove submodules from `gitignore`.
