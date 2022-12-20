@@ -44,8 +44,6 @@ namespace Emilia::Http {
 		static std::string const hostRegex{
 			"(?:gilgamesh.cc|localhost|127\\.0\\.0\\.1|::1)(?::.*)?"},
 			queryFragment{"(?:\\?[^#]*)?(?:#.*)?"};
-		static std::string const storyworldsOrRegex{
-			"erlija-past|reflections-on-blackfeather"};
 		static std::vector<Worker::RequestFilter> const filters{
 			// Responds immediately with 200.
 			{hostRegex,
@@ -62,18 +60,22 @@ namespace Emilia::Http {
 			 "/api/outbox.json/?" + queryFragment,
 			 {Method::GET},
 			 &Worker::getApiOutboxJson},
-			// User-facing endpoints, which resolve to index.html under the current
-			// storyworld, or index.html in general.
+			// Reloads tags associated with snapshots.
 			{hostRegex,
-			 "/(dashboard|snapshots/(?:[^\\?#\\.]+)|storyworlds)?" + queryFragment,
+			 "/api/refresh/?" + queryFragment,
+			 {Method::GET},
+			 &Worker::getApiRefresh},
+			// Gets snapshots under a tag, sorted by date.
+			{hostRegex,
+			 "/api/snapshots/(.+).json/?" + queryFragment,
+			 {Method::GET},
+			 &Worker::getApiSnapshotsJson},
+			// User-facing endpoints, which resolve to index.html.
+			{hostRegex,
+			 "/((dashboard|map|timeline|snapshots/(?:[^\\?#\\.]+))/?)?" +
+				 queryFragment,
 			 {Method::GET},
 			 &Worker::getUserFacing},
-			// Storyworld-specific endpoints, which may resolve to a shared static.
-			{hostRegex,
-			 "/(" + storyworldsOrRegex + ")/([^\\?#]*)" + queryFragment,
-			 {Method::GET},
-			 &Worker::getStoryworldStatic},
-			// Shared statics, or 404.
 			{hostRegex,
 			 "/([^\\?#]*)" + queryFragment,
 			 {Method::GET},
@@ -88,13 +90,6 @@ namespace Emilia::Http {
 		Request &req,
 		std::smatch const &) {
 		using namespace Rain::Literal;
-
-		if (this->maybeRejectAuthorization(req)) {
-			return {
-				{StatusCode::UNAUTHORIZED,
-				 {{{"Www-Authenticate", "Basic realm=\"api/status\""}}}}};
-		}
-
 		std::time_t time =
 			std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 		std::tm timeData;
@@ -126,21 +121,42 @@ namespace Emilia::Http {
 			bodyLen += static_cast<std::size_t>(req.body.gcount());
 		}
 		bodyLen += static_cast<std::size_t>(req.body.gcount());
-		ss << "Your request body has length " << bodyLen << ".\n\n";
+		ss << "Your request body has length " << bodyLen << ".";
 
+		ss.seekg(0, std::ios::end);
+		std::size_t ssLen = static_cast<std::size_t>(ss.tellg());
+		ss.seekg(0, std::ios::beg);
+		return {
+			{StatusCode::OK,
+			 {{{"Content-Type", "text/plain"},
+				 {"Content-Length", std::to_string(ssLen)}}},
+			 std::move(*ss.rdbuf())}};
+	}
+	Worker::ResponseAction Worker::getApiOutboxJson(
+		Request &req,
+		std::smatch const &) {
+		if (this->maybeRejectAuthorization(req)) {
+			return {
+				{StatusCode::UNAUTHORIZED,
+				 {{{"Www-Authenticate", "Basic realm=\"api/outbox.json\""}}}}};
+		}
+
+		std::stringstream ss;
+		ss << "{\"outbox\": [";
 		{
-			std::shared_lock lck(this->server.smtpServer->outboxMtx);
-			ss << "SMTP activity (" << this->server.smtpServer->outbox.size()
-				 << " total): \n";
-			for (auto const &it : this->server.smtpServer->outbox) {
+			Rain::Multithreading::SharedLockGuard lck(
+				this->server.smtpServer->outboxMtx);
+			auto it{this->server.smtpServer->outbox.begin()};
+			auto streamEnvelope{[&ss, &it]() {
 				std::time_t time = std::chrono::system_clock::to_time_t(
 					std::chrono::system_clock::now() +
 					std::chrono::duration_cast<std::chrono::system_clock::duration>(
-						it.attemptTime - std::chrono::steady_clock::now()));
+						it->attemptTime - std::chrono::steady_clock::now()));
 				std::tm timeData;
 				Rain::Time::localtime_r(&time, &timeData);
-				ss << std::put_time(&timeData, "%F %T %z") << " | ";
-				switch (it.status) {
+				ss << "{\"time\": \"" << std::put_time(&timeData, "%F %T %z")
+					 << "\", \"status\": \"";
+				switch (it->status) {
 					case Envelope::Status::PENDING:
 						ss << "PENDING";
 						break;
@@ -154,59 +170,17 @@ namespace Emilia::Http {
 						ss << "SUCCESS";
 						break;
 				}
-				ss << " | " << it.from.name << '@' << it.from.host << " > "
-					 << it.to.name << '@' << it.to.host << '\n';
+				ss << "\", \"from\": \"" << it->from.name << '@' << it->from.host
+					 << "\", \"to\": \"" << it->to.name << '@' << it->to.host << "\"}";
+			}};
+			if (it != this->server.smtpServer->outbox.end()) {
+				streamEnvelope();
+				it++;
 			}
-		}
-
-		ss.seekg(0, std::ios::end);
-		std::size_t ssLen = static_cast<std::size_t>(ss.tellg());
-		ss.seekg(0, std::ios::beg);
-		return {
-			{StatusCode::OK,
-			 {{{"Content-Type", "text/plain"},
-				 {"Content-Length", std::to_string(ssLen)}}},
-			 std::move(*ss.rdbuf())}};
-	}
-	Worker::ResponseAction Worker::getApiOutboxJson(
-		Request &,
-		std::smatch const &) {
-		std::stringstream ss;
-		ss << "{\"outbox\": [";
-		auto it{this->server.smtpServer->outbox.begin()};
-		auto streamEnvelope{[&ss, &it]() {
-			std::time_t time = std::chrono::system_clock::to_time_t(
-				std::chrono::system_clock::now() +
-				std::chrono::duration_cast<std::chrono::system_clock::duration>(
-					it->attemptTime - std::chrono::steady_clock::now()));
-			std::tm timeData;
-			Rain::Time::localtime_r(&time, &timeData);
-			ss << "{\"time\": \"" << std::put_time(&timeData, "%F %T %z")
-				 << "\", \"status\": \"";
-			switch (it->status) {
-				case Envelope::Status::PENDING:
-					ss << "PENDING";
-					break;
-				case Envelope::Status::RETRIED:
-					ss << "RETRIED";
-					break;
-				case Envelope::Status::FAILURE:
-					ss << "FAILURE";
-					break;
-				case Envelope::Status::SUCCESS:
-					ss << "SUCCESS";
-					break;
+			for (; it != this->server.smtpServer->outbox.end(); it++) {
+				ss << ",\n";
+				streamEnvelope();
 			}
-			ss << "\", \"from\": \"" << it->from.name << '@' << it->from.host
-				 << "\", \"to\": \"" << it->to.name << '@' << it->to.host << "\"}";
-		}};
-		if (it != this->server.smtpServer->outbox.end()) {
-			streamEnvelope();
-			it++;
-		}
-		for (; it != this->server.smtpServer->outbox.end(); it++) {
-			ss << ",\n";
-			streamEnvelope();
 		}
 		ss << "]}";
 		ss.seekg(0, std::ios::end);
@@ -215,42 +189,69 @@ namespace Emilia::Http {
 		return {
 			{StatusCode::OK,
 			 {{{"Content-Type", "application/json"},
-				 {"Content-Length", std::to_string(ssLen)}}},
+				 {"Content-Length", std::to_string(ssLen)},
+				 {"Access-Control-Allow-Origin", "*"}}},
+			 std::move(*ss.rdbuf())}};
+	}
+	Worker::ResponseAction Worker::getApiRefresh(
+		Request &req,
+		std::smatch const &) {
+		if (this->maybeRejectAuthorization(req)) {
+			return {
+				{StatusCode::UNAUTHORIZED,
+				 {{{"Www-Authenticate", "Basic realm=\"api/refresh\""}}}}};
+		}
+		this->server.refreshSnapshots();
+		return {{StatusCode::OK}};
+	}
+	Worker::ResponseAction Worker::getApiSnapshotsJson(
+		Request &,
+		std::smatch const &match) {
+		std::stringstream ss;
+		ss << "{\"snapshots\": [";
+		{
+			Rain::Multithreading::SharedLockGuard lck(this->server.snapshotsMtx);
+			auto tagSnapshots{this->server.snapshots[match[1]]};
+			auto it{tagSnapshots.begin()};
+			auto streamSnapshot{[&ss, &it]() {
+				ss << "{\"title\": \"" << it->title << "\", \"date\": \"" << it->date
+					 << "\", \"path\": " << it->path << "}";
+			}};
+			if (it != tagSnapshots.end()) {
+				streamSnapshot();
+				it++;
+			}
+			for (; it != tagSnapshots.end(); it++) {
+				ss << ",\n";
+				streamSnapshot();
+			}
+		}
+		ss << "]}";
+		ss.seekg(0, std::ios::end);
+		std::size_t ssLen = static_cast<std::size_t>(ss.tellg());
+		ss.seekg(0, std::ios::beg);
+		return {
+			{StatusCode::OK,
+			 {{{"Content-Type", "application/json"},
+				 {"Content-Length", std::to_string(ssLen)},
+				 {"Cache-Control", "Max-Age=1"},
+				 {"Access-Control-Allow-Origin", "*"}}},
 			 std::move(*ss.rdbuf())}};
 	}
 	Worker::ResponseAction Worker::getUserFacing(
 		Request &req,
 		std::smatch const &match) {
-		if (match[1] == "dashboard" && this->maybeRejectAuthorization(req)) {
-			return {
-				{StatusCode::UNAUTHORIZED,
-				 {{{"Www-Authenticate", "Basic realm=\"dashboard\""}}}}};
-		}
-
-		// Respond with a storyworld index or the shared index, if SRP failed.
-		auto file =
-			this->resolveStoryworldPath(this->resolveStoryworld(req), "/index.html");
-		auto response = this->getStatic(file.value());
-		response.response.value().headers["Cache-Control"] = "no-store";
-		return response;
-	}
-	Worker::ResponseAction Worker::getStoryworldStatic(
-		Request &,
-		std::smatch const &match) {
-		auto file = this->resolveStoryworldPath(match[1], match[2]);
-		if (!file) {
-			return {{StatusCode::NOT_FOUND}};
-		}
-		return this->getStatic(file.value());
+		// Respond with the shared index. SRP is handled by frontend.
+		return this->getStaticResponse(Server::STATIC_ROOT + "/index.html");
 	}
 	Worker::ResponseAction Worker::getSharedStatic(
 		Request &,
 		std::smatch const &match) {
-		auto file = this->resolveStoryworldPath("", match[1]);
+		auto file = this->resolvePath(match[1]);
 		if (!file) {
 			return {{StatusCode::NOT_FOUND}};
 		}
-		return this->getStatic(file.value());
+		return this->getStaticResponse(file.value());
 	}
 	bool Worker::maybeRejectAuthorization(Request &req) {
 		static std::string targetCredentials{
@@ -262,48 +263,22 @@ namespace Emilia::Http {
 			Rain::String::toLower(authorization.scheme) == "basic" &&
 			authorization.parameters["credentials"] == targetCredentials);
 	}
-	std::string Worker::resolveStoryworld(Request &req) {
-		auto cookie = req.headers.cookie();
-		auto it = cookie.find("storyworld-selected");
-		if (it != cookie.end()) {
-			return it->second;
-		}
-		it = cookie.find("storyworld-defaulted");
-		if (it != cookie.end()) {
-			return it->second;
-		}
-		return {};
-	}
-	std::optional<std::filesystem::path> Worker::resolveStoryworldPath(
-		std::string const &storyworld,
+	std::optional<std::filesystem::path> Worker::resolvePath(
 		std::string const &target) {
 		// target does not begin with / and may or may not end with a trailing /.
-		//
-		// First attempt to resolve the path at STATIC_ROOT/{storyworld}/{path},
-		// then STATIC_ROOT/{path}.
-		static auto const resolvePath =
-			[](std::string const &pathStr) -> std::optional<std::filesystem::path> {
-			std::filesystem::path path{pathStr};
-			if (!std::filesystem::exists(path)) {
-				return {};
-			}
-			// All files under STATIC_ROOT are fair game. Allow symlinks by only
-			// comparing absolute paths.
-			if (!Rain::Filesystem::isSubpath(path, Server::STATIC_ROOT, false)) {
-				return {};
-			}
-			return {path};
-		};
-		if (!storyworld.empty()) {
-			std::optional<std::filesystem::path> result =
-				resolvePath(Server::STATIC_ROOT + "/" + storyworld + "/" + target);
-			if (result) {
-				return result;
-			}
+		std::filesystem::path path{Server::STATIC_ROOT + "/" + target};
+		if (!std::filesystem::exists(path)) {
+			return {};
 		}
-		return resolvePath(Server::STATIC_ROOT + "/" + target);
+		// All files under STATIC_ROOT are fair game. Allow symlinks by only
+		// comparing absolute paths.
+		if (!Rain::Filesystem::isSubpath(path, Server::STATIC_ROOT, false)) {
+			return {};
+		}
+		return {path};
 	}
-	Worker::ResponseAction Worker::getStatic(std::filesystem::path const &path) {
+	Worker::ResponseAction Worker::getStaticResponse(
+		std::filesystem::path const &path) {
 		std::ifstream file(path, std::ios::binary);
 		std::string bytes;
 		bytes.assign(
@@ -329,7 +304,9 @@ namespace Emilia::Http {
 				httpPassword(httpPassword),
 				processBegin(processBegin),
 				smtpServer(smtpServer),
-				echo(echo) {}
+				echo(echo) {
+		this->refreshSnapshots();
+	}
 	Server::~Server() {
 		this->destruct();
 	}
@@ -337,5 +314,50 @@ namespace Emilia::Http {
 		NativeSocket nativeSocket,
 		SocketInterface *interrupter) {
 		return {nativeSocket, interrupter, *this};
+	}
+	void Server::refreshSnapshots() {
+		std::cout << "Refreshing snapshots..\n";
+		std::unique_lock lck(this->snapshotsMtx);
+		this->snapshots.clear();
+		for (auto const &entry : std::filesystem::directory_iterator(
+					 Server::STATIC_ROOT + "/snapshots")) {
+			if (entry.path().extension() == ".html") {
+				// Parse tags, title, date.
+				// These are specified in the HTML file in three lines with no
+				// whitespace around:
+				// <!-- emilia-snapshot-properties
+				// Test Title
+				// 2022/12/18
+				// test silver
+				// emilia-snapshot-properties -->
+				std::ifstream fileIStream(entry.path());
+				std::string line;
+				while (std::getline(fileIStream, line)) {
+					if (line == "<!-- emilia-snapshot-properties") {
+						std::string title, date, tagStr;
+						std::getline(fileIStream, title);
+						std::getline(fileIStream, date);
+						std::getline(fileIStream, tagStr);
+						std::size_t spacePos, offset{0};
+						do {
+							spacePos = tagStr.find(' ', offset);
+							this->snapshots[tagStr.substr(offset, spacePos - offset)]
+								.emplace_back(entry.path().generic_string(), title, date);
+							offset = spacePos + 1;
+						} while (spacePos != std::string::npos);
+						std::cout << "Found: " << title << " | " << date << " | "
+											<< entry.path() << '\n';
+						break;
+					}
+				}
+			}
+		}
+
+		// Sort snapshots in each tag by date.
+		for (auto &it : this->snapshots) {
+			std::sort(it.second.begin(), it.second.end());
+		}
+		std::cout << "Finished refreshing snapshots.\n";
+		std::cout.flush();
 	}
 }
