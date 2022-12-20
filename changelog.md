@@ -1,5 +1,15 @@
 # Changelog
 
+## 8.5.0
+
+1. Remove storyworld routing from backend and move to frontend.
+2. Add `/api/refresh` to refresh snapshot tags.
+3. Use shared/exclusive lock framework for outbox performance.
+4. Add endpoint for snapshot retrieval by tag.
+5. Rework frontend in `echidna` to be mobile-responsive and updated the `erlija-past` color theme to be more saturated.
+6. Reworked frontend components and FOUC resolutions.
+7. Temporarily disabled dark theme `reflections-on-blackfeather`.
+
 ## 8.4.7
 
 1. Fix compilation error.

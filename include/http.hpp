@@ -1,47 +1,49 @@
 /*
-The HTTP service is build around the concept of *storyworlds*. Storyworlds allow
-for dynamic adjustment of dependent endpoints based on user input.
+The HTTP service is built around the concept of *storyworlds*, which provide a
+themed experience for users.
 
-Endpoints are categorized into four types:
+Endpoints are categorized into three types:
 
 1. API: Storyworld-independent endpoints meant for automated access.
 2. User-facing: URLs designed to be visited by humans. Experience is dependent
 on the selected storyworld.
-3. Specific: Endpoints which can only be resolved in either one or multiple
-storyworlds. Specific endpoints only exist as paths with a `/{storyworld}/`
-prefix.
-4. Shared: Statics accessible under `/static`, not overridden by the current
-storyworld.
+3. Static: Shared statics accessible under `/echidna`.
 
 Request targets are resolved as follows:
 
 1. If the target beings with `/api`, it is an API endpoint.
-2. If the target is one of the user-facing endpoints, we will undergo the
-storyworld resolution process (SRP). Once the storyworld has been determined, it
-will be routed to `/{storyworld}/index.html`. The front-end will then redirect
-to the right user-facing component from there.
-3. A target of `/{storyworld}{path}` will route to the static at
-`/static/{storyworld}{path}` if it exists, and `/static{path}` if not.
-4. Other targets of `{path}` will route directoy to `/static{path}` if it
+2. If the target is one of the user-facing endpoints, it will always be routed
+to index.html. The front-end will then action upon the storyworld via the
+storyworld resolution process (SRP).
+4. Other targets of `{path}` will route directoy to `/echidna/{path}` if it
 exists, or return a 404.
 
 User-facing endpoints:
 
 1. `/`: Landing page.
-2. `/snapshots/{snapshot}`: Essays, projects, or notes.
-3. `/storyworlds`: Storyworld selector, which saves into the
+2. `/dashboard`: Admin dashboard.
+3. `/map`: Storyworld selector, which saves into the
 `storyworld-selected` cookie.
+4. `/timeline`: Snapshot/tag browser.
+5. `/snapshots/{snapshot}`: Essays, projects, or notes.
 
-The SRP picks a storyworld in the following priority:
+The SRP in the front-end picks a storyworld in the following priority:
 
 1. `storyworld-selected` cookie.
-2. `storyworld-defaulted` cookie.
-3. Failure.
+2. `storyworld-forced` cookie, which can be set via a query parameter on any
+user-facing endpoint. This cookie only lasts for the duration of the session.
+3. The user’s system light/dark preferences will select the default light/dark
+storyworld.
 
 API endpoints:
-* `/api/ping`: Returns 200 immediately.
-* `/api/status`: Human-readable status page (TODO: integrate this into
-storyworlds).
+* GET `/api/ping`: Returns 200 immediately.
+* GET `/api/status`: Human-readable status page.
+* GET `/api/outbox.json`: Authentication required. Returns SMTP outbox status as
+JSON.
+* POST `/api/refresh`: Authentication required. Pulls latest echidna &
+silver from Github, and recomputes snapshot tags.
+* GET `/api/snapshots.json?tag={tag}`: Returns JSON of snapshots of a given tag,
+sorted in ascending order by date.
 
 Storyworlds:
 * `erlija-past` (default light).
@@ -50,6 +52,7 @@ Storyworlds:
 #pragma once
 
 #include "smtp.hpp"
+#include "snapshot.hpp"
 
 #include <rain.hpp>
 
@@ -97,12 +100,11 @@ namespace Emilia::Http {
 		ResponseAction getApiPing(Request &, std::smatch const &);
 		ResponseAction getApiStatus(Request &, std::smatch const &);
 		ResponseAction getApiOutboxJson(Request &, std::smatch const &);
+		ResponseAction getApiRefresh(Request &, std::smatch const &);
+		ResponseAction getApiSnapshotsJson(Request &, std::smatch const &);
 
 		// Responds with the storyworld-resolved or shared index.html.
 		ResponseAction getUserFacing(Request &, std::smatch const &);
-
-		// Storyworld-specific or shared static.
-		ResponseAction getStoryworldStatic(Request &, std::smatch const &);
 
 		// General agnostic or dependent endpoints.
 		ResponseAction getSharedStatic(Request &, std::smatch const &);
@@ -110,18 +112,12 @@ namespace Emilia::Http {
 		// Returns false if and only if Authorization is valid.
 		bool maybeRejectAuthorization(Request &);
 
-		// Implements the SRP. Returns an empty string on failure.
-		std::string resolveStoryworld(Request &);
-
-		// Resolves a storyworld + (storyworld-unincluded) target into a filesystem
-		// static path, or 404. Prefers storyworld-specific files
-		std::optional<std::filesystem::path> resolveStoryworldPath(
-			std::string const &,
-			std::string const &);
+		// Resolves a target into a filesystem static path, or 404.
+		std::optional<std::filesystem::path> resolvePath(std::string const &);
 
 		// Make a response from a static file at a path. Assumes path is resolved
 		// and valid.
-		ResponseAction getStatic(std::filesystem::path const &);
+		ResponseAction getStaticResponse(std::filesystem::path const &);
 	};
 
 	class Server : public Rain::Networking::Http::Server<
@@ -151,6 +147,11 @@ namespace Emilia::Http {
 		std::unique_ptr<Emilia::Smtp::Server> &smtpServer;
 		std::atomic_bool const &echo;
 
+		// The server maintains a list of snapshots referred to by their tags. The
+		// list is refreshed by POSTing to /api/refresh.
+		std::shared_mutex snapshotsMtx;
+		std::unordered_map<std::string, std::vector<Snapshot>> snapshots;
+
 		public:
 		Server(
 			Host const &,
@@ -162,5 +163,7 @@ namespace Emilia::Http {
 
 		private:
 		virtual Worker makeWorker(NativeSocket, SocketInterface *) override;
+
+		void refreshSnapshots();
 	};
 }
