@@ -40,8 +40,6 @@ API endpoints:
 * GET `/api/status`: Human-readable status page.
 * GET `/api/outbox.json`: Authentication required. Returns SMTP outbox status as
 JSON.
-* POST `/api/refresh`: Authentication required. Pulls latest echidna &
-silver from Github, and recomputes snapshot tags.
 * GET `/api/snapshots.json?tag={tag}`: Returns JSON of snapshots of a given tag,
 sorted in ascending order by date.
 
@@ -100,7 +98,6 @@ namespace Emilia::Http {
 		ResponseAction getApiPing(Request &, std::smatch const &);
 		ResponseAction getApiStatus(Request &, std::smatch const &);
 		ResponseAction getApiOutboxJson(Request &, std::smatch const &);
-		ResponseAction getApiRefresh(Request &, std::smatch const &);
 		ResponseAction getApiSnapshotsJson(Request &, std::smatch const &);
 
 		// Responds with the storyworld-resolved or shared index.html.
@@ -161,9 +158,9 @@ namespace Emilia::Http {
 			std::atomic_bool const &);
 		virtual ~Server();
 
+		void refreshSnapshots();
+
 		private:
 		virtual Worker makeWorker(NativeSocket, SocketInterface *) override;
-
-		void refreshSnapshots();
 	};
 }

@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.5.1
+
+1. Moved snapshot refresh from an endpoint to a command.
+
 ## 8.5.0
 
 1. Remove storyworld routing from backend and move to frontend.
