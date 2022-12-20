@@ -104,6 +104,7 @@ int main(int argc, char const *argv[]) {
 						<< "toggle echo: Toggles echoing of all parsed requests/responses "
 							 "to "
 							 "the command-line.\n"
+						<< "refresh: Refresh HTTP snapshots tags.\n"
 						<< std::endl;
 				} else if (command == "exit") {
 					break;
@@ -176,6 +177,8 @@ int main(int argc, char const *argv[]) {
 				} else if (command == "toggle echo") {
 					echo = !echo;
 					std::cout << "Echo is " << (echo ? "on" : "off") << '.' << std::endl;
+				} else if (command == "refresh") {
+					httpServer->refreshSnapshots();
 				} else {
 					std::cout << "Invalid command: " << command << '.' << std::endl;
 				}

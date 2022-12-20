@@ -60,11 +60,6 @@ namespace Emilia::Http {
 			 "/api/outbox.json/?" + queryFragment,
 			 {Method::GET},
 			 &Worker::getApiOutboxJson},
-			// Reloads tags associated with snapshots.
-			{hostRegex,
-			 "/api/refresh/?" + queryFragment,
-			 {Method::GET},
-			 &Worker::getApiRefresh},
 			// Gets snapshots under a tag, sorted by date.
 			{hostRegex,
 			 "/api/snapshots/(.+).json/?" + queryFragment,
@@ -193,17 +188,6 @@ namespace Emilia::Http {
 				 {"Access-Control-Allow-Origin", "*"}}},
 			 std::move(*ss.rdbuf())}};
 	}
-	Worker::ResponseAction Worker::getApiRefresh(
-		Request &req,
-		std::smatch const &) {
-		if (this->maybeRejectAuthorization(req)) {
-			return {
-				{StatusCode::UNAUTHORIZED,
-				 {{{"Www-Authenticate", "Basic realm=\"api/refresh\""}}}}};
-		}
-		this->server.refreshSnapshots();
-		return {{StatusCode::OK}};
-	}
 	Worker::ResponseAction Worker::getApiSnapshotsJson(
 		Request &,
 		std::smatch const &match) {
@@ -316,7 +300,7 @@ namespace Emilia::Http {
 		return {nativeSocket, interrupter, *this};
 	}
 	void Server::refreshSnapshots() {
-		std::cout << "Refreshing snapshots..\n";
+		std::cout << "Refreshing snapshots...\n";
 		std::unique_lock lck(this->snapshotsMtx);
 		this->snapshots.clear();
 		for (auto const &entry : std::filesystem::directory_iterator(
