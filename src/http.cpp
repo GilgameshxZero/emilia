@@ -335,8 +335,9 @@ namespace Emilia::Http {
 		this->tags.clear();
 		this->snapshots.clear();
 
+		std::string snapshotsDirectory{Server::STATIC_ROOT + "/snapshots"};
 		for (auto const &entry : std::filesystem::recursive_directory_iterator(
-					 Server::STATIC_ROOT,
+					 snapshotsDirectory,
 					 std::filesystem::directory_options::follow_directory_symlink)) {
 			if (entry.path().extension() != ".html") {
 				continue;
@@ -351,7 +352,13 @@ namespace Emilia::Http {
 					continue;
 				}
 
-				std::string name{entry.path().stem().string()};
+				// Preserving nesting level ensures that inter-snapshot links work as
+				// expected with relative path replacementon the FE.
+				std::string name{
+					entry.path().generic_string().substr(snapshotsDirectory.size() + 1)};
+				name = name.substr(0, name.size() - 5);
+				std::cout << name << '\n';
+
 				Snapshot &snapshot{this->snapshots[name]};
 				if (!snapshot.path.empty()) {
 					std::cout << "Duplicate snapshot name: " << name
