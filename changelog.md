@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.5.7
+
+1. Revert snapshot prefix change, as it disrupts inter-snapshot linking.
+
 ## 8.5.6
 
 1. Prefix snapshot names with module name.
