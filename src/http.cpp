@@ -387,7 +387,5 @@ namespace Emilia::Http {
 					return this->snapshots[a].date < this->snapshots[b].date;
 				});
 		}
-		std::cout << "Refreshed " << this->snapshots.size() << " snapshots.\n";
-		std::cout.flush();
 	}
 }
