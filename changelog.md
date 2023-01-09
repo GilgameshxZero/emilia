@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.5.5
+
+1. Removed console output for snapshot refreshes.
+
 ## 8.5.4
 
 1. Add POST endpoint for snapshot refreshing.
