@@ -289,18 +289,14 @@ namespace Emilia::Http {
 	Worker::ResponseAction Worker::getStaticResponse(
 		std::filesystem::path const &path) {
 		std::ifstream file(path, std::ios::binary);
-		std::string bytes;
-		bytes.assign(
-			(std::istreambuf_iterator<char>(file)),
-			(std::istreambuf_iterator<char>()));
-
 		return {
 			{StatusCode::OK,
 			 {{{"Content-Type", MediaType(path.extension().string())},
+				 {"Content-Length", std::to_string(std::filesystem::file_size(path))},
 				 // Cached by default.
 				 {"Cache-Control", "Max-Age=3600"},
 				 {"Access-Control-Allow-Origin", "*"}}},
-			 std::move(bytes)}};
+			 std::move(*file.rdbuf())}};
 	}
 
 	Server::Server(

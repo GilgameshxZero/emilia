@@ -1,5 +1,10 @@
 # Changelog
 
+## 8.5.3
+
+1. Performance: increase HTTP buffer size to 2^16 from 2^10.
+2. Performance: directly send body from `std::filebuf` instead of first parsing to `std::stringbuf`.
+
 ## 8.5.2
 
 1. Add API support for submodule snapshots on the FE.
