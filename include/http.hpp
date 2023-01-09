@@ -35,6 +35,7 @@ JSON.
 * GET `/api/tags/{tag}.json`: Returns JSON of snapshots of a given tag,
 sorted in ascending order by date.
 * GET `/api/snapshots/{snapshot}.json`: JSON information for a single snapshot.
+* POST `/api/snapshots/refresh`: Refreshes list of snapshots from the filesystem.
 
 Storyworlds:
 * `erlija-past` (default light/dark).
@@ -92,6 +93,7 @@ namespace Emilia::Http {
 		ResponseAction getApiOutboxJson(Request &, std::smatch const &);
 		ResponseAction getApiTagsJson(Request &, std::smatch const &);
 		ResponseAction getApiSnapshotsJson(Request &, std::smatch const &);
+		ResponseAction getApiSnapshotsRefresh(Request &, std::smatch const &);
 
 		// Responds with the storyworld-resolved or shared index.html.
 		ResponseAction getUserFacing(Request &, std::smatch const &);

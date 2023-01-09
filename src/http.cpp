@@ -70,6 +70,10 @@ namespace Emilia::Http {
 			 "/api/snapshots/(.+).json/?" + queryFragment,
 			 {Method::GET},
 			 &Worker::getApiSnapshotsJson},
+			{hostRegex,
+			 "/api/snapshots/refresh/?" + queryFragment,
+			 {Method::POST},
+			 &Worker::getApiSnapshotsRefresh},
 			// User-facing endpoints, which resolve to index.html.
 			{hostRegex,
 			 "/((dashboard|map|timeline|snapshots/(?:[^\\?#\\.]+))/?)?" +
@@ -249,6 +253,12 @@ namespace Emilia::Http {
 				 {"Access-Control-Allow-Origin", "*"}}},
 			 std::move(*ss.rdbuf())}};
 	}
+	Worker::ResponseAction Worker::getApiSnapshotsRefresh(
+		Request &,
+		std::smatch const &) {
+		this->server.refreshSnapshots();
+		return {{StatusCode::OK, {{{"Access-Control-Allow-Origin", "*"}}}}};
+	}
 	Worker::ResponseAction Worker::getUserFacing(Request &, std::smatch const &) {
 		// Respond with the shared index. SRP is handled by frontend.
 		return this->getStaticResponse(Server::STATIC_ROOT + "/index.html");
@@ -321,7 +331,6 @@ namespace Emilia::Http {
 		return {nativeSocket, interrupter, *this};
 	}
 	void Server::refreshSnapshots() {
-		std::cout << "Refreshing snapshots...\n";
 		std::unique_lock lck(this->snapshotsMtx);
 		this->tags.clear();
 		this->snapshots.clear();
@@ -378,7 +387,7 @@ namespace Emilia::Http {
 					return this->snapshots[a].date < this->snapshots[b].date;
 				});
 		}
-		std::cout << "Found " << this->snapshots.size() << " snapshots.\n";
+		std::cout << "Refreshed " << this->snapshots.size() << " snapshots.\n";
 		std::cout.flush();
 	}
 }

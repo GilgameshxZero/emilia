@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.5.4
+
+1. Add POST endpoint for snapshot refreshing.
+
 ## 8.5.3
 
 1. Performance: increase HTTP buffer size to 2^16 from 2^10.
