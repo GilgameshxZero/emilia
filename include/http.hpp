@@ -52,8 +52,8 @@ namespace Emilia::Http {
 	class Worker : public Rain::Networking::Http::Worker<
 									 Rain::Networking::Http::Request,
 									 Rain::Networking::Http::Response,
-									 1 << 10,
-									 1 << 10,
+									 1 << 16,
+									 1 << 16,
 									 60000,
 									 60000,
 									 Rain::Networking::Ipv6FamilyInterface,
@@ -64,8 +64,8 @@ namespace Emilia::Http {
 		using SuperWorker = Rain::Networking::Http::Worker<
 			Rain::Networking::Http::Request,
 			Rain::Networking::Http::Response,
-			1 << 10,
-			1 << 10,
+			1 << 16,
+			1 << 16,
 			60000,
 			60000,
 			Rain::Networking::Ipv6FamilyInterface,
