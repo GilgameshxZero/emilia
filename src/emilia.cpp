@@ -104,7 +104,7 @@ int main(int argc, char const *argv[]) {
 						<< "toggle echo: Toggles echoing of all parsed requests/responses "
 							 "to "
 							 "the command-line.\n"
-						<< "refresh: Refresh HTTP snapshots tags.\n"
+						<< "refresh: Pull and rescan for HTTP snapshots.\n"
 						<< std::endl;
 				} else if (command == "exit") {
 					break;

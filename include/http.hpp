@@ -9,15 +9,6 @@ Endpoints are categorized into three types:
 on the selected storyworld.
 3. Static: Shared statics accessible under `/echidna`.
 
-Request targets are resolved as follows:
-
-1. If the target beings with `/api`, it is an API endpoint.
-2. If the target is one of the user-facing endpoints, it will always be routed
-to index.html. The front-end will then action upon the storyworld via the
-storyworld resolution process (SRP).
-4. Other targets of `{path}` will route directoy to `/echidna/{path}` if it
-exists, or return a 404.
-
 User-facing endpoints:
 
 1. `/`: Landing page.
@@ -25,7 +16,8 @@ User-facing endpoints:
 3. `/map`: Storyworld selector, which saves into the
 `storyworld-selected` cookie.
 4. `/timeline`: Snapshot/tag browser.
-5. `/snapshots/{snapshot}`: Essays, projects, or notes.
+5. `/snapshots/{snapshot}`: Snapshots may not share the same name with each
+other.
 
 The SRP in the front-end picks a storyworld in the following priority:
 
@@ -40,12 +32,12 @@ API endpoints:
 * GET `/api/status`: Human-readable status page.
 * GET `/api/outbox.json`: Authentication required. Returns SMTP outbox status as
 JSON.
-* GET `/api/snapshots.json?tag={tag}`: Returns JSON of snapshots of a given tag,
+* GET `/api/tags/{tag}.json`: Returns JSON of snapshots of a given tag,
 sorted in ascending order by date.
+* GET `/api/snapshots/{snapshot}.json`: JSON information for a single snapshot.
 
 Storyworlds:
-* `erlija-past` (default light).
-* `reflections-on-blackfeather` (default dark).
+* `erlija-past` (default light/dark).
 */
 #pragma once
 
@@ -98,6 +90,7 @@ namespace Emilia::Http {
 		ResponseAction getApiPing(Request &, std::smatch const &);
 		ResponseAction getApiStatus(Request &, std::smatch const &);
 		ResponseAction getApiOutboxJson(Request &, std::smatch const &);
+		ResponseAction getApiTagsJson(Request &, std::smatch const &);
 		ResponseAction getApiSnapshotsJson(Request &, std::smatch const &);
 
 		// Responds with the storyworld-resolved or shared index.html.
@@ -144,10 +137,11 @@ namespace Emilia::Http {
 		std::unique_ptr<Emilia::Smtp::Server> &smtpServer;
 		std::atomic_bool const &echo;
 
-		// The server maintains a list of snapshots referred to by their tags. The
-		// list is refreshed by POSTing to /api/refresh.
+		// The server maintains a list of snapshots, mapped by tag->name and
+		// name->snapshot.
 		std::shared_mutex snapshotsMtx;
-		std::unordered_map<std::string, std::vector<Snapshot>> snapshots;
+		std::unordered_map<std::string, std::vector<std::string>> tags;
+		std::unordered_map<std::string, Snapshot> snapshots;
 
 		public:
 		Server(

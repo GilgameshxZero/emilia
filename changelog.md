@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.5.2
+
+1. Add API support for submodule snapshots on the FE.
+
 ## 8.5.1
 
 1. Moved snapshot refresh from an endpoint to a command.

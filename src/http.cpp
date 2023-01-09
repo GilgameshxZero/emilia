@@ -62,6 +62,11 @@ namespace Emilia::Http {
 			 &Worker::getApiOutboxJson},
 			// Gets snapshots under a tag, sorted by date.
 			{hostRegex,
+			 "/api/tags/(.+).json/?" + queryFragment,
+			 {Method::GET},
+			 &Worker::getApiTagsJson},
+			// Gets information for a single snapshot.
+			{hostRegex,
 			 "/api/snapshots/(.+).json/?" + queryFragment,
 			 {Method::GET},
 			 &Worker::getApiSnapshotsJson},
@@ -79,7 +84,7 @@ namespace Emilia::Http {
 		return filters;
 	}
 	Worker::ResponseAction Worker::getApiPing(Request &, std::smatch const &) {
-		return {{StatusCode::OK}};
+		return {{StatusCode::OK, {{{"Access-Control-Allow-Origin", "*"}}}}};
 	}
 	Worker::ResponseAction Worker::getApiStatus(
 		Request &req,
@@ -124,7 +129,8 @@ namespace Emilia::Http {
 		return {
 			{StatusCode::OK,
 			 {{{"Content-Type", "text/plain"},
-				 {"Content-Length", std::to_string(ssLen)}}},
+				 {"Content-Length", std::to_string(ssLen)},
+				 {"Access-Control-Allow-Origin", "*"}}},
 			 std::move(*ss.rdbuf())}};
 	}
 	Worker::ResponseAction Worker::getApiOutboxJson(
@@ -188,26 +194,30 @@ namespace Emilia::Http {
 				 {"Access-Control-Allow-Origin", "*"}}},
 			 std::move(*ss.rdbuf())}};
 	}
-	Worker::ResponseAction Worker::getApiSnapshotsJson(
+	Worker::ResponseAction Worker::getApiTagsJson(
 		Request &,
 		std::smatch const &match) {
 		std::stringstream ss;
 		ss << "{\"snapshots\": [";
 		{
 			Rain::Multithreading::SharedLockGuard lck(this->server.snapshotsMtx);
-			auto tagSnapshots{this->server.snapshots[match[1]]};
+			std::vector<std::string> const &tagSnapshots{this->server.tags[match[1]]};
 			auto it{tagSnapshots.begin()};
-			auto streamSnapshot{[&ss, &it]() {
-				ss << "{\"title\": \"" << it->title << "\", \"date\": \"" << it->date
-					 << "\", \"path\": " << it->path << "}";
-			}};
+			// Also stream snapshot information so that FE does not need to make
+			// multiple requests.
+			auto streamSnapshot{
+				[this, &ss](std::vector<std::string>::const_iterator it) {
+					Snapshot const &snapshot{this->server.snapshots[*it]};
+					ss << "{\"name\": \"" << *it << "\", \"title\": \"" << snapshot.title
+						 << "\", \"date\": \"" << snapshot.date << "\"}";
+				}};
 			if (it != tagSnapshots.end()) {
-				streamSnapshot();
+				streamSnapshot(it);
 				it++;
 			}
 			for (; it != tagSnapshots.end(); it++) {
 				ss << ",\n";
-				streamSnapshot();
+				streamSnapshot(it);
 			}
 		}
 		ss << "]}";
@@ -218,13 +228,28 @@ namespace Emilia::Http {
 			{StatusCode::OK,
 			 {{{"Content-Type", "application/json"},
 				 {"Content-Length", std::to_string(ssLen)},
-				 {"Cache-Control", "Max-Age=1"},
 				 {"Access-Control-Allow-Origin", "*"}}},
 			 std::move(*ss.rdbuf())}};
 	}
-	Worker::ResponseAction Worker::getUserFacing(
-		Request &req,
+	Worker::ResponseAction Worker::getApiSnapshotsJson(
+		Request &,
 		std::smatch const &match) {
+		auto snapshot{this->server.snapshots[match[1]]};
+		std::stringstream ss;
+		ss << "{\"name\": \"" << match[1] << "\", \"title\": \"" << snapshot.title
+			 << "\", \"date\": \"" << snapshot.date << "\", \"path\": \""
+			 << snapshot.path.generic_string() << "\"}";
+		ss.seekg(0, std::ios::end);
+		std::size_t ssLen = static_cast<std::size_t>(ss.tellg());
+		ss.seekg(0, std::ios::beg);
+		return {
+			{StatusCode::OK,
+			 {{{"Content-Type", "application/json"},
+				 {"Content-Length", std::to_string(ssLen)},
+				 {"Access-Control-Allow-Origin", "*"}}},
+			 std::move(*ss.rdbuf())}};
+	}
+	Worker::ResponseAction Worker::getUserFacing(Request &, std::smatch const &) {
 		// Respond with the shared index. SRP is handled by frontend.
 		return this->getStaticResponse(Server::STATIC_ROOT + "/index.html");
 	}
@@ -302,46 +327,62 @@ namespace Emilia::Http {
 	void Server::refreshSnapshots() {
 		std::cout << "Refreshing snapshots...\n";
 		std::unique_lock lck(this->snapshotsMtx);
+		this->tags.clear();
 		this->snapshots.clear();
-		for (auto const &entry : std::filesystem::directory_iterator(
-					 Server::STATIC_ROOT + "/snapshots")) {
-			if (entry.path().extension() == ".html") {
-				// Parse tags, title, date.
-				// These are specified in the HTML file in three lines with no
-				// whitespace around:
-				// <!-- emilia-snapshot-properties
-				// Test Title
-				// 2022/12/18
-				// test silver
-				// emilia-snapshot-properties -->
-				std::ifstream fileIStream(entry.path());
-				std::string line;
-				while (std::getline(fileIStream, line)) {
-					if (line == "<!-- emilia-snapshot-properties") {
-						std::string title, date, tagStr;
-						std::getline(fileIStream, title);
-						std::getline(fileIStream, date);
-						std::getline(fileIStream, tagStr);
-						std::size_t spacePos, offset{0};
-						do {
-							spacePos = tagStr.find(' ', offset);
-							this->snapshots[tagStr.substr(offset, spacePos - offset)]
-								.emplace_back(entry.path().generic_string(), title, date);
-							offset = spacePos + 1;
-						} while (spacePos != std::string::npos);
-						std::cout << "Found: " << title << " | " << date << " | "
-											<< entry.path() << '\n';
-						break;
-					}
+
+		for (auto const &entry : std::filesystem::recursive_directory_iterator(
+					 Server::STATIC_ROOT,
+					 std::filesystem::directory_options::follow_directory_symlink)) {
+			if (entry.path().extension() != ".html") {
+				continue;
+			}
+
+			// Parse tags, title, date. These are specified in the HTML file in
+			// three lines with some whitespace surrounding.
+			std::ifstream fileIStream(entry.path());
+			std::string line;
+			while (std::getline(fileIStream, line)) {
+				if (line != "        <!-- emilia-snapshot-properties") {
+					continue;
 				}
+
+				// Name is simply {stem}. If there are collisions in the future,
+				// consider prefixing name here.
+				std::string name{entry.path().stem().string()};
+				Snapshot &snapshot{this->snapshots[name]};
+				if (!snapshot.path.empty()) {
+					std::cout << "Duplicate snapshot name: " << name
+										<< ". Overwriting...\n";
+				}
+				snapshot.path = entry.path();
+				std::getline(fileIStream, snapshot.title);
+				std::getline(fileIStream, snapshot.date);
+
+				// Parse tags
+				std::string tagStr, tag;
+				std::getline(fileIStream, tagStr);
+				std::size_t spacePos, offset{0};
+				do {
+					spacePos = tagStr.find(' ', offset);
+					tag = tagStr.substr(offset, spacePos - offset);
+					snapshot.tags.insert(tag);
+					this->tags[tag].push_back(name);
+					offset = spacePos + 1;
+				} while (spacePos != std::string::npos);
+				break;
 			}
 		}
 
-		// Sort snapshots in each tag by date.
-		for (auto &it : this->snapshots) {
-			std::sort(it.second.begin(), it.second.end());
+		// Sort snapshots in each tag by their date.
+		for (auto &it : this->tags) {
+			std::sort(
+				it.second.begin(),
+				it.second.end(),
+				[this](std::string const &a, std::string const &b) {
+					return this->snapshots[a].date < this->snapshots[b].date;
+				});
 		}
-		std::cout << "Finished refreshing snapshots.\n";
+		std::cout << "Found " << this->snapshots.size() << " snapshots.\n";
 		std::cout.flush();
 	}
 }
