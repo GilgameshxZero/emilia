@@ -351,16 +351,7 @@ namespace Emilia::Http {
 					continue;
 				}
 
-				// Name is the stem prefixed with the first part of the relative path
-				// under `../echidna/`.
-				std::string pathStr{entry.path().generic_string()},
-					name{
-						pathStr.substr(
-							Server::STATIC_ROOT.size() + 1,
-							pathStr.find('/', Server::STATIC_ROOT.size() + 1) -
-								Server::STATIC_ROOT.size() - 1) +
-						"-" + entry.path().stem().string()};
-
+				std::string name{entry.path().stem().string()};
 				Snapshot &snapshot{this->snapshots[name]};
 				if (!snapshot.path.empty()) {
 					std::cout << "Duplicate snapshot name: " << name
