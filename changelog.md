@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.5.9
+
+1. Remove print statement in refresh.
+
 ## 8.5.8
 
 1. Move snapshot submodules into `snapshots` directory to fix inter-snapshot linking, for now.
