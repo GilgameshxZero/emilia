@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.5.10
+
+1. Update submodules.
+
 ## 8.5.9
 
 1. Remove print statement in refresh.
