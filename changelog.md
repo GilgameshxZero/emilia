@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.5.11
+
+1. Update submodules. This fixes bug with `isSubpath` which allows HTTP clients to access files outside of the static root.
+
 ## 8.5.10
 
 1. Update submodules.
