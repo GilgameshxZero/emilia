@@ -74,23 +74,20 @@ namespace Emilia::Smtp {
 			std::string fromB64{Rain::String::Base64::encode(this->mailFrom.value())};
 			std::replace(fromB64.begin(), fromB64.end(), '/', '_');
 			std::stringstream dataPathStream;
-			// TODO: Replace /tmp/ with a platform-dependent temporary directory.
-			dataPathStream << "/tmp/" << timeData.tm_year << "-" << timeData.tm_mon
-										 << "-" << timeData.tm_mday << "-" << timeData.tm_hour
-										 << "-" << timeData.tm_min << "-" << timeData.tm_sec << "-"
-										 << fromB64 << "-" << std::rand();
-			dataPath = dataPathStream.str();
+			dataPathStream << timeData.tm_year << "-" << timeData.tm_mon << "-"
+										 << timeData.tm_mday << "-" << timeData.tm_hour << "-"
+										 << timeData.tm_min << "-" << timeData.tm_sec << "-"
+										 << std::rand() << "-" << fromB64.substr(0, 86);
+			dataPath = std::filesystem::temp_directory_path() / dataPathStream.str();
 			if (!std::filesystem::exists(dataPath)) {
 				break;
 			}
 		}
 		std::ofstream dataFile(dataPath, std::ios::binary);
-		dataFile << "X-Emilia-Mail-From: " << this->mailFrom.value() << "\r\n"
-						 << "X-Emilia-Rcpt-To:";
+		dataFile << "X-Emilia-Mail-From: " << this->mailFrom.value() << "\r\n";
 		for (Mailbox const &mailbox : this->rcptTo) {
-			dataFile << " " << mailbox;
+			dataFile << "X-Emilia-Rcpt-To: " << mailbox << "\r\n";
 		}
-		dataFile << "\r\n";
 
 		// If no data came through the connection, assume an error.
 		std::streampos beforeDataPos{dataFile.tellp()};
@@ -108,7 +105,7 @@ namespace Emilia::Smtp {
 			std::string toB64{Rain::String::Base64::encode(rcptMailbox)};
 			std::replace(toB64.begin(), toB64.end(), '/', '_');
 			std::filesystem::path envelopeDataPath(
-				dataPath.string() + "-" + toB64 + ".email");
+				dataPath.string() + "-" + toB64.substr(0, 86) + ".email");
 			std::filesystem::copy(dataPath, envelopeDataPath);
 
 			// Emplace new envelope.
