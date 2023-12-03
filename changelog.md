@@ -1,5 +1,10 @@
 # Changelog
 
+## 8.5.12
+
+1. Truncate overly long filepaths in the `SMTP` module which may cause the file save to fail and hence the email to be lost.
+2. Update submodules.
+
 ## 8.5.11
 
 1. Update submodules. This fixes bug with `isSubpath` which allows HTTP clients to access files outside of the static root.
