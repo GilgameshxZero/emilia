@@ -289,9 +289,18 @@ namespace Emilia::Http {
 		if (!std::filesystem::exists(path)) {
 			return {};
 		}
-		// All files under STATIC_ROOT are fair game. Allow symlinks by only
-		// comparing absolute paths.
-		if (!Rain::Filesystem::isSubpath(path, Server::STATIC_ROOT, false)) {
+		// All files under STATIC_ROOT are fair game.
+		// TODO: Until we have better auto-symlink detection, we must manually allow
+		// files in the symlinked paths.
+		if (
+			!Rain::Filesystem::isSubpath(path, Server::STATIC_ROOT) &&
+			!Rain::Filesystem::isSubpath(path, Server::STATIC_ROOT + "/silver") &&
+			!Rain::Filesystem::isSubpath(
+				path, Server::STATIC_ROOT + "/snapshots/altair") &&
+			!Rain::Filesystem::isSubpath(
+				path, Server::STATIC_ROOT + "/snapshots/cygnus") &&
+			!Rain::Filesystem::isSubpath(
+				path, Server::STATIC_ROOT + "/snapshots/utulek")) {
 			return {};
 		}
 		return {path};
@@ -335,50 +344,60 @@ namespace Emilia::Http {
 		this->tags.clear();
 		this->snapshots.clear();
 
+		// In case other directories have many more snapshots, only target certain
+		// subdirectories.
 		std::string snapshotsDirectory{Server::STATIC_ROOT + "/snapshots"};
-		for (auto const &entry : std::filesystem::recursive_directory_iterator(
-					 snapshotsDirectory,
-					 std::filesystem::directory_options::follow_directory_symlink)) {
-			if (entry.path().extension() != ".html") {
-				continue;
-			}
-
-			// Parse tags, title, date. These are specified in the HTML file in
-			// three lines with some whitespace surrounding.
-			std::ifstream fileIStream(entry.path());
-			std::string line;
-			while (std::getline(fileIStream, line)) {
-				if (line != "        <!-- emilia-snapshot-properties") {
+		static std::vector<std::string> const SNAPSHOT_SUBDIRECTORIES{
+			"",
+			"/altair/memos",
+			"/cygnus/fragments",
+			"/cygnus/poetry",
+			"/utulek/memos"};
+		for (auto const &subdirectory : SNAPSHOT_SUBDIRECTORIES) {
+			for (auto const &entry : std::filesystem::directory_iterator(
+						 snapshotsDirectory + subdirectory,
+						 std::filesystem::directory_options::follow_directory_symlink)) {
+				if (entry.path().extension() != ".html") {
 					continue;
 				}
 
-				// Preserving nesting level ensures that inter-snapshot links work as
-				// expected with relative path replacementon the FE.
-				std::string name{
-					entry.path().generic_string().substr(snapshotsDirectory.size() + 1)};
-				name = name.substr(0, name.size() - 5);
+				// Parse tags, title, date. These are specified in the HTML file in
+				// three lines with some whitespace surrounding.
+				std::ifstream fileIStream(entry.path());
+				std::string line;
+				while (std::getline(fileIStream, line)) {
+					if (line != "        <!-- emilia-snapshot-properties") {
+						continue;
+					}
 
-				Snapshot &snapshot{this->snapshots[name]};
-				if (!snapshot.path.empty()) {
-					std::cout << "Duplicate snapshot name: " << name
-										<< ". Overwriting...\n";
+					// Preserving nesting level ensures that inter-snapshot links work as
+					// expected with relative path replacementon the FE.
+					std::string name{entry.path().generic_string().substr(
+						snapshotsDirectory.size() + 1)};
+					name = name.substr(0, name.size() - 5);
+
+					Snapshot &snapshot{this->snapshots[name]};
+					if (!snapshot.path.empty()) {
+						std::cout << "Duplicate snapshot name: " << name
+											<< ". Overwriting...\n";
+					}
+					snapshot.path = entry.path();
+					std::getline(fileIStream, snapshot.title);
+					std::getline(fileIStream, snapshot.date);
+
+					// Parse tags
+					std::string tagStr, tag;
+					std::getline(fileIStream, tagStr);
+					std::size_t spacePos, offset{0};
+					do {
+						spacePos = tagStr.find(' ', offset);
+						tag = tagStr.substr(offset, spacePos - offset);
+						snapshot.tags.insert(tag);
+						this->tags[tag].push_back(name);
+						offset = spacePos + 1;
+					} while (spacePos != std::string::npos);
+					break;
 				}
-				snapshot.path = entry.path();
-				std::getline(fileIStream, snapshot.title);
-				std::getline(fileIStream, snapshot.date);
-
-				// Parse tags
-				std::string tagStr, tag;
-				std::getline(fileIStream, tagStr);
-				std::size_t spacePos, offset{0};
-				do {
-					spacePos = tagStr.find(' ', offset);
-					tag = tagStr.substr(offset, spacePos - offset);
-					snapshot.tags.insert(tag);
-					this->tags[tag].push_back(name);
-					offset = spacePos + 1;
-				} while (spacePos != std::string::npos);
-				break;
 			}
 		}
 

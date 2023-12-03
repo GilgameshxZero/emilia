@@ -1,5 +1,10 @@
 # Changelog
 
+## 8.5.13
+
+1. Manually specify directories of snapshots.
+2. Correctly allow symlinked statics to be accessed on the HTTP server.
+
 ## 8.5.12
 
 1. Truncate overly long filepaths in the `SMTP` module which may cause the file save to fail and hence the email to be lost.
