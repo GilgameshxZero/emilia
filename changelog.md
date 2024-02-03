@@ -1,5 +1,10 @@
 # Changelog
 
+## 8.5.14
+
+1. Modify `git` history to remove larger executable files.
+2. Similarly modify history of relevant submodules and sub-submodules.
+
 ## 8.5.13
 
 1. Manually specify directories of snapshots.
