@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.5.15
+
+1. Lossen the requirements on `emilia-snapshot-properties` parsing.
+
 ## 8.5.14
 
 1. Modify `git` history to remove larger executable files.
