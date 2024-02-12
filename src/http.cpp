@@ -366,7 +366,8 @@ namespace Emilia::Http {
 				std::ifstream fileIStream(entry.path());
 				std::string line;
 				while (std::getline(fileIStream, line)) {
-					if (line != "        <!-- emilia-snapshot-properties") {
+					Rain::String::trimWhitespace(line);
+					if (line != "<!-- emilia-snapshot-properties") {
 						continue;
 					}
 
