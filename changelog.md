@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.5.16
+
+1. Re-introduce `utulek/series` snapshots, which were mistakenly removed previously.
+
 ## 8.5.15
 
 1. Lossen the requirements on `emilia-snapshot-properties` parsing.

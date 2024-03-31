@@ -352,7 +352,8 @@ namespace Emilia::Http {
 			"/altair/memos",
 			"/cygnus/fragments",
 			"/cygnus/poetry",
-			"/utulek/memos"};
+			"/utulek/memos",
+			"/utulek/series"};
 		for (auto const &subdirectory : SNAPSHOT_SUBDIRECTORIES) {
 			for (auto const &entry : std::filesystem::directory_iterator(
 						 snapshotsDirectory + subdirectory,
