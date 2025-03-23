@@ -373,7 +373,7 @@ namespace Emilia::Http {
 					}
 
 					// Preserving nesting level ensures that inter-snapshot links work as
-					// expected with relative path replacementon the FE.
+					// expected with relative path replacement on the FE.
 					std::string name{entry.path().generic_string().substr(
 						snapshotsDirectory.size() + 1)};
 					name = name.substr(0, name.size() - 5);

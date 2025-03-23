@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.5.17
+
+1. Fix compilation in MSVC by updating to latest `rain` with selective `Rain::Literal`s.
+
 ## 8.5.16
 
 1. Re-introduce `utulek/series` snapshots, which were mistakenly removed previously.
