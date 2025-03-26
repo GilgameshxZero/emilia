@@ -301,13 +301,13 @@ namespace Emilia::Http {
 		<p>
 			I’m <a href="assets/resume-yang-yan.pdf">Yang</a>, also known as
 			<a href="https://codeforces.com/profile/GILGAMESH">GILGAMESH</a>. Welcome
-			to my personal
-			<a href="https://github.com/GilgameshxZero/emilia">website</a>.
+			to my personal website (<a
+			href="https://github.com/GilgameshxZero/emilia">source</a>).
 		</p>
 		<p>
-			While the website is under redesign, the current experience deliberately
-			avoids Javascript usage. Select debugging details are available
-			<a href="api/status">here</a>.
+			While the <a href="/">main website</a> is under redesign, this current
+			experience deliberately avoids Javascript usage. Select debugging details
+			are available <a href="api/status">here</a>.
 		</p>
 		<p>
 			Email me at
