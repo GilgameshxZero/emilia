@@ -42,7 +42,8 @@ namespace Emilia::Http {
 		// Hosts are gilgamesh.cc, localhost, 127.0.0.1, or ::1. Refer
 		// to <https://en.cppreference.com/w/cpp/regex/ecmascript>.
 		static std::string const hostRegex{
-			"(?:gilgamesh.cc|localhost|127\\.0\\.0\\.1|::1)(?::.*)?"},
+			"(?:gilgamesh.cc|localhost|127\\.0\\.0\\.1|192.168.\\d+.\\d+|::1)(?::.*)"
+			"?"},
 			queryFragment{"(\\?[^#]*)?(#.*)?"};
 		static std::vector<Worker::RequestFilter> const filters{
 			// Responds immediately with 200.
@@ -266,7 +267,7 @@ namespace Emilia::Http {
 		return {{StatusCode::OK, {{{"Access-Control-Allow-Origin", "*"}}}}};
 	}
 	Worker::ResponseAction Worker::getApiNoscriptHtml(
-		Request &req,
+		Request &,
 		std::smatch const &) {
 		std::stringstream ss;
 		ss
@@ -289,6 +290,11 @@ namespace Emilia::Http {
 		/>
 		<title>gilgamesh.cc</title>
 		<link rel="stylesheet" href="silver/silver.css" />
+		<style>
+			html {
+				-webkit-text-size-adjust: 100%;
+			}
+		</style>
 	</head>
 	<body>
 		<input class="silver-theme-toggle" type="checkbox" />
@@ -369,17 +375,20 @@ namespace Emilia::Http {
 			std::ifstream fileStream(file.value(), std::ios::binary);
 			std::stringstream ss;
 			ss << "<!DOCTYPE html><html><head><meta "
-						"charset=\"UTF-8\"><link rel=\"stylesheet\" "
+						"charset=\"UTF-8\"><meta name=\"viewport\" "
+						"content=\"width=device-width, initial-scale=1, "
+						"viewport-fit=cover\" /><link rel=\"stylesheet\" "
 						"href=\"../silver/silver.css\" /><link rel=\"stylesheet\" "
 						"href=\"../silver/selective/h1.subtitle.css\" /><title>snapshot | "
-						"gilgamesh.cc</title></head><body><input type=\"checkbox\" "
+						"gilgamesh.cc</title><style>html {-webkit-text-size-adjust: "
+						"100%;}</style></head><body><input type=\"checkbox\" "
 						"class=\"silver-theme-toggle\" enabled />"
 				 << response.response.value().body.rdbuf() << "</body></html>";
 			return {
 				{StatusCode::OK,
 				 {{{"Content-Type", MediaType(file.value().extension().string())},
 					 {"Content-Length",
-						std::to_string(std::filesystem::file_size(file.value()) + 296)},
+						std::to_string(std::filesystem::file_size(file.value()) + 439)},
 					 {"Cache-Control", "Max-Age=3600"},
 					 {"Access-Control-Allow-Origin", "*"}}},
 				 std::move(*ss.rdbuf())}};
