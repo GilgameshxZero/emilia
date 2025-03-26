@@ -43,7 +43,7 @@ namespace Emilia::Http {
 		// to <https://en.cppreference.com/w/cpp/regex/ecmascript>.
 		static std::string const hostRegex{
 			"(?:gilgamesh.cc|localhost|127\\.0\\.0\\.1|::1)(?::.*)?"},
-			queryFragment{"(?:\\?[^#]*)?(?:#.*)?"};
+			queryFragment{"(\\?[^#]*)?(#.*)?"};
 		static std::vector<Worker::RequestFilter> const filters{
 			// Responds immediately with 200.
 			{hostRegex,
@@ -70,10 +70,16 @@ namespace Emilia::Http {
 			 "/api/snapshots/(.+).json/?" + queryFragment,
 			 {Method::GET},
 			 &Worker::getApiSnapshotsJson},
+			// Refreshes snapshot listings.
 			{hostRegex,
 			 "/api/snapshots/refresh/?" + queryFragment,
 			 {Method::POST},
 			 &Worker::getApiSnapshotsRefresh},
+			// Noscript handlers.
+			{hostRegex,
+			 "/api/noscript.html/?" + queryFragment,
+			 {Method::GET},
+			 &Worker::getApiNoscriptHtml},
 			// User-facing endpoints, which resolve to index.html.
 			{hostRegex,
 			 "/((dashboard|map|timeline|snapshots/(?:[^\\?#\\.]+))/?)?" +
@@ -259,6 +265,92 @@ namespace Emilia::Http {
 		this->server.refreshSnapshots();
 		return {{StatusCode::OK, {{{"Access-Control-Allow-Origin", "*"}}}}};
 	}
+	Worker::ResponseAction Worker::getApiNoscriptHtml(
+		Request &req,
+		std::smatch const &) {
+		std::stringstream ss;
+		ss
+			<< R"""(<!-- Fallback page for browsers which do not have js enabled. -->
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<!-- Base ensures that regardless of what the URL path is, the scripts always execute from the correct relative path. -->
+		<base href="/" />
+		<meta charset="utf-8" />
+		<!-- viewport-fit=cover extends the page over any rounded corners or notches. -->
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1, viewport-fit=cover"
+		/>
+		<meta name="mobile-web-app-capable" content="yes" />
+		<meta
+			name="apple-mobile-web-app-status-bar-style"
+			content="black-translucent"
+		/>
+		<title>gilgamesh.cc</title>
+		<link rel="stylesheet" href="silver/silver.css" />
+	</head>
+	<body>
+		<input class="silver-theme-toggle" type="checkbox" />
+		<p>
+			I’m <a href="assets/resume-yang-yan.pdf">Yang</a>, also known as
+			<a href="https://codeforces.com/profile/GILGAMESH">GILGAMESH</a>. Welcome
+			to my personal
+			<a href="https://github.com/GilgameshxZero/emilia">website</a>.
+		</p>
+		<p>
+			While the website is under redesign, the current experience deliberately
+			avoids Javascript usage. Select debugging details are available
+			<a href="api/status">here</a>.
+		</p>
+		<p>
+			Email me at
+			<code>ヽ༼◕‿◕✿༽ﾉ@gilgamesh.cc</code>. A human shall replace the Kaomoji
+			with any other string.
+		</p>
+		<p>You may find my writings below. They range from technical to creative.</p>
+		<ol>)""";
+
+		std::unique_lock lck(this->server.snapshotsMtx);
+		std::vector<std::pair<std::string, Snapshot>> snapshots;
+		for (auto &it : this->server.snapshots) {
+			if (
+				it.second.tags.find("utulek") != it.second.tags.end() ||
+				it.second.tags.find("altair") != it.second.tags.end() ||
+				it.second.tags.find("monochrome") != it.second.tags.end() ||
+				it.second.tags.find("p794") != it.second.tags.end() ||
+				it.second.tags.find("cygnus") != it.second.tags.end()) {
+				snapshots.push_back(it);
+			}
+		}
+		std::sort(
+			snapshots.begin(),
+			snapshots.end(),
+			[](
+				std::pair<std::string, Snapshot> const &a,
+				std::pair<std::string, Snapshot> const &b) {
+				return a.second.date > b.second.date;
+			});
+		for (auto &it : snapshots) {
+			ss << "<li><a href=\"snapshots/" << it.first << ".html?noscript\">"
+				 << it.second.title << "</a> | " << it.second.date << "</li>";
+		}
+
+		ss << R"""(</ol>
+		<p>—to fair winds and following seas—</p>
+	</body>
+</html>)""";
+
+		ss.seekg(0, std::ios::end);
+		std::size_t ssLen = static_cast<std::size_t>(ss.tellg());
+		ss.seekg(0, std::ios::beg);
+		return {
+			{StatusCode::OK,
+			 {{{"Content-Type", "text/html"},
+				 {"Content-Length", std::to_string(ssLen)},
+				 {"Access-Control-Allow-Origin", "*"}}},
+			 std::move(*ss.rdbuf())}};
+	}
 	Worker::ResponseAction Worker::getUserFacing(Request &, std::smatch const &) {
 		// Respond with the shared index. SRP is handled by frontend.
 		return this->getStaticResponse(Server::STATIC_ROOT + "/index.html");
@@ -270,7 +362,30 @@ namespace Emilia::Http {
 		if (!file) {
 			return {{StatusCode::NOT_FOUND}};
 		}
-		return this->getStaticResponse(file.value());
+		auto response = this->getStaticResponse(file.value());
+
+		// Special-casing for noscript snapshots.
+		if (match[2] == "?noscript") {
+			std::ifstream fileStream(file.value(), std::ios::binary);
+			std::stringstream ss;
+			ss << "<!DOCTYPE html><html><head><meta "
+						"charset=\"UTF-8\"><link rel=\"stylesheet\" "
+						"href=\"../silver/silver.css\" /><link rel=\"stylesheet\" "
+						"href=\"../silver/selective/h1.subtitle.css\" /><title>snapshot | "
+						"gilgamesh.cc</title></head><body><input type=\"checkbox\" "
+						"class=\"silver-theme-toggle\" enabled />"
+				 << response.response.value().body.rdbuf() << "</body></html>";
+			return {
+				{StatusCode::OK,
+				 {{{"Content-Type", MediaType(file.value().extension().string())},
+					 {"Content-Length",
+						std::to_string(std::filesystem::file_size(file.value()) + 296)},
+					 {"Cache-Control", "Max-Age=3600"},
+					 {"Access-Control-Allow-Origin", "*"}}},
+				 std::move(*ss.rdbuf())}};
+		}
+
+		return response;
 	}
 	bool Worker::maybeRejectAuthorization(Request &req) {
 		static std::string targetCredentials{
