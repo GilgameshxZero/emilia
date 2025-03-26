@@ -1,5 +1,10 @@
 # Changelog
 
+## 8.5.19
+
+1. Use `-webkit-text-size-adjust: 100%;` to allow wider landscape mode viewing.
+2. Allow `192.168.*.*` hostnames.
+
 ## 8.5.18
 
 1. Enable a Javascript-free experience via a few new server-side endpoints. Disable `erlija-past`.
