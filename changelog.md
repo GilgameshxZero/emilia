@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.5.20
+
+1. Redirect main website back to `erlija-past`. Allow a link from the `noscript` site to the main site.
+
 ## 8.5.19
 
 1. Use `-webkit-text-size-adjust: 100%;` to allow wider landscape mode viewing.
