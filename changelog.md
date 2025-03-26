@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.5.18
+
+1. Enable a Javascript-free experience via a few new server-side endpoints. Disable `erlija-past`.
+
 ## 8.5.17
 
 1. Fix compilation in MSVC by updating to latest `rain` with selective `Rain::Literal`s.
