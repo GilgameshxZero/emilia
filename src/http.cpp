@@ -378,8 +378,8 @@ namespace Emilia::Http {
 						"charset=\"UTF-8\"><meta name=\"viewport\" "
 						"content=\"width=device-width, initial-scale=1, "
 						"viewport-fit=cover\" /><link rel=\"stylesheet\" "
-						"href=\"../silver/silver.css\" /><link rel=\"stylesheet\" "
-						"href=\"../silver/selective/h1.subtitle.css\" /><title>snapshot | "
+						"href=\"/silver/silver.css\" /><link rel=\"stylesheet\" "
+						"href=\"/silver/selective/h1.subtitle.css\" /><title>snapshot | "
 						"gilgamesh.cc</title><style>html {-webkit-text-size-adjust: "
 						"100%;}</style></head><body><input type=\"checkbox\" "
 						"class=\"silver-theme-toggle\" enabled />"
@@ -418,13 +418,7 @@ namespace Emilia::Http {
 		// files in the symlinked paths.
 		if (
 			!Rain::Filesystem::isSubpath(path, Server::STATIC_ROOT) &&
-			!Rain::Filesystem::isSubpath(path, Server::STATIC_ROOT + "/silver") &&
-			!Rain::Filesystem::isSubpath(
-				path, Server::STATIC_ROOT + "/snapshots/altair") &&
-			!Rain::Filesystem::isSubpath(
-				path, Server::STATIC_ROOT + "/snapshots/cygnus") &&
-			!Rain::Filesystem::isSubpath(
-				path, Server::STATIC_ROOT + "/snapshots/utulek")) {
+			!Rain::Filesystem::isSubpath(path, Server::STATIC_ROOT + "/silver")) {
 			return {};
 		}
 		return {path};
@@ -472,12 +466,7 @@ namespace Emilia::Http {
 		// subdirectories.
 		std::string snapshotsDirectory{Server::STATIC_ROOT + "/snapshots"};
 		static std::vector<std::string> const SNAPSHOT_SUBDIRECTORIES{
-			"",
-			"/altair/memos",
-			"/cygnus/fragments",
-			"/cygnus/poetry",
-			"/utulek/memos",
-			"/utulek/series"};
+			"/altair", "/cygnus", "/utulek", "/monochrome", "/p794"};
 		for (auto const &subdirectory : SNAPSHOT_SUBDIRECTORIES) {
 			for (auto const &entry : std::filesystem::directory_iterator(
 						 snapshotsDirectory + subdirectory,
