@@ -1,5 +1,11 @@
 # Changelog
 
+## 8.5.21
+
+1. Remove symlinks from `echidna`, and select essays to be directly in `echidna`.
+2. Essays now print to HTML without VSCode HTML boilerplate.
+3. Fixed `silver` stylesheet linking for snapshots.
+
 ## 8.5.20
 
 1. Redirect main website back to `erlija-past`. Allow a link from the `noscript` site to the main site.
