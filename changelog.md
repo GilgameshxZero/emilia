@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.5.22
+
+1. `trigger outbox` now immediately triggers emails which are marked as PENDING.
+
 ## 8.5.21
 
 1. Remove symlinks from `echidna`, and select essays to be directly in `echidna`.
