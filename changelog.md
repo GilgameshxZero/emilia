@@ -1,5 +1,11 @@
 # Changelog
 
+## 8.5.23
+
+1. Default to `noscript` site.
+2. Update silver, issue theme toggle fix for Firefox.
+3. Fix length calculation for `noscript` site.
+
 ## 8.5.22
 
 1. `trigger outbox` now immediately triggers emails which are marked as PENDING.
