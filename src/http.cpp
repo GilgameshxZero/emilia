@@ -388,7 +388,7 @@ namespace Emilia::Http {
 				{StatusCode::OK,
 				 {{{"Content-Type", MediaType(file.value().extension().string())},
 					 {"Content-Length",
-						std::to_string(std::filesystem::file_size(file.value()) + 439)},
+						std::to_string(std::filesystem::file_size(file.value()) + 435)},
 					 {"Cache-Control", "Max-Age=3600"},
 					 {"Access-Control-Allow-Origin", "*"}}},
 				 std::move(*ss.rdbuf())}};
