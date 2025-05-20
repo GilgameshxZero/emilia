@@ -1,5 +1,6 @@
 #include <emilia.hpp>
 
+#include <envelope.hpp>
 #include <http.hpp>
 #include <smtp.hpp>
 
@@ -165,10 +166,18 @@ int main(int argc, char const *argv[]) {
 				} else if (command == "trigger outbox") {
 					std::unique_lock lck(smtpServer->outboxMtx);
 					auto timeNow{std::chrono::steady_clock::now()};
-					for (auto it : smtpServer->outbox) {
-						if (it.status == Emilia::Envelope::Status::PENDING) {
-							it.attemptTime = timeNow;
+					std::vector<Emilia::Envelope> toAttempt;
+					for (auto it{smtpServer->outbox.begin()};
+							 it != smtpServer->outbox.end();) {
+						if (it->status != Emilia::Envelope::Status::PENDING) {
+							break;
 						}
+						toAttempt.emplace_back(*it);
+						it = smtpServer->outbox.erase(it);
+					}
+					for (auto &it : toAttempt) {
+						it.attemptTime = timeNow;
+						smtpServer->outbox.insert(it);
 					}
 					smtpServer->outboxEv.notify_one();
 					std::cout << "Triggered outbox send event." << std::endl;
