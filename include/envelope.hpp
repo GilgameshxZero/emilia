@@ -8,6 +8,9 @@ namespace Emilia {
 	// removed.
 	class Envelope {
 		public:
+		static std::chrono::hours const RETRY_WAIT;
+		static std::size_t const ATTEMPTS_MAX;
+
 		enum class Status { PENDING = 0, RETRIED, FAILURE, SUCCESS };
 		Status status;
 

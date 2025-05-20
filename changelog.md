@@ -1,5 +1,10 @@
 # Changelog
 
+## 8.5.24
+
+1. Fix `trigger outbox` bug which fails due to abuse of `std::set`.
+2. Adjust retries to 48 attempts at 1 hour intervals.
+
 ## 8.5.23
 
 1. Default to `noscript` site.

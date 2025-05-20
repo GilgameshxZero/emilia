@@ -177,7 +177,7 @@ namespace Emilia::Smtp {
 				smtpPassword(smtpPassword) {
 		// The sender attempts to send envelopes in the outbox.
 		this->sender = std::thread([this]() {
-			using namespace Rain::Literal;
+			// using namespace Rain::Literal;
 
 			// Attempt remaining envelopes in the outbox every hour or so. Envelopes
 			// will be ready to be retried every hour.
@@ -185,20 +185,19 @@ namespace Emilia::Smtp {
 				// Log any throws.
 				Rain::Error::consumeThrowable(
 					[this]() {
-						static auto const retryWait = 4h;
 						std::vector<Envelope> toAttempt;
 						{
 							// This lambda should only be called while we have an exclusive
 							// lock on the outboxMtx.
 							auto const getAttemptEnvelopes = [this, &toAttempt]() {
+								auto timeNow{std::chrono::steady_clock::now()};
 								// Assume we have exclusive lock. Move all envelopes we want to
 								// send from the outbox to toAttempt.
-								for (auto it = this->outbox.begin();
-										 it != this->outbox.end();) {
+								for (auto it{this->outbox.begin()}; it != this->outbox.end();) {
 									if (it->status != Envelope::Status::PENDING) {
 										break;
 									}
-									if (it->attemptTime > std::chrono::steady_clock::now()) {
+									if (it->attemptTime > timeNow) {
 										it++;
 										continue;
 									}
@@ -211,7 +210,7 @@ namespace Emilia::Smtp {
 							std::unique_lock lck(this->outboxMtx);
 							getAttemptEnvelopes();
 							if (toAttempt.empty()) {
-								this->outboxEv.wait_for(lck, retryWait);
+								this->outboxEv.wait_for(lck, Envelope::RETRY_WAIT);
 								if (this->closed) {
 									return;
 								}
@@ -224,7 +223,7 @@ namespace Emilia::Smtp {
 
 						// All attempted envelopes should be PENDING.
 						for (auto &it : toAttempt) {
-							if (it.attempt == 8) {
+							if (it.attempt == Envelope::ATTEMPTS_MAX) {
 								std::cerr << "Exceeded maximum retries: " << it.from << " > "
 													<< it.to << "\n : " << it.data << std::endl;
 								it.status = Envelope::Status::FAILURE;
@@ -346,7 +345,7 @@ namespace Emilia::Smtp {
 								this->outbox.emplace(
 									Envelope::Status::PENDING,
 									it.attempt + 1,
-									std::chrono::steady_clock::now() + retryWait,
+									std::chrono::steady_clock::now() + Envelope::RETRY_WAIT,
 									it.from,
 									it.to,
 									it.data);
