@@ -1,10 +1,10 @@
+#include <rain.hpp>
+
 #include <emilia.hpp>
 
 #include <envelope.hpp>
 #include <http.hpp>
 #include <smtp.hpp>
-
-#include <rain.hpp>
 
 int main(int argc, char const *argv[]) {
 	return Rain::Error::consumeThrowable(
