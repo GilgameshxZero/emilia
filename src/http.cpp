@@ -1,4 +1,6 @@
 // Subclasses Rain::Networking::Http specializations for custom HTTP server.
+#include <rain.hpp>
+
 #include <http.hpp>
 
 #include <emilia.hpp>
@@ -7,7 +9,7 @@
 #include <shared_mutex>
 
 namespace Emilia::Http {
-	std::string const Server::STATIC_ROOT{"../echidna"};
+	std::string const Server::STATIC_ROOT{"../../echidna"};
 	std::string const Server::HTTP_USERNAME{"gilgamesh"};
 
 	Worker::Worker(

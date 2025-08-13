@@ -1,3 +1,5 @@
+#include <rain.hpp>
+
 #include <snapshot.hpp>
 
 namespace Emilia {
