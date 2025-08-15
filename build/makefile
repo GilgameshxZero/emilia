@@ -5,12 +5,10 @@
 # Files are pre-compiled with pch.cpp.
 
 # Variables:
-# PROJ: a repository can have multiple *project*s, each in their own directory
-# 	(default = src).
-# BIN: name of the project; a project may have multiple (default = SRC (without
-# 	`.cpp`), or REPO if SRC not defined).
+# PROJ: a repository can have multiple *project*s, each in their own directory.
+# BIN: name of the project; a project may have multiple.
 # SRC: target filenames (can be multiple) to link, starting from the project
-# 	directory (default = BIN.cpp, or *.cpp if BIN is not defined.).
+# 	directory.
 # BUILD: 0 (default), 1, or 2, specifying the type of build (debug, release,
 # 	instrument).
 # ARCH: 64 (default) or 86, specifying the architecture to build for. The
@@ -262,8 +260,7 @@ PROJ_SRC_DIR := $(ROOT_DIR)$(PROJ_NAME)/
 PROJ_SRC = $(patsubst %,$(PROJ_SRC_DIR)%,$(SRC_NAME))
 
 COMPILER ?= clang++
-COMPILER_FLAGS_INCLUDES := -I$(ROOT_DIR)rain/include -I$(ROOT_DIR)include\
-	-I $(ROOT_DIR)experiment
+COMPILER_FLAGS_INCLUDES := -I$(ROOT_DIR)rain/include -I$(ROOT_DIR)include
 COMPILER_FLAGS_COMMON := $(COMPILER_FLAGS_INCLUDES) -std=c++20 -pthread\
 	-Wall -Wextra -D_CONSOLE -masm=intel
 COMPILER_FLAGS_DEBUG := -D _DEBUG -g -O0
