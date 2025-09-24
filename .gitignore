@@ -1,10 +1,43 @@
-**/.vs/
-**/bin/
-**/obj/
+// Syncthing.
+**/*local.syncthing*
+**/*archive.syncthing*
+**/.stfolder
+**/.stignore
+**/.stversions
 
-**.aps
-**.db
-**.dropbox.attr
-**.DS_Store
-**.stackdump
-**.user
+// Personal temporary.
+**/.*.tmp.*
+**/.*.tmp
+
+// General temporary.
+**/*~
+**/*.crdownload
+**/*.part
+**/.*.swp
+**/._*
+**/.DS_Store
+**/.Spotlight-V100
+**/.Trashes
+**/.aps
+**/.db
+**/.dropbox.attr
+**/.stackdump
+**/.user
+**/desktop.ini
+**/ehthumbs.db
+**/Thumbs.db
+
+// Personal development.
+**/.venv/
+**/.data/
+**/.bin/
+**/.obj/
+
+// General development.
+**/.vs/
+**/.ipynb_checkpoints/
+**/__pycache__/
+**/*.egg-info/
+**/node_modules/
+**/jspm_packages/
+**/*.nebo-files/
