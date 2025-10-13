@@ -335,8 +335,7 @@ tests: version.build.txt
 	done
 
 version.build.txt: $(INCL) $(PROJ_SRC)
-	@for i in $?; do\
-		echo Outdated: $$i.;\
+# @for i in $?; do echo Outdated: $$i.;\
 	done
 	@./version.sh $(shell echo $(REPO_NAME) | tr '[:lower:]' '[:upper:]')
 
