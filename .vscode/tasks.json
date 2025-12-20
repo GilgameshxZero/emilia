@@ -6,12 +6,10 @@
 			"type": "shell",
 			"label": "clean",
 			"options": { "cwd": "${workspaceFolder}/build" },
-			"presentation": { "clear": true, "reveal": "silent" },
+			"presentation": { "clear": true },
 
 			"command": "make",
-			"args": ["clean"],
-
-			"windows": { "command": "nmake" }
+			"args": ["clean"]
 		},
 		{
 			/* Build the project in debug mode. */
@@ -28,7 +26,6 @@
 			"problemMatcher": ["$gcc"],
 
 			"windows": {
-				"command": "nmake",
 				"args": [],
 				"problemMatcher": ["$msCompile"]
 			}
@@ -46,7 +43,6 @@
 			"problemMatcher": ["$gcc"],
 
 			"windows": {
-				"command": "nmake",
 				"args": ["BUILD=1"],
 				"problemMatcher": ["$msCompile"]
 			}

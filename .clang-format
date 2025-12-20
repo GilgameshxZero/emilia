@@ -1,29 +1,31 @@
 {
-	BasedOnStyle: Chromium,
+  BasedOnStyle: Chromium,
 
-	UseTab: Always,
-	TabWidth: 2,
-	PointerAlignment: Right,
+  UseTab: Always,
+  TabWidth: 2,
+  PointerAlignment: Right,
 
-	NamespaceIndentation: All,
-	FixNamespaceComments: false,
-	AccessModifierOffset: 0,
-	IndentCaseLabels: true,
+  NamespaceIndentation: All,
+  FixNamespaceComments: false,
+  AccessModifierOffset: 0,
+  IndentCaseLabels: true,
 
-	AlignAfterOpenBracket: AlwaysBreak,
-	AlignOperands: false,
-	ContinuationIndentWidth: 2,
+  # `clang-format` may be missing a feature to align chained method calls properly.
+  # <https://stackoverflow.com/questions/39779985/how-to-control-clang-format-indentation-of-chained-method-calls>.
+  AlignAfterOpenBracket: AlwaysBreak,
+  AlignOperands: false,
+  ContinuationIndentWidth: 2,
 
-	BinPackArguments: false,
-	BinPackParameters: false,
-	AlignConsecutiveDeclarations: false,
-	AllowShortIfStatementsOnASingleLine: true,
-	AllowShortLoopsOnASingleLine: true,
+  BinPackArguments: false,
+  BinPackParameters: false,
+  AlignConsecutiveDeclarations: false,
+  AllowShortIfStatementsOnASingleLine: true,
+  AllowShortLoopsOnASingleLine: true,
 
-	AlignTrailingComments: false,
-	ReflowComments: true,
-	ColumnLimit: 80,
+  AlignTrailingComments: false,
+  ReflowComments: true,
+  ColumnLimit: 80,
 
-	IncludeBlocks: Preserve,
-	SortUsingDeclarations: false,
+  IncludeBlocks: Preserve,
+  SortUsingDeclarations: false
 }

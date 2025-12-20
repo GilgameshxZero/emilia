@@ -417,10 +417,9 @@ namespace Emilia::Http {
 		}
 		// All files under STATIC_ROOT are fair game.
 		// TODO: Until we have better auto-symlink detection, we must manually allow
-		// files in the symlinked paths.
-		if (
-			!Rain::Filesystem::isSubpath(path, Server::STATIC_ROOT) &&
-			!Rain::Filesystem::isSubpath(path, Server::STATIC_ROOT + "/silver")) {
+		// files in the symlinked paths. Since `silver` is no longer symlinked, we
+		// do not need a manual exception here.
+		if (!Rain::Filesystem::isSubpath(path, Server::STATIC_ROOT)) {
 			return {};
 		}
 		return {path};
@@ -467,6 +466,7 @@ namespace Emilia::Http {
 		// In case other directories have many more snapshots, only target certain
 		// subdirectories.
 		std::string snapshotsDirectory{Server::STATIC_ROOT + "/snapshots"};
+		// TODO: Better snapshot detection without manual specification.
 		static std::vector<std::string> const SNAPSHOT_SUBDIRECTORIES{
 			"/altair", "/cygnus", "/utulek", "/monochrome", "/p794"};
 		for (auto const &subdirectory : SNAPSHOT_SUBDIRECTORIES) {

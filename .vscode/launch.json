@@ -1,35 +1,38 @@
+// Needs `sudo DevToolsSecurity -enable` on MacOS.
 {
 	"version": "0.2.0",
 	"configurations": [
 		{
 			"name": "debug-x64",
-			"type": "cppdbg",
+			"type": "lldb",
 			"request": "launch",
-			"program": "${workspaceFolder}/bin/emilia",
-			"args": [],
-			"stopAtEntry": false,
-			"cwd": "${workspaceFolder}/bin",
-			"console": "integratedTerminal",
 			"preLaunchTask": "build-debug-x64",
-			"MIMode": "gdb",
+			"program": "${workspaceFolder}${pathSeparator}.bin${pathSeparator}src${pathSeparator}emilia.debug.x64",
+			"cwd": "${workspaceFolder}${pathSeparator}.bin${pathSeparator}src",
+			"console": "integratedTerminal",
+			"terminal": "integrated",
+			"internalConsoleOptions": "neverOpen",
+			"stopAtEntry": false,
 
-			"windows": { "type": "cppvsdbg" },
-			"osx": { "MIMode": "lldb" }
+			"windows": {
+				"program": "${workspaceFolder}${pathSeparator}.bin${pathSeparator}src${pathSeparator}emilia.debug.x64.exe"
+			}
 		},
 		{
 			"name": "release-x64",
-			"type": "cppdbg",
+			"type": "lldb",
 			"request": "launch",
-			"program": "${workspaceFolder}/bin/emilia",
-			"args": [],
-			"stopAtEntry": false,
-			"cwd": "${workspaceFolder}/bin",
-			"console": "integratedTerminal",
 			"preLaunchTask": "build-release-x64",
-			"MIMode": "gdb",
+			"program": "${workspaceFolder}${pathSeparator}.bin${pathSeparator}src${pathSeparator}emilia.release.x64",
+			"cwd": "${workspaceFolder}${pathSeparator}.bin${pathSeparator}src",
+			"console": "integratedTerminal",
+			"terminal": "integrated",
+			"internalConsoleOptions": "neverOpen",
+			"stopAtEntry": false,
 
-			"windows": { "type": "cppvsdbg" },
-			"osx": { "MIMode": "lldb" }
+			"windows": {
+				"program": "${workspaceFolder}${pathSeparator}.bin${pathSeparator}src${pathSeparator}emilia.release.x64.exe"
+			}
 		}
 	]
 }
