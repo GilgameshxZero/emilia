@@ -417,12 +417,14 @@ namespace Emilia::Http {
 		}
 		// All files under STATIC_ROOT are fair game.
 		// TODO: Until we have better auto-symlink detection, we must manually allow
-		// files in the symlinked paths. Since `silver` is no longer symlinked, we
-		// do not need a manual exception here.
-		if (!Rain::Filesystem::isSubpath(path, Server::STATIC_ROOT)) {
-			return {};
+		// files in the symlinked paths. `slush` is the only directory symlinked
+		// out.
+		if (
+			Rain::Filesystem::isSubpath(path, Server::STATIC_ROOT) ||
+			Rain::Filesystem::isSubpath(path, Server::STATIC_ROOT + "/slush")) {
+			return {path};
 		}
-		return {path};
+		return {};
 	}
 	Worker::ResponseAction Worker::getStaticResponse(
 		std::filesystem::path const &path) {
