@@ -301,7 +301,7 @@ namespace Emilia::Http {
 	<body>
 		<input class="silver-theme-toggle" type="checkbox" />
 		<p>
-			I’m <a href="assets/resume-yang-yan.pdf">Yang</a>, also known as
+			I’m <a href="assets/resume-yang_yan.pdf">Yang</a>, also known as
 			<a href="https://codeforces.com/profile/GILGAMESH">GILGAMESH</a>. Welcome
 			to my personal website (<a
 			href="https://github.com/GilgameshxZero/emilia">source</a>).
