@@ -403,7 +403,7 @@ namespace Emilia::Smtp {
 								return {};
 							};
 
-							bool sent = false;
+							bool sent{false}, retry{false};
 							try {
 								auto res = attemptEnvelope(it);
 								if (res) {
@@ -411,20 +411,24 @@ namespace Emilia::Smtp {
 														<< it.to << ".\n"
 														<< res.value() << std::flush;
 									sent = false;
+									retry = res->statusCode / 100 == 4;
 								} else {
 									std::cout << "Sent " << it.from << " > "
 														<< it.to << '.' << std::endl;
 									sent = true;
+									retry = false;
 								}
 							} catch (std::exception const &exception) {
 								std::cout << "Failed " << it.from << " > "
 													<< it.to << ".\n"
 													<< exception.what() << std::endl;
 								sent = false;
+								retry = true;
 							} catch (...) {
 								std::cout << "Failed " << it.from << " > "
 													<< it.to << '.' << std::endl;
 								sent = false;
+								retry = true;
 							}
 
 							// Update envelope status.
@@ -433,7 +437,9 @@ namespace Emilia::Smtp {
 							if (sent) {
 								it.status = Envelope::Status::SUCCESS;
 							} else {
-								it.status = Envelope::Status::RETRIED;
+								it.status = retry
+									? Envelope::Status::RETRIED
+									: Envelope::Status::FAILURE;
 							}
 						}
 
