@@ -1,4 +1,5 @@
-// Subclasses Rain::Networking::Http specializations for custom HTTP server.
+// Subclasses Rain::Networking::Http specializations for
+// custom HTTP server.
 #include <rain.hpp>
 
 #include <http.hpp>
@@ -16,15 +17,18 @@ namespace Emilia::Http {
 		NativeSocket nativeSocket,
 		SocketInterface *interrupter,
 		Server &server)
-			: SuperWorker(nativeSocket, interrupter), server(server) {}
+			: SuperWorker(nativeSocket, interrupter),
+				server(server) {}
 	void Worker::send(Response &res) {
 		// Postprocess to add server signature.
 		res.headers.server("emilia " STRINGIFY(EMILIA_VERSION_MAJOR) "." STRINGIFY(EMILIA_VERSION_MINOR) "." STRINGIFY(EMILIA_VERSION_REVISION) "." STRINGIFY(EMILIA_VERSION_BUILD) " / rain " STRINGIFY(RAIN_VERSION_MAJOR) "." STRINGIFY(RAIN_VERSION_MINOR) "." STRINGIFY(RAIN_VERSION_REVISION) "." STRINGIFY(RAIN_VERSION_BUILD));
 		if (this->server.echo) {
-			// Body is omitted since it can only be transmitted once!
+			// Body is omitted since it can only be transmitted
+			// once!
 			std::cout << "HTTP to " << this->peerHost() << ":\n"
-								<< "HTTP/" << res.version << ' ' << res.statusCode << ' '
-								<< res.reasonPhrase << '\n'
+								<< "HTTP/" << res.version << ' '
+								<< res.statusCode << ' ' << res.reasonPhrase
+								<< '\n'
 								<< res.headers << std::endl;
 		}
 		SuperWorker::send(res);
@@ -32,19 +36,23 @@ namespace Emilia::Http {
 	Worker::Request &Worker::recv(Request &req) {
 		SuperWorker::recv(req);
 		if (this->server.echo) {
-			// Body is omitted since it can only be transmitted once!
+			// Body is omitted since it can only be transmitted
+			// once!
 			std::cout << "HTTP from " << this->peerHost() << ":\n"
-								<< req.method << ' ' << req.target << " HTTP/" << req.version
-								<< '\n'
+								<< req.method << ' ' << req.target
+								<< " HTTP/" << req.version << '\n'
 								<< req.headers << std::endl;
 		}
 		return req;
 	}
-	std::vector<Worker::RequestFilter> const &Worker::filters() {
-		// Hosts are gilgamesh.cc, localhost, 127.0.0.1, or ::1. Refer
-		// to <https://en.cppreference.com/w/cpp/regex/ecmascript>.
+	std::vector<Worker::RequestFilter> const &
+	Worker::filters() {
+		// Hosts are gilgamesh.cc, localhost, 127.0.0.1, or ::1.
+		// Refer to
+		// <https://en.cppreference.com/w/cpp/regex/ecmascript>.
 		static std::string const hostRegex{
-			"(?:gilgamesh.cc|localhost|127\\.0\\.0\\.1|192.168.\\d+.\\d+|::1)(?::.*)"
+			"(?:gilgamesh.cc|localhost|127\\.0\\.0\\.1|192.168."
+			"\\d+.\\d+|::1)(?::.*)"
 			"?"},
 			queryFragment{"(\\?[^#]*)?(#.*)?"};
 		static std::vector<Worker::RequestFilter> const filters{
@@ -85,7 +93,8 @@ namespace Emilia::Http {
 			 &Worker::getApiNoscriptHtml},
 			// User-facing endpoints, which resolve to index.html.
 			{hostRegex,
-			 "/((dashboard|map|timeline|snapshots/(?:[^\\?#\\.]+))/?)?" +
+			 "/((dashboard|map|timeline|snapshots/"
+			 "(?:[^\\?#\\.]+))/?)?" +
 				 queryFragment,
 			 {Method::GET},
 			 &Worker::getUserFacing},
@@ -96,15 +105,19 @@ namespace Emilia::Http {
 
 		return filters;
 	}
-	Worker::ResponseAction Worker::getApiPing(Request &, std::smatch const &) {
-		return {{StatusCode::OK, {{{"Access-Control-Allow-Origin", "*"}}}}};
+	Worker::ResponseAction Worker::getApiPing(
+		Request &,
+		std::smatch const &) {
+		return {
+			{StatusCode::OK,
+			 {{{"Access-Control-Allow-Origin", "*"}}}}};
 	}
 	Worker::ResponseAction Worker::getApiStatus(
 		Request &req,
 		std::smatch const &) {
 		using namespace Rain::Literal;
-		std::time_t time =
-			std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+		std::time_t time = std::chrono::system_clock::to_time_t(
+			std::chrono::system_clock::now());
 		std::tm timeData;
 		Rain::Time::localtime_r(&time, &timeData);
 
@@ -131,13 +144,15 @@ namespace Emilia::Http {
 		std::size_t bodyLen = 0;
 		char buffer[1 << 10];
 		while (req.body.read(buffer, sizeof(buffer))) {
-			bodyLen += static_cast<std::size_t>(req.body.gcount());
+			bodyLen +=
+				static_cast<std::size_t>(req.body.gcount());
 		}
 		bodyLen += static_cast<std::size_t>(req.body.gcount());
 		ss << "Your request body has length " << bodyLen << ".";
 
 		ss.seekg(0, std::ios::end);
-		std::size_t ssLen = static_cast<std::size_t>(ss.tellg());
+		std::size_t ssLen =
+			static_cast<std::size_t>(ss.tellg());
 		ss.seekg(0, std::ios::beg);
 		return {
 			{StatusCode::OK,
@@ -162,13 +177,17 @@ namespace Emilia::Http {
 				this->server.smtpServer->outboxMtx);
 			auto it{this->server.smtpServer->outbox.begin()};
 			auto streamEnvelope{[&ss, &it]() {
-				std::time_t time = std::chrono::system_clock::to_time_t(
-					std::chrono::system_clock::now() +
-					std::chrono::duration_cast<std::chrono::system_clock::duration>(
-						it->attemptTime - std::chrono::steady_clock::now()));
+				std::time_t time =
+					std::chrono::system_clock::to_time_t(
+						std::chrono::system_clock::now() +
+						std::chrono::duration_cast<
+							std::chrono::system_clock::duration>(
+							it->attemptTime -
+							std::chrono::steady_clock::now()));
 				std::tm timeData;
 				Rain::Time::localtime_r(&time, &timeData);
-				ss << "{\"time\": \"" << std::put_time(&timeData, "%F %T %z")
+				ss << "{\"time\": \""
+					 << std::put_time(&timeData, "%F %T %z")
 					 << "\", \"status\": \"";
 				switch (it->status) {
 					case Envelope::Status::PENDING:
@@ -184,21 +203,24 @@ namespace Emilia::Http {
 						ss << "SUCCESS";
 						break;
 				}
-				ss << "\", \"from\": \"" << it->from.name << '@' << it->from.host
-					 << "\", \"to\": \"" << it->to.name << '@' << it->to.host << "\"}";
+				ss << "\", \"from\": \"" << it->from.name << '@'
+					 << it->from.host << "\", \"to\": \""
+					 << it->to.name << '@' << it->to.host << "\"}";
 			}};
 			if (it != this->server.smtpServer->outbox.end()) {
 				streamEnvelope();
 				it++;
 			}
-			for (; it != this->server.smtpServer->outbox.end(); it++) {
+			for (; it != this->server.smtpServer->outbox.end();
+					 it++) {
 				ss << ",\n";
 				streamEnvelope();
 			}
 		}
 		ss << "]}";
 		ss.seekg(0, std::ios::end);
-		std::size_t ssLen = static_cast<std::size_t>(ss.tellg());
+		std::size_t ssLen =
+			static_cast<std::size_t>(ss.tellg());
 		ss.seekg(0, std::ios::beg);
 		return {
 			{StatusCode::OK,
@@ -213,16 +235,22 @@ namespace Emilia::Http {
 		std::stringstream ss;
 		ss << "{\"snapshots\": [";
 		{
-			Rain::Multithreading::SharedLockGuard lck(this->server.snapshotsMtx);
-			std::vector<std::string> const &tagSnapshots{this->server.tags[match[1]]};
+			Rain::Multithreading::SharedLockGuard lck(
+				this->server.snapshotsMtx);
+			std::vector<std::string> const &tagSnapshots{
+				this->server.tags[match[1]]};
 			auto it{tagSnapshots.begin()};
-			// Also stream snapshot information so that FE does not need to make
-			// multiple requests.
+			// Also stream snapshot information so that FE does
+			// not need to make multiple requests.
 			auto streamSnapshot{
-				[this, &ss](std::vector<std::string>::const_iterator it) {
-					Snapshot const &snapshot{this->server.snapshots[*it]};
-					ss << "{\"name\": \"" << *it << "\", \"title\": \"" << snapshot.title
-						 << "\", \"date\": \"" << snapshot.date << "\"}";
+				[this,
+				 &ss](std::vector<std::string>::const_iterator it) {
+					Snapshot const &snapshot{
+						this->server.snapshots[*it]};
+					ss << "{\"name\": \"" << *it
+						 << "\", \"title\": \"" << snapshot.title
+						 << "\", \"date\": \"" << snapshot.date
+						 << "\"}";
 				}};
 			if (it != tagSnapshots.end()) {
 				streamSnapshot(it);
@@ -235,7 +263,8 @@ namespace Emilia::Http {
 		}
 		ss << "]}";
 		ss.seekg(0, std::ios::end);
-		std::size_t ssLen = static_cast<std::size_t>(ss.tellg());
+		std::size_t ssLen =
+			static_cast<std::size_t>(ss.tellg());
 		ss.seekg(0, std::ios::beg);
 		return {
 			{StatusCode::OK,
@@ -249,11 +278,13 @@ namespace Emilia::Http {
 		std::smatch const &match) {
 		auto snapshot{this->server.snapshots[match[1]]};
 		std::stringstream ss;
-		ss << "{\"name\": \"" << match[1] << "\", \"title\": \"" << snapshot.title
-			 << "\", \"date\": \"" << snapshot.date << "\", \"path\": \""
+		ss << "{\"name\": \"" << match[1] << "\", \"title\": \""
+			 << snapshot.title << "\", \"date\": \""
+			 << snapshot.date << "\", \"path\": \""
 			 << snapshot.path.generic_string() << "\"}";
 		ss.seekg(0, std::ios::end);
-		std::size_t ssLen = static_cast<std::size_t>(ss.tellg());
+		std::size_t ssLen =
+			static_cast<std::size_t>(ss.tellg());
 		ss.seekg(0, std::ios::beg);
 		return {
 			{StatusCode::OK,
@@ -266,7 +297,9 @@ namespace Emilia::Http {
 		Request &,
 		std::smatch const &) {
 		this->server.refreshSnapshots();
-		return {{StatusCode::OK, {{{"Access-Control-Allow-Origin", "*"}}}}};
+		return {
+			{StatusCode::OK,
+			 {{{"Access-Control-Allow-Origin", "*"}}}}};
 	}
 	Worker::ResponseAction Worker::getApiNoscriptHtml(
 		Request &,
@@ -323,11 +356,16 @@ namespace Emilia::Http {
 		std::vector<std::pair<std::string, Snapshot>> snapshots;
 		for (auto &it : this->server.snapshots) {
 			if (
-				it.second.tags.find("utulek") != it.second.tags.end() ||
-				it.second.tags.find("altair") != it.second.tags.end() ||
-				it.second.tags.find("monochrome") != it.second.tags.end() ||
-				it.second.tags.find("p794") != it.second.tags.end() ||
-				it.second.tags.find("cygnus") != it.second.tags.end()) {
+				it.second.tags.find("utulek") !=
+					it.second.tags.end() ||
+				it.second.tags.find("altair") !=
+					it.second.tags.end() ||
+				it.second.tags.find("monochrome") !=
+					it.second.tags.end() ||
+				it.second.tags.find("p794") !=
+					it.second.tags.end() ||
+				it.second.tags.find("cygnus") !=
+					it.second.tags.end()) {
 				snapshots.push_back(it);
 			}
 		}
@@ -340,8 +378,9 @@ namespace Emilia::Http {
 				return a.second.date > b.second.date;
 			});
 		for (auto &it : snapshots) {
-			ss << "<li><a href=\"snapshots/" << it.first << ".html?noscript\">"
-				 << it.second.title << "</a> | " << it.second.date << "</li>";
+			ss << "<li><a href=\"snapshots/" << it.first
+				 << ".html?noscript\">" << it.second.title
+				 << "</a> | " << it.second.date << "</li>";
 		}
 
 		ss << R"""(</ol>
@@ -350,7 +389,8 @@ namespace Emilia::Http {
 </html>)""";
 
 		ss.seekg(0, std::ios::end);
-		std::size_t ssLen = static_cast<std::size_t>(ss.tellg());
+		std::size_t ssLen =
+			static_cast<std::size_t>(ss.tellg());
 		ss.seekg(0, std::ios::beg);
 		return {
 			{StatusCode::OK,
@@ -359,9 +399,13 @@ namespace Emilia::Http {
 				 {"Access-Control-Allow-Origin", "*"}}},
 			 std::move(*ss.rdbuf())}};
 	}
-	Worker::ResponseAction Worker::getUserFacing(Request &, std::smatch const &) {
-		// Respond with the shared index. SRP is handled by frontend.
-		return this->getStaticResponse(Server::STATIC_ROOT + "/index.html");
+	Worker::ResponseAction Worker::getUserFacing(
+		Request &,
+		std::smatch const &) {
+		// Respond with the shared index. SRP is handled by
+		// frontend.
+		return this->getStaticResponse(
+			Server::STATIC_ROOT + "/index.html");
 	}
 	Worker::ResponseAction Worker::getSharedStatic(
 		Request &,
@@ -374,23 +418,34 @@ namespace Emilia::Http {
 
 		// Special-casing for noscript snapshots.
 		if (match[2] == "?noscript") {
-			std::ifstream fileStream(file.value(), std::ios::binary);
+			std::ifstream fileStream(
+				file.value(), std::ios::binary);
 			std::stringstream ss;
-			ss << "<!DOCTYPE html><html><head><meta "
-						"charset=\"UTF-8\"><meta name=\"viewport\" "
-						"content=\"width=device-width, initial-scale=1, "
-						"viewport-fit=cover\" /><link rel=\"stylesheet\" "
-						"href=\"/silver/silver.css\" /><link rel=\"stylesheet\" "
-						"href=\"/silver/selective/h1.subtitle.css\" /><title>snapshot | "
-						"gilgamesh.cc</title><style>html {-webkit-text-size-adjust: "
-						"100%;}</style></head><body><input type=\"checkbox\" "
-						"class=\"silver-theme-toggle\" enabled />"
-				 << response.response.value().body.rdbuf() << "</body></html>";
+			ss
+				<< "<!DOCTYPE html><html><head><meta "
+					 "charset=\"UTF-8\"><meta name=\"viewport\" "
+					 "content=\"width=device-width, initial-scale=1, "
+					 "viewport-fit=cover\" /><link "
+					 "rel=\"stylesheet\" "
+					 "href=\"/silver/silver.css\" /><link "
+					 "rel=\"stylesheet\" "
+					 "href=\"/silver/selective/h1.subtitle.css\" "
+					 "/><title>snapshot | "
+					 "gilgamesh.cc</title><style>html "
+					 "{-webkit-text-size-adjust: "
+					 "100%;}</style></head><body><input "
+					 "type=\"checkbox\" "
+					 "class=\"silver-theme-toggle\" enabled />"
+				<< response.response.value().body.rdbuf()
+				<< "</body></html>";
 			return {
 				{StatusCode::OK,
-				 {{{"Content-Type", MediaType(file.value().extension().string())},
+				 {{{"Content-Type",
+						MediaType(file.value().extension().string())},
 					 {"Content-Length",
-						std::to_string(std::filesystem::file_size(file.value()) + 435)},
+						std::to_string(
+							std::filesystem::file_size(file.value()) +
+							435)},
 					 {"Cache-Control", "Max-Age=3600"},
 					 {"Access-Control-Allow-Origin", "*"}}},
 				 std::move(*ss.rdbuf())}};
@@ -400,28 +455,36 @@ namespace Emilia::Http {
 	}
 	bool Worker::maybeRejectAuthorization(Request &req) {
 		static std::string targetCredentials{
-			Rain::Networking::Http::Header::Authorization::encodeBasicCredentials(
-				Server::HTTP_USERNAME, this->server.httpPassword)};
+			Rain::Networking::Http::Header::Authorization::
+				encodeBasicCredentials(
+					Server::HTTP_USERNAME,
+					this->server.httpPassword)};
 
 		auto authorization = req.headers.authorization();
 		return !(
-			Rain::String::toLower(authorization.scheme) == "basic" &&
-			authorization.parameters["credentials"] == targetCredentials);
+			Rain::String::toLower(authorization.scheme) ==
+				"basic" &&
+			authorization.parameters["credentials"] ==
+				targetCredentials);
 	}
 	std::optional<std::filesystem::path> Worker::resolvePath(
 		std::string const &target) {
-		// target does not begin with / and may or may not end with a trailing /.
-		std::filesystem::path path{Server::STATIC_ROOT + "/" + target};
+		// target does not begin with / and may or may not end
+		// with a trailing /.
+		std::filesystem::path path{
+			Server::STATIC_ROOT + "/" + target};
 		if (!std::filesystem::exists(path)) {
 			return {};
 		}
 		// All files under STATIC_ROOT are fair game.
-		// TODO: Until we have better auto-symlink detection, we must manually allow
-		// files in the symlinked paths. `slush` is the only directory symlinked
-		// out.
+		// TODO: Until we have better auto-symlink detection, we
+		// must manually allow files in the symlinked paths.
+		// `slush` is the only directory symlinked out.
 		if (
-			Rain::Filesystem::isSubpath(path, Server::STATIC_ROOT) ||
-			Rain::Filesystem::isSubpath(path, Server::STATIC_ROOT + "/slush")) {
+			Rain::Filesystem::isSubpath(
+				path, Server::STATIC_ROOT) ||
+			Rain::Filesystem::isSubpath(
+				path, Server::STATIC_ROOT + "/slush")) {
 			return {path};
 		}
 		return {};
@@ -431,8 +494,10 @@ namespace Emilia::Http {
 		std::ifstream file(path, std::ios::binary);
 		return {
 			{StatusCode::OK,
-			 {{{"Content-Type", MediaType(path.extension().string())},
-				 {"Content-Length", std::to_string(std::filesystem::file_size(path))},
+			 {{{"Content-Type",
+					MediaType(path.extension().string())},
+				 {"Content-Length",
+					std::to_string(std::filesystem::file_size(path))},
 				 // Cached by default.
 				 {"Cache-Control", "Max-Age=3600"},
 				 {"Access-Control-Allow-Origin", "*"}}},
@@ -465,22 +530,33 @@ namespace Emilia::Http {
 		this->tags.clear();
 		this->snapshots.clear();
 
-		// In case other directories have many more snapshots, only target certain
-		// subdirectories.
-		std::string snapshotsDirectory{Server::STATIC_ROOT + "/snapshots"};
-		// TODO: Better snapshot detection without manual specification.
-		static std::vector<std::string> const SNAPSHOT_SUBDIRECTORIES{
-			"/altair", "/cygnus", "/utulek", "/monochrome", "/p794"};
-		for (auto const &subdirectory : SNAPSHOT_SUBDIRECTORIES) {
-			for (auto const &entry : std::filesystem::directory_iterator(
+		// In case other directories have many more snapshots,
+		// only target certain subdirectories.
+		std::string snapshotsDirectory{
+			Server::STATIC_ROOT + "/snapshots"};
+		// TODO: Better snapshot detection without manual
+		// specification.
+		static std::vector<std::string> const
+			SNAPSHOT_SUBDIRECTORIES{
+				"/altair",
+				"/cygnus",
+				"/utulek",
+				"/monochrome",
+				"/p794"};
+		for (auto const &subdirectory :
+				 SNAPSHOT_SUBDIRECTORIES) {
+			for (auto const &entry :
+					 std::filesystem::directory_iterator(
 						 snapshotsDirectory + subdirectory,
-						 std::filesystem::directory_options::follow_directory_symlink)) {
+						 std::filesystem::directory_options::
+							 follow_directory_symlink)) {
 				if (entry.path().extension() != ".html") {
 					continue;
 				}
 
-				// Parse tags, title, date. These are specified in the HTML file in
-				// three lines with some whitespace surrounding.
+				// Parse tags, title, date. These are specified in
+				// the HTML file in three lines with some whitespace
+				// surrounding.
 				std::ifstream fileIStream(entry.path());
 				std::string line;
 				while (std::getline(fileIStream, line)) {
@@ -489,10 +565,12 @@ namespace Emilia::Http {
 						continue;
 					}
 
-					// Preserving nesting level ensures that inter-snapshot links work as
-					// expected with relative path replacement on the FE.
-					std::string name{entry.path().generic_string().substr(
-						snapshotsDirectory.size() + 1)};
+					// Preserving nesting level ensures that
+					// inter-snapshot links work as expected with
+					// relative path replacement on the FE.
+					std::string name{
+						entry.path().generic_string().substr(
+							snapshotsDirectory.size() + 1)};
 					name = name.substr(0, name.size() - 5);
 
 					Snapshot &snapshot{this->snapshots[name]};
@@ -526,7 +604,8 @@ namespace Emilia::Http {
 				it.second.begin(),
 				it.second.end(),
 				[this](std::string const &a, std::string const &b) {
-					return this->snapshots[a].date < this->snapshots[b].date;
+					return this->snapshots[a].date <
+						this->snapshots[b].date;
 				});
 		}
 	}

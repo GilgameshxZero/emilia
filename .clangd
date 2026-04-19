@@ -2,3 +2,5 @@ Completion:
 	ArgumentLists: None
 InlayHints:
 	Enabled: No
+Diagnostics:
+	UnusedIncludes: None

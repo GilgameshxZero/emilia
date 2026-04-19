@@ -51,12 +51,16 @@ namespace Emilia::Smtp {
 		virtual bool onInitialResponse() override;
 		virtual ResponseAction onHelo(Request &) override;
 		virtual ResponseAction onEhlo(Request &) override;
-		virtual ResponseAction onMailMailbox(Mailbox const &) override;
-		virtual ResponseAction onRcptMailbox(Mailbox const &) override;
-		virtual ResponseAction onDataStream(std::istream &) override;
+		virtual ResponseAction onMailMailbox(
+			Mailbox const &) override;
+		virtual ResponseAction onRcptMailbox(
+			Mailbox const &) override;
+		virtual ResponseAction onDataStream(
+			std::istream &) override;
 		virtual ResponseAction onRset(Request &) override;
-		virtual ResponseAction onAuthLogin(std::string const &, std::string const &)
-			override;
+		virtual ResponseAction onAuthLogin(
+			std::string const &,
+			std::string const &) override;
 	};
 
 	class Client : public Rain::Networking::Smtp::Client<
@@ -88,7 +92,10 @@ namespace Emilia::Smtp {
 		Server &server;
 
 		public:
-		Client(std::vector<std::pair<std::size_t, std::string>> const &, Server &);
+		Client(
+			std::vector<std::pair<std::size_t, std::string>> const
+				&,
+			Server &);
 
 		using SuperClient::send;
 		using SuperClient::recv;
@@ -117,11 +124,13 @@ namespace Emilia::Smtp {
 			Rain::Networking::NoLingerSocketOption>;
 
 		public:
-		// Incoming mail is stored in the outbox and sent periodically by a server
-		// thread. The key is the last time the mail was attempted, or min if never.
+		// Incoming mail is stored in the outbox and sent
+		// periodically by a server thread. The key is the last
+		// time the mail was attempted, or min if never.
 		std::condition_variable_any outboxEv;
 
-		// Allow public access from HTTP endpoint and main management.
+		// Allow public access from HTTP endpoint and main
+		// management.
 		std::shared_mutex outboxMtx;
 		std::set<Envelope> outbox;
 
@@ -144,6 +153,8 @@ namespace Emilia::Smtp {
 		virtual ~Server();
 
 		private:
-		virtual Worker makeWorker(NativeSocket, SocketInterface *) override;
+		virtual Worker makeWorker(
+			NativeSocket,
+			SocketInterface *) override;
 	};
 }

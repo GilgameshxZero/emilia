@@ -4,7 +4,7 @@
 
 namespace Emilia {
 	std::chrono::hours const Envelope::RETRY_WAIT(1);
-	std::size_t const Envelope::ATTEMPTS_MAX{48};
+	std::size_t const Envelope::ATTEMPTS_MAX{4};
 
 	Envelope::Envelope(
 		Status status,
@@ -20,12 +20,16 @@ namespace Emilia {
 				to(to),
 				data(data) {}
 	bool Envelope::operator<(Envelope const &other) const {
-		// PENDING envelopes are always sorted first. Everything else is sorted by
-		// lastAttempt. Stale envelopes are sorted later in either case.
-		if (this->status == Status::PENDING && other.status != Status::PENDING) {
+		// PENDING envelopes are always sorted first. Everything
+		// else is sorted by lastAttempt. Stale envelopes are
+		// sorted later in either case.
+		if (
+			this->status == Status::PENDING &&
+			other.status != Status::PENDING) {
 			return true;
 		} else if (
-			this->status != Status::PENDING && other.status == Status::PENDING) {
+			this->status != Status::PENDING &&
+			other.status == Status::PENDING) {
 			return false;
 		} else {
 			// Both PENDING or both non-PENDING.
@@ -34,8 +38,8 @@ namespace Emilia {
 			} else if (this->attemptTime > other.attemptTime) {
 				return true;
 			} else {
-				// If both status and attemptTime match, then use data to enforce sort
-				// order.
+				// If both status and attemptTime match, then use
+				// data to enforce sort order.
 				return this->data > other.data;
 			}
 		}
