@@ -79,8 +79,8 @@ namespace Emilia::Smtp {
 			BLOCK_MAILBOX.count(mailbox) ||
 			BLOCK_NAME.count(mailbox.name)) {
 			if (this->server.echo) {
-				std::cout << "Rejected mail from " << mailbox
-					<< "." << std::endl;
+				std::cout << "Rejected mail from " << mailbox << "."
+									<< std::endl;
 			}
 			return {{StatusCode::TRANSACTION_FAILED}};
 		}
@@ -146,7 +146,9 @@ namespace Emilia::Smtp {
 			}
 		}
 		std::ofstream dataFile(dataPath, std::ios::binary);
-		dataFile << "X-Emilia-Mail-From: "
+		dataFile << "X-Emilia-Peer-Host: " << this->peerHost()
+						 << "\r\n"
+						 << "X-Emilia-Mail-From: "
 						 << this->mailFrom.value() << "\r\n";
 		for (Mailbox const &mailbox : this->rcptTo) {
 			dataFile << "X-Emilia-Rcpt-To: " << mailbox << "\r\n";

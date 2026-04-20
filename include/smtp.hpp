@@ -35,7 +35,8 @@ namespace Emilia::Smtp {
 			Rain::Networking::TcpProtocolInterface,
 			Rain::Networking::NoLingerSocketOption>;
 
-		bool authenticated = false;
+		bool authenticated{false};
+		Host peer;
 
 		Server &server;
 
