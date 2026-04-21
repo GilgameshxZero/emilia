@@ -36,7 +36,6 @@ namespace Emilia::Smtp {
 			Rain::Networking::NoLingerSocketOption>;
 
 		bool authenticated{false};
-		Host peer;
 
 		Server &server;
 
@@ -139,6 +138,9 @@ namespace Emilia::Smtp {
 		// Manages the outbox.
 		std::thread sender;
 		std::atomic_bool closed = false;
+
+		// Blocklists.
+
 
 		// Other state from constructor.
 		std::atomic_bool const &echo;

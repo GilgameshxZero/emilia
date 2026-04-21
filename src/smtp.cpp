@@ -69,6 +69,11 @@ namespace Emilia::Smtp {
 				{"bounce@today.com"},
 				{"bounce@securecloud.com"},
 				{"bounce@abcnews.com"},
+				{"bounce@medvi.com"},
+				{"bounce@govloanoptions.com"},
+				{"bounce@aaa.com"},
+				{"bounce@tractorsupply.com"},
+				{"bounce@leandrops.com"},
 				{"lily@cityfinancialcommunications.com"},
 				{"olivia@aohuanedu.com"}};
 		static std::unordered_set<std::string> const BLOCK_NAME{
@@ -77,11 +82,10 @@ namespace Emilia::Smtp {
 			"TT_178021x83"};
 		if (
 			BLOCK_MAILBOX.count(mailbox) ||
-			BLOCK_NAME.count(mailbox.name)) {
-			if (this->server.echo) {
-				std::cout << "Rejected mail from " << mailbox << "."
-									<< std::endl;
-			}
+			BLOCK_NAME.count(mailbox.name) ||
+			this->server.blockHost.count(this->peerHost().node) {
+			std::cout << "Rejected mail from " << mailbox << ", "
+				<< this->peerHost() << std::endl;
 			return {{StatusCode::TRANSACTION_FAILED}};
 		}
 		// If authenticated, allow from any mailbox. Otherwise,
