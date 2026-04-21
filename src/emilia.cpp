@@ -21,7 +21,8 @@ int main(int argc, char const *argv[]) {
 
 			// Parse command line options.
 			std::string httpPort{"0"}, smtpPort{"0"},
-				httpPassword, smtpForwardStr, smtpPassword;
+				httpPassword, smtpForwardStr, smtpPassword,
+				smtpSerializeFile{"../../.smtp.ser"};
 			bool showHelp{false};
 
 			Rain::String::CommandLineParser parser;
@@ -32,6 +33,8 @@ int main(int argc, char const *argv[]) {
 			parser.addParser("http-password", httpPassword);
 			parser.addParser("smtp-forward", smtpForwardStr);
 			parser.addParser("smtp-password", smtpPassword);
+			parser.addParser(
+				"smtp-serialize-file", smtpSerializeFile);
 			try {
 				parser.parse(argc - 1, argv + 1);
 			} catch (...) {
@@ -79,7 +82,11 @@ int main(int argc, char const *argv[]) {
 			// server state.
 			auto newSmtpServer = [&]() {
 				return new Emilia::Smtp::Server(
-					{"", smtpPort}, echo, smtpForward, smtpPassword);
+					{"", smtpPort},
+					echo,
+					smtpForward,
+					smtpPassword,
+					smtpSerializeFile);
 			};
 			std::unique_ptr<Emilia::Smtp::Server> smtpServer(
 				newSmtpServer());
@@ -135,6 +142,8 @@ int main(int argc, char const *argv[]) {
 							 "the command-line.\n"
 						<< "refresh: Pull and rescan for HTTP "
 							 "snapshots.\n"
+						<< "block mailbox/mailbox-name/peer-host-node: "
+							 "Toggle entry on respective blocklist.\n"
 						<< std::endl;
 				} else if (command == "exit") {
 					break;
@@ -234,6 +243,61 @@ int main(int argc, char const *argv[]) {
 										<< '.' << std::endl;
 				} else if (command == "refresh") {
 					httpServer->refreshSnapshots();
+				} else if (command == "block mailbox") {
+					std::string entry;
+					std::cout << "Entry: ";
+					std::getline(std::cin, entry);
+					auto it{smtpServer->blockMailMailbox.find(entry)};
+					if (it == smtpServer->blockMailMailbox.end()) {
+						smtpServer->blockMailMailbox.insert(entry);
+						std::cout << "Added " << entry << "."
+											<< std::endl;
+					} else {
+						smtpServer->blockMailMailbox.erase(it);
+						std::cout << "Removed " << entry << "."
+											<< std::endl;
+					}
+				} else if (command == "block mailbox-name") {
+					std::string entry;
+					std::cout << "Entry: ";
+					std::getline(std::cin, entry);
+					auto it{
+						smtpServer->blockMailMailboxName.find(entry)};
+					if (
+						it == smtpServer->blockMailMailboxName.end()) {
+						smtpServer->blockMailMailboxName.insert(entry);
+						std::cout << "Added " << entry << "."
+											<< std::endl;
+					} else {
+						smtpServer->blockMailMailboxName.erase(it);
+						std::cout << "Removed " << entry << "."
+											<< std::endl;
+					}
+				} else if (command == "block peer-host-node") {
+					std::string entry;
+					std::cout << "Entry: ";
+					std::getline(std::cin, entry);
+					auto it{
+						smtpServer->blockPeerHostNode.find(entry)};
+					if (it == smtpServer->blockPeerHostNode.end()) {
+						smtpServer->blockPeerHostNode.insert(entry);
+						std::cout << "Added " << entry << "."
+											<< std::endl;
+					} else {
+						smtpServer->blockPeerHostNode.erase(it);
+						std::cout << "Removed " << entry << "."
+											<< std::endl;
+					}
+				} else if (command == "print blocklist") {
+					for (auto &i : smtpServer->blockMailMailbox) {
+						std::cout << i << std::endl;
+					}
+					for (auto &i : smtpServer->blockMailMailboxName) {
+						std::cout << i << std::endl;
+					}
+					for (auto &i : smtpServer->blockPeerHostNode) {
+						std::cout << i << std::endl;
+					}
 				} else {
 					std::cout << "Invalid command: " << command << '.'
 										<< std::endl;

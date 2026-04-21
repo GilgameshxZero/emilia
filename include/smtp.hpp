@@ -134,24 +134,31 @@ namespace Emilia::Smtp {
 		std::shared_mutex outboxMtx;
 		std::set<Envelope> outbox;
 
+		// Blocklists.
+		std::unordered_set<
+			Mailbox,
+			Rain::Networking::Smtp::HashMailbox>
+			blockMailMailbox;
+		std::unordered_set<std::string> blockMailMailboxName,
+			blockPeerHostNode;
+
 		private:
 		// Manages the outbox.
 		std::thread sender;
 		std::atomic_bool closed = false;
 
-		// Blocklists.
-
-
 		// Other state from constructor.
 		std::atomic_bool const &echo;
 		Rain::Networking::Smtp::Mailbox const &smtpForward;
 		std::string const &smtpPassword;
+		std::string const &serializeFile;
 
 		public:
 		Server(
 			Host const &,
 			std::atomic_bool const &,
 			Rain::Networking::Smtp::Mailbox const &,
+			std::string const &,
 			std::string const &);
 		virtual ~Server();
 

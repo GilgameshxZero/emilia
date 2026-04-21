@@ -5,6 +5,8 @@
 #include <smtp.hpp>
 
 #include <emilia.hpp>
+#include "rain/data/serializer.hpp"
+#include "rain/error/consume_throwable.hpp"
 #include "rain/networking/smtp/mailbox.hpp"
 
 namespace Emilia::Smtp {
@@ -51,41 +53,14 @@ namespace Emilia::Smtp {
 	}
 	Worker::ResponseAction Worker::onMailMailbox(
 		Mailbox const &mailbox) {
-		static std::unordered_set<
-			Mailbox,
-			Rain::Networking::Smtp::HashMailbox> const
-			BLOCK_MAILBOX{
-				{"bounce@cloudvault.com"},
-				{"bounce@costco.com"},
-				{"bounce@lowes.com"},
-				{"bounce@usps.com"},
-				{"bounce@samsclub.com"},
-				{"bounce@statefarm.com"},
-				{"bounce@harborfreight.com"},
-				{"bounce@unitedhealthcare.com"},
-				{"bounce@omahasteaks.com"},
-				{"bounce@cnn.com"},
-				{"bounce@homedepot.com"},
-				{"bounce@today.com"},
-				{"bounce@securecloud.com"},
-				{"bounce@abcnews.com"},
-				{"bounce@medvi.com"},
-				{"bounce@govloanoptions.com"},
-				{"bounce@aaa.com"},
-				{"bounce@tractorsupply.com"},
-				{"bounce@leandrops.com"},
-				{"lily@cityfinancialcommunications.com"},
-				{"olivia@aohuanedu.com"}};
-		static std::unordered_set<std::string> const BLOCK_NAME{
-			"cf178021x83",
-			"newsletter_178021x83",
-			"TT_178021x83"};
 		if (
-			BLOCK_MAILBOX.count(mailbox) ||
-			BLOCK_NAME.count(mailbox.name) ||
-			this->server.blockHost.count(this->peerHost().node) {
-			std::cout << "Rejected mail from " << mailbox << ", "
-				<< this->peerHost() << std::endl;
+			this->server.blockMailMailbox.count(mailbox) ||
+			this->server.blockMailMailboxName.count(
+				mailbox.name) ||
+			this->server.blockPeerHostNode.count(
+				this->peerHost().node)) {
+			std::cout << "Rejected mail from " << mailbox << " @ "
+								<< this->peerHost() << "." << std::endl;
 			return {{StatusCode::TRANSACTION_FAILED}};
 		}
 		// If authenticated, allow from any mailbox. Otherwise,
@@ -246,12 +221,32 @@ namespace Emilia::Smtp {
 		Host const &host,
 		std::atomic_bool const &echo,
 		Rain::Networking::Smtp::Mailbox const &smtpForward,
-		std::string const &smtpPassword)
+		std::string const &smtpPassword,
+		std::string const &serializeFile)
 			: SuperServer(host),
 				echo(echo),
 				smtpForward(smtpForward),
-				smtpPassword(smtpPassword) {
-		// The sender attempts to send envelopes in the outbox.
+				smtpPassword(smtpPassword),
+				serializeFile(serializeFile) {
+		Rain::Error::consumeThrowable(
+			[this]() {
+				// De-serialize blocklists. May throw if format is
+				// invalid.
+				std::cout << "De-serializing..." << std::endl;
+				Rain::Data::Deserializer deserializer(
+					this->serializeFile);
+				deserializer >> this->blockMailMailbox >>
+					this->blockMailMailboxName >>
+					this->blockPeerHostNode;
+			},
+			RAIN_ERROR_LOCATION)();
+		std::cout << "Found " << this->blockMailMailbox.size()
+							<< ", " << this->blockMailMailboxName.size()
+							<< ", " << this->blockPeerHostNode.size()
+							<< " entries to block." << std::endl;
+
+		// The sender attempts to send envelopes in
+		// the outbox.
 		this->sender = std::thread([this]() {
 			// using namespace Rain::Literal;
 
@@ -487,6 +482,11 @@ namespace Emilia::Smtp {
 		});
 	}
 	Server::~Server() {
+		Rain::Data::Serializer serializer(this->serializeFile);
+		serializer << this->blockMailMailbox
+							 << this->blockMailMailboxName
+							 << this->blockPeerHostNode;
+
 		this->closed = true;
 		this->outboxEv.notify_one();
 		this->sender.join();
