@@ -3,8 +3,8 @@
 #include <envelope.hpp>
 
 namespace Emilia {
-	std::chrono::hours const Envelope::RETRY_WAIT(2);
-	std::size_t const Envelope::ATTEMPTS_MAX{4};
+	std::chrono::minutes const Envelope::RETRY_WAIT(15);
+	std::size_t const Envelope::ATTEMPTS_MAX{8};
 
 	Envelope::Envelope(
 		Status status,

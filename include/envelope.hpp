@@ -8,7 +8,7 @@ namespace Emilia {
 	// the envelope is sent, the email data may be removed.
 	class Envelope {
 		public:
-		static std::chrono::hours const RETRY_WAIT;
+		static std::chrono::minutes const RETRY_WAIT;
 		static std::size_t const ATTEMPTS_MAX;
 
 		enum class Status {
