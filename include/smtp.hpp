@@ -139,8 +139,7 @@ namespace Emilia::Smtp {
 			Mailbox,
 			Rain::Networking::Smtp::HashMailbox>
 			blockMailMailbox;
-		std::unordered_set<std::string> blockMailMailboxName,
-			blockPeerHostNode;
+		std::unordered_set<std::string> blockPeerHostNode;
 
 		private:
 		// Manages the outbox.

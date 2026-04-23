@@ -53,16 +53,6 @@ namespace Emilia::Smtp {
 	}
 	Worker::ResponseAction Worker::onMailMailbox(
 		Mailbox const &mailbox) {
-		if (
-			this->server.blockMailMailbox.count(mailbox) ||
-			this->server.blockMailMailboxName.count(
-				mailbox.name) ||
-			this->server.blockPeerHostNode.count(
-				this->peerHost().node)) {
-			std::cout << "Rejected mail from " << mailbox << " @ "
-								<< this->peerHost() << "." << std::endl;
-			return {{StatusCode::TRANSACTION_FAILED}};
-		}
 		// If authenticated, allow from any mailbox. Otherwise,
 		// limit against domain mailboxes.
 		if (
@@ -142,6 +132,21 @@ namespace Emilia::Smtp {
 		if (beforeDataPos == afterDataPos) {
 			std::filesystem::remove(dataPath);
 			return {{StatusCode::SYNTAX_ERROR_COMMAND}};
+		}
+
+		// If this mail is on the blocklist, abort with error,
+		// but save the data for later analysis.
+		if (
+			this->server.blockMailMailbox.count(
+				this->mailFrom.value()) ||
+			this->server.blockPeerHostNode.count(
+				this->peerHost().node)) {
+			std::cout << "Aborted " << this->mailFrom.value()
+								<< " > " << this->rcptTo << " from "
+								<< this->peerHost() << "." << std::endl;
+			return {
+				{StatusCode::
+					 REQUEST_NOT_TAKEN_MAILBOX_UNAVAILABLE_PERMANENT}};
 		}
 
 		// Push the new envelopes to the outbox for the Server
@@ -236,12 +241,10 @@ namespace Emilia::Smtp {
 				Rain::Data::Deserializer deserializer(
 					this->serializeFile);
 				deserializer >> this->blockMailMailbox >>
-					this->blockMailMailboxName >>
 					this->blockPeerHostNode;
 			},
 			RAIN_ERROR_LOCATION)();
 		std::cout << "Found " << this->blockMailMailbox.size()
-							<< ", " << this->blockMailMailboxName.size()
 							<< ", " << this->blockPeerHostNode.size()
 							<< " entries to block." << std::endl;
 
@@ -484,7 +487,6 @@ namespace Emilia::Smtp {
 	Server::~Server() {
 		Rain::Data::Serializer serializer(this->serializeFile);
 		serializer << this->blockMailMailbox
-							 << this->blockMailMailboxName
 							 << this->blockPeerHostNode;
 
 		this->closed = true;

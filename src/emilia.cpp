@@ -142,7 +142,7 @@ int main(int argc, char const *argv[]) {
 							 "the command-line.\n"
 						<< "refresh: Pull and rescan for HTTP "
 							 "snapshots.\n"
-						<< "block mailbox/mailbox-name/peer-host-node: "
+						<< "block mail-mailbox/peer-host-node/print: "
 							 "Toggle entry on respective blocklist.\n"
 						<< std::endl;
 				} else if (command == "exit") {
@@ -243,7 +243,7 @@ int main(int argc, char const *argv[]) {
 										<< '.' << std::endl;
 				} else if (command == "refresh") {
 					httpServer->refreshSnapshots();
-				} else if (command == "block mailbox") {
+				} else if (command == "block mail-mailbox") {
 					std::string entry;
 					std::cout << "Entry: ";
 					std::getline(std::cin, entry);
@@ -254,22 +254,6 @@ int main(int argc, char const *argv[]) {
 											<< std::endl;
 					} else {
 						smtpServer->blockMailMailbox.erase(it);
-						std::cout << "Removed " << entry << "."
-											<< std::endl;
-					}
-				} else if (command == "block mailbox-name") {
-					std::string entry;
-					std::cout << "Entry: ";
-					std::getline(std::cin, entry);
-					auto it{
-						smtpServer->blockMailMailboxName.find(entry)};
-					if (
-						it == smtpServer->blockMailMailboxName.end()) {
-						smtpServer->blockMailMailboxName.insert(entry);
-						std::cout << "Added " << entry << "."
-											<< std::endl;
-					} else {
-						smtpServer->blockMailMailboxName.erase(it);
 						std::cout << "Removed " << entry << "."
 											<< std::endl;
 					}
@@ -288,11 +272,8 @@ int main(int argc, char const *argv[]) {
 						std::cout << "Removed " << entry << "."
 											<< std::endl;
 					}
-				} else if (command == "print blocklist") {
+				} else if (command == "block print") {
 					for (auto &i : smtpServer->blockMailMailbox) {
-						std::cout << i << std::endl;
-					}
-					for (auto &i : smtpServer->blockMailMailboxName) {
 						std::cout << i << std::endl;
 					}
 					for (auto &i : smtpServer->blockPeerHostNode) {
