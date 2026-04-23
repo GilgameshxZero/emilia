@@ -135,10 +135,7 @@ namespace Emilia::Smtp {
 		std::set<Envelope> outbox;
 
 		// Blocklists.
-		std::unordered_set<
-			Mailbox,
-			Rain::Networking::Smtp::HashMailbox>
-			blockMailMailbox;
+		std::unordered_set<Mailbox> blockMailMailbox;
 		std::unordered_set<std::string> blockPeerHostNode;
 
 		private:

@@ -1,5 +1,7 @@
 #include <rain.hpp>
 
+#include <../rain/build/version.hpp>
+
 #include <emilia.hpp>
 
 #include <envelope.hpp>
@@ -166,7 +168,7 @@ int main(int argc, char const *argv[]) {
 													<< smtpServer->host() << "..."
 													<< std::endl;
 							},
-							RAIN_ERROR_LOCATION)();
+							std::source_location::current())();
 					}
 				} else if (command == "start http") {
 					if (httpServer) {
@@ -181,7 +183,7 @@ int main(int argc, char const *argv[]) {
 													<< httpServer->host() << "..."
 													<< std::endl;
 							},
-							RAIN_ERROR_LOCATION)();
+							std::source_location::current())();
 					}
 				} else if (command == "modify smtp") {
 					std::cout << "Modified SMTP port: ";
@@ -297,5 +299,5 @@ int main(int argc, char const *argv[]) {
 
 			return 0;
 		},
-		RAIN_ERROR_LOCATION)();
+		std::source_location::current())();
 }

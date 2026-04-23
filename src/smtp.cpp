@@ -243,7 +243,7 @@ namespace Emilia::Smtp {
 				deserializer >> this->blockMailMailbox >>
 					this->blockPeerHostNode;
 			},
-			RAIN_ERROR_LOCATION)();
+			std::source_location::current())();
 		std::cout << "Found " << this->blockMailMailbox.size()
 							<< ", " << this->blockPeerHostNode.size()
 							<< " entries to block." << std::endl;
@@ -480,7 +480,7 @@ namespace Emilia::Smtp {
 							this->outbox.emplace(it);
 						}
 					},
-					RAIN_ERROR_LOCATION)();
+					std::source_location::current())();
 			}
 		});
 	}
