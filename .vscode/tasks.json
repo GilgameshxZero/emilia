@@ -6,7 +6,7 @@
 			"type": "shell",
 			"label": "clean",
 			"options": { "cwd": "${workspaceFolder}/build" },
-			"presentation": { "clear": true },
+			"presentation": { "clear": true, "reveal": "silent" },
 
 			"command": "make",
 			"args": ["clean"]
@@ -16,14 +16,14 @@
 			"type": "shell",
 			"label": "build-debug-x64",
 			"options": { "cwd": "${workspaceFolder}/build" },
-			"presentation": { "clear": true },
+			"presentation": { "clear": true, "reveal": "never" },
 
 			/* Default build task. */
 			"group": { "kind": "build", "isDefault": true },
 
 			"command": "make",
 			"args": ["-j"],
-			"problemMatcher": ["$gcc"],
+			"problemMatcher": ["$codelldb-rustc"],
 
 			"windows": {
 				"args": [],
@@ -35,12 +35,12 @@
 			"type": "shell",
 			"label": "build-release-x64",
 			"options": { "cwd": "${workspaceFolder}/build" },
-			"presentation": { "clear": true },
+			"presentation": { "clear": true, "reveal": "never" },
 			"group": "build",
 
 			"command": "make",
 			"args": ["-j", "BUILD=1"],
-			"problemMatcher": ["$gcc"],
+			"problemMatcher": ["$codelldb-rustc"],
 
 			"windows": {
 				"args": ["BUILD=1"],

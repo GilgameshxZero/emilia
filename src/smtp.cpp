@@ -422,7 +422,9 @@ namespace Emilia::Smtp {
 														<< it.to << ".\n"
 														<< res.value() << std::flush;
 									sent = false;
-									retry = res->statusCode / 100 == 4;
+									retry = res->statusCode.getCategory() ==
+										StatusCode::Category::
+											TRANSIENT_NEGATIVE;
 								} else {
 									std::cout << "Sent " << it.from << " > "
 														<< it.to << '.' << std::endl;
