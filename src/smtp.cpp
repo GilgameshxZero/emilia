@@ -307,7 +307,7 @@ namespace Emilia::Smtp {
 
 						// All attempted envelopes should be PENDING.
 						for (auto &it : toAttempt) {
-							if (it.attempt == Envelope::ATTEMPTS_MAX) {
+							if (it.attempt >= Envelope::ATTEMPTS_MAX) {
 								std::cerr
 									<< "Exceeded maximum retries: " << it.from
 									<< " > " << it.to << "\n : " << it.data
@@ -414,34 +414,29 @@ namespace Emilia::Smtp {
 								return {};
 							};
 
-							bool sent{false}, retry{false};
+							bool sent{false}, isTransientNegative{false};
 							try {
 								auto res = attemptEnvelope(it);
 								if (res) {
 									std::cerr << "Failed " << it.from << " > "
 														<< it.to << ".\n"
 														<< res.value() << std::flush;
-									sent = false;
-									retry = res->statusCode.getCategory() ==
+									isTransientNegative =
+										res->statusCode.getCategory() ==
 										StatusCode::Category::
 											TRANSIENT_NEGATIVE;
 								} else {
 									std::cout << "Sent " << it.from << " > "
 														<< it.to << '.' << std::endl;
 									sent = true;
-									retry = false;
 								}
 							} catch (std::exception const &exception) {
 								std::cout << "Failed " << it.from << " > "
 													<< it.to << ".\n"
 													<< exception.what() << std::endl;
-								sent = false;
-								retry = true;
 							} catch (...) {
 								std::cout << "Failed " << it.from << " > "
 													<< it.to << '.' << std::endl;
-								sent = false;
-								retry = true;
 							}
 
 							// Update envelope status.
@@ -450,9 +445,12 @@ namespace Emilia::Smtp {
 							if (sent) {
 								it.status = Envelope::Status::SUCCESS;
 							} else {
-								it.status = retry
-									? Envelope::Status::RETRIED
-									: Envelope::Status::FAILURE;
+								it.status = Envelope::Status::RETRIED;
+								// A non-400 error further penalizes the
+								// retry attempt counter.
+								if (!isTransientNegative) {
+									it.attempt++;
+								}
 							}
 						}
 
