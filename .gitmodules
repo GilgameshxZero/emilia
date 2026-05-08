@@ -1,6 +1,3 @@
 [submodule "rain"]
 	path = rain
 	url = ../rain.git
-[submodule "echidna"]
-	path = echidna
-	url = ../echidna.git
