@@ -1,0 +1,102 @@
+@import "../styles/colors.css";
+
+:host {
+	/* This variable is set by the tag menu to transition the chevron from pointing down to pointing up. */
+	--chevron-scale-y: 100%;
+
+	display: flex;
+	flex-flow: row nowrap;
+
+	overflow: hidden;
+	cursor: pointer;
+	opacity: 0;
+	transition: opacity var(--transition-time), background-color var(--transition-time);
+	user-select: none;
+}
+
+:host(.loaded) {
+	opacity: 1;
+}
+
+:host(:hover),
+:host([selected]) {
+	background-color: hsl(var(--hsla-pane-1));
+}
+
+:host > div[name="wrapper"] {
+	flex: 1 1 auto;
+	display: flex;
+	flex-flow: column nowrap;
+	padding: 1.5rem 1.2rem;
+}
+
+:host > div[name="wrapper"] > h1,
+:host > div[name="wrapper"] > h2 {
+	text-align: right;
+	margin: 0;
+}
+
+:host > div[name="wrapper"] > h1 {
+	font-family: "Tangerine";
+	font-weight: normal;
+	font-size: 2.4em;
+}
+
+:host > div[name="wrapper"] > div {
+	width: 100%;
+	height: 0.1rem;
+	margin: 0.6rem 0;
+
+	background-color: black;
+}
+
+:host > div[name="wrapper"] > h2 {
+	font-family: "EB Garamond";
+	font-weight: normal;
+	font-size: 1.2em;
+}
+
+:host > div[name="wrapper"] > img {
+	display: none;
+	max-height: 0.8rem;
+	margin-top: 0.8rem;
+
+	/* This transition is broken on iOS Edge, but works on iOS Safari (2022-12-19). */
+	transform: scaleY(var(--chevron-scale-y));
+	transition: transform var(--transition-time);
+}
+
+:host > div[name="highlighter"] {
+	flex: 0 0 0.3rem;
+
+	background-color: transparent;
+	transition: background-color var(--transition-time);
+}
+
+:host([selected]) > div[name="highlighter"] {
+	background-color: hsl(var(--hsl-base-5));
+}
+
+@media (max-width: calc(1rem + 80ch)) {
+	:host {
+		flex-flow: column nowrap;
+	}
+
+	:host > div[name="wrapper"] {
+		padding-bottom: 0.8rem;
+		order: 1;
+	}
+
+	:host > div[name="wrapper"] > h1,
+	:host > div[name="wrapper"] > h2 {
+		text-align: center;
+	}
+
+	:host > div[name="highlighter"] {
+		order: 0;
+	}
+
+	:host([selected]) > div[name="wrapper"] > img {
+		display: block;
+	}
+}

@@ -1,0 +1,57 @@
+@import "../styles/colors.css";
+
+:host {
+	/* Slower transition speed for design purposes. */
+	--transition-time-ratio: 2;
+
+	/* Always positioned fixed relative to viewport, which allows body to scroll while the background remains in place. */
+	--viewport-unit: max(100vw, 100vh);
+	--snapshot-progress: 0;
+
+	position: fixed;
+	/* The gradient is designed on a 16x10 ratio. */
+	width: calc(var(--viewport-unit) * 8);
+	height: calc(var(--viewport-unit) * 5);
+	left: calc(-3 * var(--viewport-unit));
+	top: calc(-1.3 * var(--viewport-unit));
+	overflow-x: hidden;
+
+	/* There is currently (2022-12-19) a bug on iOS Safari where the conic gradient is not rendered outside the viewport and causes a small lagging black bar to show up when the address bar is being hidden during scroll. It does not show up, for example, if the background is a simple color instead. */
+	background: conic-gradient(
+		from 0deg at 0% 50%,
+		black 74.3deg,
+		hsl(var(--hsl-base-1)) 81.39deg,
+		hsl(var(--hsl-base-2)) 83.7deg,
+		hsl(var(--hsl-base-3)) 86.08deg,
+		hsl(var(--hsl-base-4)) 89.57deg,
+		hsl(var(--hsl-background-4-5)) 93.13deg,
+		hsl(var(--hsl-base-5)) 98.64deg,
+		hsl(var(--hsl-background-5-6)) 114.12deg,
+		hsl(var(--hsl-base-6)) 131.16deg,
+		black 144.37deg
+	);
+}
+
+:host([lagging]) {
+	transition: left calc(var(--transition-time-ratio) * var(--transition-time)),
+		top calc(var(--transition-time-ratio) * var(--transition-time));
+}
+
+:host([position="map"]) {
+	left: calc(-5 * var(--viewport-unit));
+	top: 0;
+}
+
+:host([position="timeline"]) {
+	left: calc(-5 * var(--viewport-unit));
+	top: calc(-1.5 * var(--viewport-unit));
+}
+
+:host([position="snapshot"]) {
+	left: calc(
+		-7 * var(--viewport-unit) + 4 * var(--viewport-unit) * var(--snapshot-progress)
+	);
+	top: calc(
+		-1.9 * var(--viewport-unit) - 2.1 * var(--viewport-unit) * var(--snapshot-progress)
+	);
+}

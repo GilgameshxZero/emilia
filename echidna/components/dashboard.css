@@ -1,0 +1,22 @@
+@import "../styles/colors.css";
+@import "../styles/fonts.css";
+
+:host {
+	position: absolute;
+	top: 0;
+	left: 0;
+	display: flex;
+	flex-flow: row wrap;
+	width: calc(100% - 2em);
+	height: calc(100% - 2em);
+	margin: 0;
+	padding: 1em;
+
+	background-color: var(--storyworld-background-color);
+	color: var(--storyworld-color);
+}
+
+:host > emilia-ping {
+	flex: 1 1 0;
+	padding: 1em;
+}

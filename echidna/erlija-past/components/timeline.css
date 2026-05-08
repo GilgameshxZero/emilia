@@ -1,0 +1,67 @@
+@import "../styles/colors.css";
+
+:host {
+	flex: 1 1 auto;
+	display: flex;
+	flex-flow: column nowrap;
+	margin: 1.5rem;
+
+	opacity: 0;
+	transition: opacity var(--transition-time);
+	color: hsl(var(--hsl-text-foreground));
+}
+
+:host(.loaded) {
+	opacity: 1;
+}
+
+:host(.disabled) {
+	pointer-events: none;
+}
+
+:host > emilia-icon {
+	margin: 0 auto 1.5rem;
+}
+
+:host > div {
+	display: flex;
+	flex-flow: row nowrap;
+	margin: 0 auto;
+	width: 100%;
+}
+
+:host > div > div {
+	flex: 0 0 50%;
+	flex-flow: column nowrap;
+	display: flex;
+}
+
+:host > div > div > emilia-tag-menu {
+	flex: 0 1 auto;
+	margin-left: auto;
+	margin-right: 0.75rem;
+}
+
+:host > div > div > emilia-snapshot-menu {
+	flex: 0 1 auto;
+	margin-left: 0.75rem;
+	margin-right: auto;
+}
+
+@media (max-width: calc(1rem + 80ch)) {
+	:host > div {
+		flex-flow: column nowrap;
+	}
+
+	:host > div > div {
+		flex: 0 0 auto;
+	}
+
+	:host > div > div > emilia-tag-menu {
+		margin: 0 auto 1.5rem;
+	}
+
+	:host > div > div > emilia-snapshot-menu {
+		margin: 0 auto;
+	}
+}

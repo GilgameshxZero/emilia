@@ -1,0 +1,3 @@
+/* This file redirects silver CSS correctly for both in-browser and VSCode use. It should mirror styles specified in the snapshot components for each storyworld. */
+@import "../silver/silver.css";
+@import "../silver/selective/h1.subtitle.css";

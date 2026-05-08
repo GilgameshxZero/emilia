@@ -1,0 +1,58 @@
+@import "../styles/colors.css";
+
+:host {
+	flex: 1 1 auto;
+	display: flex;
+	/* Enforce padding + no larger than 80ch. */
+	max-width: 80ch;
+	padding: 1.5rem max(1.5rem, 50% - 40ch);
+	margin: auto;
+
+	color: hsl(var(--hsl-text-foreground-inverse));
+	font-family: "EB Garamond";
+	font-size: 1.2em;
+	text-align: center;
+	opacity: 0;
+	transition: opacity var(--transition-time);
+}
+
+:host(.loaded) {
+	opacity: 1;
+}
+
+:host(.disabled) {
+	pointer-events: none;
+}
+
+article {
+	margin: auto;
+}
+
+/* Hotfix because text elements aren’t affected by component.js :host invisibility, for a brief flash on iOS when loading component (2022-12-19). */
+:host(.loaded) article {
+	opacity: 1;
+}
+
+a {
+	color: hsl(var(--hsl-base-5));
+}
+
+emilia-icon,
+emilia-noscript {
+	background-color: transparent;
+	opacity: var(--alpha-icon-ready);
+	transition: opacity var(--transition-time);
+	box-shadow: none;
+}
+
+emilia-icon:hover,
+emilia-noscript:hover {
+	background-color: transparent;
+	opacity: 1;
+}
+
+section[name="portals"] {
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: center;
+}

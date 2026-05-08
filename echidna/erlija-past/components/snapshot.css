@@ -1,0 +1,83 @@
+@import "../styles/colors.css";
+@import "../../silver/silver.css";
+@import "../../silver/selective/h1.subtitle.css";
+@import "../../silver/selective/theme.light.css";
+
+:host {
+	/* Override of silver.css variables. */
+	--blockquote-background-color: hsl(var(--hsla-pane-1));
+	--blockquote-border-color: hsl(var(--hsl-snapshot-accent));
+	--list-marker-color: hsl(var(--hsl-snapshot-accent));
+
+	/* Override of light/dark-dependent variables. */
+	--foreground-color: hsl(var(--hsl-text-foreground));
+	--background-color: transparent;
+	--textlink-foreground-color: hsl(var(--hsl-snapshot-accent));
+	--pre-background-color: hsl(var(--hsla-pane-1));
+
+	/* Curried from styles defined in silver.css. Less horizontal padding since snapshots already have padded container. */
+	display: flex;
+	flex-flow: column nowrap;
+	width: calc(100% - 2rem);
+	height: calc(100% - 1.5rem);
+	padding: 0 max(1rem, 50% - 40ch);
+
+	opacity: 0;
+	transition: opacity var(--transition-time);
+}
+
+:host(.loaded) {
+	opacity: 1;
+}
+
+:host(.disabled) {
+	pointer-events: none;
+}
+
+emilia-icon {
+	margin: 1.5rem auto;
+}
+
+article {
+	padding: 0 1.5rem;
+
+	background-color: hsl(var(--hsla-pane-1));
+	border-radius: 0.5rem;
+	box-shadow: 0 0 0.5rem 0.5rem hsl(var(--hsla-pane-shadow));
+}
+
+/* Allows horizontal scrolling of tables wrapped inside it. */
+article div.table-wrapper {
+	overflow-x: auto;
+}
+
+@media (max-width: calc(1rem + 80ch)) {
+	:host {
+		width: 100%;
+		padding: 0;
+	}
+
+	article {
+		padding: 0 0.5rem;
+		border-radius: 0;
+	}
+}
+
+/* Print options for this ShadowRoot. */
+@media print {
+	:host {
+		width: auto;
+		height: auto;
+		padding: initial;
+	}
+
+	emilia-icon {
+		display: none;
+	}
+
+	article {
+		padding: 0;
+
+		box-shadow: none;
+	}
+}

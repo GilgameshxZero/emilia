@@ -1,3 +1,6 @@
 [submodule "rain"]
 	path = rain
 	url = ../rain.git
+[submodule "echidna/silver"]
+	path = echidna/silver
+	url = ../silver.git

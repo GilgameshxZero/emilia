@@ -1,0 +1,52 @@
+/* Animating the expansion/shrink is difficult. We can accomplish it via JS, by computing the pixel auto height of each tag menu item before transitioning its height between that and 0: <https://css-tricks.com/using-css-transitions-auto-dimensions/>. */
+@import "../styles/colors.css";
+@import "../../styles/scrollbar.css";
+
+:host {
+	display: flex;
+	flex-flow: column nowrap;
+
+	/* Hides rounded corner overflows without disrupting scroll behavior. */
+	overflow-x: hidden;
+	border-radius: 0.5rem;
+	box-shadow: 0 0 0.5rem 0.5rem hsl(var(--hsla-pane-shadow));
+	background-color: hsl(var(--hsla-pane-1));
+	opacity: 0;
+	transition: opacity var(--transition-time);
+}
+
+:host(.loaded) {
+	opacity: 1;
+}
+
+:host(.disabled) {
+	pointer-events: none;
+}
+
+@media (max-width: calc(1rem + 80ch)) {
+	:host {
+		position: revert;
+		width: revert;
+	}
+
+	:host > emilia-tag-menu-item {
+		display: flex;
+		height: 0;
+		margin: 0;
+
+		transition: opacity var(--transition-time),
+			background-color var(--transition-time), height var(--transition-time);
+	}
+
+	:host > emilia-tag-menu-item[selected] {
+		height: auto;
+	}
+
+	:host([expanded]) > emilia-tag-menu-item {
+		height: auto;
+	}
+
+	:host([expanded]) > emilia-tag-menu-item[selected] {
+		--chevron-scale-y: -100%;
+	}
+}

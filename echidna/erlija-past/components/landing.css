@@ -1,0 +1,17 @@
+:host {
+	display: flex;
+	flex-flow: row nowrap;
+	min-height: 100vh;
+
+	opacity: 0;
+	transition: opacity var(--transition-time);
+}
+
+:host(.loaded) {
+	opacity: 1;
+}
+
+/* Somehow, the background having -1 z-index will put it behind the body background, and it having 1 z-index will put it before all other elements. So we must increment the other elements instead. */
+:host > :not(emilia-background) {
+	z-index: 1;
+}

@@ -1,0 +1,37 @@
+:root,
+:host {
+	--hue-base-1: 227;
+	--hue-base-2: 246;
+	--hue-base-3: 320;
+	--hue-base-4: 355;
+	--hue-base-5: 49;
+	--hue-base-6: 94;
+
+	--hsl-base-1: var(--hue-base-1), 50%, 34%;
+	--hsl-base-2: var(--hue-base-2), 33%, 35%;
+	--hsl-base-3: var(--hue-base-3), 33%, 44%;
+	--hsl-base-4: var(--hue-base-4), 61%, 66%;
+	--hsl-base-5: var(--hue-base-5), 100%, 73%;
+	--hsl-base-6: var(--hue-base-6), 95%, 24%;
+
+	--hsl-background-4-5: 33, 82%, 71%;
+	--hsl-background-5-6: 55, 64%, 63%;
+
+	--hsl-text-foreground: var(--hue-base-2), 10%, 10%;
+	--hsl-text-foreground-inverse: var(--hue-base-5), 90%, 90%;
+	--hsl-snapshot-accent: var(--hue-base-4), 70%, 40%;
+
+	--saturation-pane: 10%;
+	--lightness-pane: 90%;
+	--alpha-pane: 0.45;
+	--hsla-pane-1: var(--hue-base-5), var(--saturation-pane),
+		var(--lightness-pane), var(--alpha-pane);
+	/* Two panes overlapping gives 100%-(100%-30%)^2 alpha. */
+	--hsla-pane-2: var(--hue-base-5), var(--saturation-pane),
+		var(--lightness-pane),
+		calc(1 - (1 - var(--alpha-pane)) * (1 - var(--alpha-pane)));
+
+	--hsla-pane-shadow: 0, 0%, 0%, 40%;
+
+	--alpha-icon-ready: 50%;
+}

@@ -1,0 +1,31 @@
+@import "styles/fonts.css";
+@import "styles/print.css";
+@import "styles/scrollbar.css";
+
+:root,
+:host {
+	--transition-time: 0.5s;
+}
+
+html {
+	/* Increasing font size in horizontal view is an accessibility feature and should not be disabled. */
+	/* -webkit-text-size-adjust: 100%; */
+
+	background-color: black;
+
+	/* We can choose to avoid notches and rounded corners, but generally this isn’t worth the real estate loss. */
+	/* padding: env(safe-area-inset-top) env(safe-area-inset-right)
+		env(safe-area-inset-bottom) env(safe-area-inset-left); */
+}
+
+body {
+	margin: 0;
+
+	overflow: overlay;
+	opacity: 0;
+	transition: opacity var(--transition-time);
+}
+
+.loaded {
+	opacity: 1;
+}
