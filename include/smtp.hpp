@@ -14,25 +14,13 @@ namespace Emilia::Smtp {
 	class Worker : public Rain::Networking::Smtp::Worker<
 									 Rain::Networking::Smtp::Request,
 									 Rain::Networking::Smtp::Response,
-									 1 << 10,
-									 1 << 10,
-									 60000,
-									 60000,
 									 Rain::Networking::Ipv6FamilyInterface,
-									 Rain::Networking::StreamTypeInterface,
-									 Rain::Networking::TcpProtocolInterface,
 									 Rain::Networking::NoLingerSocketOption> {
 		private:
 		using SuperWorker = Rain::Networking::Smtp::Worker<
 			Rain::Networking::Smtp::Request,
 			Rain::Networking::Smtp::Response,
-			1 << 10,
-			1 << 10,
-			60000,
-			60000,
 			Rain::Networking::Ipv6FamilyInterface,
-			Rain::Networking::StreamTypeInterface,
-			Rain::Networking::TcpProtocolInterface,
 			Rain::Networking::NoLingerSocketOption>;
 
 		bool authenticated{false};
@@ -66,25 +54,13 @@ namespace Emilia::Smtp {
 	class Client : public Rain::Networking::Smtp::Client<
 									 Rain::Networking::Smtp::Request,
 									 Rain::Networking::Smtp::Response,
-									 1 << 10,
-									 1 << 10,
-									 60000,
-									 60000,
 									 Rain::Networking::Ipv4FamilyInterface,
-									 Rain::Networking::StreamTypeInterface,
-									 Rain::Networking::TcpProtocolInterface,
 									 Rain::Networking::NoLingerSocketOption> {
 		private:
 		using SuperClient = Rain::Networking::Smtp::Client<
 			Rain::Networking::Smtp::Request,
 			Rain::Networking::Smtp::Response,
-			1 << 10,
-			1 << 10,
-			60000,
-			60000,
 			Rain::Networking::Ipv4FamilyInterface,
-			Rain::Networking::StreamTypeInterface,
-			Rain::Networking::TcpProtocolInterface,
 			Rain::Networking::NoLingerSocketOption>;
 
 		using SuperClient::SuperClient;
@@ -106,8 +82,6 @@ namespace Emilia::Smtp {
 	class Server : public Rain::Networking::Smtp::Server<
 									 Worker,
 									 Rain::Networking::Ipv6FamilyInterface,
-									 Rain::Networking::StreamTypeInterface,
-									 Rain::Networking::TcpProtocolInterface,
 									 Rain::Networking::DualStackSocketOption,
 									 Rain::Networking::NoLingerSocketOption> {
 		// Allow state access.
@@ -118,8 +92,6 @@ namespace Emilia::Smtp {
 		using SuperServer = Rain::Networking::Smtp::Server<
 			Worker,
 			Rain::Networking::Ipv6FamilyInterface,
-			Rain::Networking::StreamTypeInterface,
-			Rain::Networking::TcpProtocolInterface,
 			Rain::Networking::DualStackSocketOption,
 			Rain::Networking::NoLingerSocketOption>;
 

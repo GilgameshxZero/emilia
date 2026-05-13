@@ -60,25 +60,13 @@ namespace Emilia::Http {
 	class Worker : public Rain::Networking::Http::Worker<
 									 Rain::Networking::Http::Request,
 									 Rain::Networking::Http::Response,
-									 1 << 16,
-									 1 << 16,
-									 60000,
-									 60000,
 									 Rain::Networking::Ipv6FamilyInterface,
-									 Rain::Networking::StreamTypeInterface,
-									 Rain::Networking::TcpProtocolInterface,
 									 Rain::Networking::NoLingerSocketOption> {
 		private:
 		using SuperWorker = Rain::Networking::Http::Worker<
 			Rain::Networking::Http::Request,
 			Rain::Networking::Http::Response,
-			1 << 16,
-			1 << 16,
-			60000,
-			60000,
 			Rain::Networking::Ipv6FamilyInterface,
-			Rain::Networking::StreamTypeInterface,
-			Rain::Networking::TcpProtocolInterface,
 			Rain::Networking::NoLingerSocketOption>;
 
 		public:
@@ -146,8 +134,6 @@ namespace Emilia::Http {
 	class Server : public Rain::Networking::Http::Server<
 									 Worker,
 									 Rain::Networking::Ipv6FamilyInterface,
-									 Rain::Networking::StreamTypeInterface,
-									 Rain::Networking::TcpProtocolInterface,
 									 Rain::Networking::DualStackSocketOption,
 									 Rain::Networking::NoLingerSocketOption> {
 		// Allow state access.
@@ -157,8 +143,6 @@ namespace Emilia::Http {
 		using SuperServer = Rain::Networking::Http::Server<
 			Worker,
 			Rain::Networking::Ipv6FamilyInterface,
-			Rain::Networking::StreamTypeInterface,
-			Rain::Networking::TcpProtocolInterface,
 			Rain::Networking::DualStackSocketOption,
 			Rain::Networking::NoLingerSocketOption>;
 
