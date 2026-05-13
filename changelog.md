@@ -1,5 +1,17 @@
 # Changelog
 
+## 8.5.25
+
+1. Push `rain` to `7.5.1`, which removes the need to specify TCP buffer size and stream timeouts, as well as the TCP family and Stream type for sockets which inherit TCP sockets.
+2. Implement IP & receiving blocklist for SMTP, via serializer for a version-controlled file `.smtp.ser`.
+	1. Peer hostname is now logged as an `X-Emilia` header in the envelope.
+3. Update retries to 8x over a 2-hour period, with 2x the normal penalty for a 5xx code.
+4. Reformat and upgrade makefile to new standards.
+	1. `*.assets` renamed to `*.asset`.
+	2. 60 line length.
+5. `echidna` removed as submodule and instead included inline.
+6. Enable `slush` symlink out.
+
 ## 8.5.24
 
 1. Fix `trigger outbox` bug which fails due to abuse of `std::set`.
