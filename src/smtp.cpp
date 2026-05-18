@@ -238,8 +238,10 @@ namespace Emilia::Smtp {
 				// De-serialize blocklists. May throw if format is
 				// invalid.
 				std::cout << "De-serializing..." << std::endl;
+				std::ifstream deserializeStream(
+					this->serializeFile, std::ios_base::binary);
 				Rain::Data::Deserializer deserializer(
-					this->serializeFile);
+					deserializeStream);
 				deserializer >> this->blockMailMailbox >>
 					this->blockPeerHostNode;
 			},
@@ -485,7 +487,9 @@ namespace Emilia::Smtp {
 		});
 	}
 	Server::~Server() {
-		Rain::Data::Serializer serializer(this->serializeFile);
+		std::ofstream serializeStream(
+			this->serializeFile, std::ios_base::binary);
+		Rain::Data::Serializer serializer(serializeStream);
 		serializer << this->blockMailMailbox
 							 << this->blockPeerHostNode;
 
