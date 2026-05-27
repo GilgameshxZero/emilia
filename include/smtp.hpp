@@ -11,11 +11,12 @@
 namespace Emilia::Smtp {
 	class Server;
 
-	class Worker : public Rain::Networking::Smtp::Worker<
-									 Rain::Networking::Smtp::Request,
-									 Rain::Networking::Smtp::Response,
-									 Rain::Networking::Ipv6FamilyInterface,
-									 Rain::Networking::NoLingerSocketOption> {
+	class Worker :
+		public Rain::Networking::Smtp::Worker<
+			Rain::Networking::Smtp::Request,
+			Rain::Networking::Smtp::Response,
+			Rain::Networking::Ipv6FamilyInterface,
+			Rain::Networking::NoLingerSocketOption> {
 		private:
 		using SuperWorker = Rain::Networking::Smtp::Worker<
 			Rain::Networking::Smtp::Request,
@@ -51,11 +52,12 @@ namespace Emilia::Smtp {
 			std::string const &) override;
 	};
 
-	class Client : public Rain::Networking::Smtp::Client<
-									 Rain::Networking::Smtp::Request,
-									 Rain::Networking::Smtp::Response,
-									 Rain::Networking::Ipv4FamilyInterface,
-									 Rain::Networking::NoLingerSocketOption> {
+	class Client :
+		public Rain::Networking::Smtp::Client<
+			Rain::Networking::Smtp::Request,
+			Rain::Networking::Smtp::Response,
+			Rain::Networking::Ipv4FamilyInterface,
+			Rain::Networking::NoLingerSocketOption> {
 		private:
 		using SuperClient = Rain::Networking::Smtp::Client<
 			Rain::Networking::Smtp::Request,
@@ -79,11 +81,12 @@ namespace Emilia::Smtp {
 		virtual Response &recv(Response &) override;
 	};
 
-	class Server : public Rain::Networking::Smtp::Server<
-									 Worker,
-									 Rain::Networking::Ipv6FamilyInterface,
-									 Rain::Networking::DualStackSocketOption,
-									 Rain::Networking::NoLingerSocketOption> {
+	class Server :
+		public Rain::Networking::Smtp::Server<
+			Worker,
+			Rain::Networking::Ipv6FamilyInterface,
+			Rain::Networking::DualStackSocketOption,
+			Rain::Networking::NoLingerSocketOption> {
 		// Allow state access.
 		friend Worker;
 		friend Client;

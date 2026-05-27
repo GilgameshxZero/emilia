@@ -4,23 +4,24 @@
 
 #include <smtp.hpp>
 
-#include <emilia.hpp>
 #include "rain/data/serializer.hpp"
 #include "rain/error/consume_throwable.hpp"
 #include "rain/networking/smtp/mailbox.hpp"
+#include <emilia.hpp>
+
 
 namespace Emilia::Smtp {
 	Worker::Worker(
 		NativeSocket nativeSocket,
 		SocketInterface *interrupter,
-		Server &server)
-			: SuperWorker(nativeSocket, interrupter),
-				server(server) {}
+		Server &server) :
+		SuperWorker(nativeSocket, interrupter),
+		server(server) {}
 	bool Worker::onInitialResponse() {
 		this->send(
 			{StatusCode::SERVICE_READY,
-			 {{"emilia " STRINGIFY(EMILIA_VERSION_MAJOR) "." STRINGIFY(EMILIA_VERSION_MINOR) "." STRINGIFY(EMILIA_VERSION_REVISION) "." STRINGIFY(EMILIA_VERSION_BUILD) " / rain " STRINGIFY(
-				 RAIN_VERSION_MAJOR) "." STRINGIFY(RAIN_VERSION_MINOR) "." STRINGIFY(RAIN_VERSION_REVISION) "." STRINGIFY(RAIN_VERSION_BUILD)}}});
+				{{"emilia " STRINGIFY(EMILIA_VERSION_MAJOR) "." STRINGIFY(EMILIA_VERSION_MINOR) "." STRINGIFY(EMILIA_VERSION_REVISION) "." STRINGIFY(EMILIA_VERSION_BUILD) " / rain " STRINGIFY(
+					RAIN_VERSION_MAJOR) "." STRINGIFY(RAIN_VERSION_MINOR) "." STRINGIFY(RAIN_VERSION_REVISION) "." STRINGIFY(RAIN_VERSION_BUILD)}}});
 		return false;
 	}
 	void Worker::send(Response &res) {
@@ -41,15 +42,15 @@ namespace Emilia::Smtp {
 	Worker::ResponseAction Worker::onHelo(Request &) {
 		return {
 			{StatusCode::REQUEST_COMPLETED,
-			 {"gilgamesh.cc", "AUTH LOGIN"}}};
+				{"gilgamesh.cc", "AUTH LOGIN"}}};
 	}
 	Worker::ResponseAction Worker::onEhlo(Request &) {
 		return {
 			{StatusCode::REQUEST_COMPLETED,
-			 {"gilgamesh.cc",
-				"AUTH LOGIN",
-				"8BITMIME",
-				"SMTPUTF8"}}};
+				{"gilgamesh.cc",
+					"AUTH LOGIN",
+					"8BITMIME",
+					"SMTPUTF8"}}};
 	}
 	Worker::ResponseAction Worker::onMailMailbox(
 		Mailbox const &mailbox) {
@@ -83,7 +84,7 @@ namespace Emilia::Smtp {
 			this->server.smtpForward.host.node.empty()) {
 			return {
 				{StatusCode::TRANSACTION_FAILED,
-				 {{"No forwarding configured."}}}};
+					{{"No forwarding configured."}}}};
 		}
 
 		// Receive and save to a file, whose filename is
@@ -144,9 +145,8 @@ namespace Emilia::Smtp {
 			std::cout << "Aborted " << this->mailFrom.value()
 								<< " > " << this->rcptTo << " from "
 								<< this->peerHost() << "." << std::endl;
-			return {
-				{StatusCode::
-					 REQUEST_NOT_TAKEN_MAILBOX_UNAVAILABLE_PERMANENT}};
+			return {{StatusCode::
+					REQUEST_NOT_TAKEN_MAILBOX_UNAVAILABLE_PERMANENT}};
 		}
 
 		// Push the new envelopes to the outbox for the Server
@@ -204,8 +204,9 @@ namespace Emilia::Smtp {
 	Client::Client(
 		std::vector<std::pair<std::size_t, std::string>> const
 			&mxRecords,
-		Server &server)
-			: SuperClient(mxRecords, 25), server(server) {}
+		Server &server) :
+		SuperClient(mxRecords, 25),
+		server(server) {}
 	void Client::send(Request &req) {
 		if (this->server.echo) {
 			std::cout << "SMTP to " << this->peerHost() << ":\n"
@@ -227,12 +228,12 @@ namespace Emilia::Smtp {
 		std::atomic_bool const &echo,
 		Rain::Networking::Smtp::Mailbox const &smtpForward,
 		std::string const &smtpPassword,
-		std::string const &serializeFile)
-			: SuperServer(host),
-				echo(echo),
-				smtpForward(smtpForward),
-				smtpPassword(smtpPassword),
-				serializeFile(serializeFile) {
+		std::string const &serializeFile) :
+		SuperServer(host),
+		echo(echo),
+		smtpForward(smtpForward),
+		smtpPassword(smtpPassword),
+		serializeFile(serializeFile) {
 		Rain::Error::consumeThrowable(
 			[this]() {
 				// De-serialize blocklists. May throw if format is
@@ -273,8 +274,9 @@ namespace Emilia::Smtp {
 									// Assume we have exclusive lock. Move all
 									// envelopes we want to send from the
 									// outbox to toAttempt.
-									for (auto it{this->outbox.begin()};
-											 it != this->outbox.end();) {
+									for (
+										auto it{this->outbox.begin()};
+										it != this->outbox.end();) {
 										if (
 											it->status !=
 											Envelope::Status::PENDING) {
@@ -359,8 +361,9 @@ namespace Emilia::Smtp {
 								}
 								client.send(
 									{Command::MAIL,
-									 "FROM:<" +
-										 static_cast<std::string>(from) + ">"});
+										"FROM:<" +
+											static_cast<std::string>(from) +
+											">"});
 								{
 									auto res = client.recv();
 									if (
@@ -371,8 +374,8 @@ namespace Emilia::Smtp {
 								}
 								client.send(
 									{Command::RCPT,
-									 "TO:<" + static_cast<std::string>(to) +
-										 ">"});
+										"TO:<" + static_cast<std::string>(to) +
+											">"});
 								{
 									auto res = client.recv();
 									if (

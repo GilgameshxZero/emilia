@@ -197,8 +197,9 @@ int main(int argc, char const *argv[]) {
 					std::unique_lock lck(smtpServer->outboxMtx);
 					std::cout << smtpServer->outbox.size()
 										<< " total in outbox." << std::endl;
-					for (auto it = smtpServer->outbox.begin();
-							 it != smtpServer->outbox.end();) {
+					for (
+						auto it = smtpServer->outbox.begin();
+						it != smtpServer->outbox.end();) {
 						if (
 							it->status ==
 							Emilia::Envelope::Status::PENDING) {
@@ -213,8 +214,9 @@ int main(int argc, char const *argv[]) {
 					std::unique_lock lck(smtpServer->outboxMtx);
 					auto timeNow{std::chrono::steady_clock::now()};
 					std::vector<Emilia::Envelope> toAttempt;
-					for (auto it{smtpServer->outbox.begin()};
-							 it != smtpServer->outbox.end();) {
+					for (
+						auto it{smtpServer->outbox.begin()};
+						it != smtpServer->outbox.end();) {
 						if (
 							it->status !=
 							Emilia::Envelope::Status::PENDING) {

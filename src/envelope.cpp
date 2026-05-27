@@ -12,13 +12,13 @@ namespace Emilia {
 		std::chrono::steady_clock::time_point attemptTime,
 		Rain::Networking::Smtp::Mailbox const &from,
 		Rain::Networking::Smtp::Mailbox const &to,
-		std::filesystem::path const &data)
-			: status(status),
-				attempt(attempt),
-				attemptTime(attemptTime),
-				from(from),
-				to(to),
-				data(data) {}
+		std::filesystem::path const &data) :
+		status(status),
+		attempt(attempt),
+		attemptTime(attemptTime),
+		from(from),
+		to(to),
+		data(data) {}
 	bool Envelope::operator<(Envelope const &other) const {
 		// PENDING envelopes are always sorted first. Everything
 		// else is sorted by lastAttempt. Stale envelopes are

@@ -1,31 +1,53 @@
 {
-	BasedOnStyle: Chromium,
-
+	# clang-format currently has no option to indent only once
+	# after scope resolution `::`.
+	# Furthermore, alignment of open brackets on a return line
+	# fails to use ContinuationIndentWidth and instead adds
+	# the block indent.
+	# Furthermore, stream operators are always aligned, even
+	# when they have no reason to be. Ternary operators are
+	# also incorrectly aligned despite
+	# `AlignOperands: DontAlign`.
 	UseTab: Always,
 	TabWidth: 2,
-	PointerAlignment: Right,
-
-	NamespaceIndentation: All,
-	FixNamespaceComments: false,
-	AccessModifierOffset: 0,
-	IndentCaseLabels: true,
-
-	# `clang-format` may be missing a feature to align chained method calls properly.
-	# <https://stackoverflow.com/questions/39779985/how-to-control-clang-format-indentation-of-chained-method-calls>.
-	AlignAfterOpenBracket: AlwaysBreak,
-	AlignOperands: false,
 	ContinuationIndentWidth: 2,
-
-	BinPackArguments: false,
-	BinPackParameters: false,
-	AlignConsecutiveDeclarations: false,
-	AllowShortIfStatementsOnASingleLine: true,
-	AllowShortLoopsOnASingleLine: true,
-
-	AlignTrailingComments: false,
-	ReflowComments: true,
+	ConstructorInitializerIndentWidth: 2,
 	ColumnLimit: 60,
 
 	IncludeBlocks: Preserve,
-	SortUsingDeclarations: false
+	SortUsingDeclarations: Never,
+	
+	PointerAlignment: Right,
+	AccessModifierOffset: 0,
+	IndentCaseLabels: true,
+	IndentPPDirectives: BeforeHash,
+	NamespaceIndentation: All,
+	BreakTemplateDeclarations: true,
+	SpaceAfterTemplateKeyword: false,
+	
+	AlignTrailingComments: false,
+	ReflowComments: true,
+	FixNamespaceComments: false,
+	AllowShortIfStatementsOnASingleLine: true,
+	AllowShortLoopsOnASingleLine: true,
+
+	BinPackArguments: false,
+	BinPackParameters: false,
+	AlignAfterOpenBracket: false,
+	AlignOperands: DontAlign,
+	AlignConsecutiveDeclarations: false,
+	AlignEscapedNewlines: DontAlign,
+	AllowAllParametersOfDeclarationOnNextLine: false,
+	BreakAfterOpenBracketBracedList: true,
+	BreakAfterOpenBracketFunction: true,
+	BreakAfterOpenBracketIf: true,
+	BreakAfterOpenBracketLoop: true,
+	BreakAfterOpenBracketSwitch: true,
+	BreakInheritanceList: AfterColon,
+	BreakConstructorInitializers: AfterColon,
+	PackConstructorInitializers: CurrentLine,
+	BreakAfterReturnType: Automatic,
+	IndentWrappedFunctionNames: true,
+
+	PenaltyReturnTypeOnItsOwnLine: 95,
 }

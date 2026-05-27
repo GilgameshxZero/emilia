@@ -57,11 +57,12 @@ Storyworlds:
 namespace Emilia::Http {
 	class Server;
 
-	class Worker : public Rain::Networking::Http::Worker<
-									 Rain::Networking::Http::Request,
-									 Rain::Networking::Http::Response,
-									 Rain::Networking::Ipv6FamilyInterface,
-									 Rain::Networking::NoLingerSocketOption> {
+	class Worker :
+		public Rain::Networking::Http::Worker<
+			Rain::Networking::Http::Request,
+			Rain::Networking::Http::Response,
+			Rain::Networking::Ipv6FamilyInterface,
+			Rain::Networking::NoLingerSocketOption> {
 		private:
 		using SuperWorker = Rain::Networking::Http::Worker<
 			Rain::Networking::Http::Request,
@@ -81,8 +82,8 @@ namespace Emilia::Http {
 		// Server state.
 		Server &server;
 
-		virtual std::vector<RequestFilter> const &filters()
-			override;
+		virtual std::vector<RequestFilter> const &
+			filters() override;
 
 		ResponseAction getApiPing(
 			Request &,
@@ -131,11 +132,12 @@ namespace Emilia::Http {
 			std::filesystem::path const &);
 	};
 
-	class Server : public Rain::Networking::Http::Server<
-									 Worker,
-									 Rain::Networking::Ipv6FamilyInterface,
-									 Rain::Networking::DualStackSocketOption,
-									 Rain::Networking::NoLingerSocketOption> {
+	class Server :
+		public Rain::Networking::Http::Server<
+			Worker,
+			Rain::Networking::Ipv6FamilyInterface,
+			Rain::Networking::DualStackSocketOption,
+			Rain::Networking::NoLingerSocketOption> {
 		// Allow state access.
 		friend Worker;
 

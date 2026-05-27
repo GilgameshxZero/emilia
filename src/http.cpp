@@ -4,6 +4,8 @@
 
 #include <http.hpp>
 
+#include <../build/version.hpp>
+#include <../rain/build/version.hpp>
 #include <emilia.hpp>
 #include <envelope.hpp>
 
@@ -16,12 +18,14 @@ namespace Emilia::Http {
 	Worker::Worker(
 		NativeSocket nativeSocket,
 		SocketInterface *interrupter,
-		Server &server)
-			: SuperWorker(nativeSocket, interrupter),
-				server(server) {}
+		Server &server) :
+		SuperWorker(nativeSocket, interrupter),
+		server(server) {}
 	void Worker::send(Response &res) {
 		// Postprocess to add server signature.
-		res.headers.server("emilia " STRINGIFY(EMILIA_VERSION_MAJOR) "." STRINGIFY(EMILIA_VERSION_MINOR) "." STRINGIFY(EMILIA_VERSION_REVISION) "." STRINGIFY(EMILIA_VERSION_BUILD) " / rain " STRINGIFY(RAIN_VERSION_MAJOR) "." STRINGIFY(RAIN_VERSION_MINOR) "." STRINGIFY(RAIN_VERSION_REVISION) "." STRINGIFY(RAIN_VERSION_BUILD));
+		res.headers.server(
+			"emilia " STRINGIFY(EMILIA_VERSION_MAJOR) "." STRINGIFY(EMILIA_VERSION_MINOR) "." STRINGIFY(EMILIA_VERSION_REVISION) "." STRINGIFY(EMILIA_VERSION_BUILD) " / rain " STRINGIFY(
+				RAIN_VERSION_MAJOR) "." STRINGIFY(RAIN_VERSION_MINOR) "." STRINGIFY(RAIN_VERSION_REVISION) "." STRINGIFY(RAIN_VERSION_BUILD));
 		if (this->server.echo) {
 			// Body is omitted since it can only be transmitted
 			// once!
@@ -46,7 +50,7 @@ namespace Emilia::Http {
 		return req;
 	}
 	std::vector<Worker::RequestFilter> const &
-	Worker::filters() {
+		Worker::filters() {
 		// Hosts are gilgamesh.cc, localhost, 127.0.0.1, or ::1.
 		// Refer to
 		// <https://en.cppreference.com/w/cpp/regex/ecmascript>.
@@ -58,50 +62,50 @@ namespace Emilia::Http {
 		static std::vector<Worker::RequestFilter> const filters{
 			// Responds immediately with 200.
 			{hostRegex,
-			 "/api/ping/?" + queryFragment,
-			 {Method::GET},
-			 &Worker::getApiPing},
+				"/api/ping/?" + queryFragment,
+				{Method::GET},
+				&Worker::getApiPing},
 			// Service status.
 			{hostRegex,
-			 "/api/status/?" + queryFragment,
-			 {Method::GET},
-			 &Worker::getApiStatus},
+				"/api/status/?" + queryFragment,
+				{Method::GET},
+				&Worker::getApiStatus},
 			// Outbox JSON.
 			{hostRegex,
-			 "/api/outbox.json/?" + queryFragment,
-			 {Method::GET},
-			 &Worker::getApiOutboxJson},
+				"/api/outbox.json/?" + queryFragment,
+				{Method::GET},
+				&Worker::getApiOutboxJson},
 			// Gets snapshots under a tag, sorted by date.
 			{hostRegex,
-			 "/api/tags/(.+).json/?" + queryFragment,
-			 {Method::GET},
-			 &Worker::getApiTagsJson},
+				"/api/tags/(.+).json/?" + queryFragment,
+				{Method::GET},
+				&Worker::getApiTagsJson},
 			// Gets information for a single snapshot.
 			{hostRegex,
-			 "/api/snapshots/(.+).json/?" + queryFragment,
-			 {Method::GET},
-			 &Worker::getApiSnapshotsJson},
+				"/api/snapshots/(.+).json/?" + queryFragment,
+				{Method::GET},
+				&Worker::getApiSnapshotsJson},
 			// Refreshes snapshot listings.
 			{hostRegex,
-			 "/api/snapshots/refresh/?" + queryFragment,
-			 {Method::POST},
-			 &Worker::getApiSnapshotsRefresh},
+				"/api/snapshots/refresh/?" + queryFragment,
+				{Method::POST},
+				&Worker::getApiSnapshotsRefresh},
 			// Noscript handlers.
 			{hostRegex,
-			 "/api/noscript.html/?" + queryFragment,
-			 {Method::GET},
-			 &Worker::getApiNoscriptHtml},
+				"/api/noscript.html/?" + queryFragment,
+				{Method::GET},
+				&Worker::getApiNoscriptHtml},
 			// User-facing endpoints, which resolve to index.html.
 			{hostRegex,
-			 "/((dashboard|map|timeline|snapshots/"
-			 "(?:[^\\?#\\.]+))/?)?" +
-				 queryFragment,
-			 {Method::GET},
-			 &Worker::getUserFacing},
+				"/((dashboard|map|timeline|snapshots/"
+				"(?:[^\\?#\\.]+))/?)?" +
+					queryFragment,
+				{Method::GET},
+				&Worker::getUserFacing},
 			{hostRegex,
-			 "/([^\\?#]*)" + queryFragment,
-			 {Method::GET},
-			 &Worker::getSharedStatic}};
+				"/([^\\?#]*)" + queryFragment,
+				{Method::GET},
+				&Worker::getSharedStatic}};
 
 		return filters;
 	}
@@ -110,7 +114,7 @@ namespace Emilia::Http {
 		std::smatch const &) {
 		return {
 			{StatusCode::OK,
-			 {{{"Access-Control-Allow-Origin", "*"}}}}};
+				{{{"Access-Control-Allow-Origin", "*"}}}}};
 	}
 	Worker::ResponseAction Worker::getApiStatus(
 		Request &req,
@@ -122,24 +126,34 @@ namespace Emilia::Http {
 		Rain::Time::localtime_r(&time, &timeData);
 
 		std::stringstream ss;
-		ss << "emilia " STRINGIFY(EMILIA_VERSION_MAJOR) "." STRINGIFY(EMILIA_VERSION_MINOR) "." STRINGIFY(EMILIA_VERSION_REVISION) "." STRINGIFY(EMILIA_VERSION_BUILD) " / rain " STRINGIFY(RAIN_VERSION_MAJOR) "." STRINGIFY(RAIN_VERSION_MINOR) "." STRINGIFY(RAIN_VERSION_REVISION) "." STRINGIFY(RAIN_VERSION_BUILD) << '\n'
-			 << "Build: " << (Rain::Platform::isDebug() ? "Debug" : "Release")
-			 << ". Platform: " << Rain::Platform::getPlatform() << ".\n"
-			 << '\n'
-			 << "Hello world, " << this->peerHost() << ". I am " << this->host()
-			 << ".\n"
-			 << "Server time:  " << std::put_time(&timeData, "%F %T %z") << ".\n"
-			 << "Server start: "
-			 << std::put_time(&this->server.processBegin, "%F %T %z") << ".\n"
-			 << '\n'
-			 << "HTTP threads/workers: " << this->server.threads() << " / "
-			 << this->server.workers() << ".\n"
-			 << "SMTP threads/workers: " << this->server.smtpServer->threads() << " / "
-			 << this->server.smtpServer->workers() << ".\n"
-			 << '\n'
-			 << "Your request:\n"
-			 << req.method << ' ' << req.target << ' ' << req.version << '\n'
-			 << req.headers << '\n';
+		ss
+			<< "emilia " STRINGIFY(EMILIA_VERSION_MAJOR) "." STRINGIFY(EMILIA_VERSION_MINOR) "." STRINGIFY(EMILIA_VERSION_REVISION) "." STRINGIFY(EMILIA_VERSION_BUILD) " / rain " STRINGIFY(
+					 RAIN_VERSION_MAJOR) "." STRINGIFY(RAIN_VERSION_MINOR) "." STRINGIFY(RAIN_VERSION_REVISION) "." STRINGIFY(RAIN_VERSION_BUILD)
+			<< '\n'
+			<< "Build: "
+			<< (Rain::Platform::isDebug() ? "Debug" : "Release")
+			<< ". Platform: " << Rain::Platform::getPlatform()
+			<< ".\n"
+			<< '\n'
+			<< "Hello world, " << this->peerHost() << ". I am "
+			<< this->host() << ".\n"
+			<< "Server time:  "
+			<< std::put_time(&timeData, "%F %T %z") << ".\n"
+			<< "Server start: "
+			<< std::put_time(
+					 &this->server.processBegin, "%F %T %z")
+			<< ".\n"
+			<< '\n'
+			<< "HTTP threads/workers: " << this->server.threads()
+			<< " / " << this->server.workers() << ".\n"
+			<< "SMTP threads/workers: "
+			<< this->server.smtpServer->threads() << " / "
+			<< this->server.smtpServer->workers() << ".\n"
+			<< '\n'
+			<< "Your request:\n"
+			<< req.method << ' ' << req.target << ' '
+			<< req.version << '\n'
+			<< req.headers << '\n';
 
 		std::size_t bodyLen = 0;
 		char buffer[1 << 10];
@@ -156,10 +170,10 @@ namespace Emilia::Http {
 		ss.seekg(0, std::ios::beg);
 		return {
 			{StatusCode::OK,
-			 {{{"Content-Type", "text/plain"},
-				 {"Content-Length", std::to_string(ssLen)},
-				 {"Access-Control-Allow-Origin", "*"}}},
-			 std::move(*ss.rdbuf())}};
+				{{{"Content-Type", "text/plain"},
+					{"Content-Length", std::to_string(ssLen)},
+					{"Access-Control-Allow-Origin", "*"}}},
+				std::move(*ss.rdbuf())}};
 	}
 	Worker::ResponseAction Worker::getApiOutboxJson(
 		Request &req,
@@ -167,7 +181,7 @@ namespace Emilia::Http {
 		if (this->maybeRejectAuthorization(req)) {
 			return {
 				{StatusCode::UNAUTHORIZED,
-				 {{{"Www-Authenticate", "Basic realm=\"api/outbox.json\""}}}}};
+					{{{"Www-Authenticate", "Basic realm=\"api/outbox.json\""}}}}};
 		}
 
 		std::stringstream ss;
@@ -211,8 +225,9 @@ namespace Emilia::Http {
 				streamEnvelope();
 				it++;
 			}
-			for (; it != this->server.smtpServer->outbox.end();
-					 it++) {
+			for (
+				; it != this->server.smtpServer->outbox.end();
+				it++) {
 				ss << ",\n";
 				streamEnvelope();
 			}
@@ -224,10 +239,10 @@ namespace Emilia::Http {
 		ss.seekg(0, std::ios::beg);
 		return {
 			{StatusCode::OK,
-			 {{{"Content-Type", "application/json"},
-				 {"Content-Length", std::to_string(ssLen)},
-				 {"Access-Control-Allow-Origin", "*"}}},
-			 std::move(*ss.rdbuf())}};
+				{{{"Content-Type", "application/json"},
+					{"Content-Length", std::to_string(ssLen)},
+					{"Access-Control-Allow-Origin", "*"}}},
+				std::move(*ss.rdbuf())}};
 	}
 	Worker::ResponseAction Worker::getApiTagsJson(
 		Request &,
@@ -243,8 +258,8 @@ namespace Emilia::Http {
 			// Also stream snapshot information so that FE does
 			// not need to make multiple requests.
 			auto streamSnapshot{
-				[this,
-				 &ss](std::vector<std::string>::const_iterator it) {
+				[this, &ss](
+					std::vector<std::string>::const_iterator it) {
 					Snapshot const &snapshot{
 						this->server.snapshots[*it]};
 					ss << "{\"name\": \"" << *it
@@ -268,10 +283,10 @@ namespace Emilia::Http {
 		ss.seekg(0, std::ios::beg);
 		return {
 			{StatusCode::OK,
-			 {{{"Content-Type", "application/json"},
-				 {"Content-Length", std::to_string(ssLen)},
-				 {"Access-Control-Allow-Origin", "*"}}},
-			 std::move(*ss.rdbuf())}};
+				{{{"Content-Type", "application/json"},
+					{"Content-Length", std::to_string(ssLen)},
+					{"Access-Control-Allow-Origin", "*"}}},
+				std::move(*ss.rdbuf())}};
 	}
 	Worker::ResponseAction Worker::getApiSnapshotsJson(
 		Request &,
@@ -288,10 +303,10 @@ namespace Emilia::Http {
 		ss.seekg(0, std::ios::beg);
 		return {
 			{StatusCode::OK,
-			 {{{"Content-Type", "application/json"},
-				 {"Content-Length", std::to_string(ssLen)},
-				 {"Access-Control-Allow-Origin", "*"}}},
-			 std::move(*ss.rdbuf())}};
+				{{{"Content-Type", "application/json"},
+					{"Content-Length", std::to_string(ssLen)},
+					{"Access-Control-Allow-Origin", "*"}}},
+				std::move(*ss.rdbuf())}};
 	}
 	Worker::ResponseAction Worker::getApiSnapshotsRefresh(
 		Request &,
@@ -299,7 +314,7 @@ namespace Emilia::Http {
 		this->server.refreshSnapshots();
 		return {
 			{StatusCode::OK,
-			 {{{"Access-Control-Allow-Origin", "*"}}}}};
+				{{{"Access-Control-Allow-Origin", "*"}}}}};
 	}
 	Worker::ResponseAction Worker::getApiNoscriptHtml(
 		Request &,
@@ -394,10 +409,10 @@ namespace Emilia::Http {
 		ss.seekg(0, std::ios::beg);
 		return {
 			{StatusCode::OK,
-			 {{{"Content-Type", "text/html"},
-				 {"Content-Length", std::to_string(ssLen)},
-				 {"Access-Control-Allow-Origin", "*"}}},
-			 std::move(*ss.rdbuf())}};
+				{{{"Content-Type", "text/html"},
+					{"Content-Length", std::to_string(ssLen)},
+					{"Access-Control-Allow-Origin", "*"}}},
+				std::move(*ss.rdbuf())}};
 	}
 	Worker::ResponseAction Worker::getUserFacing(
 		Request &,
@@ -440,23 +455,22 @@ namespace Emilia::Http {
 				<< "</body></html>";
 			return {
 				{StatusCode::OK,
-				 {{{"Content-Type",
-						MediaType(file.value().extension().string())},
-					 {"Content-Length",
-						std::to_string(
-							std::filesystem::file_size(file.value()) +
-							435)},
-					 {"Cache-Control", "Max-Age=3600"},
-					 {"Access-Control-Allow-Origin", "*"}}},
-				 std::move(*ss.rdbuf())}};
+					{{{"Content-Type",
+							MediaType(file.value().extension().string())},
+						{"Content-Length",
+							std::to_string(
+								std::filesystem::file_size(file.value()) +
+								435)},
+						{"Cache-Control", "Max-Age=3600"},
+						{"Access-Control-Allow-Origin", "*"}}},
+					std::move(*ss.rdbuf())}};
 		}
 
 		return response;
 	}
 	bool Worker::maybeRejectAuthorization(Request &req) {
-		static std::string targetCredentials{
-			Rain::Networking::Http::Header::Authorization::
-				encodeBasicCredentials(
+		static std::string targetCredentials{Rain::Networking::
+				Http::Header::Authorization::encodeBasicCredentials(
 					Server::HTTP_USERNAME,
 					this->server.httpPassword)};
 
@@ -494,14 +508,15 @@ namespace Emilia::Http {
 		std::ifstream file(path, std::ios::binary);
 		return {
 			{StatusCode::OK,
-			 {{{"Content-Type",
-					MediaType(path.extension().string())},
-				 {"Content-Length",
-					std::to_string(std::filesystem::file_size(path))},
-				 // Cached by default.
-				 {"Cache-Control", "Max-Age=3600"},
-				 {"Access-Control-Allow-Origin", "*"}}},
-			 std::move(*file.rdbuf())}};
+				{{{"Content-Type",
+						MediaType(path.extension().string())},
+					{"Content-Length",
+						std::to_string(
+							std::filesystem::file_size(path))},
+					// Cached by default.
+					{"Cache-Control", "Max-Age=3600"},
+					{"Access-Control-Allow-Origin", "*"}}},
+				std::move(*file.rdbuf())}};
 	}
 
 	Server::Server(
@@ -509,17 +524,15 @@ namespace Emilia::Http {
 		std::string const &httpPassword,
 		std::tm const &processBegin,
 		std::unique_ptr<Emilia::Smtp::Server> &smtpServer,
-		std::atomic_bool const &echo)
-			: SuperServer(host),
-				httpPassword(httpPassword),
-				processBegin(processBegin),
-				smtpServer(smtpServer),
-				echo(echo) {
+		std::atomic_bool const &echo) :
+		SuperServer(host),
+		httpPassword(httpPassword),
+		processBegin(processBegin),
+		smtpServer(smtpServer),
+		echo(echo) {
 		this->refreshSnapshots();
 	}
-	Server::~Server() {
-		this->destruct();
-	}
+	Server::~Server() { this->destruct(); }
 	Worker Server::makeWorker(
 		NativeSocket nativeSocket,
 		SocketInterface *interrupter) {
@@ -543,13 +556,14 @@ namespace Emilia::Http {
 				"/utulek",
 				"/monochrome",
 				"/p794"};
-		for (auto const &subdirectory :
-				 SNAPSHOT_SUBDIRECTORIES) {
-			for (auto const &entry :
-					 std::filesystem::directory_iterator(
-						 snapshotsDirectory + subdirectory,
-						 std::filesystem::directory_options::
-							 follow_directory_symlink)) {
+		for (
+			auto const &subdirectory : SNAPSHOT_SUBDIRECTORIES) {
+			for (
+				auto const &entry :
+				std::filesystem::directory_iterator(
+					snapshotsDirectory + subdirectory,
+					std::filesystem::directory_options::
+						follow_directory_symlink)) {
 				if (entry.path().extension() != ".html") {
 					continue;
 				}
