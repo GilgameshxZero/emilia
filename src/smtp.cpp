@@ -6,9 +6,9 @@
 
 #include "rain/data/serializer.hpp"
 #include "rain/error/consume_throwable.hpp"
+#include "rain/math/sqrt.hpp"
 #include "rain/networking/smtp/mailbox.hpp"
 #include <emilia.hpp>
-
 
 namespace Emilia::Smtp {
 	Worker::Worker(
@@ -474,8 +474,10 @@ namespace Emilia::Smtp {
 								this->outbox.emplace(
 									Envelope::Status::PENDING,
 									it.attempt + 1,
+									// sqrt(N) backoff.
 									std::chrono::steady_clock::now() +
-										Envelope::RETRY_WAIT,
+										Envelope::RETRY_WAIT *
+											Rain::Math::sqrt(it.attempt + 1),
 									it.from,
 									it.to,
 									it.data);
