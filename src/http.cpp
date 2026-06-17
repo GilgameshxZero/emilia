@@ -1,5 +1,6 @@
 // Subclasses Rain::Networking::Http specializations for
 // custom HTTP server.
+#include "rain/string/string.hpp"
 #include <rain.hpp>
 
 #include <http.hpp>
@@ -9,6 +10,7 @@
 #include <emilia.hpp>
 #include <envelope.hpp>
 
+#include <random>
 #include <shared_mutex>
 
 namespace Emilia::Http {
@@ -125,6 +127,26 @@ namespace Emilia::Http {
 		std::tm timeData;
 		Rain::Time::localtime_r(&time, &timeData);
 
+		// Generate random data for a UUIDv4 and a 32-length hex
+		// password.
+		static std::random_device randomDevice;
+		static std::independent_bits_engine<
+			std::mt19937,
+			std::numeric_limits<unsigned char>::digits,
+			unsigned char>
+			independentBitsEngine(randomDevice());
+		std::array<unsigned char, 16> randomBytes[2];
+		// Important to pass with std::ref so that the IBE is
+		// modified.
+		std::generate(
+			randomBytes[0].begin(),
+			randomBytes[0].end(),
+			std::ref(independentBitsEngine));
+		std::generate(
+			randomBytes[1].begin(),
+			randomBytes[1].end(),
+			std::ref(independentBitsEngine));
+
 		std::stringstream ss;
 		ss
 			<< "emilia " STRINGIFY(EMILIA_VERSION_MAJOR) "." STRINGIFY(EMILIA_VERSION_MINOR) "." STRINGIFY(EMILIA_VERSION_REVISION) "." STRINGIFY(EMILIA_VERSION_BUILD) " / rain " STRINGIFY(
@@ -149,6 +171,14 @@ namespace Emilia::Http {
 			<< "SMTP threads/workers: "
 			<< this->server.smtpServer->threads() << " / "
 			<< this->server.smtpServer->workers() << ".\n"
+			<< '\n'
+			<< "UUIDv4: "
+			<< Rain::String::asHexStr(
+					 randomBytes[0],
+					 Rain::String::HexStrFormat::UUID_V4)
+			<< '\n'
+			<< "Raw:    " << Rain::String::asHexStr(randomBytes[1])
+			<< '\n'
 			<< '\n'
 			<< "Your request:\n"
 			<< req.method << ' ' << req.target << ' '
