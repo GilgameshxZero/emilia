@@ -1,13 +1,10 @@
 // Subclasses Rain::Networking::Smtp specializations for
 // custom SMTP server.
 #include <rain.hpp>
+#include <../rain/build/version.hpp>
 
 #include <smtp.hpp>
 
-#include "rain/data/serializer.hpp"
-#include "rain/error/consume_throwable.hpp"
-#include "rain/math/sqrt.hpp"
-#include "rain/networking/smtp/mailbox.hpp"
 #include <emilia.hpp>
 
 namespace Emilia::Smtp {

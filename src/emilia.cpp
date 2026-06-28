@@ -1,5 +1,4 @@
 #include <rain.hpp>
-
 #include <../rain/build/version.hpp>
 
 #include <emilia.hpp>
