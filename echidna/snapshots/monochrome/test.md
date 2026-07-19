@@ -51,7 +51,7 @@ forme|<pre><code>multi-line code blocks must be<br/>wrapped with HTML pre -> cod
 
 In some browsers, `autoplay` on a `video` element triggers fullscreen on a mobile device. We should be wary of this and only enable `autoplay` if this behavior is always desired, or case for mobile.
 
-<video src="test.md-assets/emilia.webm#large" autoplay loop muted></video>
+<video src="test.md-assets/emilia.mkv#large" autoplay loop muted></video>
 *<i>Another caption, this time on a `webm` with some $\LaTeX$, manually italicized. Auto-italicization is easier when the italicization occurs not at the boundaries of the caption.</i>*
 
 The CSS supports dark/light themes in VSCode webview preview. Upon printing to HTML, light/dark theme is set by system preference instead. This preference-dependence should be overwritten for purely light/dark themed websites.

@@ -8,7 +8,7 @@ emilia-snapshot-properties -->
 <p>Over the course of eight years and many builds, I have come to see a fledgling desire to steal my father's computer passwords transform into 7000 lines of C++, a sub-par webserver for HTTP and SMTP, and a wealth of experience about low-level WinAPI and network protocols that I'll probably never use again.</p>
 <p>Join me on a brief tour of the history of <code>Emilia</code>, from conception to discovery to implementation!</p>
 <p>This also includes a tour of the evolution of the Rain library, an abstraction layer I've built over the years as necessary.</p>
-<p><video src="a-brief-history-of-emilia.md-assets/emilia.webm" autoplay loop muted></video><br>
+<p><video src="a-brief-history-of-emilia.md-assets/emilia.mkv" autoplay loop muted></video><br>
 <em>A smiling Emilia (not the webserver).</em></p>
 <h2 id="early-years-with-c">Early Years with C++</h2>
 <p>C++ became my favorite language when I came to learn that it was capable to writing every application on a computer I had ever used. Unlike the higher-level languages, which would need to integrate other frameworks to build a complete application, C++ did not need any libraries beyond those provided by Windows to build everything I had used. My early passions for coding stemmed, like many, from a desire to create games like those which had give me so much joy.</p>
@@ -16,13 +16,13 @@ emilia-snapshot-properties -->
 <p>One of my more complete games, written in 2011, is called <code>Infection</code>.</p>
 <p>You run a lemonade stand and sell infected food to customers until you kill the entire population. Lemonade consists of three components: lemons, water and ice. The more of those three are infected, the more likely the customers will get infected. There's a bunch of mechanics regarding how the disease spreads and wanes, as well as how much the public trusts the food from your stand.</p>
 <p>It's like taking the worst parts of running an <em>actual</em> lemon stand and the Pandemic game and putting them together. Here's a short GIF of the game.</p>
-<p><video src="a-brief-history-of-emilia.md-assets/infection.webm" autoplay loop muted></video><br>
+<p><video src="a-brief-history-of-emilia.md-assets/infection.mkv" autoplay loop muted></video><br>
 <em>Me losing $11 selling very expensive, non-infected, lemonade. Not really worth it.</em></p>
 <p>Infection used multithreading to constantly evaluate the world-state and either print it or present menu options for selling lemonade. Multithreading and blocking on <code>cin</code> with <code>getch</code> for menu selection was non-trivial to implement. Perhaps most annoying was the time spent printing to <code>cout</code>, which would cause the console to flicker for a short second (visible in the GIF above) while the new world-state was displayed.</p>
 <p>There's two ways of solving the flickering problem. One: use <code>system(clear)</code>. However, as many on the web would tell you, this isn't very safe. The other option is to switch to a GUI. I heavily favored this option. After all, many of the games I played were graphical, and I wished to emulate them.</p>
 <h3 id="windows-api--gui">Windows API &amp; GUI</h3>
 <p>The first complete WinAPI GUI application I coded was called <code>TurboWord</code>. <code>TurboWord</code> was a flashcard application, which would organize vocabulary into sets and decks of flashcards, which could be edited and viewed and reviewed.</p>
-<p><video src="a-brief-history-of-emilia.md-assets/turboword.webm" autoplay loop muted></video><br>
+<p><video src="a-brief-history-of-emilia.md-assets/turboword.mkv" autoplay loop muted></video><br>
 <em>Example use of <code>TurboWord</code> with a pre-established library of flashcards.</em></p>
 <p>Looks simple, right? Well, it turns out that WinAPI doesn't give you much to work with. A lot of the behavior you may think obvious I had to implement myself.</p>
 <ul>
@@ -49,7 +49,7 @@ emilia-snapshot-properties -->
 <li>Calculate position and redraw elements on resize.</li>
 </ul>
 <p>It was a big task to complete <code>TurboWord</code>. My next GUI project, <code>Coder</code>, was never finished. <code>Coder</code> was an application to encode and decode with compression and encryption algorithms.</p>
-<p><video src="a-brief-history-of-emilia.md-assets/coder.webm" autoplay loop muted></video><br>
+<p><video src="a-brief-history-of-emilia.md-assets/coder.mkv" autoplay loop muted></video><br>
 <em>Example use of <code>Coder</code>.</em></p>
 <p>A you can imagine, all the components in <code>Coder</code> also had to be custom styled. To give an idea of what that means, here's the inside of the redraw function for the rectangle buttons from <code>TurboWord</code>. This redraw reads the state of the button and redraws it accordingly. It is called on any state change, which happens on mouse events. Most of the work of the code is in setting up all the drawing objects and registering with the WinAPI, and so very little is the actual drawing logic.</p>
 <pre><code class="language-c++">HPEN pen = <span class="hljs-built_in">CreatePen</span> (PS_SOLID, <span class="hljs-number">1</span>, <span class="hljs-built_in">RGB</span> (<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>)), orig_pen;
@@ -113,7 +113,7 @@ orig_font = <span class="hljs-built_in">reinterpret_cast</span>&lt;HFONT&gt;(<sp
 - Someone not talking about stealing passwords, probably.</p>
 </blockquote>
 <p>Knowing that moving forward with GUIs was a very tedious option, I looked to the other cool things I could do with programming. Viruses are pretty cool too. Here's my first attempt of a keylogger.</p>
-<p><video src="a-brief-history-of-emilia.md-assets/keylogger.webm" autoplay loop muted></video><br>
+<p><video src="a-brief-history-of-emilia.md-assets/keylogger.mkv" autoplay loop muted></video><br>
 <em>Demonstration of the keylogger, which saves its log to a local file <code>hi.txt</code>.</em></p>
 <p>I've attached a snippet of the beginning of the low-level keyboard hook function code below.</p>
 <pre><code class="language-c++">__declspec(dllexport) <span class="hljs-function">LRESULT CALLBACK <span class="hljs-title">handlekeys</span><span class="hljs-params">(<span class="hljs-type">int</span> code, WPARAM wp, LPARAM lp)</span>
@@ -245,7 +245,7 @@ string text;
 <span class="hljs-built_in">EndWSA</span> ();
 </code></pre>
 <p>It's not much, but it turns out game logic is difficult to write. And what if the other player was able to inject packages pretending to be my application to make illegal moves? I'd have to check that, and design a way to deal with that, and deal with inconsistent network connections, and find out how I would connect to external IPs instead of internal...</p>
-<p><video src="a-brief-history-of-emilia.md-assets/junqi.webm" autoplay loop muted></video><br>
+<p><video src="a-brief-history-of-emilia.md-assets/junqi.mkv" autoplay loop muted></video><br>
 <em>Connecting the client to the server, and having the server send messages to the client.</em></p>
 <p>However, this 军旗 application was a major step forward for me. This is the first time I was able to set up communications between two computers on the network (albeit, local). But I knew nothing about the big, vast IP network out there and how to communicate with it. Neither did I have the motivation to do so, when a browser would work just fine. It took me another three years to take my first step onto the web.</p>
 <h3 id="rainlibrary1">RainLibrary1</h3>
@@ -687,7 +687,7 @@ END
 <p>It might look quite long, but it's pretty short for a C++ webserver. <code>Monochrome2</code> ignored the entire request that it would receive. Instead, it would send back a static HTML string (which you can see in the code above) each time, on each connection, then close it immediately.</p>
 <p>At the same time, I registered the domain name <code>emilia-tan.com</code>, pointed it to my home IP, and linked my external port 80 to my internal port 80 and suddenly (after more firewall/router tweaking) my website was viewable online. I could access it with any web browser from anywhere, and see the plaintext I had sent back with my program.</p>
 <p>This is also the landmark when the name <code>Emilia</code> became used. At this point, however, the webserver was still called <code>Monochrome2</code>. Below is a GIF showing the webserver in action.</p>
-<p><video src="a-brief-history-of-emilia.md-assets/mono-2.webm" autoplay loop muted></video><br>
+<p><video src="a-brief-history-of-emilia.md-assets/mono-2.mkv" autoplay loop muted></video><br>
 <em>Start the webserver, and refresh the page a few times to see an in-memory counter increase.</em></p>
 <p>One of the most annoying problems at this stage in the history was the fact that my home IP was dynamic, and I would have to log onto GoDaddy every once in a while to update the DNS of <code>emilia-tan.com</code> to point back to my new home IP. Eventually, I solved this problem my hosting Emilia on a static IP AWS EC2 instance.</p>
 <h3 id="monochrome-3">Monochrome 3</h3>
@@ -1011,18 +1011,18 @@ contenttype = <span class="hljs-string">&quot;application/octet-stream&quot;</sp
 <p>The beginning of the code handles special processing for <code>POST requests</code>, which we want to delay until the entire <code>POST</code> request arrives. The rest of the code is wrapped in a large <code>if</code>. The <code>if</code> segment deals with the case where the browser requests a callable script (CGI, which we'll cover soon); in which case we want to make the necessary preparations to run the script and pipe its output back to the browser. The <code>else</code> segment responds to a file request, in which case we send back the fildata.</p>
 <p><code>Monochrome3</code> was pretty janky. As you can see above, I basically ignore all the headers that the browser sends, and simply send back the requested file and close the socket. There's a long series of <code>if</code>s in the middle of the code which set the <code>content-type</code> header of the HTTP response.</p>
 <p>For all that work, the front-end didn't look that different. It was only that this time, I could edit the webpage as an HTML instead of C++. And it's much more adaptable. The GIF below showcases <code>Monochrome3</code>.</p>
-<p><video src="a-brief-history-of-emilia.md-assets/mono-3.webm" autoplay loop muted></video><br>
+<p><video src="a-brief-history-of-emilia.md-assets/mono-3.mkv" autoplay loop muted></video><br>
 <em>Example use of <code>Monochrome3</code>. The webpage still displays <code>Monochrome2</code>, for some reason.</em></p>
 <p>It's pretty impressive that the server itself worked. Perhaps most impressive, however, was the ability to support CGI scripts.</p>
 <h3 id="cgi">CGI</h3>
 <p>CGI scripts are the beginnings of an actual backend for any website. Instead of returning the filedata, the webserver would instead run the file as an executable, pipe into it either a <code>POST</code> request from <code>stdin</code> or a <code>GET</code> request as part of the environment variable block. Then, webservers would typically take the output from <code>stdout</code> of the executable and pipe that back to the browser as a response.</p>
 <p>You can see this process of piping in the data and piping out the data to the browser in the code for <code>Monochrome3</code> above. <code>GET</code> is piped into <code>QUERY_STRING</code>, while <code>POST</code> is piped into <code>cin</code>.</p>
 <p>One of the first things I built was a directory browser called <code>FileExplorer</code> through several CGI scripts for uploading, deleting, and nagivating, allowing me to modify the files on my server back-end remotely! This meant that if I had something I wished to share with friends, I could simply upload it to my webserver, and give them a link to that!</p>
-<p><video src="a-brief-history-of-emilia.md-assets/mono-3-cgi.webm" autoplay loop muted></video><br>
+<p><video src="a-brief-history-of-emilia.md-assets/mono-3-cgi.mkv" autoplay loop muted></video><br>
 <em>Showcase of the directory browser <code>FileExplorer.exe</code>, which allows the browser to see files outside of the server root and modify them.</em></p>
 <p><code>FileExplorer</code> is as unsafe as unsafe can get. By putting <code>FileExplorer</code> on my website, I allow anyone who knows about it to change anything with my server machine directly. But, if the server is running on my local machine, it's also a good way to access the files I want remotely.</p>
 <p>An interesting detail you may be able to observe is in the URL for the <code>FileExplorer</code>, which takes a path script as a hex string starting with <code>A</code>, since many path names contain characters incompatible with URI accessors in the URL.</p>
-<p><video src="a-brief-history-of-emilia.md-assets/emilia-2.webm" autoplay loop muted></video><br>
+<p><video src="a-brief-history-of-emilia.md-assets/emilia-2.mkv" autoplay loop muted></video><br>
 <em>Another smiling Emilia (also not the webserver).</em></p>
 <h2 id="file-transfer-emiliabackup">File Transfer: EmiliaBackup</h2>
 <p>With all of this file transfer work, I decided that it would be cool to build a backup service for myself. I named this <code>EmiliaBackup</code>. In a way, this paralleled the development of <code>Monochrome3</code> by allowing me to familiarize myself with the WinAPI calls associated with the filesystem, but not having to deal with any HTTP or SMTP protocols. Instead, I build my own grassroots file transfer protocol.</p>
@@ -1680,7 +1680,7 @@ This script modifies the subscriber list for the mailing list.
 }
 </code></pre>
 <p>CGI scripts are fairly lightweight, even though they're implemented in C++.</p>
-<p><video src="a-brief-history-of-emilia.md-assets/cgi-emails.webm" autoplay loop muted></video><br>
+<p><video src="a-brief-history-of-emilia.md-assets/cgi-emails.mkv" autoplay loop muted></video><br>
 <em>Showcasing the calling and response of the CGI script on click of the <code>Submit</code> button on the homepage.</em></p>
 <h3 id="configuration">Configuration</h3>
 <p>Many of the magic numbers spread throughout <code>Monochrome3</code> have been moved to a configuration file.</p>
@@ -1752,7 +1752,7 @@ Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6
 HTTP Client connected from 194.147.32.109. Total: 7.
 </code></pre>
 <p>An abbreviated version of the log is output to the console. Below is a GIF demonstrating this in action.</p>
-<p><video src="a-brief-history-of-emilia.md-assets/console-output.webm" autoplay loop muted></video></p>
+<p><video src="a-brief-history-of-emilia.md-assets/console-output.mkv" autoplay loop muted></video></p>
 <p>The corresponding class in <code>rain-aeternum</code> is <code>LogStream</code>, which also has options to capture logs from <code>cout</code>, <code>cin</code>, <code>cerr</code>, and sockets.</p>
 <h3 id="emails--smtp">Emails &amp; SMTP</h3>
 <p>The SMTP server on <code>Emilia</code> is slightly more complicated than after the initial discovery. The internal state of the request during the handshake is managed by a function pointer to the callback to handle an incoming request. Otherwise, responses to the remote server are generally pretty standard and not very customizable. Since <code>Emilia</code> is also responsible for forwarding emails, it also contains an implementation of an SMTP client, which is not shown below.</p>
@@ -1858,10 +1858,10 @@ timeout <span class="hljs-number">1</span>
 </code></pre>
 <p>I actually wrote this one myself! Batch is hard...</p>
 <p>Here's how a typical deployment might look like, with the <code>sync</code> command.</p>
-<p><video src="a-brief-history-of-emilia.md-assets/sync.webm" autoplay loop muted></video><br>
+<p><video src="a-brief-history-of-emilia.md-assets/sync.mkv" autoplay loop muted></video><br>
 <em>Running the <code>sync</code> command. The remote server does not need to restart since we don't write to any locked files.</em></p>
 <h2 id="final-thoughts">Final Thoughts</h2>
-<p><video src="a-brief-history-of-emilia.md-assets/emilia-3.webm" autoplay loop muted></video><br>
+<p><video src="a-brief-history-of-emilia.md-assets/emilia-3.mkv" autoplay loop muted></video><br>
 <em>Yet another smiling Emilia (again, not the webserver).</em></p>
 <p>It's taken a very long time to learn everything I needed to know to make <code>Emilia</code> what it is today over the course of an entire eight years through experimentation. I'm sure I could have learned a fraction of what I know now by reading up on the protocols, but frankly, that would have been much less fun. Looking back, I treasure all the breakthroughs and discoveries I made while implementing <code>Emilia</code>. Now, with the server how it is, updates to it are generally quality-of-life updates and not too critical. The most exciting thing going forward would likely be the flexibility provided to me through the CGI scripts and exploiting that to make some cool web services. I'm wrestling with ideas of a music radio and a database service right now.</p>
 <p><code>Emilia</code> (and previously, <code>Monochrome3</code> and <code>PixivBot</code>) have always been solitary projects. I doubt they will ever change from that. I find a certain joy in sitting down and forgetting everything and coding on a project which has near-infinite potential but will also never be used by many more than just me. Sometimes, it may be frustrating, but most of the times its calming knowing that everything I need to know I can gather by myself and without anyone's help. I doubt <code>Emilia</code> will ever get more low-level than it is right now, but I would gladly welcome more fundamental challenges again.</p>
