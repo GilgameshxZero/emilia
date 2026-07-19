@@ -5,7 +5,7 @@ monochrome
 emilia-snapshot-properties -->
 <h1 id="a-brief-history-of-emilia">A Brief History of Emilia</h1>
 <p>December 25, 2018</p>
-<p>Over the course of eight years and many builds, I have come to see a fledgeling desire to steal my father's computer passwords transform into 7000 lines of C++, a sub-par webserver for HTTP and SMTP, and a wealth of experience about low-level WinAPI and network protocols that I'll probably never use again.</p>
+<p>Over the course of eight years and many builds, I have come to see a fledgling desire to steal my father's computer passwords transform into 7000 lines of C++, a sub-par webserver for HTTP and SMTP, and a wealth of experience about low-level WinAPI and network protocols that I'll probably never use again.</p>
 <p>Join me on a brief tour of the history of <code>Emilia</code>, from conception to discovery to implementation!</p>
 <p>This also includes a tour of the evolution of the Rain library, an abstraction layer I've built over the years as necessary.</p>
 <p><video src="a-brief-history-of-emilia.md-assets/emilia.webm" autoplay loop muted></video><br>
@@ -192,7 +192,7 @@ SockAddr.sin_addr   = *((LPIN_ADDR)*lpHostEntry-&gt;h_addr_list);
 </code></pre>
 <h2 id="军旗-luzhanqi-and-sockets">军旗 (Luzhanqi) and Sockets</h2>
 <p>Two years later, my father and I were playing 军旗, known as Luzhanqi in the states. It's a two-player game, like chess. However, playing 军旗 often requires a third person: the judge. This is because each player's pieces are not revealed to the other player. So when there is a conflict between pieces, there must be a judge to look at both pieces and resolve the conflict. If a player acted as the judge, he would gain unfair information about the other player's pieces.</p>
-<p><img src="a-brief-history-of-emilia.md-assets/junqi.jpg" alt=""><br>
+<p><img src="a-brief-history-of-emilia.md-assets/junqi.avif" alt=""><br>
 <em>A nice wooden board for 军旗. A given player cannot see the opponent's pieces.</em></p>
 <p>Being an only child, the requirement of a judge meant that every game of 军旗 would need to engage the entire family. This meant that often, because one of my parents were busy, we were unable to play. How great would it be if a computer could serve as the judge, so that even if my mother were busy, my father and I could still play? This would require us to sit at different computers so we couldn't see each others' pieces, but we would also need to communicate to each other about the moves we were making. Surely there would be a better way to communicate moves without yelling to each other and inputting the opponent's moves ourselves? I remember distinctly that my father pushing me, saying that as a programmer, I should be able to figure it out. Well, here I am, dad, writing this tech post.</p>
 <h3 id="basic-winsock">Basic Winsock</h3>
@@ -293,7 +293,7 @@ string text;
 </code></pre>
 <p>As you can see, there's a lot more files here. There are many more files for basic GUI controls, as well as a flurry of files dealing with WSA. Here's the <a href="a-brief-history-of-emilia.md-assets/RainLibrary1.zip">download</a>.</p>
 <h2 id="the-pixiv-breakthrough">The Pixiv Breakthrough</h2>
-<p><img src="a-brief-history-of-emilia.md-assets/pixiv.jpg" alt=""><br>
+<p><img src="a-brief-history-of-emilia.md-assets/pixiv.avif" alt=""><br>
 <em>The website found at <a href="https://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=72190967">https://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=72190967</a>.</em></p>
 <p>Pixiv is a Japanese website for artists to share their work. It attracts mainly artists who draw anime-style art. Most anime images that you can find online can likely have their source traced back to Pixiv, one way or another. So if I were trying to find the most beautiful anime-style pictures, then starting at Pixiv would be a good bet.</p>
 <p>Roughly, each image page like the above consists of an image, some recommendations for similar images, and a bunch of other stuff I didn't care about. Back in 2016, the recommendations would have also been more diverse, containing images from other artists as well. It's a shame they removed that recommender from the UI a while ago. Clicking on the main image would give you a special page with the full version of the image, from where clicking &quot;Save As...&quot; on a typical browser would allow you to save the full version. &quot;Save As...&quot; from the page shown above would give you a &quot;master&quot; version of the image, which sometimes would not be the highest quality available.</p>
@@ -301,7 +301,7 @@ string text;
 <p>Unfortunately, Pixiv has since changed its API, and my code no longer works, so I will not be able to showcase any images/GIFs in this section.</p>
 <h3 id="request-imitation-with-chrome">Request Imitation with Chrome</h3>
 <p>This was also the year that I interned at my first company, Lucid Software. There, I learned to debug webapps using the Chrome debugger. One of the techniques for debugging is looking at the Network tab, which would show all the requests that the browser would send to the webserver and the responses as well, including the headers. If the browser could send these requests, could I also send these requests, and even automate all the clicking on Pixiv's website?</p>
-<p><img src="a-brief-history-of-emilia.md-assets/pixiv-network.jpg" alt=""><br>
+<p><img src="a-brief-history-of-emilia.md-assets/pixiv-network.avif" alt=""><br>
 <em>Chrome's Network tab, showing the headers of both the request and response for the main page above.</em></p>
 <p>It was also at this internship that I learned to use Selenium, a library to control web browsers through code. While Selenium would have definitely been the easier way to go for this scraping project, it didn't feel <em>clean</em>. It loaded too much unnecessary stuff in the background, and couldn't control multiple tabs at once, and would display an ugly browser in the background to process the images (I didn't know about <code>headless</code> mode back then). Doing it in C++, I could fully customize what I wanted and didn't want, and how it was shown to me and how it was stored. I suppose this is probably the point of no return, where I abandoned the thought of using pre-built libraries to browse the web but instead to code it all from scratch. In hindsight, I wish I had given the other option more consideration. But reinventing the wheel turned out okay, I think.</p>
 <p>Knowing what I knew about sockets, I set out to try to send some requests to Pixiv.</p>
@@ -491,7 +491,7 @@ END
 END
 </code></pre>
 <p>As mentioned, the resource file here imports the version information and saves it in a block into the generated EXE. Here's what it looks like:</p>
-<p><img src="a-brief-history-of-emilia.md-assets/pixivbot-version.jpg" alt=""><br>
+<p><img src="a-brief-history-of-emilia.md-assets/pixivbot-version.avif" alt=""><br>
 <em>Version information visible in the built EXE.</em></p>
 <p>I learned to optimize this routine later on, but automatic build versioning would stay with Emilia moving forward.</p>
 <h3 id="rainlibrary2">RainLibrary2</h3>
@@ -1245,7 +1245,7 @@ contenttype = <span class="hljs-string">&quot;application/octet-stream&quot;</sp
 <ol>
 <li>
 <p>I didn't set an MX record on the DNS for my local IP. In fact, there is no way to setup DNS on an IP. Thus, I had to point <code>emilia-tan.com</code>'s MX record to my local IP instead, and send emails to <code>@emilia-tan.com</code>. Or, I could point the A record to my local IP, and point the MX record to <code>@</code>.</p>
-<p><img src="a-brief-history-of-emilia.md-assets/godaddy-dns.jpg" alt=""><br>
+<p><img src="a-brief-history-of-emilia.md-assets/godaddy-dns.avif" alt=""><br>
 <em><code>emilia-tan.com</code>'s DNS record today.</em></p>
 </li>
 <li>
@@ -1254,14 +1254,14 @@ contenttype = <span class="hljs-string">&quot;application/octet-stream&quot;</sp
 </li>
 </ol>
 <p>I was not able to solve the second problem until I started at MIT in late 2017. MIT's ISP does not block incoming connections on port 25. After trying my email listening again, finding on Google to setup my MX record, and opening up all ports on my local firewall, success! This was almost as exciting as receiving a response from Pixiv. Finally, I had Google knocking on my door!</p>
-<p><img src="a-brief-history-of-emilia.md-assets/first-smtp.jpg" alt=""><br>
+<p><img src="a-brief-history-of-emilia.md-assets/first-smtp.avif" alt=""><br>
 <em>The first ever SMTP request I ever saw, on a port 25 listener on my local machine, sent from Google's SMTP server.</em></p>
 <p>On the left I have setup code to mimic a simple SMTP server, sending back skeleton responses to prompt the remote SMTP server to send more data. Instead of dealing with the data, it'll simply print out the data to the console, which is on the right. The first few lines after <code>Client IP: 209.85.217.194</code> (that's Google's SMTP IP address, by the way) are from the SMTP server. The lines after that are of the actual email, with headers in the MIME format and the body right below that after the boundary.</p>
 <p>Unfortunately, I no longer have this listening code, but it shouldn't be difficult to setup. I won't showcase a GIF for this process.</p>
 <p>Once I knew how to receive requests, the rest was simple. I would probe around with my program and try different responses, learn from Google's SMTP server about how to act as an SMTP client, and mimic them to setup my own SMTP client to send emails. My initial SMTP server on <code>Emilia</code> simply forwarded all the emails to my gmail account, MIME headers included.</p>
 <h2 id="refining-deployment">Refining Deployment</h2>
 <p>At the beginning of my first year at MIT, I also decided that the website, along with the new SMTP server, was worth keeping online at all times. Instead of running it locally so that it would only be online when my computer was active and the application was running, I registered my first ever AWS account and setup and EC2 instance and hosted it there. Luckily, AWS did not block incoming SMTP connections, but they did limit outgoing port 25 connections. It took a while to figure out, but I eventually petitioned for the limit to be removed. At this point, my webserver was always available, and there were no downsides to having it on EC2 instead of my local machine, save for one: deployment routines for updates were complicated.</p>
-<p><img src="a-brief-history-of-emilia.md-assets/hyperspace.jpg" alt=""><br>
+<p><img src="a-brief-history-of-emilia.md-assets/hyperspace.avif" alt=""><br>
 <em>It was also around this time that I decided that a plaintext website wasn't enough, and transitioned to using the Hyperspace template with the fileserver. Unfortunately I have not saved the actual website from then.</em></p>
 <p>In the beginning, I synced code changes to my EC2 instance by setting up Selective Sync in Dropbox, so that any changes I made on my local machine would be almost immediately reflected on my remote EC2 instance. The solution was not very good, because sometimes I would modify files or logs on my local machine while they would also be updated on the instance, and it would get confusing very fast.</p>
 <p>As a result, I embarked on writing my own deployment routine early in 2018. The internal mechanics of this were fairly similar to those of <code>EmiliaBackup</code>: file transfers, message callbacks, and such. However, it quickly grew too complicated. The version which I wrote during the summer of 2018 contained so many options that even the <code>readme</code> for my repository at that point in time contained a long section just to describe the workflows. Here's that section, to illustrate how confusing it was:</p>
@@ -1409,7 +1409,7 @@ contenttype = <span class="hljs-string">&quot;application/octet-stream&quot;</sp
 <p><code>RainLibrary3</code>'s development also paralleled the continuing development of <code>Monochrome3</code>, which at this point, was called <code>Emilia</code> already. <a href="a-brief-history-of-emilia.md-assets/RainLibrary3">Download</a>.</p>
 <h2 id="modern-day-emilia">Modern-Day Emilia</h2>
 <p>All of the history brings us to the current iteration of Emilia, the 5.4.4.1891 server. First, let's take a look at the front-end, which now has a <a href="https://github.com/GilgameshxZero/emilia-tan-com">real home</a> as a repository.</p>
-<p><img src="a-brief-history-of-emilia.md-assets/emilia-home.jpg" alt=""><br>
+<p><img src="a-brief-history-of-emilia.md-assets/emilia-home.avif" alt=""><br>
 <em>The current front-end landing page.</em></p>
 <p>I moved away from the Hyperspace theme to a custom theme during the summer of 2018, using the same color palette as Hyperspace. However, it seemed a bit heavy, so the most recent redesign uses much more faded colors, but also a more colorful layout, to display the website. Scrollbars are hidden, and there is no page navigation; all the menu nagivation is implemented with XHR. The website is very responsive to size adjustments, and scrolling and sizing work well on mobile as well as opposed to during the summer. Most of the mobile sizing adjustments are performed through media queries.</p>
 <p>The backend of Emilia lives <a href="https://github.com/GilgameshxZero/emilia">here</a>. I'll explain the manifestation and evolution of each of the components in the history of Emilia discussed prior.</p>
@@ -1457,7 +1457,7 @@ contenttype = <span class="hljs-string">&quot;application/octet-stream&quot;</sp
 </code></pre>
 <p><code>rain-aeternum</code> has unified coding &amp; naming style, multithreading-safe functions, and the current functions used in <code>Emilia</code>. It is also pretty backwards-compatible with <code>RainLibrary3</code>. <a href="a-brief-history-of-emilia.md-assets/rain-aeternum.zip">Download</a>.</p>
 <p>For reference, here's an overview of the classes defined in <code>rain-aeternum</code>. We'll talk about some of them later.</p>
-<p><img src="a-brief-history-of-emilia.md-assets/rain-classes.jpg" alt=""><br>
+<p><img src="a-brief-history-of-emilia.md-assets/rain-classes.avif" alt=""><br>
 <em>Overview of <code>rain-aternum</code> classes.</em></p>
 <h3 id="winsock--listening">Winsock &amp; Listening</h3>
 <p>Much of the boilerplate code for WSA/winsock is within <code>rain-aeternum</code>. Here's a summary of the functions available in <code>rain-aeternum</code> for winsock setup.</p>

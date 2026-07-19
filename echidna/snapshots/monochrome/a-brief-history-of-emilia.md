@@ -8,7 +8,7 @@ emilia-snapshot-properties -->
 
 December 25, 2018
 
-Over the course of eight years and many builds, I have come to see a fledgeling desire to steal my father's computer passwords transform into 7000 lines of C++, a sub-par webserver for HTTP and SMTP, and a wealth of experience about low-level WinAPI and network protocols that I'll probably never use again.
+Over the course of eight years and many builds, I have come to see a fledgling desire to steal my father's computer passwords transform into 7000 lines of C++, a sub-par webserver for HTTP and SMTP, and a wealth of experience about low-level WinAPI and network protocols that I'll probably never use again.
 
 Join me on a brief tour of the history of `Emilia`, from conception to discovery to implementation!
 
@@ -226,7 +226,7 @@ Here's a summary of `RainLibrary0`, the first iteration, which was used in `Code
 
 Two years later, my father and I were playing 军旗, known as Luzhanqi in the states. It's a two-player game, like chess. However, playing 军旗 often requires a third person: the judge. This is because each player's pieces are not revealed to the other player. So when there is a conflict between pieces, there must be a judge to look at both pieces and resolve the conflict. If a player acted as the judge, he would gain unfair information about the other player's pieces.
 
-![](a-brief-history-of-emilia.md-assets/junqi.jpg)
+![](a-brief-history-of-emilia.md-assets/junqi.avif)
 *A nice wooden board for 军旗. A given player cannot see the opponent's pieces.*
 
 Being an only child, the requirement of a judge meant that every game of 军旗 would need to engage the entire family. This meant that often, because one of my parents were busy, we were unable to play. How great would it be if a computer could serve as the judge, so that even if my mother were busy, my father and I could still play? This would require us to sit at different computers so we couldn't see each others' pieces, but we would also need to communicate to each other about the moves we were making. Surely there would be a better way to communicate moves without yelling to each other and inputting the opponent's moves ourselves? I remember distinctly that my father pushing me, saying that as a programmer, I should be able to figure it out. Well, here I am, dad, writing this tech post.
@@ -346,7 +346,7 @@ As you can see, there's a lot more files here. There are many more files for bas
 
 ## The Pixiv Breakthrough
 
-![](a-brief-history-of-emilia.md-assets/pixiv.jpg)
+![](a-brief-history-of-emilia.md-assets/pixiv.avif)
 *The website found at <https://www.pixiv.net/member_illust.php?mode=medium&illust_id=72190967>.*
 
 Pixiv is a Japanese website for artists to share their work. It attracts mainly artists who draw anime-style art. Most anime images that you can find online can likely have their source traced back to Pixiv, one way or another. So if I were trying to find the most beautiful anime-style pictures, then starting at Pixiv would be a good bet.
@@ -361,7 +361,7 @@ Unfortunately, Pixiv has since changed its API, and my code no longer works, so 
 
 This was also the year that I interned at my first company, Lucid Software. There, I learned to debug webapps using the Chrome debugger. One of the techniques for debugging is looking at the Network tab, which would show all the requests that the browser would send to the webserver and the responses as well, including the headers. If the browser could send these requests, could I also send these requests, and even automate all the clicking on Pixiv's website?
 
-![](a-brief-history-of-emilia.md-assets/pixiv-network.jpg)
+![](a-brief-history-of-emilia.md-assets/pixiv-network.avif)
 *Chrome's Network tab, showing the headers of both the request and response for the main page above.*
 
 It was also at this internship that I learned to use Selenium, a library to control web browsers through code. While Selenium would have definitely been the easier way to go for this scraping project, it didn't feel *clean*. It loaded too much unnecessary stuff in the background, and couldn't control multiple tabs at once, and would display an ugly browser in the background to process the images (I didn't know about `headless` mode back then). Doing it in C++, I could fully customize what I wanted and didn't want, and how it was shown to me and how it was stored. I suppose this is probably the point of no return, where I abandoned the thought of using pre-built libraries to browse the web but instead to code it all from scratch. In hindsight, I wish I had given the other option more consideration. But reinventing the wheel turned out okay, I think.
@@ -588,7 +588,7 @@ END
 
 As mentioned, the resource file here imports the version information and saves it in a block into the generated EXE. Here's what it looks like:
 
-![](a-brief-history-of-emilia.md-assets/pixivbot-version.jpg)
+![](a-brief-history-of-emilia.md-assets/pixivbot-version.avif)
 *Version information visible in the built EXE.*
 
 I learned to optimize this routine later on, but automatic build versioning would stay with Emilia moving forward.
@@ -1387,7 +1387,7 @@ It was trivial to setup listening on port 25, the unencrypted SMTP port, having 
 
 1. I didn't set an MX record on the DNS for my local IP. In fact, there is no way to setup DNS on an IP. Thus, I had to point `emilia-tan.com`'s MX record to my local IP instead, and send emails to `@emilia-tan.com`. Or, I could point the A record to my local IP, and point the MX record to `@`.
    
-   ![](a-brief-history-of-emilia.md-assets/godaddy-dns.jpg)
+   ![](a-brief-history-of-emilia.md-assets/godaddy-dns.avif)
    *`emilia-tan.com`'s DNS record today.*
 
 2. The ISP was blocking incoming connections to port 25. It turns out that most modern ISPs blocking incoming connections to port 25 due to the immense amount of spam circulating through email these days. I did not want to spend the time to talk to the ISP to convince them to open up port 25 for my home internet connection, so I was not able to do anything about this problem at this point.
@@ -1396,7 +1396,7 @@ It was trivial to setup listening on port 25, the unencrypted SMTP port, having 
 
 I was not able to solve the second problem until I started at MIT in late 2017. MIT's ISP does not block incoming connections on port 25. After trying my email listening again, finding on Google to setup my MX record, and opening up all ports on my local firewall, success! This was almost as exciting as receiving a response from Pixiv. Finally, I had Google knocking on my door!
 
-![](a-brief-history-of-emilia.md-assets/first-smtp.jpg)
+![](a-brief-history-of-emilia.md-assets/first-smtp.avif)
 *The first ever SMTP request I ever saw, on a port 25 listener on my local machine, sent from Google's SMTP server.*
 
 On the left I have setup code to mimic a simple SMTP server, sending back skeleton responses to prompt the remote SMTP server to send more data. Instead of dealing with the data, it'll simply print out the data to the console, which is on the right. The first few lines after `Client IP: 209.85.217.194` (that's Google's SMTP IP address, by the way) are from the SMTP server. The lines after that are of the actual email, with headers in the MIME format and the body right below that after the boundary.
@@ -1409,7 +1409,7 @@ Once I knew how to receive requests, the rest was simple. I would probe around w
 
 At the beginning of my first year at MIT, I also decided that the website, along with the new SMTP server, was worth keeping online at all times. Instead of running it locally so that it would only be online when my computer was active and the application was running, I registered my first ever AWS account and setup and EC2 instance and hosted it there. Luckily, AWS did not block incoming SMTP connections, but they did limit outgoing port 25 connections. It took a while to figure out, but I eventually petitioned for the limit to be removed. At this point, my webserver was always available, and there were no downsides to having it on EC2 instead of my local machine, save for one: deployment routines for updates were complicated.
 
-![](a-brief-history-of-emilia.md-assets/hyperspace.jpg)
+![](a-brief-history-of-emilia.md-assets/hyperspace.avif)
 *It was also around this time that I decided that a plaintext website wasn't enough, and transitioned to using the Hyperspace template with the fileserver. Unfortunately I have not saved the actual website from then.*
 
 In the beginning, I synced code changes to my EC2 instance by setting up Selective Sync in Dropbox, so that any changes I made on my local machine would be almost immediately reflected on my remote EC2 instance. The solution was not very good, because sometimes I would modify files or logs on my local machine while they would also be updated on the instance, and it would get confusing very fast.
@@ -1542,7 +1542,7 @@ The penultimate iteration of the Rain library, `RainLibrary3`, is summarized bel
 
 All of the history brings us to the current iteration of Emilia, the 5.4.4.1891 server. First, let's take a look at the front-end, which now has a [real home](https://github.com/GilgameshxZero/emilia-tan-com) as a repository.
 
-![](a-brief-history-of-emilia.md-assets/emilia-home.jpg)
+![](a-brief-history-of-emilia.md-assets/emilia-home.avif)
 *The current front-end landing page.*
 
 I moved away from the Hyperspace theme to a custom theme during the summer of 2018, using the same color palette as Hyperspace. However, it seemed a bit heavy, so the most recent redesign uses much more faded colors, but also a more colorful layout, to display the website. Scrollbars are hidden, and there is no page navigation; all the menu nagivation is implemented with XHR. The website is very responsive to size adjustments, and scrolling and sizing work well on mobile as well as opposed to during the summer. Most of the mobile sizing adjustments are performed through media queries.
@@ -1599,7 +1599,7 @@ The current iteration of the Rain library abandons the numerical numbering syste
 
 For reference, here's an overview of the classes defined in `rain-aeternum`. We'll talk about some of them later.
 
-![](a-brief-history-of-emilia.md-assets/rain-classes.jpg)
+![](a-brief-history-of-emilia.md-assets/rain-classes.avif)
 *Overview of `rain-aternum` classes.*
 
 ### Winsock & Listening

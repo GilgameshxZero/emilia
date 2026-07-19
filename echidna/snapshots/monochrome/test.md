@@ -44,7 +44,7 @@ forme|<pre><code>multi-line code blocks must be<br/>wrapped with HTML pre -> cod
 *and now*|<blockquote>**a demonstration of images**<br/>test</blockquote>
 <code>multi-line<br/>inline code</code>|$\LaTeX$<br/>$\begin{aligned}\text{can}&=\text{be put}\\\text{over}&=f(x^\text{multiple lines})\end{aligned}$<br/><br/>but will require inline HTML<br/><span class="katex-display">$f(x)=x^2-x+h$</span>As you may observe, `display`-style $\KaTeX$ may be used by wrapping the $\KaTeX$ syntax in a `span` element with class `katex-display`. Surely there is a way to add `tag`s too, but I have not yet figured it out.
 
-![](test.md-assets/2021-08-24-14-16-53.jpg#large)
+![](test.md-assets/2021-08-24-14-16-53.avif#large)
 *This should not be italicized, but styled as a caption.*
 
 ### Smaller titles
