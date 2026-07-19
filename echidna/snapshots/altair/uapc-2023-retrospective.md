@@ -11,7 +11,7 @@ Yang Yan
 
 We placed 10th on the [UAPC 2023](https://codeforces.com/blog/entry/113620) open division [standings](https://uapc23open.kattis.com/contests/uapc23open/standings) and failed the VTuber community as a result. I write this retrospective in reparation.
 
-![](uapc-2023-retrospective.md-assets/2023-03-16-12-01-53.png)
+![](uapc-2023-retrospective.md-assets/2023-03-16-12-01-53.avif)
 *My inbox is open for qualified suitors, Melinda.*
 
 While Isometric and Scout did not join me until the final of four hours, my blunder was failing to focus in the latter half to solve K, and spending too long, too early, on E. In addition, I was too lax about time and resubmission penalty, as I had assumed I would be the sole team to AK, and decided incorrectly to solve everything in order.
@@ -108,7 +108,7 @@ This is the second of such ICPC-style contests I have experienced. Next time, I 
 
 I wonder if Huaiyu still remembers our Google Chat from 2015.
 
-![](uapc-2023-retrospective.md-assets/2023-03-16-11-59-30.png)
+![](uapc-2023-retrospective.md-assets/2023-03-16-11-59-30.avif)
 *How far I have fallen.*
 
 Congratulations to him on 1st. He is advised to refrain from feeling too comfortable.

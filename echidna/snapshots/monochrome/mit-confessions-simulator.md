@@ -49,7 +49,7 @@ As a side, I also scraped the time at which posts were made from the css selecto
 
 ### Cleaning & Preparation
 
-![](mit-confessions-simulator.md-assets/psa.png)
+![](mit-confessions-simulator.md-assets/psa.avif)
 *Anything without a confession number is trash. For this project, at least...*
 
 In preparation for training, I made a few design choices:
@@ -65,7 +65,7 @@ In order to have the model be able to write new posts, it is necessary for the m
 
 Data from all three sources combined totalled just over 1MB.
 
-![](mit-confessions-simulator.md-assets/kevin-comment.png)
+![](mit-confessions-simulator.md-assets/kevin-comment.avif)
 *My friend Kevin comments on the project :(*
 
 ## Char-RNN
@@ -138,7 +138,7 @@ Largely based on [this](https://machinelearningmastery.com/text-generation-lstm-
 
 ### Thoughts
 
-![](mit-confessions-simulator.md-assets/course-6.png)
+![](mit-confessions-simulator.md-assets/course-6.avif)
 *A distinctly MIT flavor.*
 
 Samples generated from this first model were largely repetitive due to the lack of temperature and using `argmax` during sampling. However, this does not mitigate the concern that loss plateaued at a high value. Given the small batch size and the high loss, I should have realized this was an indicator that the network was not big enough. Instead, I stupidly made the network more shallow instead for the second model.
@@ -167,7 +167,7 @@ Okay, I guess \'better\' is relative. At least some words are legible here, and 
 
 Don't worry, samples get better with the incorporation of temperature in later models.
 
-![](mit-confessions-simulator.md-assets/seals.png)
+![](mit-confessions-simulator.md-assets/seals.avif)
 *Not sure where the seals came from...*
 
 ## Second Model: 1x512 LSTM
@@ -204,7 +204,7 @@ I don't believe dropout affects loss minima, but only the time required to reach
 
 ### Thoughts
 
-![](mit-confessions-simulator.md-assets/model-training.png)
+![](mit-confessions-simulator.md-assets/model-training.avif)
 *Shhh, the model is training!*
 
 Unfortunately, loss seemed to converge at a higher number for this model than the last. Samples generated were significantly better, however, with the incorporation of temperature and choosing from the output distribution. I found `0.35` to be a solid temperature choice for the final iteration of this model.
@@ -251,7 +251,7 @@ I am not familiar with the mathematics behind GRUs; however, research suggests t
 	* As expected, lower temperatures result in much better spelling than higher temperatures.
 	* Sampling speed isn't great, partially because it isn't a parallel operation (this not suited for the GPU) and my CPU isn't top-tier.
 
-![](mit-confessions-simulator.md-assets/loss-epochs.png)
+![](mit-confessions-simulator.md-assets/loss-epochs.avif)
 *Praying for loss to continue decreasing...*
 
 ### Thoughts
@@ -284,7 +284,7 @@ Lot's of simple, correctly spelled words. Sentences are pretty runny, which is l
 
 There's more variety at this temperature, and most words are spelled correctly. I'd say this is on par with Karpathy's Paul Graham generator:
 
-![](mit-confessions-simulator.md-assets/paul-graham.png)
+![](mit-confessions-simulator.md-assets/paul-graham.avif)
 
 Here's `temperature = 0.80`:
 
@@ -342,7 +342,7 @@ Another option would be to have used word-based rather than char-based models. H
 
 `argmax` vs. sampling from the output distribution and temperature turned out to be hugely important. My concern is with [blog posts such as this one](https://chunml.github.io/ChunML.github.io/project/Creating-Text-Generator-Using-Recurrent-Neural-Network/), which clearly uses `argmax` but still generates non-repetitive samples. I'm no RNN master, but those results look fishy to me:
 
-![](mit-confessions-simulator.md-assets/trung-post.png)
+![](mit-confessions-simulator.md-assets/trung-post.avif)
 
 Given, Trung's network is reasonably bigger than mine - but I don't think that would offset the effect of having `argmax` to create such variety in samples.
 

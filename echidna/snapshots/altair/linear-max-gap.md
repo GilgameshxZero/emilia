@@ -76,7 +76,7 @@ Well, Richard is a PhD (or postdoc (or professor?)) now. And I still can’t say
 
 I’ve been playing around with Github Copilot recently on recommendation of a friend Tony, and found it to be surprisingly compentent, but ultimately useless, while writing this post:
 
-![](linear-max-gap.md-assets/2022-12-01-22-24-31.png)
+![](linear-max-gap.md-assets/2022-12-01-22-24-31.avif)
 *Close, Copilot.*
 
 ---

@@ -55,7 +55,7 @@ She winked. It was a wink that stuck with me all the way until Saturday night, a
 
 Finally, Saturday night had come. I had trekked across campus to arrive at her cozy single on dormitory row. Sitting right beside me, Hina's reflective green eyes drifted up towards the ceiling, the light from her desk lamp blazing a path around her pupil like the sun on a hot day in the desert. Instinctively, I met her gaze upon her ceiling, a white drywall colored like the orange sunset by the warmness of her presence as it seemed to diffuse into the air through the steam from her cup of hot chocolate. Her room was a welcome repose from the cold outside.
 
-![](love-hina.md-assets/2020-05-25-23-13-03.png)
+![](love-hina.md-assets/2020-05-25-23-13-03.avif)
 *<sup>[1]</sup>*
 
 "And what do you want to be a part of your college experience, Gil?"

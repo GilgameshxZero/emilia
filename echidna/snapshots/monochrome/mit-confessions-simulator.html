@@ -39,7 +39,7 @@ emilia-snapshot-properties -->
 </ul>
 <p>As a side, I also scraped the time at which posts were made from the css selector <code>abbr._5ptz</code>. You can find the raw scraped data, in JSON, <a href="mit-confessions-simulator.md-assets/data-raw.zip">here</a>.</p>
 <h3 id="cleaning--preparation">Cleaning &amp; Preparation</h3>
-<p><img src="mit-confessions-simulator.md-assets/psa.png" alt=""><br>
+<p><img src="mit-confessions-simulator.md-assets/psa.avif" alt=""><br>
 <em>Anything without a confession number is trash. For this project, at least...</em></p>
 <p>In preparation for training, I made a few design choices:</p>
 <ul>
@@ -54,7 +54,7 @@ emilia-snapshot-properties -->
 <p>The flipside of the latter two design choices above is that they restrict the alphabet of generated samples. In my case, this wasn't top priority to capture the intricacies of MIT Confessions language.</p>
 <p>In order to have the model be able to write new posts, it is necessary for the model to be able to recognize post ends. Thus, I concatenated all cleaned posts into one large string to serve as the training data, each post being separated by a <code>\0</code> (NULL) character. Post order was randomized. <a href="mit-confessions-simulator.md-assets/data-concat.zip">This</a> is the concatenated file of posts with the confession number, which was postprocessed to remove the confessions number in each post. These strings served as training and validation data for both the <code>char-RNN</code> and the <code>char-n-gram</code>.</p>
 <p>Data from all three sources combined totalled just over 1MB.</p>
-<p><img src="mit-confessions-simulator.md-assets/kevin-comment.png" alt=""><br>
+<p><img src="mit-confessions-simulator.md-assets/kevin-comment.avif" alt=""><br>
 <em>My friend Kevin comments on the project :(</em></p>
 <h2 id="char-rnn">Char-RNN</h2>
 <h3 id="basics">Basics</h3>
@@ -128,7 +128,7 @@ emilia-snapshot-properties -->
 </li>
 </ul>
 <h3 id="thoughts">Thoughts</h3>
-<p><img src="mit-confessions-simulator.md-assets/course-6.png" alt=""><br>
+<p><img src="mit-confessions-simulator.md-assets/course-6.avif" alt=""><br>
 <em>A distinctly MIT flavor.</em></p>
 <p>Samples generated from this first model were largely repetitive due to the lack of temperature and using <code>argmax</code> during sampling. However, this does not mitigate the concern that loss plateaued at a high value. Given the small batch size and the high loss, I should have realized this was an indicator that the network was not big enough. Instead, I stupidly made the network more shallow instead for the second model.</p>
 <p>Here's a <em>sample</em> of the final <code>argmax</code> model's samples:</p>
@@ -156,7 +156,7 @@ bef, but you'se beeo in sa! lit lasieur teams of shoutoi of this ostglng ciefeen
 </blockquote>
 <p>Okay, I guess 'better' is relative. At least some words are legible here, and there is some sentence structure.</p>
 <p>Don't worry, samples get better with the incorporation of temperature in later models.</p>
-<p><img src="mit-confessions-simulator.md-assets/seals.png" alt=""><br>
+<p><img src="mit-confessions-simulator.md-assets/seals.avif" alt=""><br>
 <em>Not sure where the seals came from...</em></p>
 <h2 id="second-model-1x512-lstm">Second Model: 1x512 LSTM</h2>
 <h3 id="layers-1">Layers</h3>
@@ -206,7 +206,7 @@ bef, but you'se beeo in sa! lit lasieur teams of shoutoi of this ostglng ciefeen
 </li>
 </ul>
 <h3 id="thoughts-1">Thoughts</h3>
-<p><img src="mit-confessions-simulator.md-assets/model-training.png" alt=""><br>
+<p><img src="mit-confessions-simulator.md-assets/model-training.avif" alt=""><br>
 <em>Shhh, the model is training!</em></p>
 <p>Unfortunately, loss seemed to converge at a higher number for this model than the last. Samples generated were significantly better, however, with the incorporation of temperature and choosing from the output distribution. I found <code>0.35</code> to be a solid temperature choice for the final iteration of this model.</p>
 <h2 id="third-model-2x512-gru">Third Model: 2x512 GRU</h2>
@@ -262,7 +262,7 @@ bef, but you'se beeo in sa! lit lasieur teams of shoutoi of this ostglng ciefeen
 </ul>
 </li>
 </ul>
-<p><img src="mit-confessions-simulator.md-assets/loss-epochs.png" alt=""><br>
+<p><img src="mit-confessions-simulator.md-assets/loss-epochs.avif" alt=""><br>
 <em>Praying for loss to continue decreasing...</em></p>
 <h3 id="thoughts-2">Thoughts</h3>
 <p>With the right temperature, generated text quality seemed to be on par with Karpathy's models. I think, even if I trained for more epochs, I wouldn't see too significant of a rise in quality. Tony's suggestions were very helpful in knocking down loss to this level.</p>
@@ -294,7 +294,7 @@ i'm just a better from any makes me and i'm so better and i'm not me.</p>
 <p>#1467 i feel like i'm a lot of the life and i'm just too great the fuck on the grades of the whole problem.</p>
 </blockquote>
 <p>There's more variety at this temperature, and most words are spelled correctly. I'd say this is on par with Karpathy's Paul Graham generator:</p>
-<p><img src="mit-confessions-simulator.md-assets/paul-graham.png" alt=""></p>
+<p><img src="mit-confessions-simulator.md-assets/paul-graham.avif" alt=""></p>
 <p>Here's <code>temperature = 0.80</code>:</p>
 <blockquote>
 <p>#14696 hel! not is io the got window is at mong respect her and two and republiter?</p>
@@ -343,6 +343,6 @@ type. my family would ever think to myself...</p>
 <p>Generating convincing predictive text is deceptively difficult. Unfortunately, the <code>char-RNN</code> didn't perform too well compared to the <code>char-n-gram</code> here. Given more data, perhaps, we could hit an even lower loss with the RNN. However, that still is no replacement for the wit captured by the <code>char-n-gram</code> model, which would also perform much better with more data.</p>
 <p>Another option would be to have used word-based rather than char-based models. However, I did not have the time to look into this.</p>
 <p><code>argmax</code> vs. sampling from the output distribution and temperature turned out to be hugely important. My concern is with <a href="https://chunml.github.io/ChunML.github.io/project/Creating-Text-Generator-Using-Recurrent-Neural-Network/">blog posts such as this one</a>, which clearly uses <code>argmax</code> but still generates non-repetitive samples. I'm no RNN master, but those results look fishy to me:</p>
-<p><img src="mit-confessions-simulator.md-assets/trung-post.png" alt=""></p>
+<p><img src="mit-confessions-simulator.md-assets/trung-post.avif" alt=""></p>
 <p>Given, Trung's network is reasonably bigger than mine - but I don't think that would offset the effect of having <code>argmax</code> to create such variety in samples.</p>
 <p>Well, now it's finally time to jump on the RL &amp; adversarial bandwagons I guess.</p>
