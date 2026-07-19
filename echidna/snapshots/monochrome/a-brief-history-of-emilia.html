@@ -174,7 +174,7 @@ SockAddr.sin_addr   = *((LPIN_ADDR)*lpHostEntry-&gt;h_addr_list);
 <p>Eventually, I gave up on ever being able to send an email with my C++ code. Sure, no one wants to give up. But besides Google, I had no one to ask for help, and there were no more leads to follow.</p>
 <h3 id="rainlibrary0">RainLibrary0</h3>
 <p>One of the most influential things to come out of the GUI exploration was <code>RainLibrary0</code>. The Rain libraries are a series of libraries that build an abstraction layer atop the WinAPI, which makes coding future applications much easier. The development of Emilia parallels the development of the Rain libraries.</p>
-<p>Here's a summary of <code>RainLibrary0</code>, the first iteration, which was used in <code>Coder</code> and <code>TurboWord</code>. You can download it <a href="a-brief-history-of-emilia.md-assets/RainLibrary0.zip">here</a>.</p>
+<p>Here's a summary of <code>RainLibrary0</code>, the first iteration, which was used in <code>Coder</code> and <code>TurboWord</code>. You can download it <a href="a-brief-history-of-emilia.md-assets/RainLibrary0.tar.xz">here</a>.</p>
 <pre><code>02/17/14  19:46             5,805 Button.cpp
 03/13/14  13:00             1,912 Button.h
 08/24/13  13:35            12,102 FileEdit.cpp
@@ -291,7 +291,7 @@ string text;
 01/01/17  23:03             7,848 WSA2Utility.cpp
 01/01/17  23:04             3,853 WSA2Utility.h
 </code></pre>
-<p>As you can see, there's a lot more files here. There are many more files for basic GUI controls, as well as a flurry of files dealing with WSA. Here's the <a href="a-brief-history-of-emilia.md-assets/RainLibrary1.zip">download</a>.</p>
+<p>As you can see, there's a lot more files here. There are many more files for basic GUI controls, as well as a flurry of files dealing with WSA. Here's the <a href="a-brief-history-of-emilia.md-assets/RainLibrary1.tar.xz">download</a>.</p>
 <h2 id="the-pixiv-breakthrough">The Pixiv Breakthrough</h2>
 <p><img src="a-brief-history-of-emilia.md-assets/pixiv.avif" alt=""><br>
 <em>The website found at <a href="https://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=72190967">https://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=72190967</a>.</em></p>
@@ -521,7 +521,7 @@ END
 03/04/18  08:19             4,253 RainWSA2Utility.cpp
 03/04/18  08:15             1,165 RainWSA2Utility.h
 </code></pre>
-<p><code>RainLibrary2</code> moves away from the older GUI routines and focuses on console routines. The GUI routines were not up-to-date with my newest programming philosophies and not commonly used, so they were not incorporated into future Rain libraries. <a href="a-brief-history-of-emilia.md-assets/RainLibrary2.zip">Here's the download</a>.</p>
+<p><code>RainLibrary2</code> moves away from the older GUI routines and focuses on console routines. The GUI routines were not up-to-date with my newest programming philosophies and not commonly used, so they were not incorporated into future Rain libraries. <a href="a-brief-history-of-emilia.md-assets/RainLibrary2.tar.xz">Here's the download</a>.</p>
 <h2 id="monochrome-2--3">Monochrome 2 &amp; 3</h2>
 <p><code>PixivBot</code> was a network client, and servers are a different beast. Knowing now that I could connect with remote servers with Winsock, I dove out to try to write a server of my own which, instead of imitating the client-side requests that I saw in Chrome, would imitate the server-side responses. I wrote my first webserver in C++ as the third (2, because we're coders) program of a series of experimental programs I called Monochrome.</p>
 <p>This is the main code responsible for <code>Monochrome2</code>, beyond the Rain library code. <code>Monochrome2</code> uses <code>RainLibrary1</code>. The code below contains most of the logic surrounding handling new connections to the server and sending bytes.</p>
@@ -1406,7 +1406,7 @@ contenttype = <span class="hljs-string">&quot;application/octet-stream&quot;</sp
 05/29/18  14:45             4,253 RainWSA2Utility.cpp
 05/23/18  08:19             1,130 RainWSA2Utility.h
 </code></pre>
-<p><code>RainLibrary3</code>'s development also paralleled the continuing development of <code>Monochrome3</code>, which at this point, was called <code>Emilia</code> already. <a href="a-brief-history-of-emilia.md-assets/RainLibrary3">Download</a>.</p>
+<p><code>RainLibrary3</code>'s development also paralleled the continuing development of <code>Monochrome3</code>, which at this point, was called <code>Emilia</code> already. <a href="a-brief-history-of-emilia.md-assets/RainLibrary3.tar.xz">Download</a>.</p>
 <h2 id="modern-day-emilia">Modern-Day Emilia</h2>
 <p>All of the history brings us to the current iteration of Emilia, the 5.4.4.1891 server. First, let's take a look at the front-end, which now has a <a href="https://github.com/GilgameshxZero/emilia-tan-com">real home</a> as a repository.</p>
 <p><img src="a-brief-history-of-emilia.md-assets/emilia-home.avif" alt=""><br>
@@ -1455,7 +1455,7 @@ contenttype = <span class="hljs-string">&quot;application/octet-stream&quot;</sp
 12/20/18  19:26               247 utility-time.h
 11/25/18  15:05               213 windows-lam-include.h
 </code></pre>
-<p><code>rain-aeternum</code> has unified coding &amp; naming style, multithreading-safe functions, and the current functions used in <code>Emilia</code>. It is also pretty backwards-compatible with <code>RainLibrary3</code>. <a href="a-brief-history-of-emilia.md-assets/rain-aeternum.zip">Download</a>.</p>
+<p><code>rain-aeternum</code> has unified coding &amp; naming style, multithreading-safe functions, and the current functions used in <code>Emilia</code>. It is also pretty backwards-compatible with <code>RainLibrary3</code>. <a href="a-brief-history-of-emilia.md-assets/rain-aeternum.tar.xz">Download</a>.</p>
 <p>For reference, here's an overview of the classes defined in <code>rain-aeternum</code>. We'll talk about some of them later.</p>
 <p><img src="a-brief-history-of-emilia.md-assets/rain-classes.avif" alt=""><br>
 <em>Overview of <code>rain-aternum</code> classes.</em></p>

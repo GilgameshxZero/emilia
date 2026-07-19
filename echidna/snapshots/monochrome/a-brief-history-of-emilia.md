@@ -203,7 +203,7 @@ Eventually, I gave up on ever being able to send an email with my C++ code. Sure
 
 One of the most influential things to come out of the GUI exploration was `RainLibrary0`. The Rain libraries are a series of libraries that build an abstraction layer atop the WinAPI, which makes coding future applications much easier. The development of Emilia parallels the development of the Rain libraries.
 
-Here's a summary of `RainLibrary0`, the first iteration, which was used in `Coder` and `TurboWord`. You can download it [here](a-brief-history-of-emilia.md-assets/RainLibrary0.zip).
+Here's a summary of `RainLibrary0`, the first iteration, which was used in `Coder` and `TurboWord`. You can download it [here](a-brief-history-of-emilia.md-assets/RainLibrary0.tar.xz).
 
 ```
 02/17/14  19:46             5,805 Button.cpp
@@ -342,7 +342,7 @@ The development of the 军旗 application, among other things, led to the develo
 01/01/17  23:04             3,853 WSA2Utility.h
 ```
 
-As you can see, there's a lot more files here. There are many more files for basic GUI controls, as well as a flurry of files dealing with WSA. Here's the [download](a-brief-history-of-emilia.md-assets/RainLibrary1.zip).
+As you can see, there's a lot more files here. There are many more files for basic GUI controls, as well as a flurry of files dealing with WSA. Here's the [download](a-brief-history-of-emilia.md-assets/RainLibrary1.tar.xz).
 
 ## The Pixiv Breakthrough
 
@@ -624,7 +624,7 @@ The `1.1.3` version of `PixivBot` once again iterated on the Rain library. Earli
 03/04/18  08:15             1,165 RainWSA2Utility.h
 ```
 
-`RainLibrary2` moves away from the older GUI routines and focuses on console routines. The GUI routines were not up-to-date with my newest programming philosophies and not commonly used, so they were not incorporated into future Rain libraries. [Here's the download](a-brief-history-of-emilia.md-assets/RainLibrary2.zip).
+`RainLibrary2` moves away from the older GUI routines and focuses on console routines. The GUI routines were not up-to-date with my newest programming philosophies and not commonly used, so they were not incorporated into future Rain libraries. [Here's the download](a-brief-history-of-emilia.md-assets/RainLibrary2.tar.xz).
 
 ## Monochrome 2 & 3
 
@@ -1536,7 +1536,7 @@ The penultimate iteration of the Rain library, `RainLibrary3`, is summarized bel
 05/23/18  08:19             1,130 RainWSA2Utility.h
 ```
 
-`RainLibrary3`'s development also paralleled the continuing development of `Monochrome3`, which at this point, was called `Emilia` already. [Download](a-brief-history-of-emilia.md-assets/RainLibrary3.zip).
+`RainLibrary3`'s development also paralleled the continuing development of `Monochrome3`, which at this point, was called `Emilia` already. [Download](a-brief-history-of-emilia.md-assets/RainLibrary3.tar.xz).
 
 ## Modern-Day Emilia
 
@@ -1595,7 +1595,7 @@ The current iteration of the Rain library abandons the numerical numbering syste
 11/25/18  15:05               213 windows-lam-include.h
 ```
 
-`rain-aeternum` has unified coding & naming style, multithreading-safe functions, and the current functions used in `Emilia`. It is also pretty backwards-compatible with `RainLibrary3`. [Download](a-brief-history-of-emilia.md-assets/rain-aeternum.zip).
+`rain-aeternum` has unified coding & naming style, multithreading-safe functions, and the current functions used in `Emilia`. It is also pretty backwards-compatible with `RainLibrary3`. [Download](a-brief-history-of-emilia.md-assets/rain-aeternum.tar.xz).
 
 For reference, here's an overview of the classes defined in `rain-aeternum`. We'll talk about some of them later.
 

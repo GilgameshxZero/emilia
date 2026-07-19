@@ -45,7 +45,7 @@ I am not familiar with Facebook's Graph API, and my latest interactions with it 
 * **Extremely long posts**: These posts don't have a `See More` link but rather a `Continue Reading` link, which would open a new tab with the full post. I decided to disregard these posts, since they were few and far in-between.
 * **Non-text posts**: Since we're working with characters here, simply discarding these posts was fine.
 
-As a side, I also scraped the time at which posts were made from the css selector `abbr._5ptz`. You can find the raw scraped data, in JSON, [here](mit-confessions-simulator.md-assets/data-raw.zip).
+As a side, I also scraped the time at which posts were made from the css selector `abbr._5ptz`. You can find the raw scraped data, in JSON, [here](mit-confessions-simulator.md-assets/data-raw.tar.xz).
 
 ### Cleaning & Preparation
 
@@ -61,7 +61,7 @@ In preparation for training, I made a few design choices:
 
 The flipside of the latter two design choices above is that they restrict the alphabet of generated samples. In my case, this wasn't top priority to capture the intricacies of MIT Confessions language.
 
-In order to have the model be able to write new posts, it is necessary for the model to be able to recognize post ends. Thus, I concatenated all cleaned posts into one large string to serve as the training data, each post being separated by a `\0` (NULL) character. Post order was randomized. [This](mit-confessions-simulator.md-assets/data-concat.zip) is the concatenated file of posts with the confession number, which was postprocessed to remove the confessions number in each post. These strings served as training and validation data for both the `char-RNN` and the `char-n-gram`.
+In order to have the model be able to write new posts, it is necessary for the model to be able to recognize post ends. Thus, I concatenated all cleaned posts into one large string to serve as the training data, each post being separated by a `\0` (NULL) character. Post order was randomized. [This](mit-confessions-simulator.md-assets/data-concat.tar.xz) is the concatenated file of posts with the confession number, which was postprocessed to remove the confessions number in each post. These strings served as training and validation data for both the `char-RNN` and the `char-n-gram`.
 
 Data from all three sources combined totalled just over 1MB.
 
