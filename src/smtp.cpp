@@ -1,5 +1,6 @@
 // Subclasses Rain::Networking::Smtp specializations for
 // custom SMTP server.
+#include "rain/string/string.hpp"
 #include <../rain/build/version.hpp>
 #include <rain.hpp>
 
@@ -164,7 +165,7 @@ namespace Emilia::Smtp {
 						REQUEST_NOT_TAKEN_MAILBOX_UNAVAILABLE_PERMANENT}};
 			}
 
-			// Block via the "From" header.
+			// Block via the "From:" header.
 			std::optional<Mailbox> fromMailbox;
 			std::ifstream dataFile(dataPath, std::ios::binary);
 			for (
@@ -172,20 +173,22 @@ namespace Emilia::Smtp {
 				if (line.substr(0, 5) != "From:") {
 					continue;
 				}
-				auto fromMailboxBeginIdx{line.find_first_of('<')};
-				if (fromMailboxBeginIdx == std::string::npos) {
-					continue;
-				}
-				auto fromMailboxEndIdx{line.find_last_of('>')};
+				auto fromMailboxBeginIdx{line.find_first_of('<')},
+					fromMailboxEndIdx{line.find_last_of('>')};
+				std::string candidate;
 				if (
+					fromMailboxBeginIdx == std::string::npos ||
 					fromMailboxEndIdx == std::string::npos ||
 					fromMailboxEndIdx < fromMailboxBeginIdx) {
-					continue;
+					candidate = line.substr(5);
+				} else {
+					candidate = line.substr(
+						fromMailboxBeginIdx + 1,
+						fromMailboxEndIdx - fromMailboxBeginIdx - 1);
 				}
-				fromMailbox.emplace(line.substr(
-					fromMailboxBeginIdx + 1,
-					fromMailboxEndIdx - fromMailboxBeginIdx - 1));
-				Rain::String::toLower(fromMailbox.value().name);
+				Rain::String::trimWhitespace(candidate);
+				Rain::String::toLower(candidate);
+				fromMailbox.emplace(candidate);
 				break;
 			}
 			if (
