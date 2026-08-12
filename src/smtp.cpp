@@ -143,12 +143,23 @@ namespace Emilia::Smtp {
 			}
 			Rain::String::toLower(mailMailbox.name);
 			if (
-				this->server.blockMailMailbox.count(mailMailbox) ||
+				this->server.blockMailMailbox.count(mailMailbox)) {
+				std::cout << "Aborted " << this->mailFrom.value()
+									<< " > " << this->rcptTo << " from "
+									<< this->peerHost()
+									<< " under `blockMailMailbox` policy."
+									<< std::endl;
+				return {{StatusCode::
+						REQUEST_NOT_TAKEN_MAILBOX_UNAVAILABLE_PERMANENT}};
+			}
+			if (
 				this->server.blockPeerHostNode.count(
 					this->peerHost().node)) {
 				std::cout << "Aborted " << this->mailFrom.value()
 									<< " > " << this->rcptTo << " from "
-									<< this->peerHost() << "." << std::endl;
+									<< this->peerHost()
+									<< " under `blockPeerHostNode` policy."
+									<< std::endl;
 				return {{StatusCode::
 						REQUEST_NOT_TAKEN_MAILBOX_UNAVAILABLE_PERMANENT}};
 			}
@@ -165,9 +176,10 @@ namespace Emilia::Smtp {
 				if (fromMailboxBeginIdx == std::string::npos) {
 					continue;
 				}
-				auto fromMailboxEndIdx{
-					line.find_last_of('>', fromMailboxBeginIdx)};
-				if (fromMailboxEndIdx == std::string::npos) {
+				auto fromMailboxEndIdx{line.find_last_of('>')};
+				if (
+					fromMailboxEndIdx == std::string::npos ||
+					fromMailboxEndIdx < fromMailboxBeginIdx) {
 					continue;
 				}
 				fromMailbox.emplace(line.substr(
@@ -182,7 +194,9 @@ namespace Emilia::Smtp {
 					fromMailbox.value())) {
 				std::cout << "Aborted " << this->mailFrom.value()
 									<< " > " << this->rcptTo << " from "
-									<< this->peerHost() << "." << std::endl;
+									<< this->peerHost()
+									<< " under `blockFromMailbox` policy."
+									<< std::endl;
 				return {{StatusCode::
 						REQUEST_NOT_TAKEN_MAILBOX_UNAVAILABLE_PERMANENT}};
 			}
