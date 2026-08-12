@@ -109,9 +109,11 @@ namespace Emilia::Smtp {
 		std::shared_mutex outboxMtx;
 		std::set<Envelope> outbox;
 
-		// Blocklists.
-		std::unordered_set<Mailbox> blockMailMailbox;
-		std::unordered_set<std::string> blockPeerHostNode;
+		// Blocklists. Use ordered set, which, while not
+		// necessary, helps with stable (de)serialization order.
+		std::set<Mailbox> blockMailMailbox,
+			blockFromMailbox;
+		std::set<std::string> blockPeerHostNode;
 
 		private:
 		// Manages the outbox.

@@ -1,7 +1,7 @@
 // Subclasses Rain::Networking::Smtp specializations for
 // custom SMTP server.
-#include <rain.hpp>
 #include <../rain/build/version.hpp>
+#include <rain.hpp>
 
 #include <smtp.hpp>
 
@@ -132,18 +132,57 @@ namespace Emilia::Smtp {
 			return {{StatusCode::SYNTAX_ERROR_COMMAND}};
 		}
 
-		// If this mail is on the blocklist, abort with error,
-		// but save the data for later analysis.
-		if (
-			this->server.blockMailMailbox.count(
-				this->mailFrom.value()) ||
-			this->server.blockPeerHostNode.count(
-				this->peerHost().node)) {
-			std::cout << "Aborted " << this->mailFrom.value()
-								<< " > " << this->rcptTo << " from "
-								<< this->peerHost() << "." << std::endl;
-			return {{StatusCode::
-					REQUEST_NOT_TAKEN_MAILBOX_UNAVAILABLE_PERMANENT}};
+		// If this mail is on the blocklist, abort with error.
+		{
+			Mailbox mailMailbox{this->mailFrom.value()};
+			auto plusAddressIdx{
+				mailMailbox.name.find_first_of('+')};
+			if (plusAddressIdx != std::string::npos) {
+				mailMailbox.name =
+					mailMailbox.name.substr(0, plusAddressIdx);
+			}
+			if (
+				this->server.blockMailMailbox.count(mailMailbox) ||
+				this->server.blockPeerHostNode.count(
+					this->peerHost().node)) {
+				std::cout << "Aborted " << this->mailFrom.value()
+									<< " > " << this->rcptTo << " from "
+									<< this->peerHost() << "." << std::endl;
+				return {{StatusCode::
+						REQUEST_NOT_TAKEN_MAILBOX_UNAVAILABLE_PERMANENT}};
+			}
+
+			// Block via the "From" header.
+			std::optional<Mailbox> fromMailbox;
+			std::ifstream dataFile(dataPath, std::ios::binary);
+			for (
+				std::string line; std::getline(dataFile, line);) {
+				if (line.substr(0, 5) != "From:") {
+					continue;
+				}
+				auto fromMailboxBeginIdx{line.find_first_of('<')};
+				if (fromMailboxBeginIdx == std::string::npos) {
+					continue;
+				}
+				auto fromMailboxEndIdx{
+					line.find_last_of('>', fromMailboxBeginIdx)};
+				if (fromMailboxEndIdx == std::string::npos) {
+					continue;
+				}
+				fromMailbox.emplace(line.substr(
+					fromMailboxBeginIdx + 1,
+					fromMailboxEndIdx - fromMailboxBeginIdx - 1));
+			}
+			if (
+				!fromMailbox ||
+				this->server.blockFromMailbox.count(
+					fromMailbox.value())) {
+				std::cout << "Aborted " << this->mailFrom.value()
+									<< " > " << this->rcptTo << " from "
+									<< this->peerHost() << "." << std::endl;
+				return {{StatusCode::
+						REQUEST_NOT_TAKEN_MAILBOX_UNAVAILABLE_PERMANENT}};
+			}
 		}
 
 		// Push the new envelopes to the outbox for the Server
@@ -202,7 +241,7 @@ namespace Emilia::Smtp {
 		std::vector<std::pair<std::size_t, std::string>> const
 			&mxRecords,
 		Server &server) :
-		SuperClient(mxRecords, 25),
+		SuperClient(mxRecords),
 		server(server) {}
 	void Client::send(Request &req) {
 		if (this->server.echo) {
@@ -241,10 +280,11 @@ namespace Emilia::Smtp {
 				Rain::Data::Deserializer deserializer(
 					deserializeStream);
 				deserializer >> this->blockMailMailbox >>
-					this->blockPeerHostNode;
+					this->blockFromMailbox >> this->blockPeerHostNode;
 			},
 			std::source_location::current())();
 		std::cout << "Found " << this->blockMailMailbox.size()
+							<< ", " << this->blockFromMailbox.size()
 							<< ", " << this->blockPeerHostNode.size()
 							<< " entries to block." << std::endl;
 
@@ -416,9 +456,10 @@ namespace Emilia::Smtp {
 								return {};
 							};
 
-							bool sent{false}, isTransientNegative{false};
+							bool sent{false}, isTransientNegative{false},
+								isDmarcError{false};
 							try {
-								auto res = attemptEnvelope(it);
+								auto res{attemptEnvelope(it)};
 								if (res) {
 									std::cerr << "Failed " << it.from << " > "
 														<< it.to << ".\n"
@@ -427,6 +468,16 @@ namespace Emilia::Smtp {
 										res->statusCode.getCategory() ==
 										StatusCode::Category::
 											TRANSIENT_NEGATIVE;
+									for (auto &line : res->lines) {
+										if (
+											line.find("DMARC") !=
+											std::string::npos) {
+											// If DMARC error, note that, and fail
+											// forever.
+											isDmarcError = true;
+											break;
+										}
+									}
 								} else {
 									std::cout << "Sent " << it.from << " > "
 														<< it.to << '.' << std::endl;
@@ -452,6 +503,9 @@ namespace Emilia::Smtp {
 								// retry attempt counter.
 								if (!isTransientNegative) {
 									it.attempt++;
+								}
+								if (isDmarcError) {
+									it.attempt = Envelope::ATTEMPTS_MAX;
 								}
 							}
 						}
@@ -493,6 +547,7 @@ namespace Emilia::Smtp {
 			this->serializeFile, std::ios_base::binary);
 		Rain::Data::Serializer serializer(serializeStream);
 		serializer << this->blockMailMailbox
+							 << this->blockFromMailbox
 							 << this->blockPeerHostNode;
 
 		this->closed = true;
