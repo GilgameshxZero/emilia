@@ -1,5 +1,5 @@
-#include <rain.hpp>
 #include <../rain/build/version.hpp>
+#include <rain.hpp>
 
 #include <emilia.hpp>
 
@@ -143,7 +143,9 @@ int main(int argc, char const *argv[]) {
 							 "the command-line.\n"
 						<< "refresh: Pull and rescan for HTTP "
 							 "snapshots.\n"
-						<< "block mail-mailbox/peer-host-node/print: "
+						<< "block "
+							 "mail-mailbox/from-mailbox/peer-host-node/"
+							 "print: "
 							 "Toggle entry on respective blocklist.\n"
 						<< std::endl;
 				} else if (command == "exit") {
@@ -260,6 +262,20 @@ int main(int argc, char const *argv[]) {
 						std::cout << "Removed " << entry << "."
 											<< std::endl;
 					}
+				} else if (command == "block from-mailbox") {
+					std::string entry;
+					std::cout << "Entry: ";
+					std::getline(std::cin, entry);
+					auto it{smtpServer->blockFromMailbox.find(entry)};
+					if (it == smtpServer->blockFromMailbox.end()) {
+						smtpServer->blockFromMailbox.insert(entry);
+						std::cout << "Added " << entry << "."
+											<< std::endl;
+					} else {
+						smtpServer->blockFromMailbox.erase(it);
+						std::cout << "Removed " << entry << "."
+											<< std::endl;
+					}
 				} else if (command == "block peer-host-node") {
 					std::string entry;
 					std::cout << "Entry: ";
@@ -277,6 +293,9 @@ int main(int argc, char const *argv[]) {
 					}
 				} else if (command == "block print") {
 					for (auto &i : smtpServer->blockMailMailbox) {
+						std::cout << i << std::endl;
+					}
+					for (auto &i : smtpServer->blockFromMailbox) {
 						std::cout << i << std::endl;
 					}
 					for (auto &i : smtpServer->blockPeerHostNode) {

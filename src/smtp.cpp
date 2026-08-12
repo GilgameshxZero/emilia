@@ -141,6 +141,7 @@ namespace Emilia::Smtp {
 				mailMailbox.name =
 					mailMailbox.name.substr(0, plusAddressIdx);
 			}
+			Rain::String::toLower(mailMailbox.name);
 			if (
 				this->server.blockMailMailbox.count(mailMailbox) ||
 				this->server.blockPeerHostNode.count(
@@ -172,6 +173,8 @@ namespace Emilia::Smtp {
 				fromMailbox.emplace(line.substr(
 					fromMailboxBeginIdx + 1,
 					fromMailboxEndIdx - fromMailboxBeginIdx - 1));
+				Rain::String::toLower(fromMailbox.value().name);
+				break;
 			}
 			if (
 				!fromMailbox ||
