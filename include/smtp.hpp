@@ -124,6 +124,7 @@ namespace Emilia::Smtp {
 		Rain::Networking::Smtp::Mailbox const &smtpForward;
 		std::string const &smtpPassword;
 		std::string const &serializeFile;
+		std::string const &loopbackAddress;
 		std::string const &maildir;
 
 		public:
@@ -131,6 +132,7 @@ namespace Emilia::Smtp {
 			Host const &,
 			std::atomic_bool const &,
 			Rain::Networking::Smtp::Mailbox const &,
+			std::string const &,
 			std::string const &,
 			std::string const &,
 			std::string const &);

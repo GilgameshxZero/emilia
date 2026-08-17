@@ -23,7 +23,10 @@ int main(int argc, char const *argv[]) {
 			// Parse command line options.
 			std::string httpPort{"0"}, smtpPort{"0"},
 				httpPassword, smtpForwardStr, smtpPassword,
-				smtpSerializeFile{"../../.smtp.ser"}, smtpMaildir{"../../../../../machine/gilgamesh-58/inbox"};
+				smtpSerializeFile{"../../.smtp.ser"},
+				smtpLoopbackAddress,
+				smtpMaildir{
+					"../../../../../machine/gilgamesh-58/inbox.maildir/"};
 			bool showHelp{false};
 
 			Rain::String::CommandLineParser parser;
@@ -36,6 +39,8 @@ int main(int argc, char const *argv[]) {
 			parser.addParser("smtp-password", smtpPassword);
 			parser.addParser(
 				"smtp-serialize-file", smtpSerializeFile);
+			parser.addParser(
+				"smtp-loopback-address", smtpLoopbackAddress);
 			parser.addParser("smtp-maildir", smtpMaildir);
 			try {
 				parser.parse(argc - 1, argv + 1);
@@ -68,6 +73,7 @@ int main(int argc, char const *argv[]) {
 										 "specified, enables authenticated "
 										 "clients to send from domain.\n"
 									<< "--smtp-serialize-file\n"
+									<< "--smtp-loopback-address\n"
 									<< "--smtp-maildir\n"
 									<< std::endl;
 				return 0;
@@ -91,6 +97,7 @@ int main(int argc, char const *argv[]) {
 					smtpForward,
 					smtpPassword,
 					smtpSerializeFile,
+					smtpLoopbackAddress,
 					smtpMaildir);
 			};
 			std::unique_ptr<Emilia::Smtp::Server> smtpServer(

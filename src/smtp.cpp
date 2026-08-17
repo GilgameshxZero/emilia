@@ -208,6 +208,22 @@ namespace Emilia::Smtp {
 		// Push the new envelopes to the outbox for the Server
 		// to send.
 		for (Mailbox const &rcptMailbox : this->rcptTo) {
+			// If envelope is addressed to a specific domain
+			// address, do not forward it to the forwarding
+			// address, and instead save it to the maildir.
+			if (
+				static_cast<std::string>(rcptMailbox) ==
+				this->server.loopbackAddress) {
+				std::filesystem::copy(
+					dataPath,
+					std::filesystem::path(this->server.maildir) /
+						"new" / dataPath.filename());
+				std::cout << "Inboxed loopback from "
+									<< this->mailFrom.value() << '.'
+									<< std::endl;
+				continue;
+			}
+
 			// Envelope data is copied from the dataFile.
 			std::string toB64{
 				Rain::String::Base64::encode(rcptMailbox)};
@@ -216,15 +232,6 @@ namespace Emilia::Smtp {
 				dataPath.string() + "-" + toB64.substr(0, 86) +
 				".email");
 			std::filesystem::copy(dataPath, envelopeDataPath);
-
-			// If envelope is addressed to @gilgamesh.cc,
-			// additionally copy it to a maildir.
-			if (rcptMailbox.host == "gilgamesh.cc") {
-				std::filesystem::copy(
-					dataPath,
-					std::filesystem::path(this->server.maildir) /
-						"new" / dataPath.filename());
-			}
 
 			// Emplace new envelope.
 			std::unique_lock lck(this->server.outboxMtx);
@@ -294,12 +301,14 @@ namespace Emilia::Smtp {
 		Rain::Networking::Smtp::Mailbox const &smtpForward,
 		std::string const &smtpPassword,
 		std::string const &serializeFile,
+		std::string const &loopbackAddress,
 		std::string const &maildir) :
 		SuperServer(host),
 		echo{echo},
 		smtpForward{smtpForward},
 		smtpPassword{smtpPassword},
 		serializeFile{serializeFile},
+		loopbackAddress{loopbackAddress},
 		maildir{maildir} {
 		Rain::Error::consumeThrowable(
 			[this]() {
