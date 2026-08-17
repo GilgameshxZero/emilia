@@ -111,8 +111,7 @@ namespace Emilia::Smtp {
 
 		// Blocklists. Use ordered set, which, while not
 		// necessary, helps with stable (de)serialization order.
-		std::set<Mailbox> blockMailMailbox,
-			blockFromMailbox;
+		std::set<Mailbox> blockMailMailbox, blockFromMailbox;
 		std::set<std::string> blockPeerHostNode;
 
 		private:
@@ -125,12 +124,14 @@ namespace Emilia::Smtp {
 		Rain::Networking::Smtp::Mailbox const &smtpForward;
 		std::string const &smtpPassword;
 		std::string const &serializeFile;
+		std::string const &maildir;
 
 		public:
 		Server(
 			Host const &,
 			std::atomic_bool const &,
 			Rain::Networking::Smtp::Mailbox const &,
+			std::string const &,
 			std::string const &,
 			std::string const &);
 		virtual ~Server();

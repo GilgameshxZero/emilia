@@ -23,7 +23,7 @@ int main(int argc, char const *argv[]) {
 			// Parse command line options.
 			std::string httpPort{"0"}, smtpPort{"0"},
 				httpPassword, smtpForwardStr, smtpPassword,
-				smtpSerializeFile{"../../.smtp.ser"};
+				smtpSerializeFile{"../../.smtp.ser"}, smtpMaildir{"../../../../../machine/gilgamesh-58/inbox"};
 			bool showHelp{false};
 
 			Rain::String::CommandLineParser parser;
@@ -36,6 +36,7 @@ int main(int argc, char const *argv[]) {
 			parser.addParser("smtp-password", smtpPassword);
 			parser.addParser(
 				"smtp-serialize-file", smtpSerializeFile);
+			parser.addParser("smtp-maildir", smtpMaildir);
 			try {
 				parser.parse(argc - 1, argv + 1);
 			} catch (...) {
@@ -66,6 +67,8 @@ int main(int argc, char const *argv[]) {
 									<< "--smtp-password (\"\"): If "
 										 "specified, enables authenticated "
 										 "clients to send from domain.\n"
+									<< "--smtp-serialize-file\n"
+									<< "--smtp-maildir\n"
 									<< std::endl;
 				return 0;
 			}
@@ -87,7 +90,8 @@ int main(int argc, char const *argv[]) {
 					echo,
 					smtpForward,
 					smtpPassword,
-					smtpSerializeFile);
+					smtpSerializeFile,
+					smtpMaildir);
 			};
 			std::unique_ptr<Emilia::Smtp::Server> smtpServer(
 				newSmtpServer());

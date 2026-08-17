@@ -217,6 +217,15 @@ namespace Emilia::Smtp {
 				".email");
 			std::filesystem::copy(dataPath, envelopeDataPath);
 
+			// If envelope is addressed to @gilgamesh.cc,
+			// additionally copy it to a maildir.
+			if (rcptMailbox.host == "gilgamesh.cc") {
+				std::filesystem::copy(
+					dataPath,
+					std::filesystem::path(this->server.maildir) /
+						"new" / dataPath.filename());
+			}
+
 			// Emplace new envelope.
 			std::unique_lock lck(this->server.outboxMtx);
 			this->server.outbox.emplace(
@@ -284,12 +293,14 @@ namespace Emilia::Smtp {
 		std::atomic_bool const &echo,
 		Rain::Networking::Smtp::Mailbox const &smtpForward,
 		std::string const &smtpPassword,
-		std::string const &serializeFile) :
+		std::string const &serializeFile,
+		std::string const &maildir) :
 		SuperServer(host),
-		echo(echo),
-		smtpForward(smtpForward),
-		smtpPassword(smtpPassword),
-		serializeFile(serializeFile) {
+		echo{echo},
+		smtpForward{smtpForward},
+		smtpPassword{smtpPassword},
+		serializeFile{serializeFile},
+		maildir{maildir} {
 		Rain::Error::consumeThrowable(
 			[this]() {
 				// De-serialize blocklists. May throw if format is
