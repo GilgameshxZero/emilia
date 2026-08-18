@@ -218,9 +218,9 @@ namespace Emilia::Smtp {
 					dataPath,
 					std::filesystem::path(this->server.maildir) /
 						"new" / dataPath.filename());
-				std::cout << "Inboxed loopback from "
-									<< this->mailFrom.value() << '.'
-									<< std::endl;
+				// std::cout << "Inboxed loopback from "
+				// 					<< this->mailFrom.value() << '.'
+				// 					<< std::endl;
 				continue;
 			}
 
