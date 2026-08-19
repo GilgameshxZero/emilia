@@ -37,12 +37,15 @@ namespace Emilia::Smtp {
 		}
 		return req;
 	}
-	Worker::ResponseAction Worker::onHelo(Request &) {
+	Worker::ResponseAction Worker::onHelo(Request &request) {
+		this->isEhlo = false;
+		this->ehloParameter = request.parameter;
 		return {
 			{StatusCode::REQUEST_COMPLETED,
 				{"gilgamesh.cc", "AUTH LOGIN"}}};
 	}
 	Worker::ResponseAction Worker::onEhlo(Request &request) {
+		this->isEhlo = true;
 		this->ehloParameter = request.parameter;
 		return {
 			{StatusCode::REQUEST_COMPLETED,
@@ -104,11 +107,12 @@ namespace Emilia::Smtp {
 		// debugging. Note that the "for" part of this is lost
 		// for mails with multiple `rcptTo`s, which may be
 		// undesireable.
+		// `id` tracking for transactions is not implemented.
 		dataFile << "Received: from " << this->ehloParameter
 						 << " (" << this->peerHost().node << ")\r\n\t"
 						 << "by gilgamesh.cc (Emilia)\r\n\t"
-						 << "with ESMTP\r\n\t"
-						 << "id 0";
+						 << "with " << (this->isEhlo ? "ESMTP" : "SMTP")
+						 << "\r\n\tid 0";
 		if (this->rcptTo.size() == 1) {
 			dataFile << "\r\n\tfor <"
 							 << static_cast<std::string>(
