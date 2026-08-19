@@ -229,7 +229,7 @@ namespace Emilia::Smtp {
 			std::replace(toB64.begin(), toB64.end(), '/', '_');
 			std::filesystem::path envelopeDataPath(
 				dataPath.string() + "-" + toB64.substr(0, 86) +
-				".email");
+				".eml");
 			std::filesystem::copy(dataPath, envelopeDataPath);
 
 			// Emplace new envelope.
