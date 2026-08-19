@@ -42,7 +42,8 @@ namespace Emilia::Smtp {
 			{StatusCode::REQUEST_COMPLETED,
 				{"gilgamesh.cc", "AUTH LOGIN"}}};
 	}
-	Worker::ResponseAction Worker::onEhlo(Request &) {
+	Worker::ResponseAction Worker::onEhlo(Request &request) {
+		this->ehloParameter = request.parameter;
 		return {
 			{StatusCode::REQUEST_COMPLETED,
 				{"gilgamesh.cc",
@@ -89,24 +90,9 @@ namespace Emilia::Smtp {
 		// constructed uniquely.
 		std::filesystem::path dataPath;
 		while (true) {
-			std::time_t timeNow = time(nullptr);
-			std::tm timeData;
-			Rain::Time::localtime_r(&timeNow, &timeData);
-			// Base64 is not filename-safe, so we replace '/' with
-			// '_' instead.
-			std::string fromB64{Rain::String::Base64::encode(
-				this->mailFrom.value())};
-			std::replace(
-				fromB64.begin(), fromB64.end(), '/', '_');
+			auto timeNow{std::chrono::system_clock::now()};
 			std::stringstream dataPathStream;
-			dataPathStream << timeData.tm_year << "-"
-										 << timeData.tm_mon << "-"
-										 << timeData.tm_mday << "-"
-										 << timeData.tm_hour << "-"
-										 << timeData.tm_min << "-"
-										 << timeData.tm_sec << "-"
-										 << std::rand() << "-"
-										 << fromB64.substr(0, 86);
+			dataPathStream << timeNow << std::rand();
 			dataPath = std::filesystem::temp_directory_path() /
 				dataPathStream.str();
 			if (!std::filesystem::exists(dataPath)) {
@@ -114,13 +100,28 @@ namespace Emilia::Smtp {
 			}
 		}
 		std::ofstream dataFile(dataPath, std::ios::binary);
-		dataFile << "X-Emilia-Peer-Host: " << this->peerHost()
-						 << "\r\n"
-						 << "X-Emilia-Mail-From: "
-						 << this->mailFrom.value() << "\r\n";
-		for (Mailbox const &mailbox : this->rcptTo) {
-			dataFile << "X-Emilia-Rcpt-To: " << mailbox << "\r\n";
+		// Make a new `Received` header for this hop, for
+		// debugging. Note that the "for" part of this is lost
+		// for mails with multiple `rcptTo`s, which may be
+		// undesireable.
+		dataFile << "Received: from " << this->ehloParameter
+						 << "(" << this->peerHost().node << ")\n\t"
+						 << "by gilgamesh.cc (Emilia)\n\t"
+						 << "with ESMTP\n\t"
+						 << "id 0";
+		if (this->rcptTo.size() == 1) {
+			dataFile << "\n\tfor <"
+							 << static_cast<std::string>(
+										*this->rcptTo.begin())
+							 << ">";
 		}
+		std::time_t time{std::chrono::system_clock::to_time_t(
+			std::chrono::system_clock::now())};
+		std::tm timeData;
+		Rain::Time::localtime_r(&time, &timeData);
+		dataFile << ";\n\t"
+						 << std::put_time(
+									&timeData, "%a, %d %b %Y %H:%M:%S +0000");
 
 		// If no data came through the connection, assume an
 		// error.
@@ -218,9 +219,6 @@ namespace Emilia::Smtp {
 					dataPath,
 					std::filesystem::path(this->server.maildir) /
 						"new" / dataPath.filename());
-				// std::cout << "Inboxed loopback from "
-				// 					<< this->mailFrom.value() << '.'
-				// 					<< std::endl;
 				continue;
 			}
 

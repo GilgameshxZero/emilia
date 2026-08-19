@@ -25,6 +25,7 @@ namespace Emilia::Smtp {
 			Rain::Networking::NoLingerSocketOption>;
 
 		bool authenticated{false};
+		std::string ehloParameter;
 
 		Server &server;
 

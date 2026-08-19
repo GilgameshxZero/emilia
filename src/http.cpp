@@ -1,10 +1,10 @@
 // Subclasses Rain::Networking::Http specializations for
 // custom HTTP server.
-#include <rain.hpp>
 #include <../rain/build/version.hpp>
+#include <rain.hpp>
 
-#include <http.hpp>
 #include <../build/version.hpp>
+#include <http.hpp>
 
 #include <emilia.hpp>
 #include <envelope.hpp>
@@ -118,8 +118,8 @@ namespace Emilia::Http {
 		Request &req,
 		std::smatch const &) {
 		using namespace Rain::Literal;
-		std::time_t time = std::chrono::system_clock::to_time_t(
-			std::chrono::system_clock::now());
+		std::time_t time{std::chrono::system_clock::to_time_t(
+			std::chrono::system_clock::now())};
 		std::tm timeData;
 		Rain::Time::localtime_r(&time, &timeData);
 
@@ -131,17 +131,16 @@ namespace Emilia::Http {
 			std::numeric_limits<unsigned char>::digits,
 			unsigned char>
 			independentBitsEngine(randomDevice());
-		std::array<unsigned char, 16> randomBytes[2];
+		std::array<unsigned char, 16> randomBytes;
 		// Important to pass with std::ref so that the IBE is
 		// modified.
 		std::generate(
-			randomBytes[0].begin(),
-			randomBytes[0].end(),
+			randomBytes.begin(),
+			randomBytes.end(),
 			std::ref(independentBitsEngine));
-		std::generate(
-			randomBytes[1].begin(),
-			randomBytes[1].end(),
-			std::ref(independentBitsEngine));
+		// Fix bytes in UUIDv4.
+		randomBytes[6] = (randomBytes[6] & 0x0F) | 0x40;
+		randomBytes[8] = (randomBytes[8] & 0x3F) | 0x80;
 
 		std::stringstream ss;
 		ss
@@ -170,10 +169,8 @@ namespace Emilia::Http {
 			<< '\n'
 			<< "UUIDv4: "
 			<< Rain::String::asHexStr(
-					 randomBytes[0],
+					 randomBytes,
 					 Rain::String::HexStrFormat::UUID_V4)
-			<< '\n'
-			<< "Raw:    " << Rain::String::asHexStr(randomBytes[1])
 			<< '\n'
 			<< '\n'
 			<< "Your request:\n"
