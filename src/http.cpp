@@ -83,11 +83,6 @@ namespace Emilia::Http {
 				"/api/snapshots/(.+).json/?" + queryFragment,
 				{Method::GET},
 				&Worker::getApiSnapshotsJson},
-			// Refreshes snapshot listings.
-			{hostRegex,
-				"/api/snapshots/refresh/?" + queryFragment,
-				{Method::POST},
-				&Worker::getApiSnapshotsRefresh},
 			// Noscript handlers.
 			{hostRegex,
 				"/api/noscript.html/?" + queryFragment,
@@ -169,8 +164,7 @@ namespace Emilia::Http {
 			<< '\n'
 			<< "UUIDv4: "
 			<< Rain::String::asHexStr(
-					 randomBytes,
-					 Rain::String::HexStrFormat::UUID_V4)
+					 randomBytes, Rain::String::HexStrFormat::UUID_V4)
 			<< '\n'
 			<< '\n'
 			<< "Your request:\n"
@@ -275,8 +269,12 @@ namespace Emilia::Http {
 		{
 			Rain::Multithreading::SharedLockGuard lck(
 				this->server.snapshotsMtx);
+			auto tagMatch{this->server.tags.find(match[1])};
+			if (tagMatch == this->server.tags.end()) {
+				return {{StatusCode::NOT_FOUND}};
+			}
 			std::vector<std::string> const &tagSnapshots{
-				this->server.tags[match[1]]};
+				tagMatch->second};
 			auto it{tagSnapshots.begin()};
 			// Also stream snapshot information so that FE does
 			// not need to make multiple requests.
@@ -314,7 +312,12 @@ namespace Emilia::Http {
 	Worker::ResponseAction Worker::getApiSnapshotsJson(
 		Request &,
 		std::smatch const &match) {
-		auto snapshot{this->server.snapshots[match[1]]};
+		auto snapshotMatch{
+			this->server.snapshots.find(match[1])};
+		if (snapshotMatch == this->server.snapshots.end()) {
+			return {{StatusCode::NOT_FOUND}};
+		}
+		auto snapshot{snapshotMatch->second};
 		std::stringstream ss;
 		ss << "{\"name\": \"" << match[1] << "\", \"title\": \""
 			 << snapshot.title << "\", \"date\": \""
@@ -330,14 +333,6 @@ namespace Emilia::Http {
 					{"Content-Length", std::to_string(ssLen)},
 					{"Access-Control-Allow-Origin", "*"}}},
 				std::move(*ss.rdbuf())}};
-	}
-	Worker::ResponseAction Worker::getApiSnapshotsRefresh(
-		Request &,
-		std::smatch const &) {
-		this->server.refreshSnapshots();
-		return {
-			{StatusCode::OK,
-				{{{"Access-Control-Allow-Origin", "*"}}}}};
 	}
 	Worker::ResponseAction Worker::getApiNoscriptHtml(
 		Request &,
