@@ -105,12 +105,12 @@ namespace Emilia::Smtp {
 		// for mails with multiple `rcptTo`s, which may be
 		// undesireable.
 		dataFile << "Received: from " << this->ehloParameter
-						 << "(" << this->peerHost().node << ")\n\t"
-						 << "by gilgamesh.cc (Emilia)\n\t"
-						 << "with ESMTP\n\t"
+						 << " (" << this->peerHost().node << ")\r\n\t"
+						 << "by gilgamesh.cc (Emilia)\r\n\t"
+						 << "with ESMTP\r\n\t"
 						 << "id 0";
 		if (this->rcptTo.size() == 1) {
-			dataFile << "\n\tfor <"
+			dataFile << "\r\n\tfor <"
 							 << static_cast<std::string>(
 										*this->rcptTo.begin())
 							 << ">";
@@ -119,9 +119,10 @@ namespace Emilia::Smtp {
 			std::chrono::system_clock::now())};
 		std::tm timeData;
 		Rain::Time::localtime_r(&time, &timeData);
-		dataFile << ";\n\t"
+		dataFile << ";\r\n\t"
 						 << std::put_time(
-									&timeData, "%a, %d %b %Y %H:%M:%S +0000");
+									&timeData, "%a, %d %b %Y %H:%M:%S +0000")
+						 << "\r\n";
 
 		// If no data came through the connection, assume an
 		// error.
