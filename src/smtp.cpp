@@ -40,6 +40,16 @@ namespace Emilia::Smtp {
 	Worker::ResponseAction Worker::onHelo(Request &request) {
 		this->isEhlo = false;
 		this->ehloParameter = request.parameter;
+		std::replace(
+			this->ehloParameter.begin(),
+			this->ehloParameter.end(),
+			'\r',
+			' ');
+		std::replace(
+			this->ehloParameter.begin(),
+			this->ehloParameter.end(),
+			'\n',
+			' ');
 		return {
 			{StatusCode::REQUEST_COMPLETED,
 				{"gilgamesh.cc", "AUTH LOGIN"}}};
@@ -47,6 +57,16 @@ namespace Emilia::Smtp {
 	Worker::ResponseAction Worker::onEhlo(Request &request) {
 		this->isEhlo = true;
 		this->ehloParameter = request.parameter;
+		std::replace(
+			this->ehloParameter.begin(),
+			this->ehloParameter.end(),
+			'\r',
+			' ');
+		std::replace(
+			this->ehloParameter.begin(),
+			this->ehloParameter.end(),
+			'\n',
+			' ');
 		return {
 			{StatusCode::REQUEST_COMPLETED,
 				{"gilgamesh.cc",
@@ -302,7 +322,8 @@ namespace Emilia::Smtp {
 								<< std::endl;
 		}
 		// Any username is valid, but the password has to
-		// match.
+		// match. Only one user knows the password, and they can
+		// auth as anyone they want.
 		if (
 			!this->server.smtpPassword.empty() &&
 			this->server.smtpPassword == password) {
