@@ -128,12 +128,47 @@ namespace Emilia::Smtp {
 									&timeData, "%a, %d %b %Y %H:%M:%S +0000")
 						 << "\r\n";
 
-		// If no data came through the connection, assume an
-		// error.
+		// Fail if available disk size is low.
+		static std::size_t const MAX_ENVELOPE_SIZE{
+			64 * 1024 * 1024},
+			BUFFER_SIZE{64 * 1024};
+		std::array<char, BUFFER_SIZE> buffer;
+		if (
+			std::filesystem::space(dataPath.parent_path())
+				.available < MAX_ENVELOPE_SIZE) {
+			// TODO: dataFile on disk is not cleaned up.
+			return {{StatusCode::
+					REQUEST_NOT_TAKEN_INSUFFICIENT_STORAGE}};
+		}
+
+		// Read up to MAX_ENVELOPE_SIZE characters.
 		std::streampos beforeDataPos{dataFile.tellp()};
-		dataFile << stream.rdbuf();
+		for (std::size_t envelopeSize{};;) {
+			if (envelopeSize >= MAX_ENVELOPE_SIZE) {
+				// TODO: dataFile on disk is not cleaned up.
+				return {{StatusCode::
+						REQUEST_ABORTED_INSUFFICIENT_STORAGE_PERMANENT}};
+			}
+			auto bufferRead{stream.rdbuf()->sgetn(
+				buffer.data(),
+				min(
+					BUFFER_SIZE, MAX_ENVELOPE_SIZE - envelopeSize))};
+			if (bufferRead <= 0) {
+				break;
+			}
+			dataFile.write(buffer.data(), bufferRead);
+			if (!dataFile) {
+				// TODO: cleanup.
+				return {{StatusCode::
+						REQUEST_NOT_TAKEN_INSUFFICIENT_STORAGE}};
+			}
+			envelopeSize += bufferRead;
+		}
 		std::streampos afterDataPos{dataFile.tellp()};
 		dataFile.close();
+
+		// If no data came through the connection, assume an
+		// error.
 		if (beforeDataPos == afterDataPos) {
 			std::filesystem::remove(dataPath);
 			return {{StatusCode::SYNTAX_ERROR_COMMAND}};
@@ -266,7 +301,8 @@ namespace Emilia::Smtp {
 								<< ": " << username << " : " << password
 								<< std::endl;
 		}
-		// Any username is valid, but the password has to match.
+		// Any username is valid, but the password has to
+		// match.
 		if (
 			!this->server.smtpPassword.empty() &&
 			this->server.smtpPassword == password) {
@@ -345,15 +381,16 @@ namespace Emilia::Smtp {
 					[this]() {
 						std::vector<Envelope> toAttempt;
 						{
-							// This lambda should only be called while we
-							// have an exclusive lock on the outboxMtx.
+							// This lambda should only be called while
+							// we have an exclusive lock on the
+							// outboxMtx.
 							auto const getAttemptEnvelopes =
 								[this, &toAttempt]() {
 									auto timeNow{
 										std::chrono::steady_clock::now()};
-									// Assume we have exclusive lock. Move all
-									// envelopes we want to send from the
-									// outbox to toAttempt.
+									// Assume we have exclusive lock. Move
+									// all envelopes we want to send from
+									// the outbox to toAttempt.
 									for (
 										auto it{this->outbox.begin()};
 										it != this->outbox.end();) {
@@ -371,8 +408,8 @@ namespace Emilia::Smtp {
 									}
 								};
 
-							// Wait on mutex only if no pending envelopes
-							// are ready yet.
+							// Wait on mutex only if no pending
+							// envelopes are ready yet.
 							std::unique_lock lck(this->outboxMtx);
 							getAttemptEnvelopes();
 							if (toAttempt.empty()) {
@@ -384,9 +421,9 @@ namespace Emilia::Smtp {
 								getAttemptEnvelopes();
 							}
 
-							// Done with exclusive lock; we will add these
-							// envelopes back later with an updated
-							// status.
+							// Done with exclusive lock; we will add
+							// these envelopes back later with an
+							// updated status.
 						}
 
 						// All attempted envelopes should be PENDING.
@@ -406,8 +443,9 @@ namespace Emilia::Smtp {
 							auto const attemptEnvelope =
 								[this](Envelope const &envelope)
 								-> std::optional<Client::Response> {
-								// Translate to/from. Mails are always from
-								// postmaster@node. If the to mailbox is
+								// Translate to/from. Mails are always
+								// from postmaster@node. If the to mailbox
+								// is
 								// @node, then it is instead redirected to
 								// the smtpForward. Otherwise, it remains
 								// the same.
@@ -515,8 +553,8 @@ namespace Emilia::Smtp {
 										if (
 											line.find("DMARC") !=
 											std::string::npos) {
-											// If DMARC error, note that, and fail
-											// forever.
+											// If DMARC error, note that, and
+											// fail forever.
 											isDmarcError = true;
 											break;
 										}
@@ -554,11 +592,11 @@ namespace Emilia::Smtp {
 						}
 
 						// For each attempt, insert its updated status
-						// back into the outbox. None of them should be
-						// PENDING anymore. For those marked as RETRIED,
-						// insert a PENDING envelope in addition. For
-						// those marked as success, delete the data
-						// file.
+						// back into the outbox. None of them should
+						// be PENDING anymore. For those marked as
+						// RETRIED, insert a PENDING envelope in
+						// addition. For those marked as success,
+						// delete the data file.
 						std::unique_lock lck(this->outboxMtx);
 						for (auto const &it : toAttempt) {
 							if (it.status == Envelope::Status::SUCCESS) {
