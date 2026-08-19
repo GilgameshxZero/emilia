@@ -151,7 +151,7 @@ namespace Emilia::Smtp {
 		// Fail if available disk size is low.
 		static std::size_t const MAX_ENVELOPE_SIZE{
 			64 * 1024 * 1024},
-			BUFFER_SIZE{64 * 1024};
+			BUFFER_SIZE{1024};
 		std::array<char, BUFFER_SIZE> buffer;
 		if (
 			std::filesystem::space(dataPath.parent_path())
