@@ -115,7 +115,8 @@ namespace Emilia::Smtp {
 		while (true) {
 			auto timeNow{std::chrono::system_clock::now()};
 			std::stringstream dataPathStream;
-			dataPathStream << timeNow.time_since_epoch() << std::rand();
+			dataPathStream << timeNow.time_since_epoch().count()
+										 << '-' << std::rand();
 			dataPath = std::filesystem::temp_directory_path() /
 				dataPathStream.str();
 			if (!std::filesystem::exists(dataPath)) {
