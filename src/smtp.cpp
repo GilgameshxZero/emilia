@@ -1,6 +1,5 @@
 // Subclasses Rain::Networking::Smtp specializations for
 // custom SMTP server.
-#include "rain/string/string.hpp"
 #include <../rain/build/version.hpp>
 #include <rain.hpp>
 

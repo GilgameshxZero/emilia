@@ -5,6 +5,7 @@
 
 #include <envelope.hpp>
 #include <http.hpp>
+#include <imap.hpp>
 #include <smtp.hpp>
 
 int main(int argc, char const *argv[]) {
@@ -22,11 +23,11 @@ int main(int argc, char const *argv[]) {
 
 			// Parse command line options.
 			std::string httpPort{"0"}, smtpPort{"0"},
-				httpPassword, smtpForwardStr, smtpPassword,
-				smtpSerializeFile{"../../.smtp.ser"},
+				imapPort{"0"}, httpPassword, smtpForwardStr,
+				smtpPassword, smtpSerializeFile{"../../.smtp.ser"},
 				smtpLoopbackAddress,
-				smtpMaildir{
-					"../../../../../machine/gilgamesh-58/inbox.maildir/"};
+				smtpMaildir{"../../../../../machine/gilgamesh-58/"
+										"inbox.maildir/"};
 			bool showHelp{false};
 
 			Rain::String::CommandLineParser parser;
@@ -34,6 +35,7 @@ int main(int argc, char const *argv[]) {
 			parser.addParser("h", showHelp);
 			parser.addParser("http-port", httpPort);
 			parser.addParser("smtp-port", smtpPort);
+			parser.addParser("imap-port", imapPort);
 			parser.addParser("http-password", httpPassword);
 			parser.addParser("smtp-forward", smtpForwardStr);
 			parser.addParser("smtp-password", smtpPassword);
@@ -116,6 +118,13 @@ int main(int argc, char const *argv[]) {
 				newHttpServer());
 			std::cout << "HTTP server listening on "
 								<< httpServer->host() << "..." << std::endl;
+			auto newImapServer = [&]() {
+				return new Emilia::Imap::Server({"", imapPort});
+			};
+			std::unique_ptr<Emilia::Imap::Server> imapServer{
+				newImapServer()};
+			std::cout << "IMAP server listening on "
+								<< imapServer->host() << "..." << std::endl;
 
 			// Parse commands.
 			std::cout << "Listening to commands..." << std::endl;
@@ -319,14 +328,13 @@ int main(int argc, char const *argv[]) {
 			}
 
 			// Attempt graceful close.
-			std::cout << "Attempting graceful close of HTTP and "
-									 "SMTP servers..."
+			std::cout << "Attempting graceful close of servers..."
 								<< std::endl;
 			httpServer.reset();
 			smtpServer.reset();
-			std::cout
-				<< "Gracefully closed HTTP and SMTP servers."
-				<< std::endl;
+			imapServer.reset();
+			std::cout << "Gracefully closed servers."
+								<< std::endl;
 
 			return 0;
 		},
