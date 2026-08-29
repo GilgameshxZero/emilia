@@ -6,6 +6,7 @@
 #include <smtp.hpp>
 
 #include <emilia.hpp>
+#include <thread>
 
 namespace Emilia::Smtp {
 	Worker::Worker(
@@ -324,6 +325,8 @@ namespace Emilia::Smtp {
 		// Any username is valid, but the password has to
 		// match. Only one user knows the password, and they can
 		// auth as anyone they want.
+		using namespace Rain::Literal;
+		std::this_thread::sleep_for(1s);
 		if (
 			!this->server.smtpPassword.empty() &&
 			this->server.smtpPassword == password) {
