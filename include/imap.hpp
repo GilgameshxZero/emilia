@@ -17,7 +17,7 @@ namespace Emilia::Imap {
 			Rain::Networking::NoLingerSocketOption>;
 
 		public:
-	Worker(NativeSocket, SocketInterface *);
+		Worker(NativeSocket, SocketInterface *);
 	};
 
 	class Client :
