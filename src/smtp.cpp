@@ -1,6 +1,7 @@
 // Subclasses Rain::Networking::Smtp specializations for
 // custom SMTP server.
 #include <../rain/build/version.hpp>
+#include <chrono>
 #include <rain.hpp>
 
 #include <smtp.hpp>
@@ -267,6 +268,32 @@ namespace Emilia::Smtp {
 			}
 		}
 
+		// Interpret the X-Emilia-Deliver-After header for
+		// scheduled sends.
+		std::chrono::steady_clock::duration deliverDelay{};
+		{
+			std::ifstream dataFile(dataPath, std::ios::binary);
+			for (
+				std::string line; std::getline(dataFile, line);) {
+				if (
+					line.substr(0, 23) != "X-Emilia-Deliver-After:") {
+					continue;
+				}
+				std::tm tm;
+				std::istringstream iss{line.substr(23)};
+				iss >> std::get_time(&tm, "%Y-%m-%dT%H:%M:%SZ");
+				if (iss.fail()) {
+					continue;
+				}
+				deliverDelay = max(
+					std::chrono::system_clock::from_time_t(
+						std::mktime(&tm)) -
+						std::chrono::system_clock::now(),
+					std::chrono::steady_clock::duration::zero());
+				break;
+			}
+		}
+
 		// Push the new envelopes to the outbox for the Server
 		// to send.
 		for (Mailbox const &rcptMailbox : this->rcptTo) {
@@ -297,7 +324,7 @@ namespace Emilia::Smtp {
 			this->server.outbox.emplace(
 				Envelope::Status::PENDING,
 				0,
-				std::chrono::steady_clock::now(),
+				std::chrono::steady_clock::now() + deliverDelay,
 				this->mailFrom.value(),
 				rcptMailbox,
 				envelopeDataPath);
@@ -396,9 +423,8 @@ namespace Emilia::Smtp {
 		this->sender = std::thread([this]() {
 			// using namespace Rain::Literal;
 
-			// Attempt remaining envelopes in the outbox every
-			// hour or so. Envelopes will be ready to be retried
-			// every hour.
+			// Attempt pending envelopes. Re-scans them every
+			// minute.
 			while (!this->closed) {
 				// Log any throws.
 				Rain::Error::consumeThrowable(
@@ -437,8 +463,8 @@ namespace Emilia::Smtp {
 							std::unique_lock lck(this->outboxMtx);
 							getAttemptEnvelopes();
 							if (toAttempt.empty()) {
-								this->outboxEv.wait_for(
-									lck, Envelope::RETRY_WAIT);
+								using namespace Rain::Literal;
+								this->outboxEv.wait_for(lck, 60s);
 								if (this->closed) {
 									return;
 								}
