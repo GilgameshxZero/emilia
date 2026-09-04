@@ -289,8 +289,7 @@ namespace Emilia::Smtp {
 					std::chrono::system_clock::from_time_t(
 						std::mktime(&tm)) -
 						std::chrono::system_clock::now(),
-					std::chrono::steady_clock::duration::zero());
-				break;
+					deliverDelay);
 			}
 		}
 
