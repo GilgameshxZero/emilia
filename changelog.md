@@ -1,5 +1,29 @@
 # Changelog
 
+## 8.5.26
+
+1. Fix `/api/status` to properly display versioning information.
+2. Adjust SMTP retires to sqrt-backoff, up to 150 times. 5xx errors are double-penalized.
+	1. DMARC failures are not retried.
+3. Add UUIDv4 generator to `/api/status`.
+4. `slush` is now gitignored.
+5. Images are re-encoded to `.avif`. Videos are re-encoded via new settings to `.mkv` AV1 + opus across the board. `.zip` is re-encoded to `.tar.xz`.
+6. Blocklist updated. Added blocklist based on `From:` header. Serialized blocklist is now ordered to prevent too many changes.
+7. Updated forwarding scheme so that the source of truth is now stored in a `maildir`.
+8. Old `X-Emilia` headers are replaced with a single `Received:` header.
+9. Cached emails are stored with `.eml` instead of `.email`. Removed the B64-encoded emails in the filename, and revert to epoch + random int.
+10. Prepare for implementation of IMAP server.
+11. Various security fixes.
+	1.  Updated various parsers in `rain`. See `rain` changelog.
+	2.  Removed snapshots refresh endpoint.
+	3.  Return 404 for invalid snapshots tag query.
+	4.  Implement maximum size of 100MB for SMTP envelopes.
+	5.  Lowered SMTP data buffer size.
+12. Added `image/avif` as a Content-Type in HTTP (via `rain`).
+13. `X-Emilia-Deliver-After` allows for delayed send of emails.
+14. SMTP underflow bug fix (via `rain`).
+15. Standardize line endings to LF.
+
 ## 8.5.25
 
 1. Push `rain` to `7.5.1`, which removes the need to specify TCP buffer size and stream timeouts, as well as the TCP family and Stream type for sockets which inherit TCP sockets.

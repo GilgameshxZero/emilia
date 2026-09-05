@@ -6,7 +6,7 @@
 namespace Emilia::Imap {
 	Worker::Worker(
 		NativeSocket nativeSocket,
-		SocketInterface *interrupter) : 
+		SocketInterface *interrupter) :
 		SuperWorker(nativeSocket, interrupter) {
 		std::cout << "IMAP Worker created." << std::endl;
 	}
