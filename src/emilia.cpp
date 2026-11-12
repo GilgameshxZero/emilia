@@ -26,7 +26,7 @@ int main(int argc, char const *argv[]) {
 				imapPort{"0"}, httpPassword, smtpForwardStr,
 				smtpPassword, smtpSerializeFile{"../../.smtp.ser"},
 				smtpLoopbackAddress,
-				smtpMaildir{"../../../../../machine/gilgamesh-58/"
+				smtpMaildir{"../../../../../module/email/"
 										"inbox.maildir/"};
 			bool showHelp{false};
 
