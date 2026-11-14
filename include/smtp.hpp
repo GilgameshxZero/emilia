@@ -123,18 +123,14 @@ namespace Emilia::Smtp {
 
 		// Other state from constructor.
 		std::atomic_bool const &echo;
-		Rain::Networking::Smtp::Mailbox const &smtpForward;
 		std::string const &smtpPassword;
 		std::string const &serializeFile;
-		std::string const &loopbackAddress;
 		std::string const &maildir;
 
 		public:
 		Server(
 			Host const &,
 			std::atomic_bool const &,
-			Rain::Networking::Smtp::Mailbox const &,
-			std::string const &,
 			std::string const &,
 			std::string const &,
 			std::string const &);

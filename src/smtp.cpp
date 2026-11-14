@@ -99,17 +99,6 @@ namespace Emilia::Smtp {
 	}
 	Worker::ResponseAction Worker::onDataStream(
 		std::istream &stream) {
-		// This function is only called when mailFrom/rcptTo are
-		// non-empty, and those are only non-empty if valid
-		// parameters have been given.
-		if (
-			this->server.smtpForward.name.empty() ||
-			this->server.smtpForward.host.node.empty()) {
-			return {
-				{StatusCode::TRANSACTION_FAILED,
-					{{"No forwarding configured."}}}};
-		}
-
 		// Receive and save to a file, whose filename is
 		// constructed uniquely.
 		std::filesystem::path dataPath;
@@ -128,7 +117,7 @@ namespace Emilia::Smtp {
 		// Make a new `Received` header for this hop, for
 		// debugging. Note that the "for" part of this is lost
 		// for mails with multiple `rcptTo`s, which may be
-		// undesireable.
+		// undesirable.
 		// `id` tracking for transactions is not implemented.
 		dataFile << "Received: from " << this->ehloParameter
 						 << " (" << this->peerHost().node << ")\r\n\t"
@@ -296,41 +285,39 @@ namespace Emilia::Smtp {
 		// Push the new envelopes to the outbox for the Server
 		// to send.
 		for (Mailbox const &rcptMailbox : this->rcptTo) {
-			// If envelope is addressed to a specific domain
-			// address, do not forward it to the forwarding
-			// address, and instead save it to the maildir.
-			if (
-				static_cast<std::string>(rcptMailbox) ==
-				this->server.loopbackAddress) {
-				// Local copy: undo SMTP DATA framing. The outbox
-				// copies keep the terminator for forwarding.
-				std::ifstream in(dataPath, std::ios::binary);
-				std::ofstream out(
-					std::filesystem::path(this->server.maildir) /
-						"new" / dataPath.filename(),
-					std::ios::binary);
-				// We need to unstuff here for a valid mail file for
-				// maildir.
-				for (std::string line; std::getline(in, line);) {
-					bool const crlf{
-						!line.empty() && line.back() == '\r'};
-					if (crlf) {
-						line.pop_back();
-					}
-					// Real "." lines arrive dot-stuffed as "..",
-					// so a bare "." is always the terminator.
-					if (line == ".") {
-						break;
-					}
-					// Unstuff one leading ".".
-					if (!line.empty() && line[0] == '.') {
-						line.erase(0, 1);
-					}
-					out << line;
-					if (crlf || !in.eof()) {
-						out << "\r\n";
-					}
+			// Local copy: undo SMTP DATA framing. The outbox
+			// copies keep the terminator for forwarding.
+			std::ifstream in(dataPath, std::ios::binary);
+			std::ofstream out(
+				std::filesystem::path(this->server.maildir) /
+					"new" / dataPath.filename(),
+				std::ios::binary);
+			// We need to un-stuff here for a valid mail file for
+			// maildir.
+			for (std::string line; std::getline(in, line);) {
+				bool const crlf{
+					!line.empty() && line.back() == '\r'};
+				if (crlf) {
+					line.pop_back();
 				}
+				// Real "." lines arrive dot-stuffed as "..",
+				// so a bare "." is always the terminator.
+				if (line == ".") {
+					break;
+				}
+				// Un-stuff one leading ".".
+				if (!line.empty() && line[0] == '.') {
+					line.erase(0, 1);
+				}
+				out << line;
+				if (crlf || !in.eof()) {
+					out << "\r\n";
+				}
+			}
+
+			// If the envelope is addressed to any address
+			// @gilgamesh.cc, we are done.
+			if (rcptMailbox.host.node == "gilgamesh.cc") {
 				continue;
 			}
 
@@ -412,17 +399,13 @@ namespace Emilia::Smtp {
 	Server::Server(
 		Host const &host,
 		std::atomic_bool const &echo,
-		Rain::Networking::Smtp::Mailbox const &smtpForward,
 		std::string const &smtpPassword,
 		std::string const &serializeFile,
-		std::string const &loopbackAddress,
 		std::string const &maildir) :
 		SuperServer(host),
 		echo{echo},
-		smtpForward{smtpForward},
 		smtpPassword{smtpPassword},
 		serializeFile{serializeFile},
-		loopbackAddress{loopbackAddress},
 		maildir{maildir} {
 		Rain::Error::consumeThrowable(
 			[this]() {
@@ -525,10 +508,7 @@ namespace Emilia::Smtp {
 								// the same.
 								static Mailbox const from(
 									"postmaster", "gilgamesh.cc");
-								Mailbox to(
-									envelope.to.host == Host("gilgamesh.cc")
-										? this->smtpForward
-										: envelope.to);
+								Mailbox to{envelope.to};
 
 								Client client(
 									Rain::Networking::getMxRecords(to.host),

@@ -23,9 +23,8 @@ int main(int argc, char const *argv[]) {
 
 			// Parse command line options.
 			std::string httpPort{"0"}, smtpPort{"0"},
-				imapPort{"0"}, httpPassword, smtpForwardStr,
-				smtpPassword, smtpSerializeFile{"../../.smtp.ser"},
-				smtpLoopbackAddress,
+				imapPort{"0"}, httpPassword, smtpPassword,
+				smtpSerializeFile{"../../.smtp.ser"},
 				smtpMaildir{"../../../../../module/email/"
 										"inbox.maildir/"};
 			bool showHelp{false};
@@ -37,12 +36,9 @@ int main(int argc, char const *argv[]) {
 			parser.addParser("smtp-port", smtpPort);
 			parser.addParser("imap-port", imapPort);
 			parser.addParser("http-password", httpPassword);
-			parser.addParser("smtp-forward", smtpForwardStr);
 			parser.addParser("smtp-password", smtpPassword);
 			parser.addParser(
 				"smtp-serialize-file", smtpSerializeFile);
-			parser.addParser(
-				"smtp-loopback-address", smtpLoopbackAddress);
 			parser.addParser("smtp-maildir", smtpMaildir);
 			try {
 				parser.parse(argc - 1, argv + 1);
@@ -67,23 +63,16 @@ int main(int argc, char const *argv[]) {
 										 "server.\n"
 									<< "--http-password (\"\"): Password for "
 										 "authenticated routes.\n"
-									<< "--smtp-forward (\"\"): If specified, "
-										 "forwards all received "
-										 "emails to "
-										 "listed address.\n"
 									<< "--smtp-password (\"\"): If "
 										 "specified, enables authenticated "
 										 "clients to send from domain.\n"
 									<< "--smtp-serialize-file\n"
-									<< "--smtp-loopback-address\n"
 									<< "--smtp-maildir\n"
 									<< std::endl;
 				return 0;
 			}
 
 			// Shared state.
-			Rain::Networking::Smtp::Mailbox smtpForward(
-				smtpForwardStr);
 			std::atomic_bool echo{false};
 			std::time_t time{std::chrono::system_clock::to_time_t(
 				std::chrono::system_clock::now())};
@@ -96,10 +85,8 @@ int main(int argc, char const *argv[]) {
 				return new Emilia::Smtp::Server(
 					{"", smtpPort},
 					echo,
-					smtpForward,
 					smtpPassword,
 					smtpSerializeFile,
-					smtpLoopbackAddress,
 					smtpMaildir);
 			};
 			std::unique_ptr<Emilia::Smtp::Server> smtpServer(
@@ -153,8 +140,6 @@ int main(int argc, char const *argv[]) {
 						<< "trigger outbox: Forces a send of any "
 							 "PENDING envelopes, even "
 							 "if they are scheduled in the future.\n"
-						<< "modify forward: Modify SMTP forwarding "
-							 "address.\n"
 						<< "modify password: Modify SMTP "
 							 "authentication password.\n"
 						<< "toggle echo: Toggles echoing of all parsed "
@@ -253,11 +238,6 @@ int main(int argc, char const *argv[]) {
 					smtpServer->outboxEv.notify_one();
 					std::cout << "Triggered outbox send event."
 										<< std::endl;
-				} else if (command == "modify forward") {
-					std::cout << "Modified SMTP forward: ";
-					std::getline(std::cin, smtpForwardStr);
-					smtpForward = smtpForwardStr;
-					std::cout << "Modified." << std::endl;
 				} else if (command == "modify password") {
 					std::cout << "Modified SMTP password: ";
 					std::getline(std::cin, smtpPassword);
