@@ -285,39 +285,43 @@ namespace Emilia::Smtp {
 		// Push the new envelopes to the outbox for the Server
 		// to send.
 		for (Mailbox const &rcptMailbox : this->rcptTo) {
-			// Local copy: undo SMTP DATA framing. The outbox
-			// copies keep the terminator for forwarding.
-			std::ifstream in(dataPath, std::ios::binary);
-			std::ofstream out(
-				std::filesystem::path(this->server.maildir) /
-					"new" / dataPath.filename(),
-				std::ios::binary);
-			// We need to un-stuff here for a valid mail file for
-			// maildir.
-			for (std::string line; std::getline(in, line);) {
-				bool const crlf{
-					!line.empty() && line.back() == '\r'};
-				if (crlf) {
-					line.pop_back();
-				}
-				// Real "." lines arrive dot-stuffed as "..",
-				// so a bare "." is always the terminator.
-				if (line == ".") {
-					break;
-				}
-				// Un-stuff one leading ".".
-				if (!line.empty() && line[0] == '.') {
-					line.erase(0, 1);
-				}
-				out << line;
-				if (crlf || !in.eof()) {
-					out << "\r\n";
-				}
-			}
-
 			// If the envelope is addressed to any address
-			// @gilgamesh.cc, we are done.
+			// @gilgamesh.cc, un-stuff it, save it, and we are
+			// done. Otherwise, queue it for send.
 			if (rcptMailbox.host.node == "gilgamesh.cc") {
+				// Local copy: undo SMTP DATA framing. The outbox
+				// copies keep the terminator for forwarding.
+				std::ifstream in(dataPath, std::ios::binary);
+				std::ofstream out(
+					std::filesystem::path(this->server.maildir) /
+						"new" / dataPath.filename(),
+					std::ios::binary);
+				// We need to un-stuff here for a valid mail file
+				// for maildir.
+				for (std::string line; std::getline(in, line);) {
+					bool const crlf{
+						!line.empty() && line.back() == '\r'};
+					if (crlf) {
+						line.pop_back();
+					}
+					// Real "." lines arrive dot-stuffed as "..",
+					// so a bare "." is always the terminator.
+					if (line == ".") {
+						break;
+					}
+					// Un-stuff one leading ".".
+					if (!line.empty() && line[0] == '.') {
+						line.erase(0, 1);
+					}
+					out << line;
+					if (crlf || !in.eof()) {
+						out << "\r\n";
+					}
+				}
+
+				std::cout << "Received " << this->mailFrom.value()
+									<< " > " << rcptMailbox << '.'
+									<< std::endl;
 				continue;
 			}
 
