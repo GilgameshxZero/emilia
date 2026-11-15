@@ -1,7 +1,8 @@
 // Subclasses Rain::Networking::Http specializations for
 // custom HTTP server.
-#include <../rain/build/version.hpp>
 #include <rain.hpp>
+
+#include <../rain/build/version.hpp>
 
 #include <../build/version.hpp>
 #include <http.hpp>
@@ -123,10 +124,10 @@ namespace Emilia::Http {
 		static std::random_device randomDevice;
 		static std::independent_bits_engine<
 			std::mt19937,
-			std::numeric_limits<unsigned char>::digits,
-			unsigned char>
+			std::numeric_limits<uint32_t>::digits,
+			uint32_t>
 			independentBitsEngine(randomDevice());
-		std::array<unsigned char, 16> randomBytes;
+		std::array<uint32_t, 4> randomBytes;
 		// Important to pass with std::ref so that the IBE is
 		// modified.
 		std::generate(
@@ -134,8 +135,10 @@ namespace Emilia::Http {
 			randomBytes.end(),
 			std::ref(independentBitsEngine));
 		// Fix bytes in UUIDv4.
-		randomBytes[6] = (randomBytes[6] & 0x0F) | 0x40;
-		randomBytes[8] = (randomBytes[8] & 0x3F) | 0x80;
+		randomBytes[1] =
+			(randomBytes[1] & 0xFFFF0FFFu) | 0x00004000u;
+		randomBytes[2] =
+			(randomBytes[2] & 0x3FFFFFFFu) | 0x80000000u;
 
 		std::stringstream ss;
 		ss

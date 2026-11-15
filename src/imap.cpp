@@ -1,4 +1,3 @@
-#include <../rain/build/version.hpp>
 #include <rain.hpp>
 
 #include <imap.hpp>

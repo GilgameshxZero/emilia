@@ -1,8 +1,8 @@
 // Subclasses Rain::Networking::Smtp specializations for
 // custom SMTP server.
-#include <../rain/build/version.hpp>
-#include <chrono>
 #include <rain.hpp>
+
+#include <../rain/build/version.hpp>
 
 #include <smtp.hpp>
 
@@ -92,7 +92,7 @@ namespace Emilia::Smtp {
 		// can only send to the domain.
 		if (
 			this->authenticated ||
-			mailbox.host == "gilgamesh.cc") {
+			mailbox.host == Host("gilgamesh.cc")) {
 			return SuperWorker::onRcptMailbox(mailbox);
 		}
 		return {{StatusCode::AUTHENTICATION_REQUIRED}};
@@ -275,9 +275,11 @@ namespace Emilia::Smtp {
 					continue;
 				}
 				deliverDelay = max(
-					std::chrono::system_clock::from_time_t(
-						std::mktime(&tm)) -
-						std::chrono::system_clock::now(),
+					std::chrono::duration_cast<
+						std::chrono::steady_clock::duration>(
+						std::chrono::system_clock::from_time_t(
+							std::mktime(&tm)) -
+						std::chrono::system_clock::now()),
 					deliverDelay);
 			}
 		}
