@@ -370,13 +370,13 @@ namespace Emilia::Smtp {
 		// match. Only one user knows the password, and they can
 		// auth as anyone they want.
 		using namespace Rain::Literal;
-		std::this_thread::sleep_for(1s);
 		if (
 			!this->server.smtpPassword.empty() &&
 			this->server.smtpPassword == password) {
 			this->authenticated = true;
 			return {{StatusCode::AUTHENTICATION_SUCCEEDED}};
 		}
+		std::this_thread::sleep_for(1s);
 		return {{StatusCode::AUTHENTICATION_INVALID}};
 	}
 
