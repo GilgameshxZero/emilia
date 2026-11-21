@@ -501,7 +501,8 @@ namespace Emilia::Smtp {
 									}
 								}
 								client.send(
-									{Command::EHLO, "gilgamesh.cc"});
+									{Command::EHLO,
+										"gilgamesh-58.gilgamesh.cc"});
 								{
 									auto res = client.recv();
 									if (
