@@ -81,7 +81,7 @@ namespace Emilia::Smtp {
 		// limit against domain mailboxes.
 		if (
 			this->authenticated ||
-			mailbox.host != "gilgamesh.cc") {
+			mailbox.host != Host("gilgamesh.cc")) {
 			return SuperWorker::onMailMailbox(mailbox);
 		}
 		return {{StatusCode::AUTHENTICATION_REQUIRED}};
@@ -257,40 +257,13 @@ namespace Emilia::Smtp {
 			}
 		}
 
-		// Interpret the X-Emilia-Deliver-After header for
-		// scheduled sends.
-		std::chrono::steady_clock::duration deliverDelay{};
-		{
-			std::ifstream dataFile(dataPath, std::ios::binary);
-			for (
-				std::string line; std::getline(dataFile, line);) {
-				if (
-					line.substr(0, 23) != "X-Emilia-Deliver-After:") {
-					continue;
-				}
-				std::tm tm;
-				std::istringstream iss{line.substr(23)};
-				iss >> std::get_time(&tm, "%Y-%m-%dT%H:%M:%SZ");
-				if (iss.fail()) {
-					continue;
-				}
-				deliverDelay = max(
-					std::chrono::duration_cast<
-						std::chrono::steady_clock::duration>(
-						std::chrono::system_clock::from_time_t(
-							std::mktime(&tm)) -
-						std::chrono::system_clock::now()),
-					deliverDelay);
-			}
-		}
-
 		// Push the new envelopes to the outbox for the Server
 		// to send.
 		for (Mailbox const &rcptMailbox : this->rcptTo) {
 			// If the envelope is addressed to any address
 			// @gilgamesh.cc, un-stuff it, save it, and we are
 			// done. Otherwise, queue it for send.
-			if (rcptMailbox.host.node == "gilgamesh.cc") {
+			if (rcptMailbox.host == Host("gilgamesh.cc")) {
 				// Local copy: undo SMTP DATA framing. The outbox
 				// copies keep the terminator for forwarding.
 				std::ifstream in(dataPath, std::ios::binary);
@@ -341,7 +314,7 @@ namespace Emilia::Smtp {
 			this->server.outbox.emplace(
 				Envelope::Status::PENDING,
 				0,
-				std::chrono::steady_clock::now() + deliverDelay,
+				std::chrono::steady_clock::now(),
 				this->mailFrom.value(),
 				rcptMailbox,
 				envelopeDataPath);
